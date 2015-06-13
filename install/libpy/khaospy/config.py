@@ -1,0 +1,1 @@
+#khaospy.config
