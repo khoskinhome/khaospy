@@ -21,6 +21,16 @@
 ./install/libpy/khaospy/pi2cMultiLightSingleWayManual.py
 ./install/libpy/khaospy/pi2cSingleLightTwoWayManual.py
 
+./install/libpy/khaospy/pi2cBoilerRadiator.py
+
+./install/libpy/khaospy/piOneWireTemperatureSensor.py
+
+#### ./install/libpy/khaospy/pi2cTSL2561LightSensor.py ## not sure about the light sensor I have.
+
+./install/libpy/khaospy/pi2cDoorWindowSwitch.py
+
+./install/libpy/khaospy/pi2cPIRSwitch.py
+
 ./install/libpy/khaospy/utils.py
 
 ./install/libpy/khaospy/i2cPort.py
