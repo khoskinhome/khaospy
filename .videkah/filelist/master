@@ -11,6 +11,7 @@
 ./install/bin
 
 ./install/libpy/test.py
+./install/libpy/testhack.py
 
 ./install/libpy/khaospy-daemon.py
 
@@ -22,23 +23,30 @@ DEVICE = 0x20
 ./install/libpy/khaospy/
 ./install/libpy/khaospy/__init__.py
 
-./install/libpy/khaospy/pi2cMultiLightSingleWayManual.py
-./install/libpy/khaospy/pi2cSingleLightTwoWayManual.py
+./install/libpy/khaospy/mcp23017MultiLightSingleWayManual.py
+./install/libpy/khaospy/mcp23017SingleLightTwoWayManual.py
 
-./install/libpy/khaospy/pi2cBoilerRadiator.py
+./install/libpy/khaospy/mcp23017BoilerRadiator.py
 
 ./install/libpy/khaospy/piOneWireTemperatureSensor.py
 
 #### ./install/libpy/khaospy/pi2cTSL2561LightSensor.py ## not sure about the light sensor I have.
 
-./install/libpy/khaospy/pi2cDoorWindowSwitch.py
+./install/libpy/khaospy/mcp23017DoorWindowSwitch.py
 
-./install/libpy/khaospy/pi2cPIRSwitch.py
+./install/libpy/khaospy/mcp23017PIRSwitch.py
+
+
+
 
 ./install/libpy/khaospy/utils.py
 
 ./install/libpy/khaospy/i2cPort.py
 ./install/libpy/khaospy/i2cPortCollection.py
+
+
+./install/libpy/khaospy/mcp23017.py:1:  # has all the mcp23017 ports running on a pi. not just one chip.
+./install/libpy/khaospy/mcp23017Port.py
 
 ./install/libpy/khaospy/oneWirePort.py
 ./install/libpy/khaospy/oneWirePortCollection.py

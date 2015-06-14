@@ -1,7 +1,7 @@
 """
-khaospy.pi2cBoilerRadiator
+khaospy.mcp23017BoilerRadiator
 is going to be very similar to
-khaospy.pi2cMultiLightSingleWayManual
+khaospy.mcp23017MultiLightSingleWayManual
 
 They are both solving a similar problem.
 

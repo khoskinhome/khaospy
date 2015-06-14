@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
-# ./install/libpy/khaospy/pi2cMultiLightSingleWayManual.py
-import khaospy.pi2cMultiLightSingleWayManual
+# ./install/libpy/khaospy/mcp23017MultiLightSingleWayManual.py
+import khaospy.mcp23017MultiLightSingleWayManual
 
-# ./install/libpy/khaospy/pi2cSingleLightTwoWayManual.py
-import khaospy.pi2cSingleLightTwoWayManual
+# ./install/libpy/khaospy/mcp23017SingleLightTwoWayManual.py
+import khaospy.mcp23017SingleLightTwoWayManual
 
 # ./install/libpy/khaospy/utils.py
 import khaospy.utils
@@ -21,11 +21,11 @@ import khaospy.config
 
 
 def run():
-    mlsw = khaospy.pi2cMultiLightSingleWayManual.Device()
+    mlsw = khaospy.mcp23017MultiLightSingleWayManual.Device()
     mlsw.getSwitchMainsState()
 
-    ## ./install/libpy/khaospy/pi2cSingleLightTwoWayManual.py
-    sltw = khaospy.pi2cSingleLightTwoWayManual.Device()
+    ## ./install/libpy/khaospy/mcp23017SingleLightTwoWayManual.py
+    sltw = khaospy.mcp23017SingleLightTwoWayManual.Device()
 
     sltw.pollMainsDetector()
 

@@ -3,7 +3,10 @@
 
 if [[ ! $1 ]]; then
 
-    PIHOST=pimain
+    echo "you need to feed this script with either pimain, piloft , piold or pioldwifi"
+    exit 1
+
+#    PIHOST=pimain
 
 else
     PIHOST=$1
