@@ -12,6 +12,10 @@
 
 ./install/libpy/test.py
 
+./install/libpy/khaospy-daemon.py
+
+DEVICE = 0x20
+
 ./install/libpy/khaospy/daemon.py
 
 

@@ -1,10 +1,18 @@
 #!/bin/bash
 
-PIHOST=192.168.1.9
+
+if [[ ! $1 ]]; then
+
+    PIHOST=pimain
+
+else
+    PIHOST=$1
+fi
 
 USER=khoskin
 
 PI_INSTALL_DIR=/opt/khaospy
+
 
 ssh $USER@$PIHOST "if [ ! -d $PI_INSTALL_DIR ] ; then sudo mkdir -p $PI_INSTALL_DIR; fi;"
 
@@ -23,10 +31,12 @@ if [ ! -d install ]; then
 
 fi
 
-echo "Install !"
+echo "#############################################################"
+echo "installing to $USER@$PIHOST:$PI_INSTALL_DIR"
+echo "#############################################################"
 
 cd ./install
 
-tar zcvf - ./ | ssh $USER@$PIHOST "( cd $PI_INSTALL_DIR ; sudo tar zxvf - )"
+tar zcf - ./ | ssh $USER@$PIHOST "( cd $PI_INSTALL_DIR ; sudo tar zxvf - )"
 
 
