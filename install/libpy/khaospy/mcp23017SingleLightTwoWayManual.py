@@ -13,7 +13,8 @@ TwoWayManual means that the manual switch that controls the circuit is a two way
 
 # In the following file "Mains" == 240v Mains ( i.e. not low voltage )
 
-import khaospyUtils
+import khaospy.utils
+import khaospy.exception
 
 class Device(object):
 
@@ -22,7 +23,7 @@ class Device(object):
 
     def getSwitchMainsState(self) :
         # throws an error.
-        raise khaospyUtils.Kaboom("mcp23017SingleLightTwoWayManual cannot getSwitchMainsState")
+        raise khaospy.exception.Kaboom("mcp23017SingleLightTwoWayManual cannot getSwitchMainsState")
 
     def getSwitchExtraState(self) :
         # returns the state of the extra low voltage switch. ( on(true) or off(false) )

@@ -9,11 +9,11 @@ import khaospy.mcp23017SingleLightTwoWayManual
 # ./install/libpy/khaospy/utils.py
 import khaospy.utils
 
-# ./install/libpy/khaospy/i2cPort.py
-import khaospy.i2cPort
+# ./install/libpy/khaospy/mcp23017Port.py
+import khaospy.mcp23017Port
 
-# ./install/libpy/khaospy/i2cPortCollection.py
-import khaospy.i2cPortCollection
+# ./install/libpy/khaospy/mcp23017PortsCollection.py
+import khaospy.mcp23017PortsCollection
 
 # ./install/libpy/khaospy/config.py
 import khaospy.config
