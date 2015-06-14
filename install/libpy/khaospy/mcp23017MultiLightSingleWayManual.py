@@ -1,5 +1,4 @@
 #./install/libpy/khaospy/mcp23017MultiLightSingleWayManual.py
-#./install/libpy/test.py
 
 """
 mcp23017MultiLightSingleWayManual is a very long name.
@@ -11,11 +10,12 @@ MultiLight means that multiple lights can be individually controlled
 SingleWayManual means that the manual switch that controls the circuit is a single way. You need to look at the wiring diagram to understand this.
 
 """
+import khaospy
+from khaospy import devb
+from khaospy import exception
 
-class Device(object):
-
-#    def __init__(self) :
-#        return
+class Device(khaospy.devb.Base):
+    #class Device(object):
 
     def getSwitchMainsState(self) :
         # returns the state of the mains voltage switch.  ( on(true) or off(false) )

@@ -1,25 +1,27 @@
-"""
-mcp23017SingleLightTwoWayManual is a very long name.
-
-mcp23017 means this device is interfaced with the Raspberry Pi via an MCP23017 chip
-
-SingleLight means that a single Lighting circuit is controlled. You can have more than one light on the circuit, but there is just one two way lighting circuit that controls all the lights.
-
-TwoWayManual means that the manual switch that controls the circuit is a two way. You need to look at the wiring diagram to understand this.
-
-"""
 #./install/libpy/khaospy/mcp23017SingleLightTwoWayManual.py
-#./install/libpy/test.py
 
-# In the following file "Mains" == 240v Mains ( i.e. not low voltage )
+#from khaospy import oneWirePort, mcp23017DoorWindowSwitch, mcp23017PIRSwitch, mcp23017MultiLightSingleWayManual, kdevice, oneWirePortsCollection, config, mcp23017, daemon, mcp23017BoilerRadiator, factory, exception, Factory, oneWireTemperatureSensor, mcp23017SingleLightTwoWayManual, utils
 
-import khaospy.utils
-import khaospy.exception
+import khaospy
+from khaospy import devb
+from khaospy import exception
 
-class Device(object):
+class Device(khaospy.devb.Base):
+    #iclass Device(object):
+    """
+    mcp23017SingleLightTwoWayManual is a very long name.
 
-    def __init__(self) :
-        return
+    mcp23017 means this device is interfaced with the Raspberry Pi via an MCP23017 chip
+
+    SingleLight means that a single Lighting circuit is controlled.
+    You can have more than one light on the circuit,
+    but there is just one two way lighting circuit that controls all the lights.
+
+    TwoWayManual means that the manual switch that controls the circuit is a two way.
+    You need to look at the wiring diagram to understand this.
+
+    In the method names "Mains" == 240v Mains ( i.e. not low voltage )
+    """
 
     def getSwitchMainsState(self) :
         # throws an error.

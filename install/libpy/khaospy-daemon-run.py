@@ -1,7 +1,10 @@
 #!/usr/bin/python
 
-#./install/libpy/khaospy/daemon.py
-import khaospy.daemon
+#daemon,
+
+import khaospy
+
+from khaospy import daemon
 
 khaospy.daemon.run()
 

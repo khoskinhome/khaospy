@@ -21,6 +21,8 @@
 ./install/libpy/test.py
 ./install/libpy/testhack.py
 ./install/libpy/testgethostname.py
+./install/libpy/testjsonconf.py
+./install/libpy/test.py
 
 
 ####
@@ -29,11 +31,11 @@
 
 ### DEVICE = 0x20
 
-./install/libpy/khaospy/
+#./install/libpy/khaospy/
 ./install/libpy/khaospy/__init__.py
 
 ./install/libpy/khaospy/daemon.py
-./install/libpy/khaospy/config.py
+## ./install/libpy/khaospy/config.py
 ./install/libpy/khaospy/utils.py
 ./install/libpy/khaospy/exception.py
 
@@ -41,8 +43,13 @@
 ## mcp23017 intefaced devices :
 #############
 
-./install/libpy/khaospy/mcp23017.py
+./install/libpy/khaospy/factory.py
 
+./install/libpy/khaospy/devf.py
+
+./install/libpy/khaospy/devb.py
+
+./install/libpy/khaospy/mcp23017.py
 
 ./install/libpy/khaospy/mcp23017MultiLightSingleWayManual.py
 ./install/libpy/khaospy/mcp23017SingleLightTwoWayManual.py
@@ -72,6 +79,9 @@
 ##############################################################################
 
 ./install/docs
+
+./install/docs/dependencies.txt
+
 
 ##############################################################################
 ./install/hackingpython/

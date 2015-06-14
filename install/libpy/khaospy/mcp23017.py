@@ -24,7 +24,7 @@ class port(object):
 
 class collection(object):
     """
-    Has all the mcp23017 ports, on all the mcp23017 chips.
+    Has all the mcp23017 ports, on all the mcp23017 chips. ( using the mcp23017.port class )
 
     One Raspberry Pi can support up to 8 MCP23017 chips with i2cAddresses in
     the range of 0x20 -> 0x27

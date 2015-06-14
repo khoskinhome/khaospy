@@ -262,7 +262,7 @@ my $json = JSON->new->allow_nonref;
 
 for my $ha_device ( keys %$conf ) { # ha = home auto
 
-    burp ( "${config_dir}/${ha_device}.cfg" , $json->pretty->encode( $conf->{$ha_device} ));
+    burp ( "${config_dir}/${ha_device}.json" , $json->encode( $conf->{$ha_device} ));
 
 }
 
