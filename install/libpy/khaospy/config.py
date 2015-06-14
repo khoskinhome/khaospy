@@ -3,4 +3,17 @@
 """
 reads in the config, usually found in /opt/khaospy/
 
+
+
+
 """
+
+
+"""
+
+read in the 
+
+"""
+
+def 
+

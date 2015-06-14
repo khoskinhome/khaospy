@@ -2,22 +2,32 @@
 
 ./install/
 
-./install/www
+##############################################################################
+# ./install/www
 
-./install/conf
+##############################################################################
+# ./install/conf
 
-./install/www-bin
+##############################################################################
+# ./install/www-bin
 
-./install/bin
+##############################################################################
+# ./install/bin
 
+##############################################################################
+# libpy .......
+
+## hacky test scripts :
 ./install/libpy/test.py
 ./install/libpy/testhack.py
+./install/libpy/testgethostname.py
+
+
+####
 
 ./install/libpy/khaospy-daemon-run.py
 
 ### DEVICE = 0x20
-
-
 
 ./install/libpy/khaospy/
 ./install/libpy/khaospy/__init__.py
@@ -30,8 +40,9 @@
 ##############################
 ## mcp23017 intefaced devices :
 #############
-./install/libpy/khaospy/mcp23017PortsCollection.py:1:  # has all the mcp23017 ports running on a pi. not just one chip.
-./install/libpy/khaospy/mcp23017Port.py
+
+./install/libpy/khaospy/mcp23017.py
+
 
 ./install/libpy/khaospy/mcp23017MultiLightSingleWayManual.py
 ./install/libpy/khaospy/mcp23017SingleLightTwoWayManual.py
@@ -58,16 +69,23 @@
 
 ###############################
 
+##############################################################################
 
 ./install/docs
 
+##############################################################################
 ./install/hackingpython/
 
 
+##############################################################################
 ./install/hackingpython/read.json.py
 
 
+##############################################################################
 ./perl-port/stdout-json-cfg.pl
 
 
+##############################################################################
 install-to-pi.bash
+
+

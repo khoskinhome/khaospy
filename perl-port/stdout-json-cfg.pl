@@ -16,7 +16,7 @@ my $conf = {
 
     amelialight => {
         HomeAutoClass       => "khaospy.mcp23017MultiLightSingleWayManual.Device",
-        MachineIPAddress    => "192.168.1.8",
+        Hostname            => "piloft", # => "192.168.1.8",
 
         ChangeOver => { # formerly amelia_light_change_over
             enabled         => 1,
@@ -149,7 +149,7 @@ my $conf = {
 
     bathroomlight => {
         HomeAutoClass       => "khaospy.mcp23017SingleLightTwoWayManual.Device",
-        MachineIPAddress    => "192.168.1.8",
+        Hostname            => "piloft", # "192.168.1.8",
 
         ChangeOver => { # formerly bathroom_light_change_over. relay-1 on pcb.
             enabled         => 1,
@@ -200,7 +200,7 @@ my $conf = {
 
     testbedlight => {
         HomeAutoClass       => "khaospy.mcp23017MultiLightSingleWayManual.Device",
-        MachineIPAddress    => "192.168.1.10",
+        Hostname            => "piold", # 192.168.1.10,
 
         ChangeOver => { # relay-1 on pcb # changeover # white-signal-wire
             enabled         => 1,
@@ -236,7 +236,6 @@ my $conf = {
             current_state   => 1, # gets set by prog
 
         },
-
 
         Lights => [
             {  # relay-2 on pcb # light-auto-on-off # blue-signal-wire

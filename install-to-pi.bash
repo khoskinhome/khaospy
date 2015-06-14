@@ -40,6 +40,9 @@ echo "#############################################################"
 
 cd ./install
 
+
+chmod 755 ./libpy/*.py
+
 tar zcf - ./ | ssh $USER@$PIHOST "( cd $PI_INSTALL_DIR ; sudo tar zxvf - )"
 
 
