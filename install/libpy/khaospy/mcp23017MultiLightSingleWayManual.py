@@ -17,6 +17,11 @@ from khaospy import exception
 class Device(khaospy.deviceb.Base):
     #class Device(object):
 
+    def __init__(self,deviceConfig):
+        print "mcp23017MultiLightSingleWayManual __init__"
+        super (Device, self).__init__(deviceConfig)
+        self.addMCP20317Ports()
+
     def getSwitchMainsState(self) :
         # returns the state of the mains voltage switch.  ( on(true) or off(false) )
         print ("mcp23017MultiLightSingleWayManual.getSwitchMainsState")

@@ -22,6 +22,10 @@ class Device(khaospy.deviceb.Base):
 
     In the method names "Mains" == 240v Mains ( i.e. not low voltage )
     """
+    def __init__(self,deviceConfig):
+        print "mcp23017MultiLightSingleWayManual __init__"
+        super (Device, self).__init__(deviceConfig)
+        self.addMCP20317Ports()
 
     def getSwitchMainsState(self) :
         # throws an error.

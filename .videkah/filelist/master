@@ -47,7 +47,6 @@
 
 ./install/libpy/khaospy/devicec.py
 
-
 ./install/libpy/khaospy/deviceb.py
 
 ./install/libpy/khaospy/mcp23017.py
@@ -70,8 +69,7 @@
 ###############################
 ## oneWire interface devices :
 
-./install/libpy/khaospy/oneWirePort.py
-./install/libpy/khaospy/oneWirePortsCollection.py
+./install/libpy/khaospy/oneWire.py
 
 ./install/libpy/khaospy/oneWireTemperatureSensor.py
 

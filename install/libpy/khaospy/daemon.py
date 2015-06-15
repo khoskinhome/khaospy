@@ -61,7 +61,7 @@ class Runner(object):
 
             print ( "######################" )
             if cls.hostname != config["Hostname"] :
-                print ( "Device %s is on host %s (not this host) )" % ( deviceName , config["Hostname"] ) )
+                print ( "Device %s is on host %s (not this host)" % ( deviceName , config["Hostname"] ) )
             else :
                 print ( "Device %s is a %s" % ( deviceName , config["HomeAutoClass"]))
 

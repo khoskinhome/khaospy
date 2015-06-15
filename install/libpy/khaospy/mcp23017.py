@@ -32,11 +32,14 @@ class collection(object):
 
     # a collection of mcp23017 ports on one or more mcp23017 chips.
 
-    def poll():
+    @classmethod
+    def poll(cls):
         """
         polls all the ports, which means :
         outputs are pushed to the MCP23017 chip(s)
         inputs  are got from the MCP23017 chip(s)
         """
 
-
+    @classmethod
+    def addPorts(cls, deviceConfig):
+        print ( "addPorts called with " + deviceConfig )
