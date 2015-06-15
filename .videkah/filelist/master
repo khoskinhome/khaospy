@@ -43,11 +43,9 @@
 ## mcp23017 intefaced devices :
 #############
 
-./install/libpy/khaospy/factory.py
-
 ./install/libpy/khaospy/devicef.py
 
-./install/libpy/khaospy/devcollection.py
+./install/libpy/khaospy/devicec.py
 
 
 ./install/libpy/khaospy/deviceb.py

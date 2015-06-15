@@ -6,6 +6,7 @@ import khaospy
 
 from khaospy import daemon
 
-khaospy.daemon.run()
+khaospy.daemon.Runner.run()
+#./install/libpy/khaospy/daemon.py
 
 
