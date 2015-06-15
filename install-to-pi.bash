@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 
 if [[ ! $1 ]]; then
@@ -15,9 +15,6 @@ fi
 USER=khoskin
 
 PI_INSTALL_DIR=/opt/khaospy
-
-
-ssh $USER@$PIHOST "if [ ! -d $PI_INSTALL_DIR ] ; then sudo mkdir -p $PI_INSTALL_DIR; fi;"
 
 # sanity checks to make sure we're in the correct place :
 if [ ! -f install-to-pi.bash ]; then
@@ -42,6 +39,11 @@ cd ./install
 
 
 chmod 755 ./libpy/*.py
+
+ssh $USER@$PIHOST "if [ ! -d $PI_INSTALL_DIR ] ; then sudo mkdir -p $PI_INSTALL_DIR; fi;"
+
+# make sure old files aren't hanging around , just to break things like pyc's can when the main py has been renamed :
+ssh $USER@$PIHOST "rm \`find $PI_INSTALL_DIR | egrep \"\\.p(y|yc)$\"\`"
 
 tar zcf - ./ | ssh $USER@$PIHOST "( cd $PI_INSTALL_DIR ; sudo tar zxvf - )"
 
