@@ -7,7 +7,7 @@ import os
 import socket
 
 import khaospy
-from khaospy import devf
+from khaospy import devicef
 
 confdir ='/opt/khaospy/conf/'
 
@@ -76,7 +76,7 @@ def buildAllFromConfig():
             # TODO need to remove ".json" from filename before it gets passes as the deviceName
             config["DeviceName"] = filename
 
-            blah = khaospy.devf.factory( config )
+            blah = khaospy.devicef.factory( config )
 
             ##pprint ( config )
 

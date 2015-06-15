@@ -11,10 +11,10 @@ SingleWayManual means that the manual switch that controls the circuit is a sing
 
 """
 import khaospy
-from khaospy import devb
+from khaospy import deviceb
 from khaospy import exception
 
-class Device(khaospy.devb.Base):
+class Device(khaospy.deviceb.Base):
     #class Device(object):
 
     def getSwitchMainsState(self) :

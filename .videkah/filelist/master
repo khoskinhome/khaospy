@@ -45,9 +45,12 @@
 
 ./install/libpy/khaospy/factory.py
 
-./install/libpy/khaospy/devf.py
+./install/libpy/khaospy/devicef.py
 
-./install/libpy/khaospy/devb.py
+./install/libpy/khaospy/devcollection.py
+
+
+./install/libpy/khaospy/deviceb.py
 
 ./install/libpy/khaospy/mcp23017.py
 

@@ -3,10 +3,10 @@
 #from khaospy import oneWirePort, mcp23017DoorWindowSwitch, mcp23017PIRSwitch, mcp23017MultiLightSingleWayManual, kdevice, oneWirePortsCollection, config, mcp23017, daemon, mcp23017BoilerRadiator, factory, exception, Factory, oneWireTemperatureSensor, mcp23017SingleLightTwoWayManual, utils
 
 import khaospy
-from khaospy import devb
+from khaospy import deviceb
 from khaospy import exception
 
-class Device(khaospy.devb.Base):
+class Device(khaospy.deviceb.Base):
     #iclass Device(object):
     """
     mcp23017SingleLightTwoWayManual is a very long name.
