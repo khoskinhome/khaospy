@@ -4,7 +4,7 @@ from pprint import pprint
 import khaospy
 from khaospy import devicef
 
-class Collection(object):
+class collection(object):
     """
     collection of devices
     """
@@ -21,3 +21,8 @@ class Collection(object):
         for d in cls.allDevices:
             pprint ( cls.allDevices[d].getConfig() )
 
+
+    @classmethod
+    def pollAll(cls):
+        print ( "Device Collection poll All devices ")
+        #TODO write this

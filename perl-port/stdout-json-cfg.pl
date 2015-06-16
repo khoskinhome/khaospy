@@ -13,6 +13,9 @@ my $i2cbus = {
     testautomationlight => 0, # on an original pi . hence bus 0
 };
 
+# The DeviceNames must only have ASCII AlphaNumerals in them. No dots or other punctuation marks.
+# i.e. in perl regex terms of a character class  [a-zA-Z0-9] 
+
 my $conf = {
 
     amelialight => {

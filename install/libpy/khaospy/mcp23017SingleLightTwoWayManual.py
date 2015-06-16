@@ -25,52 +25,98 @@ class Device(khaospy.deviceb.Base):
     def __init__(self,deviceConfig):
         print "mcp23017MultiLightSingleWayManual __init__"
         super (Device, self).__init__(deviceConfig)
-        self.addMCP20317Ports()
 
-    def getSwitchMainsState(self) :
-        # throws an error.
-        raise khaospy.exception.Kaboom("mcp23017SingleLightTwoWayManual cannot getSwitchMainsState")
+    def addPortsFromConfig(self):
+        """
+        # here we know the correct type of ports to add.
+        """
+        #TODO write this
 
     def getSwitchExtraState(self) :
-        # returns the state of the extra low voltage switch. ( on(true) or off(false) )
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        Returns the state of the extra low voltage switch. ( on(true) or off(false) )
+        """
         print ("mcp23017SingleLightTwoWayManual.getSwitchExtraState")
+        #TODO write this
         return False
 
-    def pollMainsDetector(self):
+
+    def getMainsDetector(self):
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        This is the state of the 240v detector.
+        In this circuit it is also the getCircuitState() ( look at the wiring diagram )
+        """
+        #TODO write this
         print ("mcp23017SingleLightTwoWayManual.pollMainsDetector")
         return True;
 
-#    def pollSwitchAndToggle(self) :
-#        # polls the state of Li
-#        print ("mcp23017SingleLightTwoWayManual.pollSwitchAndToggle")
-#        return False
 
-#    def areLightsMainlyOn(self) :
-#        # should this be called "isLightsMainlyOn" ? that sounds wrong to me.
-#        # returns True or False. If 5 lights out of a possible 9 are "ON" this returns True. If 4 lights out of a possible 9 are "ON" this method returns False.
-#        print ("mcp23017SingleLightTwoWayManual.areLightsMainlyOn")
-#        return False
-
-    # if the list-of-lights isn't defined in the following method calls, the default is ALL lights.
-
-    def getLightState ( self ) :
-        # returns an the state of the Light ( on(true) or off(false) ) . This is what the 240v-detector detects
+    def getCircuitState ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        Returns whether a circuit is on or off.
+        In this case that is a single lighting circuit.
+        In this class it is the same as the getMainsDetector() ( look at the wiring diagram )
+        """
+        #TODO write this
         print ("mcp23017SingleLightTwoWayManual.getLightState" )
         return False
 
-    def setLightOn ( self ) :
-        print ("mcp23017SingleLightTwoWayManual.setLightOn")
+    def setOn ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setOn")
         return False
 
-    def setLightOff ( self ) :
-        print ("mcp23017SingleLightTwoWayManual.setLightOff")
+    def setOff ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setOff")
         return False
 
-    def setLightToggle ( self ) :
-        print ("mcp23017SingleLightTwoWayManual.setLightToggle")
+    def setToggle ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        Swaps light from current state. If light is on, this method switches it off
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setToggle")
         return False
-        #  ( swaps light from current state. if light is on, this method switches it off )
 
+    def setAutoOn ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        sets Automation on for this module.
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setAutoOn")
+        return False
 
+    def setAutoOff ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        sets Automation off for this module.
+        This also de-energises all the relays.
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setAutoOff")
+        return False
 
+    def pollInputsAndToggle(self) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        In this module it only polls the getSwitchExtraState() and if
+        the state of this switch has changed, then setToggle() will be called.
+        """
+        #TODO write this
+
+#    def getSwitchMainsState(self) :
+#        # throws an error.
+#        raise khaospy.exception.Kaboom("mcp23017SingleLightTwoWayManual cannot getSwitchMainsState")
 

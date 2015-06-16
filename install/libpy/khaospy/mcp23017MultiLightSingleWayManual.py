@@ -20,48 +20,169 @@ class Device(khaospy.deviceb.Base):
     def __init__(self,deviceConfig):
         print "mcp23017MultiLightSingleWayManual __init__"
         super (Device, self).__init__(deviceConfig)
-        self.addMCP20317Ports()
+
+    def addPortsFromConfig(self):
+        """
+        Call the addPort on the correct type of portsCollection
+
+        The multiLights in the array get flattened out to having a PortName of :
+
+            "DeviceName.Light[0]"
+        
+        """
+        #TODO write this
+
+    def getSwitchExtraState(self) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        Returns the state of the extra low voltage switch. ( on(true) or off(false) )
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.getSwitchExtraState")
+        return False
+
+    def getMainsDetector(self):
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        This is the state of the 240v detector.
+        In this circuit this is also the state of the mains switch ( look at the wiring diagram )
+        This method is a synonym for getSwitchMainsState(self) 
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.getMainsDetector")
+        return True;
+
+
+    def getCircuitState ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        Returns whether a circuit is on or off.
+        That is in fact a lie.
+        This returns a calculated value of how many lights are on.
+        This method is a synonym for areLightsMainlyOn(self)
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.getCircuitState" )
+        return False
+
+    def setOn ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        This will set all of the 1 or more Lighting circuits on.
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setOn")
+        return False
+
+    def setOff ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        This will set all of the 1 or more Lighting circuits off.
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setOff")
+        return False
+
+    def setToggle ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        Swaps light from current state. If light is on, this method switches it off
+        This will toggle all of the 1 or more Lighting circuits to the opposite state.
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setToggle")
+        return False
+
+    def setAutoOn ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        sets Automation on for this module.
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setAutoOn")
+        return False
+
+    def setAutoOff ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        sets Automation off for this module.
+        This also de-energises all the relays.
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setAutoOff")
+        return False
+
+    def pollInputsAndToggle(self) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        In this module it only polls the getSwitchExtraState() and if
+        the state of this switch has changed, then setToggle() will be called.
+        """
+        #TODO write this
+
+    ##########################################################
+    # methods specific to MultiLight 
+    ##########################################################
 
     def getSwitchMainsState(self) :
-        # returns the state of the mains voltage switch.  ( on(true) or off(false) )
+        """
+        Of the two light circuit arrangements only MultiLightsSingleWayManual
+        can detect the state of the Old-Manual-Mains-Wall-Switch.
+
+        Returns the state of the mains voltage switch.  ( on(true) or off(false) )
+        """
+        #TODO write this
         print ("mcp23017MultiLightSingleWayManual.getSwitchMainsState")
         return False
 
-    def getSwitchExtraState(self) :
-        # returns the state of the extra low voltage switch. ( on(true) or off(false) )
-        print ("mcp23017MultiLightSingleWayManual.getSwitchExtraState")
-        return False
-
-    def pollMainsDetector():
-        print ("mcp23017MultiLightSingleWayManual.pollMainsDetector")
-
-#    def pollSwitchAndToggle(self) :
-#        # polls the state of Li
-#        print ("mcp23017MultiLightSingleWayManual.pollSwitchAndToggle")
-#        return False
-
     def areLightsMainlyOn(self) :
-        # should this be called "isLightsMainlyOn" ? that sounds wrong to me.
-        # returns True or False. If 5 lights out of a possible 9 are "ON" this returns True. If 4 lights out of a possible 9 are "ON" this method returns False.
+        """
+        Only the MultiLightsSingleWayManual type of wiring needs to do a calculation
+        on whether more or less of the individual lamps are on.
+        ( this is used when "toggling" all lights.)
+
+        The return value is calculated using the relay states and the getMainsDetector state.
+
+        If the majority (or all) of the lights are "ON" this method returns True,
+        otherwise it returns False.
+        """
+        #TODO write this
         print ("mcp23017MultiLightSingleWayManual.areLightsMainlyOn")
         return False
 
-    # if the list-of-lights isn't defined in the following method calls, the default is ALL lights.
+    def getCircuitStateArray ( self ) :
+        """
+        returns an array with the calculated state of all the lights in the multiple circuits.
+        This is actually the state that the relay is in, and if necessary the getMainsDetector state is used. 
 
-    def getLightState ( self, list_of_lights ) :
-        # returns an array of 1 or more lights state ( on(true) or off(false) ) . This is a calculated value. ( not the 240v-detector-state ) .
-        print ("mcp23017MultiLightSingleWayManual.getLightState %r " % list_of_lights )
+        """
+        #TODO write this
+
+    def setOnArray ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        This will set all of the 1 or more Lighting circuits on.
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setOn")
         return False
 
-    def setLightOn ( self, list_of_lights ) :
-        print ("mcp23017MultiLightSingleWayManual.setLightOn")
+    def setOffArray ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        This will set all of the 1 or more Lighting circuits off.
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setOff")
         return False
 
-    def setLightOff ( self, list_of_lights ) :
-        print ("mcp23017MultiLightSingleWayManual.setLightOff")
+    def setToggleArray ( self ) :
+        """
+        Generic method on all Lighting-Power-Control-Module classes.
+        Swaps light from current state. If light is on, this method switches it off
+        This will toggle all of the 1 or more Lighting circuits to the opposite state.
+        """
+        #TODO write this
+        print ("mcp23017SingleLightTwoWayManual.setToggle")
         return False
 
-    def setLightToggle ( self, list_of_lights ) :
-        print ("mcp23017MultiLightSingleWayManual.setLightToggle")
-        return False
-        #  ( swaps light from current state. if light is on, this method switches it off )
