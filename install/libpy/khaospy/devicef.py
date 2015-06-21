@@ -12,6 +12,9 @@ from khaospy import mcp23017BoilerRadiator
 #
 ##### import khaospy.mcp23017TSL2561LightSensor ## not sure about the light sensor I have.
 #
+
+# all I need is an mcp23017AlarmSwitch. That'd cover window door or PIR
+
 ## ./install/libpy/khaospy/mcp23017DoorWindowSwitch.py
 from khaospy import mcp23017DoorWindowSwitch
 #
