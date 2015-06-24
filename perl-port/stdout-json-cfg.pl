@@ -18,6 +18,11 @@ my $i2cbus = {
 
 my $conf = {
 
+    'amelia-room-thermometer' => {
+        HomeAutoClass       => "khaospy.mcp23017MultiLightSingleWayManual.Device",
+        Hostname            => "piloft", # => "192.168.1.8",
+        OneWireAddress      => "28-02146329ceff",
+    },
     amelialight => {
         HomeAutoClass       => "khaospy.mcp23017MultiLightSingleWayManual.Device",
         Hostname            => "piloft", # => "192.168.1.8",

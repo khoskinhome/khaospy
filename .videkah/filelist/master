@@ -29,10 +29,14 @@
 
 ./install/libpy/khaospy-daemon-run.py
 
+./install/libpy/khaospy-one-wired-daemon.py
+./install/libpy/khaospy-one-wired-receiver-subscribe.py
 ### DEVICE = 0x20
 
 #./install/libpy/khaospy/
 ./install/libpy/khaospy/__init__.py
+
+
 
 ./install/libpy/khaospy/daemon.py
 ## ./install/libpy/khaospy/config.py
@@ -57,6 +61,8 @@
 ./install/libpy/khaospy/mcp23017BoilerRadiator.py
 
 #### ./install/libpy/khaospy/mcp23017TSL2561LightSensor.py ## not sure about the light sensor I have.
+
+./install/libpy/khaospy/mcp23017AlarmSwitch.py
 
 ./install/libpy/khaospy/mcp23017DoorWindowSwitch.py
 
@@ -83,18 +89,111 @@
 
 
 ##############################################################################
-./install/hackingpython/
-
-
-##############################################################################
-./install/hackingpython/read.json.py
-
-
-##############################################################################
 ./perl-port/stdout-json-cfg.pl
 
 
 ##############################################################################
 install-to-pi.bash
 
+##############################################################################
+./install/hackingpython/
+
+
+./install/hackingpython/redirect.py
+
+./install/hackingpython/wbk/webby.py
+./install/hackingpython/web-user.xml
+
+
+
+./install/hackingpython/os.json.py
+
+./install/hackingpython/generators.py
+./install/hackingpython/generators2.py
+./install/hackingpython/zip.py
+
+
+./install/hackingpython/zeromqkarl.py
+./install/hackingpython/zeromqkarl2.py
+./install/hackingpython/zmqpairserver.py
+./install/hackingpython/zmqpairclient.py
+
+./install/hackingpython/zmqpublish.py
+./install/hackingpython/zmqsubscribe.py
+
+
+
+
+./install/hackingpython/generators-fib.py
+
+
+./install/hackingpython/greenlet.py
+./install/hackingpython/gevent.py
+
+./install/hackingpython/daemon.py
+./install/hackingpython/spam.py
+
+
+
+
+
+./install/hackingpython/list-comprehension.py
+./install/hackingpython/email.py
+
+
+
+
+./install/hackingpython/read.json.py
+
+./install/hackingpython/ginkgo-hacking.py
+
+./install/hackingpython/quickstart.py
+./install/hackingpython/quickstart2.py
+
+./install/hackingpython/coroutines.py
+
+install/hackingpython/generators/apachelog.py
+install/hackingpython/generators/broadcast.py
+install/hackingpython/generators/bytesgen.py
+install/hackingpython/generators/consumer.py
+install/hackingpython/generators/downloads.py
+install/hackingpython/generators/fieldmap.py
+install/hackingpython/generators/follow.py
+install/hackingpython/generators/gencat.py
+install/hackingpython/generators/Generators.pdf
+install/hackingpython/generators/genevents.py
+install/hackingpython/generators/genfind.py
+install/hackingpython/generators/gengrep.py
+install/hackingpython/generators/genlog.py
+install/hackingpython/generators/genmessages.py
+install/hackingpython/generators/genmulti.py
+install/hackingpython/generators/genopen.py
+install/hackingpython/generators/genpickle.py
+install/hackingpython/generators/genqueue.py
+install/hackingpython/generators/genreceive.py
+install/hackingpython/generators/genshutdown.py
+install/hackingpython/generators/gentrace.py
+install/hackingpython/generators/hosts.py
+install/hackingpython/generators/index.html
+install/hackingpython/generators/largefiles.py
+install/hackingpython/generators/largest.py
+install/hackingpython/generators/linesdir.py
+install/hackingpython/generators/logcoroutine.py
+install/hackingpython/generators/makebig.py
+install/hackingpython/generators/msgtest.py
+install/hackingpython/generators/netsend.py
+install/hackingpython/generators/nongenlog.py
+install/hackingpython/generators/query404.py
+install/hackingpython/generators/realtime404.py
+install/hackingpython/generators/receivefrom.py
+install/hackingpython/generators/recvcount.py
+install/hackingpython/generators/redict.py
+install/hackingpython/generators/retuple.py
+install/hackingpython/generators/robots.py
+install/hackingpython/generators/runservers.py
+install/hackingpython/generators/runservers.sh
+install/hackingpython/generators/sendto.py
+install/hackingpython/generators/shutdownevt.py
+install/hackingpython/generators/storelast.py
+install/hackingpython/generators/thrsend.py
 
