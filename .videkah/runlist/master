@@ -1,2 +1,7 @@
+./install-to-pi.bash pioldwifi && ./install-to-pi.bash piloft && ./install-to-pi.bash khaospy
+./install-to-pi.bash pioldwifi && ./install-to-pi.bash piloft && ./install-to-pi.bash pimain && ./install-to-pi.bash khaospy
 ./install-to-pi.bash pioldwifi
-#this script will accept a hostname get kicked off for 
+./install-to-pi.bash piloft
+./install-to-pi.bash pimain
+./install-to-pi.bash khaospy
+#this script will accept a hostname get kicked off for

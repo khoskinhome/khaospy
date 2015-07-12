@@ -39,6 +39,9 @@ cd ./install
 
 
 chmod 755 ./libpy/*.py
+chmod 755 ./hackingpython/*.py
+chmod 755 ./bin/*
+chmod 755 ./www-bin/*
 
 ssh $USER@$PIHOST "if [ ! -d $PI_INSTALL_DIR ] ; then sudo mkdir -p $PI_INSTALL_DIR; fi;"
 

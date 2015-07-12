@@ -31,6 +31,8 @@
 
 ./install/libpy/khaospy-one-wired-daemon.py
 ./install/libpy/khaospy-one-wired-receiver-subscribe.py
+./install/libpy/khaospy-one-wired-receiver-subscribe-just-listen.py
+./install/libpy/khaospy-one-wired-receiver-subscribe-CRAP.py
 ### DEVICE = 0x20
 
 #./install/libpy/khaospy/
@@ -83,6 +85,13 @@
 
 ##############################################################################
 
+install/bin/rrdcreategraph.sh
+install/bin/rrdcreategraph-orig.sh
+install/bin/rrdcreategraph.pl
+
+
+##############################################################################
+
 ./install/docs
 
 ./install/docs/dependencies.txt
@@ -91,12 +100,24 @@
 ##############################################################################
 ./perl-port/stdout-json-cfg.pl
 
+./perl-port/khaospy-pi-rest-daemon-req-resp-structure.pl
+
 
 ##############################################################################
+
 install-to-pi.bash
 
 ##############################################################################
+
+
+./install/www/index.html
+
+./install/www-bin/graphs.pl
+
+############################################################################
 ./install/hackingpython/
+
+./install/hackingpython/multiprocessing-karl.py
 
 
 ./install/hackingpython/redirect.py

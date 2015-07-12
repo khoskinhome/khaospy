@@ -42,7 +42,8 @@ if not os.path.isdir(oneWireDir):
 
 print os.getcwd()
 
-polleveryseconds=15
+polleveryseconds=30
+#polleveryseconds=1
 lastpoll=time.time() - polleveryseconds
 
 while True:
