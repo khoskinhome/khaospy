@@ -7,7 +7,7 @@ import zmq
 import time
 import json
 import yaml
-import rrdtool
+#import rrdtool
 
 import os.path
 

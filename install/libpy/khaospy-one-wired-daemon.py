@@ -15,7 +15,7 @@ Saying that I can't see more than one of these running on a machine.
 So a standard port of 5001 will work okay.
 
 
-By Karl "khaos" Hoskin 2015-06-23
+By Karl Hoskin 2015-06-23
 """
 
 import zmq
@@ -36,6 +36,8 @@ socket.bind("tcp://*:%s" % port)
 oneWireDir='/sys/bus/w1/devices/'
 os.chdir( oneWireDir )
 
+
+#TODO get this modprobe to actually work
 if not os.path.isdir(oneWireDir):
     os.system("modprobe w1-gpio")
     os.system("modprobe w1-therm")
