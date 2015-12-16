@@ -7,14 +7,21 @@
 #
 ############################
 
+# TODO error checking for the 3 params :
+# $1 = rrdfile
+# $2 = location
+# $3 = dir-name-for images.
+
 RRDPATH="/opt/khaospy/rrd/"
-IMGPATH="/opt/khaospy/rrdimg/$1"
+IMGPATH="/opt/khaospy/rrdimg/$3"
 
 if [[ ! -d $IMGPATH ]] ; then
-    mkdir -p $IMGPATH 
+    mkdir -p $IMGPATH
 fi 
 
 RRDFILE=$1
+
+LOCATION_NAME=$2
 
 LAT="51.6290100N"
 LON="0.3584240E"
@@ -68,9 +75,10 @@ AREA:dawntilldusk#CCCCCC \
 COMMENT:"Dawn\:    $DAWNHR\:$DAWNMIN  Sunrise\: $SUNRISEHR\:$SUNRISEMIN\l" \
 COMMENT:"\u" \
 COMMENT:"Sunset\:  $SUNSETHR\:$SUNSETMIN  Dusk\:    $DUSKHR\:$DUSKMIN\r" \
-COMMENT:"  Location         Last        Avg\l" \
-LINE2:temp1$RAWCOLOUR:"a" \
+LINE2:temp1$RAWCOLOUR:"$LOCATION_NAME" \
+COMMENT:" Last = " \
 GPRINT:temp1:LAST:"%5.1lf °C" \
+COMMENT:" Ave = " \
 GPRINT:temp1:AVERAGE:"%5.1lf °C\l" \
 HRULE:0#66CCFF:"freezing\l"
 
@@ -94,19 +102,14 @@ CDEF:dusktilldawn=LTIME,86400,%,$DAWN,LT,INF,LTIME,86400,%,$DUSK,GT,INF,UNKN,tem
 CDEF:dawntilldusk=LTIME,86400,%,$DAWN,LT,NEGINF,LTIME,86400,%,$DUSK,GT,NEGINF,UNKN,temp1,*,IF,IF \
 AREA:dusktilldawn#CCCCCC \
 AREA:dawntilldusk#CCCCCC \
-COMMENT:"  Location         Last        Avg\l" \
-COMMENT:"\t\t\t\t\t\t---------------------------\l" \
+COMMENT:"Dawn\:    $DAWNHR\:$DAWNMIN  Sunrise\: $SUNRISEHR\:$SUNRISEMIN\l" \
 COMMENT:"\u" \
-COMMENT:"Dawn\:    $DAWNHR\:$DAWNMIN\r" \
-COMMENT:"\u" \
-COMMENT:"Sunrise\: $SUNRISEHR\:$SUNRISEMIN\r" \
-LINE1:temp1$RAWCOLOUR:"a" \
-GPRINT:temp1:LAST:"%5.1lf °C" \
+COMMENT:"Sunset\:  $SUNSETHR\:$SUNSETMIN  Dusk\:    $DUSKHR\:$DUSKMIN\r" \
+LINE1:temp1$RAWCOLOUR:"$LOCATION_NAME" \
+COMMENT:" Last = " \
+GPRINT:temp1:LAST:"%5.1lf °C     " \
+COMMENT:" Ave = " \
 GPRINT:temp1:AVERAGE:"%5.1lf °C\l" \
-COMMENT:"\u" \
-COMMENT:"Sunset\:  $SUNSETHR\:$SUNSETMIN\r" \
-COMMENT:"\u" \
-COMMENT:"Dusk\:    $DUSKHR\:$DUSKMIN\r" \
 HRULE:0#66CCFF:"freezing\l"
 
 #week
@@ -119,6 +122,7 @@ rrdtool graph $IMGPATH/week.png --start -1w \
 --color=SHADEB#9999CC \
 --watermark="© khaos - 2015" \
 DEF:temp1=$RRDPATH/$RRDFILE:a:AVERAGE \
+CDEF:trend1=temp1,86400,TREND \
 CDEF:nightplus=LTIME,86400,%,$SUNR,LT,INF,LTIME,86400,%,$SUNS,GT,INF,UNKN,temp1,*,IF,IF \
 CDEF:nightminus=LTIME,86400,%,$SUNR,LT,NEGINF,LTIME,86400,%,$SUNS,GT,NEGINF,UNKN,temp1,*,IF,IF \
 AREA:nightplus#E0E0E0 \
@@ -127,15 +131,12 @@ CDEF:dusktilldawn=LTIME,86400,%,$DAWN,LT,INF,LTIME,86400,%,$DUSK,GT,INF,UNKN,tem
 CDEF:dawntilldusk=LTIME,86400,%,$DAWN,LT,NEGINF,LTIME,86400,%,$DUSK,GT,NEGINF,UNKN,temp1,*,IF,IF \
 AREA:dusktilldawn#CCCCCC \
 AREA:dawntilldusk#CCCCCC \
-COMMENT:"  Location         Last        Avg\l" \
-COMMENT:"\u" \
-COMMENT:"Location         Last        Avg  \r" \
-COMMENT:"\t\t\t\t\t\t---------------------------\l" \
-COMMENT:"\u" \
-LINE1:temp1$RAWCOLOUR:"a" \
-GPRINT:temp1:LAST:"%5.1lf °C" \
+LINE2:trend1$RAWCOLOUR4:"$LOCATION_NAME 6h average\l" \
+LINE1:temp1$RAWCOLOUR:"$LOCATION_NAME" \
+COMMENT:" Last = " \
+GPRINT:temp1:LAST:"%5.1lf °C     " \
+COMMENT:" Ave = " \
 GPRINT:temp1:AVERAGE:"%5.1lf °C\l" \
-COMMENT:"\u" \
 HRULE:0#66CCFF:"freezing\l"
 
 #month
@@ -148,15 +149,11 @@ rrdtool graph $IMGPATH/month.png --start -1m \
 --color=SHADEA#9999CC \
 --watermark="© khaos - 2015" \
 DEF:temp1=$RRDPATH/$RRDFILE:a:AVERAGE \
-COMMENT:"  Location         Last        Avg\l" \
-COMMENT:"\u" \
-COMMENT:"Location         Last        Avg  \r" \
-COMMENT:"\t\t\t\t\t\t---------------------------\l" \
-COMMENT:"\u" \
-LINE1:temp1$RAWCOLOUR:"a" \
-GPRINT:temp1:LAST:"%5.1lf °C" \
+LINE1:temp1$RAWCOLOUR:"$LOCATION_NAME" \
+COMMENT:" Last = " \
+GPRINT:temp1:LAST:"%5.1lf °C     " \
+COMMENT:" Ave = " \
 GPRINT:temp1:AVERAGE:"%5.1lf °C\l" \
-COMMENT:"\u" \
 HRULE:0#66CCFF:"freezing\l"
 
 #year
@@ -169,15 +166,11 @@ rrdtool graph $IMGPATH/year.png --start -1y \
 --slope-mode \
 --watermark="© khaos - 2015" \
 DEF:temp1=$RRDPATH/$RRDFILE:a:AVERAGE \
-COMMENT:"  Location         Last        Avg\l" \
-COMMENT:"\u" \
-COMMENT:"Location         Last        Avg  \r" \
-COMMENT:"\t\t\t\t\t\t---------------------------\l" \
-COMMENT:"\u" \
-LINE1:temp1$RAWCOLOUR:"a" \
-GPRINT:temp1:LAST:"%5.1lf °C" \
+LINE1:temp1$RAWCOLOUR:"$LOCATION_NAME" \
+COMMENT:" Last = " \
+GPRINT:temp1:LAST:"%5.1lf °C     " \
+COMMENT:" Ave = " \
 GPRINT:temp1:AVERAGE:"%5.1lf °C\l" \
-COMMENT:"\u" \
 HRULE:0#66CCFF:"freezing\l"
 
 #averages
@@ -195,8 +188,5 @@ CDEF:nightplus=LTIME,86400,%,$SUNR,LT,INF,LTIME,86400,%,$SUNS,GT,INF,UNKN,temp1,
 CDEF:nightminus=LTIME,86400,%,$SUNR,LT,NEGINF,LTIME,86400,%,$SUNS,GT,NEGINF,UNKN,temp1,*,IF,IF \
 AREA:nightplus#CCCCCC \
 AREA:nightminus#CCCCCC \
-COMMENT:"\t\t\t\t\t\t---------------------------\l" \
-LINE2:trend1$RAWCOLOUR4:"d 6h average\l" \
-COMMENT:"\u" \
-COMMENT:"\u" \
+LINE2:trend1$RAWCOLOUR4:"$LOCATION_NAME 6h average\l" \
 

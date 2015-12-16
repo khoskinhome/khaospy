@@ -66,7 +66,7 @@ my $onewire2conf =  { map { $heating_config->{$_}{OneWireAddress} => $_ } keys %
 # AC-CF-23-8D-7E-D2 karlradiator    192.168.1.163
 # AC-CF-23-8D-3B-96 frontroomrad    192.168.1.164
 
-# TODO find a way of using the host name from /etc/hosts to get the ip and mac. 
+# TODO find a way of using the host name from /etc/hosts to get the ip and mac.
 my $controls = {
     alisonrad       => { ip => '192.168.1.161', mac => 'AC:CF:23:72:D1:FE' },
     ameliarad       => { ip => '192.168.1.160', mac => 'AC-CF-23-72-F3-D4' },
@@ -283,6 +283,8 @@ sub get_packed_mac {
 
 #############################################################
 # getting the temperatures.
+
+# http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
 
 use AnyEvent;
 use ZMQ::LibZMQ3;
