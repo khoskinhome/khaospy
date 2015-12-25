@@ -1,28 +1,20 @@
 #!/usr/bin/python
 
-
 """
+khaospy-one-wired-receiver.py
+
 Karl Hoskin 25-Dec-2015
 
-# so this will form the basis of the rrd updater.
-#
-# So there will be a central script that will fork processes for all the different IPs we have for all of the pi's
+subscribes to hosts that are "sending" temperature readings.
 
-# so one pi will be collected by just one forked process.
+If an rrd doesn't exist it creates the rrd.
 
-# this script is going to have to read the centralised config that will define all the hostnames.
-# this centralised config will also give the oneWire thermometers with their 64bit address a "device name" , and a "pretty name" . The pretty name will be much like the device name, but it will have spaces and funny characters allowed.
+Updates the rrds with the data received.
 
-#TODO  apparently zmq subscribe sockets are fussy about being closed down with ctrl-c, so this needs to be handled in the correct way. The ctrl-c signal needs to be intercepted, and a proper quit made on this daemon.
-
-TODO pass in the params of
-    host  ( no default , will fail if this isn't supplied )
-    port  ( default 5001 )
-for where to subscribe the listener to.
+TODO  apparently zmq subscribe sockets are fussy about being closed down with ctrl-c, so this needs to be handled in the correct way. The ctrl-c signal needs to be intercepted, and a proper quit made on this script
 
 """
 
-import sys
 import zmq
 
 import time
@@ -34,26 +26,43 @@ import os.path
 
 from pprint import pprint
 
-port = "5001"
+import sys
+import getopt
+
+# cli options :
+verbose = False
+host = ''
+port = 5001
+
+options, remainder = getopt.getopt(sys.argv[1:], 'h:p:v', ['host=', 'port=', 'verbose', ])
+
+for opt, arg in options:
+    if opt in ('-h', '--host'):
+        host = arg
+    elif opt in ('-v', '--verbose'):
+        verbose = True
+    elif opt in ('-p', '--port'):
+        port = arg
+
+print 'VERBOSE   :', verbose
+print 'HOST      :', host
+print 'PORT      :', port
 
 # Socket to talk to server
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
 
-print "Collecting updates from temperature senders"
-#socket.connect ("tcp://pioldwifi:%s" % port)
-socket.connect ("tcp://piloft:%s" % port)
+print "Receiving temperature senders from %s:%s" % ( host, port )
+socket.connect ("tcp://%s:%s" % ( host, port ))
 
-rrddatapath ='/opt/khaospy/rrd/' # make sure there is a slash on the end of this !
+# make sure there is a slash on the end of this :
+rrddatapath ='/opt/khaospy/rrd/'
 if not os.path.isdir(rrddatapath) :
     # print "no rrddatapath %s" % rrddatapath
     raise NameError( "no rrddatapath %s" % rrddatapath )
 
-
-# Subscribe to zipcode, default is NYC, 10001
 topicfilter = "oneWireThermometer"
 socket.setsockopt(zmq.SUBSCRIBE, topicfilter)
-
 
 while (1) :
     string = socket.recv()
@@ -84,9 +93,7 @@ while (1) :
         'RRA:AVERAGE:0.5:32:1440',\
         'RRA:AVERAGE:0.5:60:17520' );
 
-
     iso8601time = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime( sensorData['EpochTime'] ))
     print "update %s  %s  %s Celcius " % ( iso8601time, sensorData['OneWireAddress'],sensorData['Celsius'])
 
     rrdtool.update( rrdname, "%s:%s" % (sensorData['EpochTime'], sensorData['Celsius'] ))
-

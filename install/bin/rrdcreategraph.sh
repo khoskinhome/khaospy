@@ -1,5 +1,9 @@
 #!/bin/bash
 
+###
+# TO BE DELETED 
+# This has been replaced by install/bin/rrdcreategraph-2.pl
+
 # original code by https://weather.bartbania.com/bash.txt
 ############################
 #

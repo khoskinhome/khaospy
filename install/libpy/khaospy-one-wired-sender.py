@@ -2,24 +2,18 @@
 
 """
 khaospy-one-wired-sender
+
 By Karl Hoskin 2015-06-23 and 2015-12-25
 
-polls a Raspberry Pi for its oneWire connected DS18b20
-thermometers.
+Polls a Raspberry Pi for its oneWire connected DS18b20 thermometers.
 
 Then uses zeromq to publishes the results to a port.
 
-Thus some other process can listen to these reports.
-
-
-TODO pass in the params of
-    port  ( default 5001 )
-for where to subscribe the listener to.
+khaospy-one-wired-receiver.py listens to these ports.
 
 """
 
 import zmq
-import sys
 import os
 import os.path
 import time
@@ -27,7 +21,23 @@ import re
 import json
 from pprint import pprint
 
-port = "5001"
+import sys
+import getopt
+
+# cli options :
+verbose = False
+port = 5001
+
+options, remainder = getopt.getopt(sys.argv[1:], 'p:v', [ 'port=', 'verbose', ])
+
+for opt, arg in options:
+    if opt in ('-v', '--verbose'):
+        verbose = True
+    elif opt in ('-p', '--port'):
+        port = arg
+
+print 'VERBOSE   :', verbose
+print 'PORT      :', port
 
 context = zmq.Context()
 socket = context.socket(zmq.PUB)
@@ -35,7 +45,6 @@ socket.bind("tcp://*:%s" % port)
 
 oneWireDir='/sys/bus/w1/devices/'
 os.chdir( oneWireDir )
-
 
 #TODO get this modprobe to actually work
 if not os.path.isdir(oneWireDir):
@@ -45,7 +54,7 @@ if not os.path.isdir(oneWireDir):
 print os.getcwd()
 
 polleveryseconds=30
-#polleveryseconds=1
+
 lastpoll=time.time() - polleveryseconds
 
 while True:
@@ -73,7 +82,7 @@ while True:
                     jsonbody['Celsius']=float(data[1].split("=")[1])/1000
                 else:
                     jsonbody['Celsius']="ERROR: NOT READY !!"
-                       
-                print json.dumps( jsonbody ) 
+
+                print json.dumps( jsonbody )
                 socket.send("%s %s" % (jsonbody['HomeAutoClass'], json.dumps( jsonbody )))
 

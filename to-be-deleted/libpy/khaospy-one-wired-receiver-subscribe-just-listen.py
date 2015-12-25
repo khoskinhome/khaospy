@@ -1,6 +1,9 @@
 #!/usr/bin/python
 #
 
+# TO BE DELETED.
+# THIS HAS BEEN REPLACED BY khaospy-one-wired-receiver-just-listen.py
+
 import sys
 import zmq
 

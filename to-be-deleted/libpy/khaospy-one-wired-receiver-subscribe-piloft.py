@@ -1,6 +1,10 @@
 #!/usr/bin/python
 #
 
+# TO BE DELETED.
+# THIS HAS BEEN REPLACED BY khaospy-one-wired-receiver.py
+
+
 import sys
 import zmq
 
@@ -19,8 +23,8 @@ port = "5001"
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
 
-print "Collecting updates from pioldwifi temperature monitor server..."
-socket.connect ("tcp://pioldwifi:%s" % port)
+print "Collecting updates from piloft temperature monitor server..."
+socket.connect ("tcp://piloft:%s" % port)
 
 rrddatapath ='/opt/khaospy/rrd/' # make sure there is a slash on the end of this !
 if not os.path.isdir(rrddatapath) :
