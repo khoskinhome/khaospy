@@ -5,6 +5,7 @@ use 5.14.2;
 
 use JSON;
 
+
 # generate the JSON conf file in perl !
 
 my $khaospy_root = "/opt/khaospy";
@@ -36,6 +37,10 @@ my $conf = {
         {
             script => "/opt/khaospy/libpy/khaospy-one-wired-sender.py",
             params => "", # can have param --port=number, defaults to 5001
+        },
+        {
+            script => "/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
+            params => "",
         },
     ],
     pioldwifi => [
