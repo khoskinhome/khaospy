@@ -7,7 +7,7 @@ use JSON;
 
 # generate the JSON conf file in perl !
 
-my $khaospy_root = "/opt/khaospy"
+my $khaospy_root = "/opt/khaospy";
 
 my $conf_file="$khaospy_root/conf/daemon-runner.json";
 
@@ -46,4 +46,13 @@ my $conf = {
     ],
 };
 
+my $json = JSON->new->allow_nonref;
+
+burp ( $conf_file, $json->pretty->encode( $conf ) );
+
+sub burp {
+    my( $file_name ) = shift ;
+    open( my $fh, ">" , $file_name ) || die "can't create $file_name $!" ;
+    print $fh @_ ;
+}
 

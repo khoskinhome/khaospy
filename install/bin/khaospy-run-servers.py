@@ -22,15 +22,5 @@ import re
 import json
 from pprint import pprint
 
-##!/usr/bin/perl
-#use strict;
-#use warnings;
-#use 5.14.2;
-#
-#use JSON;
-#
-#my $khaospy_root = "/opt/khaospy"
-#
-#my $conf_file="$khaospy_root/conf/daemon-runner.json";
-#
+
 
