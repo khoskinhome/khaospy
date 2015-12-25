@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+use Data::Dumper;
+
 my $rrdpath          = "/opt/khaospy/rrd";
 my $rrdimgpath       = "/opt/khaospy/rrdimg";
 my $rrdimgpath_group = "/opt/khaospy/rrdimg-group";
@@ -123,7 +125,10 @@ for my $tgrp ( keys %$groups ){
 sub graph_periods {
     my ($imgpath, $p ) = @_ ;
 
+    print "graph_periods imgpath=$imgpath :\n".Dumper($p);
+
     my $periods = [
+        { name => "4hours.png" , period =>'4h'  },
         { name => "day.png"    , period =>'1d'  },
         { name => "3days.png"  , period =>'3d'  },
         { name => "week.png"   , period =>'7d'  },
@@ -133,9 +138,7 @@ sub graph_periods {
     for my $t_p ( @$periods ) {
         multi_graph_day( $imgpath, $t_p->{name}, $t_p->{period} ,$p );
     };
-
 }
-
 
 sub multi_graph_day {
     my ($imgpath, $graph_name, $period, $p ) = @_ ;
@@ -145,6 +148,7 @@ sub multi_graph_day {
     my $COMMENT_lines = '';
     my $count = 1;
 
+    
 
     my @sorted_p = sort { $a->{location_name} cmp $b->{location_name} } @$p;
 

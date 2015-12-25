@@ -60,7 +60,8 @@ while (1) :
     rrdname = rrddatapath + "/" + sensorData['OneWireAddress']
     if not os.path.isfile(rrdname):
         print "creating rrd %s" % rrdname
-        rrdtool.create( rrdname , '--start', 'now', '--step', '60', 'DS:a:GAUGE:120:-50:50', 'RRA:AVERAGE:0.5:1:12', 'RRA:AVERAGE:0.5:1:288', 'RRA:AVERAGE:0.5:12:168', 'RRA:AVERAGE:0.5:12:720', 'RRA:AVERAGE:0.5:288:365');
+        #rrdtool.create( rrdname , '--start', 'now', '--step', '60', 'DS:a:GAUGE:120:-50:50', 'RRA:AVERAGE:0.5:1:12', 'RRA:AVERAGE:0.5:1:288', 'RRA:AVERAGE:0.5:12:168', 'RRA:AVERAGE:0.5:12:720', 'RRA:AVERAGE:0.5:288:365');
+        rrdtool.create( rrdname , '--start', 'now', '--step', '60', 'DS:a:GAUGE:120:-50:50', 'RRA:AVERAGE:0.5:1:1440', 'RRA:AVERAGE:0.5:4:1440', 'RRA:AVERAGE:0.5:8:1440', 'RRA:AVERAGE:0.5:32:1440', 'RRA:AVERAGE:0.5:96:1440', 'RRA:AVERAGE:0.5:183:1440', 'RRA:AVERAGE:0.5:365:1440');
 
     iso8601time = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime( sensorData['EpochTime'] ))
     print "update %s  %s  %s Celcius " % ( iso8601time, sensorData['OneWireAddress'],sensorData['Celsius'])

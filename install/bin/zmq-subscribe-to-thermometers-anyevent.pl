@@ -3,6 +3,10 @@ use strict;
 use warnings;
 use Data::Dumper;
 
+# 2015-12-25 . This is the current script for polling thermometers and switching the orvibo S20s.
+
+
+
 ############################
 #/sys/bus/w1/devices/28-00000670596d/w1_slave  bathroom
 #{"HomeAutoClass": "oneWireThermometer", "OneWireAddress": "28-00000670596d", "EpochTime": 1448811213.284851, "Celsius": 21.812}

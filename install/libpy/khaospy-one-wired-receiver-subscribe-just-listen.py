@@ -15,6 +15,10 @@ from pprint import pprint
 
 port = "5001"
 
+
+# This script is to test that stuff is being sent by a "sender" of temperatures.
+
+
 # Socket to talk to server
 context = zmq.Context()
 socket = context.socket(zmq.SUB)

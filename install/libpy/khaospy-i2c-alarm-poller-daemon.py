@@ -32,6 +32,11 @@ from pprint import pprint
 
 port = "5051"
 
+#get the i2c bus to work :
+os.system( "sudo modprobe i2c-dev" );
+os.system ( "sudo chmod o+rw /dev/i2c*");
+os.system ( "sudo modprobe -r i2c_bcm2708 && sudo modprobe i2c_bcm2708 baudrate=400000");
+
 context = zmq.Context()
 socket = context.socket(zmq.PUB)
 socket.bind("tcp://*:%s" % port)
@@ -39,7 +44,7 @@ socket.bind("tcp://*:%s" % port)
 print os.getcwd()
 
 # smbus : Rev 2 Pi uses 1 ,  Rev 1 Pi uses 0
-bus = smbus.SMBus(0)
+bus = smbus.SMBus(1)
 
 # if IODIR bit is set to 1 it is an input
 # if IODIR bit is set to 0 it is an output
