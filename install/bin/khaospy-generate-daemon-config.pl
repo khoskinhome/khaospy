@@ -5,7 +5,6 @@ use 5.14.2;
 
 use JSON;
 
-
 # generate the JSON conf file in perl !
 
 my $khaospy_root = "/opt/khaospy";
@@ -14,40 +13,17 @@ my $conf_file="$khaospy_root/conf/daemon-runner.json";
 
 my $conf = {
     piserver => [
-        {
-            script => "/opt/khaospy/libpy/khaospy-one-wired-receiver.py",
-            params => "--host piloft", # can have param --port , defaults to 5001
-        },
-        {
-            script => "/opt/khaospy/libpy/khaospy-one-wired-receiver.py",
-            params => "--host pioldwifi",
-        },
+        "/opt/khaospy/bin/khaospy-one-wired-receiver-pioldwifi.bash",
+        "/opt/khaospy/bin/khaospy-one-wired-receiver-piloft.bash",
     ],
-    piserver2 => [
-        {
-            script => "/opt/khaospy/libpy/khaospy-one-wired-receiver.py",
-            params => "--host piloft",
-        },
-        {
-            script => "/opt/khaospy/libpy/khaospy-one-wired-receiver.py",
-            params => "--host pioldwifi",
-        },
-    ],
+#    piserver2 => [
+#    ],
     piloft => [
-        {
-            script => "/opt/khaospy/libpy/khaospy-one-wired-sender.py",
-            params => "", # can have param --port=number, defaults to 5001
-        },
-        {
-            script => "/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
-            params => "",
-        },
+        "/opt/khaospy/bin/khaospy-one-wired-sender.py",
+        "/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
     ],
     pioldwifi => [
-        {
-            script => "/opt/khaospy/libpy/khaospy-one-wired-sender.py",
-            params => "",
-        },
+        "/opt/khaospy/bin/khaospy-one-wired-sender.py",
     ],
 };
 
