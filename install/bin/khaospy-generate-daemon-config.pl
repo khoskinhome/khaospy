@@ -15,6 +15,7 @@ my $conf = {
     piserver => [
         "/opt/khaospy/bin/khaospy-one-wired-receiver-pioldwifi.bash",
         "/opt/khaospy/bin/khaospy-one-wired-receiver-piloft.bash",
+#        "/opt/khaospy/bin/khaospy-orvibo-s20-radiator.pl",
     ],
 #    piserver2 => [
 #    ],
@@ -22,7 +23,7 @@ my $conf = {
         "/opt/khaospy/bin/khaospy-one-wired-sender.py",
         "/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
     ],
-    pioldwifi => [
+    piold => [
         "/opt/khaospy/bin/khaospy-one-wired-sender.py",
     ],
 };

@@ -43,13 +43,17 @@ context = zmq.Context()
 socket = context.socket(zmq.PUB)
 socket.bind("tcp://*:%s" % port)
 
+os.system('modprobe w1-gpio')
+os.system('modprobe w1-therm')
+
 oneWireDir='/sys/bus/w1/devices/'
 os.chdir( oneWireDir )
 
-#TODO get this modprobe to actually work
-if not os.path.isdir(oneWireDir):
-    os.system("modprobe w1-gpio")
-    os.system("modprobe w1-therm")
+
+##TODO get this modprobe to actually work
+#if not os.path.isdir(oneWireDir):
+#    os.system("modprobe w1-gpio")
+#    os.system("modprobe w1-therm")
 
 print os.getcwd()
 
