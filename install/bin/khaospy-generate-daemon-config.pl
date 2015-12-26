@@ -5,7 +5,7 @@ use 5.14.2;
 
 use JSON;
 
-# generate the JSON conf file in perl !
+# generate the daemon-runner JSON conf file in perl !
 
 my $khaospy_root = "/opt/khaospy";
 

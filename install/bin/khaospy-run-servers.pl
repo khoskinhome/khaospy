@@ -50,6 +50,8 @@ for my $cfg_entry ( @{$conf->{$thishost}} ){
     #print "starting $cfg_entry->{script} $cfg_entry->{params}\n";
     #print "    log = $log_file\n    pid = $pid_file\n";
 
+    # currently the directory /opt/khaospy/bin is unsafe . so "/usr/bin/daemon" needs
+    # to be run with -U switch. TODO this needs fixing.
     my $syscall = "sudo /usr/bin/daemon -U --name=$pid_file --stdout=$log_file.stdout --stderr=$log_file.stderr --command='$command'";
     #--errlog=$log_file.errlog --dbglog=$log_file.dbglog --output=$log_file.output
 
@@ -64,11 +66,5 @@ sub slurp {
 
     open( my $fh, $file ) or die "Can't open $file\n";
     return do { local( $/ ) ; <$fh> } ;
-}
-
-sub burp {
-    my( $file_name ) = shift ;
-    open( my $fh, ">" , $file_name ) || die "can't create $file_name $!" ;
-    print $fh @_ ;
 }
 

@@ -319,56 +319,64 @@ use ZMQ::Constants qw(ZMQ_SUB ZMQ_SUBSCRIBE ZMQ_RCVMORE ZMQ_FD);
 
 use JSON;
 my $json = JSON->new->allow_nonref;
-
-my $context = zmq_init();
-my $subscriber = zmq_socket($context, ZMQ_SUB);
-zmq_connect($subscriber, 'tcp://piloft:5001');
-zmq_setsockopt($subscriber, ZMQ_SUBSCRIBE, 'oneWireThermometer');
-
-my %stat;
-my $cnt=0;
-
 my $quit_program = AnyEvent->condvar;
 
-my $fh = zmq_getsockopt( $subscriber, ZMQ_FD );
+my $context = zmq_init();
 
-my $w = AnyEvent->io(
-    fh   => $fh,
-    poll => "r",
-    cb   => sub {
-        while ( my $recvmsg = zmq_recvmsg( $subscriber, ZMQ_RCVMORE ) ) {
-            my $msg = zmq_msg_data($recvmsg);
-            my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
+my $w = [];
+for my $host ( qw/piloft pioldwifi/ ) {
 
-            my $msg_decoded = $json->decode( $msgdata );
+    my $subscriber = zmq_socket($context, ZMQ_SUB);
+    zmq_connect($subscriber, "tcp://$host:5001");
+    zmq_setsockopt($subscriber, ZMQ_SUBSCRIBE, 'oneWireThermometer');
 
-            my $owaddr    = $msg_decoded->{OneWireAddress};
-            my $curr_temp = $msg_decoded->{Celsius};
+    my $fh = zmq_getsockopt( $subscriber, ZMQ_FD );
 
-            my $name = $onewire2conf->{"$owaddr"};
-            my $hc = $heating_config->{"$name"};
-
-            print "##########\n";
-            print "$name : Celsius = $curr_temp.\n";
-
-            if ( $curr_temp > $hc->{upper_room_temp} ){
-                if ( $hc->{orviboS20_rad_hostname} ) {
-                    print "$name : Switch off ".$hc->{orviboS20_rad_hostname}."\n";
-                    print "$name : signal_control = ".signal_control($hc->{orviboS20_rad_hostname},"off")."\n";
-                } else {
-                    print "$name : Nothing configured to switch off\n";
-                }
-            }
-            elsif ( $curr_temp < $hc->{lower_room_temp} ){
-                if ( $hc->{orviboS20_rad_hostname} ) {
-                    print "$name : Switch on ".$hc->{orviboS20_rad_hostname}."\n";
-                    print "$name : signal_control = ".signal_control($hc->{orviboS20_rad_hostname},"on")."\n";
-                } else {
-                    print "$name : Nothing configured to switch on\n";
-                }
-            }
-        }
-    });
+    push @$w , anyevent_io( $fh, $subscriber);
+};
 
 $quit_program->recv;
+
+sub anyevent_io {
+    my ( $fh, $subscriber ) = @_;
+    return AnyEvent->io(
+        fh   => $fh,
+        poll => "r",
+        cb   => sub {
+            while ( my $recvmsg = zmq_recvmsg( $subscriber, ZMQ_RCVMORE ) ) {
+                my $msg = zmq_msg_data($recvmsg);
+                my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
+
+                my $msg_decoded = $json->decode( $msgdata );
+
+                my $owaddr    = $msg_decoded->{OneWireAddress};
+                my $curr_temp = $msg_decoded->{Celsius};
+
+                my $name = $onewire2conf->{"$owaddr"};
+                my $hc = $heating_config->{"$name"};
+
+                print "##########\n";
+                print "$name : Celsius = $curr_temp.\n";
+
+    #            if ( $curr_temp > $hc->{upper_room_temp} ){
+    #                if ( $hc->{orviboS20_rad_hostname} ) {
+    #                    print "$name : Switch off ".$hc->{orviboS20_rad_hostname}."\n";
+    #                    print "$name : signal_control = ".signal_control($hc->{orviboS20_rad_hostname},"off")."\n";
+    #                } else {
+    #                    print "$name : Nothing configured to switch off\n";
+    #                }
+    #            }
+    #            elsif ( $curr_temp < $hc->{lower_room_temp} ){
+    #                if ( $hc->{orviboS20_rad_hostname} ) {
+    #                    print "$name : Switch on ".$hc->{orviboS20_rad_hostname}."\n";
+    #                    print "$name : signal_control = ".signal_control($hc->{orviboS20_rad_hostname},"on")."\n";
+    #                } else {
+    #                    print "$name : Nothing configured to switch on\n";
+    #                }
+    #            }
+            }
+        },
+    );
+}
+
 
