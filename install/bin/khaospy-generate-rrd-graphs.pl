@@ -22,32 +22,6 @@ my $thermometer_conf = $json->decode(
     slurp ( $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH )
 );
 
-print Dumper($thermometer_conf);
-
-# TODO the Latitude and Longitude need to go into a central config :
-my $LAT="51.6290100N";
-my $LON="0.3584240E";
-
-# Calculating Civil Twilight based on location from LAT LON
-my $DUSKHR=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun rises/{:a;n;/Nautical twilight/b;p;ba}' | cut -c 45-46`;
-my $DUSKMIN=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun rises/{:a;n;/Nautical twilight/b;p;ba}' | cut -c 47-48`;
-my $DAWNHR=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun rises/{:a;n;/Nautical twilight/b;p;ba}' | cut -c 30-31`;
-my $DAWNMIN=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun rises/{:a;n;/Nautical twilight/b;p;ba}' | cut -c 32-33`;
-
-# Calculating sunset/sunrise based on location from LAT LON
-my $SUNRISEHR=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun transits/{:a;n;/Civil twilight/b;p;ba}' | cut -c 30-31`;
-my $SUNRISEMIN=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun transits/{:a;n;/Civil twilight/b;p;ba}' | cut -c 32-33`;
-my $SUNSETHR=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun transits/{:a;n;/Civil twilight/b;p;ba}' | cut -c 45-46`;
-my $SUNSETMIN=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun transits/{:a;n;/Civil twilight/b;p;ba}' | cut -c 47-48`;
-
-# Converting to seconds
-my $SUNR=($SUNRISEHR * 3600 + $SUNRISEMIN * 60);
-my $SUNS=($SUNSETHR * 3600 + $SUNSETMIN * 60);
-my $DUSK=($DUSKHR * 3600 + $DUSKMIN * 60);
-my $DAWN=($DAWNHR * 3600 + $DAWNMIN * 60);
-
-print "sunrise $SUNR : sunset $SUNS : dusk $DUSK : dawn $DAWN \n";
-
 my $COLOURS = [
     my $RAWCOLOUR="#FF9933",
     my $RAWCOLOUR2="#0033FF",
@@ -112,11 +86,16 @@ sub graph_periods {
     print "graph_periods imgpath=$imgpath :\n".Dumper($p);
 
     my $periods = [
-        { name => "4hours.png" , period =>'4h'  },
-        { name => "day.png"    , period =>'1d'  },
-        { name => "3days.png"  , period =>'3d'  },
-        { name => "week.png"   , period =>'7d'  },
-        { name => "2weeks.png" , period =>'14d' },
+        { name => "4hours.png"   , period =>'4h'  },
+        { name => "day.png"      , period =>'1d'  },
+        { name => "3days.png"    , period =>'3d'  },
+        { name => "week.png"     , period =>'7d'  },
+        { name => "2weeks.png"   , period =>'14d' },
+        { name => "month.png"    , period =>'1m'  },
+        { name => "quarter.png"  , period =>'3m'  },
+        { name => "6months.png"  , period =>'6m'  },
+        { name => "year.png"     , period =>'1y'  },
+        #{ name => "2years.png"   , period =>'2y'  },
     ];
 
     for my $t_p ( @$periods ) {
@@ -136,41 +115,43 @@ sub multi_graph_day {
     for my $line ( @sorted_p ){
         $DEF_lines .= "DEF:temp$count=$line->{rrdpath_n_file}:a:AVERAGE  ";
 
+        my $padded_location_name
+            = $line->{location_name} . ( " " x ( 20 - length $line->{location_name} ) );
+
         $COMMENT_lines .= << "        EOCOMMENT";
-            LINE$count:temp${count}$COLOURS->[$count-1]:'$line->{location_name}'
-            COMMENT:' Last = '
-            GPRINT:temp$count:LAST:'%5.1lf °C     '
-            COMMENT:' Ave = '
-            GPRINT:temp$count:AVERAGE:'%5.1lf °C\\l'
+            LINE$count:temp${count}$COLOURS->[$count-1]:'$padded_location_name'
+            COMMENT:' Last ='
+            GPRINT:temp$count:LAST:'%2.1lf °C  '
+            COMMENT:' Ave ='
+            GPRINT:temp$count:AVERAGE:'%2.1lf °C\\l'
         EOCOMMENT
         $count ++ ;
     }
 
+    my $sun_config = '' ;
+
+    if ( $period =~ /[dh]$/ ){
+        $sun_config=rrd_sun_config();
+    }
+
+    my $vertical_title = $graph_name;
+    $vertical_title =~ s/\.png$//;
+    $vertical_title =~ s/(\d+)(.*)/\1 \2/;
+
     my $cmd = <<"    EODAY";
         rrdtool graph $imgpath/$graph_name --start -$period --end now
-        -v "Last day (°C)"
+        -v "$vertical_title (°C)"
         --lower-limit=0
         --full-size-mode
-        --width=1600 --height=900
+        --width=1024 --height=768
         --slope-mode
         --color=SHADEA#9999CC
         --watermark="© khaos - 2015"
         $DEF_lines
         CDEF:trend3=temp1,21600,TREND
-        CDEF:nightplus=LTIME,86400,%,$SUNR,LT,INF,LTIME,86400,%,$SUNS,GT,INF,UNKN,temp1,*,IF,IF
-        CDEF:nightminus=LTIME,86400,%,$SUNR,LT,NEGINF,LTIME,86400,%,$SUNS,GT,NEGINF,UNKN,temp1,*,IF,IF
-        AREA:nightplus#E0E0E0
-        AREA:nightminus#E0E0E0
-        CDEF:dusktilldawn=LTIME,86400,%,$DAWN,LT,INF,LTIME,86400,%,$DUSK,GT,INF,UNKN,temp1,*,IF,IF
-        CDEF:dawntilldusk=LTIME,86400,%,$DAWN,LT,NEGINF,LTIME,86400,%,$DUSK,GT,NEGINF,UNKN,temp1,*,IF,IF
-        AREA:dusktilldawn#CCCCCC
-        AREA:dawntilldusk#CCCCCC
-        COMMENT:'Dawn\\:    $DAWNHR\\:$DAWNMIN  Sunrise\\: $SUNRISEHR\\:$SUNRISEMIN\\l'
-        COMMENT:'\\u'
-        COMMENT:'Sunset\\:  $SUNSETHR\\:$SUNSETMIN  Dusk\\:    $DUSKHR\\:$DUSKMIN\\r'
+        $sun_config
         $COMMENT_lines
         HRULE:0#66CCFF:'freezing\\l'
-
     EODAY
 
     $cmd =~ s/\n//g;
@@ -180,3 +161,79 @@ sub multi_graph_day {
 
 }
 
+{
+    my $sun_config;
+
+    sub rrd_sun_config {
+
+        return $sun_config if $sun_config;
+
+        my $SUN;
+        eval { $SUN = sunrise_dawn_n_dusk(); };
+
+        return "" if $@;
+
+        $sun_config = <<"        EOSUNCFG";
+
+            CDEF:nightplus=LTIME,86400,%,$SUN->{sun_rise_epoch_secs},LT,INF,LTIME,86400,%,$SUN->{sun_set_epoch_secs},GT,INF,UNKN,temp1,*,IF,IF
+            CDEF:nightminus=LTIME,86400,%,$SUN->{sun_rise_epoch_secs},LT,NEGINF,LTIME,86400,%,$SUN->{sun_set_epoch_secs},GT,NEGINF,UNKN,temp1,*,IF,IF
+            AREA:nightplus#E0E0E0
+            AREA:nightminus#E0E0E0
+            CDEF:dusktilldawn=LTIME,86400,%,$SUN->{dawn_epoch_secs},LT,INF,LTIME,86400,%,$SUN->{dusk_epoch_secs},GT,INF,UNKN,temp1,*,IF,IF
+            CDEF:dawntilldusk=LTIME,86400,%,$SUN->{dawn_epoch_secs},LT,NEGINF,LTIME,86400,%,$SUN->{dusk_epoch_secs},GT,NEGINF,UNKN,temp1,*,IF,IF
+            AREA:dusktilldawn#CCCCCC
+            AREA:dawntilldusk#CCCCCC
+            COMMENT:'Dawn\\:    $SUN->{dawn_hour}\\:$SUN->{dawn_min}  Sunrise\\: $SUN->{sun_rise_hour}\\:$SUN->{sun_rise_min}\\l'
+            COMMENT:'\\u'
+            COMMENT:'Sunset\\:  $SUN->{sun_set_hour}\\:$SUN->{sun_set_min}  Dusk\\:    $SUN->{dusk_hour}\\:$SUN->{dusk_min}\\r'
+
+        EOSUNCFG
+
+        return $sun_config;
+    };
+}
+
+sub sunrise_dawn_n_dusk {
+
+    my $sunwait_cmd = "/usr/bin/sunwait";
+
+    if ( ! -f $sunwait_cmd ){
+        die "$sunwait_cmd is not installed. Cannot show sunrise and sunset in graphs \n";
+    }
+
+    # TODO the Latitude and Longitude need to go into a central config :
+    my $LAT="51.6290100N";
+    my $LON="0.3584240E";
+
+    # Calculating Civil Twilight based on location from LAT LON
+    my $dusk_hour=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun rises/{:a;n;/Nautical twilight/b;p;ba}' | cut -c 45-46`;
+    my $dusk_min=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun rises/{:a;n;/Nautical twilight/b;p;ba}' | cut -c 47-48`;
+    my $dawn_hour=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun rises/{:a;n;/Nautical twilight/b;p;ba}' | cut -c 30-31`;
+    my $dawn_min=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun rises/{:a;n;/Nautical twilight/b;p;ba}' | cut -c 32-33`;
+
+    # Calculating sunset/sunrise based on location from LAT LON
+    my $sun_rise_hour=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun transits/{:a;n;/Civil twilight/b;p;ba}' | cut -c 30-31`;
+    my $sun_rise_min=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun transits/{:a;n;/Civil twilight/b;p;ba}' | cut -c 32-33`;
+    my $sun_set_hour=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun transits/{:a;n;/Civil twilight/b;p;ba}' | cut -c 45-46`;
+    my $sun_set_min=`/usr/bin/sunwait sun up $LAT $LON -p | sed -n '/Sun transits/{:a;n;/Civil twilight/b;p;ba}' | cut -c 47-48`;
+
+    # print "sunrise $SUNR : sunset $SUNS : dusk $DUSK : dawn $DAWN \n";
+
+    return {
+        dawn_hour           => $dawn_hour,
+        dawn_min            => $dawn_min,
+        dawn_epoch_secs     => ($dawn_hour * 3600 + $dawn_min * 60),
+
+        sun_rise_hour       => $sun_rise_hour,
+        sun_rise_min        => $sun_rise_min,
+        sun_rise_epoch_secs => ($sun_rise_hour * 3600 + $sun_rise_hour * 60),
+
+        sun_set_hour        => $sun_set_hour,
+        sun_set_min         => $sun_set_min,
+        sun_set_epoch_secs  => ($sun_set_hour * 3600 + $sun_set_min * 60),
+
+        dusk_hour           => $dusk_hour,
+        dusk_min            => $dusk_min,
+        dusk_epoch_secs     => ($dusk_hour * 3600 + $dusk_min * 60),
+    };
+}
