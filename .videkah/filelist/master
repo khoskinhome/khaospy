@@ -41,6 +41,7 @@ crap.pl
 ##############################################################################
 # graphing of rrds.
 
+./install/bin/khaospy-generate-json-configs.pl
 install/bin/rrdcreategraph-2.pl
 
 to-be-deleted/bin/rrdcreategraph.sh
