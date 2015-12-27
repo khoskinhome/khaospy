@@ -7,7 +7,7 @@ use JSON;
 
 # generate the daemon-runner JSON conf file in perl !
 
-my $khaospy_conf_root = "/opt/khaospy";
+my $khaospy_conf_root = "/opt/khaospy/conf";
 my $json = JSON->new->allow_nonref;
 
 my %conffiles = (
@@ -17,10 +17,10 @@ my %conffiles = (
         => heating_thermometer_config(),
 );
 
-my $conf_file ( keys %conffiles ) {
+for my $conf_file ( keys %conffiles ) {
 
     burp ( "$khaospy_conf_root/$conf_file",
-            $json->pretty->encode( $conffiles{$conf_file} );
+            $json->pretty->encode( $conffiles{$conf_file} )
     );
 }
 
