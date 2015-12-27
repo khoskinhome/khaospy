@@ -45,7 +45,7 @@ chmod 755 ./www-bin/*
 ssh $USER@$PIHOST "if [ ! -d $PI_INSTALL_DIR ] ; then sudo mkdir -p $PI_INSTALL_DIR; fi;"
 
 # make sure old files aren't hanging around , just to break things like pyc's can when the main py has been renamed :
-ssh $USER@$PIHOST "rm \`find $PI_INSTALL_DIR | egrep \"\\.(py|pyc|pl|bash|sh|json|swp)$\"\`"
+ssh $USER@$PIHOST "rm \`find $PI_INSTALL_DIR | egrep \"\\.(py|pyc|pl|bash|sh|swp)$\"\`"
 
 
 # not currently using libpy . so its excluded ....
