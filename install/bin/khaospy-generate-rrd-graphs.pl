@@ -86,15 +86,16 @@ sub graph_periods {
     print "graph_periods imgpath=$imgpath :\n".Dumper($p);
 
     my $periods = [
-        { name => "4hours.png"   , period =>'4h'  },
-        { name => "day.png"      , period =>'1d'  },
-        { name => "3days.png"    , period =>'3d'  },
-        { name => "week.png"     , period =>'7d'  },
-        { name => "2weeks.png"   , period =>'14d' },
-        { name => "month.png"    , period =>'1m'  },
-        { name => "quarter.png"  , period =>'3m'  },
-        { name => "6months.png"  , period =>'6m'  },
-        { name => "year.png"     , period =>'1y'  },
+        { name => "4Hours.png"   , period =>'4h'  },
+        { name => "Day.png"      , period =>'1d'  },
+        { name => "2Days.png"     , period =>'2d'  },
+        { name => "4Days.png"    , period =>'4d'  },
+        { name => "Week.png"     , period =>'7d'  },
+        { name => "2Weeks.png"   , period =>'14d' },
+        { name => "Month.png"    , period =>'1m'  },
+        { name => "Quarter.png"  , period =>'3m'  },
+        { name => "6Months.png"  , period =>'6m'  },
+        { name => "Year.png"     , period =>'1y'  },
         #{ name => "2years.png"   , period =>'2y'  },
     ];
 
@@ -120,10 +121,14 @@ sub multi_graph_day {
 
         $COMMENT_lines .= << "        EOCOMMENT";
             LINE$count:temp${count}$COLOURS->[$count-1]:'$padded_location_name'
-            COMMENT:' Last ='
-            GPRINT:temp$count:LAST:'%2.1lf °C  '
+            COMMENT:' Min ='
+            GPRINT:temp$count:MIN:'%2.1lf °C '
+            COMMENT:' Max ='
+            GPRINT:temp$count:MAX:'%2.1lf °C '
             COMMENT:' Ave ='
-            GPRINT:temp$count:AVERAGE:'%2.1lf °C\\l'
+            GPRINT:temp$count:AVERAGE:'%2.1lf °C '
+            COMMENT:' Last ='
+            GPRINT:temp$count:LAST:'%2.1lf °C\\l'
         EOCOMMENT
         $count ++ ;
     }
@@ -138,12 +143,14 @@ sub multi_graph_day {
     $vertical_title =~ s/\.png$//;
     $vertical_title =~ s/(\d+)(.*)/\1 \2/;
 
+    my $lc_graph_name = lc $graph_name;
+
     my $cmd = <<"    EODAY";
-        rrdtool graph $imgpath/$graph_name --start -$period --end now
+        rrdtool graph $imgpath/$lc_graph_name --start -$period --end now
         -v "$vertical_title (°C)"
         --lower-limit=0
         --full-size-mode
-        --width=1024 --height=768
+        --width=1200 --height=800
         --slope-mode
         --color=SHADEA#9999CC
         --watermark="© khaos - 2015"
