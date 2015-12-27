@@ -8,10 +8,11 @@ my $rrdpath          = "/opt/khaospy/rrd";
 my $rrdimgpath       = "/opt/khaospy/rrdimg";
 my $rrdimgpath_group = "/opt/khaospy/rrdimg-group";
 
-#mkdir $rrdimgpath if ( ! -d $rrdimgpath ) ;
+# mkdir $rrdimgpath if ( ! -d $rrdimgpath )
 
 chdir $rrdpath;
 
+# TODO the Latitude and Longitude need to go into a central config :
 my $LAT="51.6290100N";
 my $LON="0.3584240E";
 

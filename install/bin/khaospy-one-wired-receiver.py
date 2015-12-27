@@ -14,7 +14,14 @@ Updates the rrds with the data received.
 TODO  apparently zmq subscribe sockets are fussy about being closed down with ctrl-c, so this needs to be handled in the correct way. The ctrl-c signal needs to be intercepted, and a proper quit made on this script
 
 """
+"""
+It would be nicer to have one script that works out what hosts are publishing "one-wire" temperatures,
+subscribes to them all and updates the rrds.
 
+probably going to do this with the perl "AnyEvent" script I have.
+
+
+"""
 import zmq
 
 import time

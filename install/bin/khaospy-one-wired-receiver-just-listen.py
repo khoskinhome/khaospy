@@ -28,22 +28,21 @@ from pprint import pprint
 import sys
 import getopt
 
+print "#####################"
+print "Started ",(time.strftime("%Y-%m-%d %H:%M:%S"))
+
 # cli options :
-verbose = False
 host = ''
 port = 5001
 
-options, remainder = getopt.getopt(sys.argv[1:], 'h:p:v', ['host=', 'port=', 'verbose', ])
+options, remainder = getopt.getopt(sys.argv[1:], 'h:p:', ['host=', 'port=', ])
 
 for opt, arg in options:
     if opt in ('-h', '--host'):
         host = arg
-    elif opt in ('-v', '--verbose'):
-        verbose = True
     elif opt in ('-p', '--port'):
         port = arg
 
-print 'VERBOSE   :', verbose
 print 'HOST      :', host
 print 'PORT      :', port
 
@@ -63,7 +62,7 @@ while (1) :
     sensorData = yaml.safe_load( messagedata )
 
     iso8601time = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime( sensorData['EpochTime'] ))
-    print "update %s  %s  %s Celcius " % ( iso8601time, sensorData['OneWireAddress'],sensorData['Celsius'])
+    print "Listen %s  %s  %s Celcius " % ( iso8601time, sensorData['OneWireAddress'],sensorData['Celsius'])
 
 
 

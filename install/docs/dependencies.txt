@@ -1,1 +1,36 @@
-sudo apt-get install python-yaml
+
+sudo apt-get update
+
+sudo apt-get install apache2 -y
+sudo apt-get install daemon -y
+sudo apt-get install i2c-tools -y
+sudo apt-get install libsodium -y
+sudo apt-get install libsodium-dev -y
+sudo apt-get install libzmq3-dev -y
+sudo apt-get install libzmq-dev -y
+sudo apt-get install make autoconf automake libtool -y
+sudo apt-get install perl-cpanm -y
+sudo apt-get install perl-doc -y
+sudo apt-get install perl-modules -y
+sudo apt-get install perl term-readkey-perl -y
+sudo apt-get install python-dev -y
+sudo apt-get install python-devel -y
+sudo apt-get install python-dev -y
+sudo apt-get install python-pip -y
+sudo apt-get install python-rrdtool
+sudo apt-get install python-rrdtool -y
+sudo apt-get install python-smbus -y
+sudo apt-get install python-yaml -y
+sudo apt-get install python-zmq -y
+sudo apt-get install rrdtool -y
+sudo apt-get install screen -y
+sudo apt-get -y install git
+sudo pip install python-rrdtool
+sudo pip install python-yaml
+sudo pip install pyzmq
+sudo pip install yaml
+sudo pip py
+sudo pip pyzmq
+sudo pip search rrdtool
+sudo pip search yaml
+
