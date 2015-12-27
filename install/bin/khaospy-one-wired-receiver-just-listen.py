@@ -8,6 +8,8 @@ subscribes to hosts that are "sending" temperature readings.
 
 This script just listens. No RRD creation or updating here.
 
+This script is primarily for testing.
+
 
 TODO  apparently zmq subscribe sockets are fussy about being closed down with ctrl-c, so this needs to be handled in the correct way. The ctrl-c signal needs to be intercepted, and a proper quit made on this script
 

@@ -7,9 +7,10 @@ By Karl Hoskin 2015-06-23 and 2015-12-25
 
 Polls a Raspberry Pi for its oneWire connected DS18b20 thermometers.
 
-Then uses zeromq to publishes the results to a port.
+Then uses zeromq to publish the results to a port.
 
-khaospy-one-wired-receiver.py listens to these ports.
+khaospy-one-wired-receiver.py listens to these ports. ( and creates RRDs )
+
 
 """
 

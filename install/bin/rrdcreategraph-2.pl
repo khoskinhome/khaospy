@@ -55,11 +55,11 @@ my $address_map = {
         group => 'upstairs',
     },
     '28-000006e04e8b' => {
-        name  => 'playhouse-1',
+        name  => 'playhouse-tv',
         group => 'outside',
     },
     '28-0000066fe99e' => {
-        name  => 'playhouse-2',
+        name  => 'playhouse-9e-door',
         group => 'outside',
     },
     '28-00000670596d' => {
