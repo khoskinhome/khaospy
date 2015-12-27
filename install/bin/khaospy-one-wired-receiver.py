@@ -37,23 +37,19 @@ import sys
 import getopt
 
 # cli options :
-verbose = False
 host = ''
 port = 5001
 
-options, remainder = getopt.getopt(sys.argv[1:], 'h:p:v', ['host=', 'port=', 'verbose', ])
+options, remainder = getopt.getopt(sys.argv[1:], 'h:p:', ['host=', 'port=' ])
 
 for opt, arg in options:
     if opt in ('-h', '--host'):
         host = arg
-    elif opt in ('-v', '--verbose'):
-        verbose = True
     elif opt in ('-p', '--port'):
         port = arg
 
-print 'VERBOSE   :', verbose
-print 'HOST      :', host
-print 'PORT      :', port
+print 'HOST -h --host :', host
+print 'PORT -p --port :', port
 
 # Socket to talk to server
 context = zmq.Context()
@@ -101,6 +97,7 @@ while (1) :
         'RRA:AVERAGE:0.5:60:17520' );
 
     iso8601time = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime( sensorData['EpochTime'] ))
+    rrdtool.update( rrdname, "%s:%s" % (sensorData['EpochTime'], sensorData['Celsius'] ))
+
     print "update %s  %s  %s Celcius " % ( iso8601time, sensorData['OneWireAddress'],sensorData['Celsius'])
 
-    rrdtool.update( rrdname, "%s:%s" % (sensorData['EpochTime'], sensorData['Celsius'] ))
