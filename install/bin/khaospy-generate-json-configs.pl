@@ -19,6 +19,8 @@ my %conffiles = (
 
 for my $conf_file ( keys %conffiles ) {
 
+    print "Generating $khaospy_conf_root/$conf_file\n";
+
     burp ( "$khaospy_conf_root/$conf_file",
             $json->pretty->encode( $conffiles{$conf_file} )
     );

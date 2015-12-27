@@ -6,7 +6,25 @@ use Data::Dumper;
 
 my $rrdpath          = "/opt/khaospy/rrd";
 my $rrdimgpath       = "/opt/khaospy/rrdimg";
-my $rrdimgpath_group = "/opt/khaospy/rrdimg-group";
+my $rrdimgpath_rrd_group = "/opt/khaospy/rrdimg-group";
+use JSON;
+
+my $khaospy_conf_thermometers = "/opt/khaospy/conf/heating_thermometer.json";
+my $json = JSON->new->allow_nonref;
+
+my $thermometer_conf =  $json->decode( slurp ( $khaospy_conf_thermometers) );
+
+print Dumper($thermometer_conf);
+
+#TODO get slurp in one central place and "use" that :
+sub slurp {
+    my ($file ) = @_;
+    print "Opening file $file\n";
+
+    open( my $fh, $file ) or die "Can't open $file\n";
+    return do { local( $/ ) ; <$fh> } ;
+}
+
 
 # mkdir $rrdimgpath if ( ! -d $rrdimgpath )
 
@@ -50,59 +68,27 @@ my $COLOURS = [
 
 my $TRENDCOLOUR="#FFFF00",
 
-my $address_map = {
-    '28-0000066ebc74' => {
-        name  => 'Alison',
-        group => 'upstairs',
-    },
-    '28-000006e04e8b' => {
-        name  => 'playhouse-tv',
-        group => 'outside',
-    },
-    '28-0000066fe99e' => {
-        name  => 'playhouse-9e-door',
-        group => 'outside',
-    },
-    '28-00000670596d' => {
-        name  => 'Bathroom',
-        group => 'upstairs',
-    },
-    '28-021463277cff' => {
-        name  => 'Loft',
-        group => 'upstairs',
-    },
-    '28-0214632d16ff' => {
-        name  => 'Amelia',
-        group => 'upstairs',
-    },
-    '28-021463423bff' => {
-        name  => 'Upstairs-Landing',
-        group => 'upstairs',
-    },
-};
-
-
-my $groups = { all => [] };
+my $rrd_groups = { all => [] };
 
 while ( <*> ){
-    my $address = $_;
-    my $name    = $address_map->{$address}{name};
-    my $group   = $address_map->{$address}{group};
+    my $address   = $_;
+    my $name      = $thermometer_conf->{$address}{name};
+    my $rrd_group = $thermometer_conf->{$address}{rrd_group};
 
-    print "$address name => $address : group => $group \n";
+    print "$address name => $address : rrd_group => $rrd_group \n";
 
     my $imgpath="$rrdimgpath/$address-$name";
     mkdir $imgpath if ( ! -d $imgpath );
 
-    $groups->{$group} = [] if ! exists $groups->{$group};
+    $rrd_groups->{$rrd_group} = [] if ! exists $rrd_groups->{$rrd_group};
 
     my $this_g = {
             rrdpath_n_file => "$rrdpath/$address",
             location_name => $name,
         };
 
-    push @{$groups->{$group}}, $this_g;
-    push @{$groups->{all}}, $this_g;
+    push @{$rrd_groups->{$rrd_group}}, $this_g;
+    push @{$rrd_groups->{all}}, $this_g;
 
     graph_periods($imgpath, [ $this_g ] );
 
@@ -110,15 +96,15 @@ while ( <*> ){
 
 print "\n";
 
-for my $tgrp ( keys %$groups ){
-    print "group $tgrp\n";
+for my $tgrp ( keys %$rrd_groups ){
+    print "rrd_group $tgrp\n";
 
     my $imgpath="$rrdimgpath/$tgrp";
     mkdir $imgpath if ! -d $imgpath ;
 
-    # multi_graph_day( $imgpath, "day", "1d", $groups->{$tgrp} );
+    # multi_graph_day( $imgpath, "day", "1d", $rrd_groups->{$tgrp} );
 
-    graph_periods($imgpath,$groups->{$tgrp});
+    graph_periods($imgpath,$rrd_groups->{$tgrp});
 
 }
 
@@ -326,7 +312,7 @@ sub graph_day {
 #
 
 
-#    my $linkpath = $rrdimgpath."/".lc($address_map->{$_});
+#    my $linkpath = $rrdimgpath."/".lc($thermometer_conf->{$_});
 #    if ( ! -l $linkpath ) {
 #        system("ln -s $path $linkpath");
 #    }

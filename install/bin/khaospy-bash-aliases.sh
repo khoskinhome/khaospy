@@ -16,9 +16,16 @@ alias ps-khaospy='ps afux | egrep "(one-wired|khaospy|amelia)" | grep -v grep | 
 export PATH="$PATH:/opt/khaospy/bin"
 
 alias cdkhaospy='cd /opt/khaospy/'
+alias cdkhaospybin='cd /opt/khaospy/bin/'
+alias cdkhaospyconf='cd /opt/khaospy/conf/'
+alias cdkhaospydocs='cd /opt/khaospy/docs/'
+alias cdkhaospydownloads='cd /opt/khaospy/downloads/'
+alias cdkhaospyhackingpython='cd /opt/khaospy/hackingpython/'
+alias cdkhaospywww='cd /opt/khaospy/www/'
+alias cdkhaospywwwbin='cd /opt/khaospy/www-bin/'
 alias cdkhaospypid='cd /opt/khaospy/pid/'
 alias cdkhaospylog='cd /opt/khaospy/log/'
-alias cdkhaospybin='cd /opt/khaospy/bin/'
+
 
 alias bashrc='. ~/.bashrc'
 
