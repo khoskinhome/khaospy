@@ -42,7 +42,6 @@ my $controls = $json->decode(
 
 #############################################################
 # getting the temperatures.
-
 # http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
 
 my $quit_program = AnyEvent->condvar;
@@ -50,6 +49,9 @@ my $quit_program = AnyEvent->condvar;
 my $context = zmq_init();
 
 my $w = [];
+
+# TODO need a way to get the hosts to subscribe to for temperature readings
+# ( rather than this list of hosts )
 for my $host ( qw/piloft pioldwifi/ ) {
 
     my $subscriber = zmq_socket($context, ZMQ_SUB);
@@ -62,6 +64,9 @@ for my $host ( qw/piloft pioldwifi/ ) {
 };
 
 $quit_program->recv;
+
+######################################################
+
 
 sub anyevent_io {
     my ( $fh, $subscriber ) = @_;
