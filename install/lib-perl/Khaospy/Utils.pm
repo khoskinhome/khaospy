@@ -22,8 +22,7 @@ sub burp {
     print $fh @_ ;
 }
 
-
-
+# sub  get_hashval () {}
 
 
 

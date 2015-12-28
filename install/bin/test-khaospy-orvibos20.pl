@@ -31,10 +31,9 @@ my $controls = $json->decode(
 
 print Dumper ( $controls ) ;
 
-my $ip  = '192.168.1.160';
-my $mac = 'AC-CF-23-72-F3-D4';
-
-test_on_off_status($ip,$mac);
+#my $ip  = '192.168.1.160';
+#my $mac = 'AC-CF-23-72-F3-D4';
+#test_on_off_status($ip,$mac);
 
 for my $control_key ( keys %$controls ) {
     print "##############\n";
@@ -75,7 +74,7 @@ sub test_on_off_status {
         eval { $return = signal_control( $ip, $mac, $action ) };
 
         if ( $@ ) {
-            print "FAILED testing ($ip, $mac, $action) DIED with return = $return\n";
+            print "FAILED testing ($ip, $mac, $action) DIED with return = $return ; $@\n";
         } else {
             if ($test->{$action} eq $return){
                 print "PASSED testing ($ip, $mac, $action) return = $return\n";
