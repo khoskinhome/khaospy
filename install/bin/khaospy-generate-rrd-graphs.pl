@@ -88,7 +88,7 @@ sub graph_periods {
     my $periods = [
         { name => "4Hours.png"   , period =>'4h'  },
         { name => "Day.png"      , period =>'1d'  },
-        { name => "2Days.png"     , period =>'2d'  },
+        { name => "2Days.png"    , period =>'2d'  },
         { name => "4Days.png"    , period =>'4d'  },
         { name => "Week.png"     , period =>'7d'  },
         { name => "2Weeks.png"   , period =>'14d' },
