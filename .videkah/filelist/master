@@ -10,21 +10,25 @@
 # the web page stuff.
 # plus there is setup with the /tmp/
 
+
+#######################################################
+
+./install/lib-perl/Khaospy/Utils.pm
+./install/lib-perl/Khaospy/Constants.pm
+./install/lib-perl/Khaospy/OrviboS20.pm
+
 #######################################################
 # running all the scripts
 
+
 ./install/bin/khaospy-generate-json-configs.pl
-./install/bin/khaospy-run-servers.pl
-crap.pl
-./install/bin/khaospy-run-servers.py
+./install/bin/khaospy-run-daemons.pl
 
 
-
-./install/bin/khaospy-one-wired-receiver-pioldwifi.bash
-./install/bin/khaospy-one-wired-receiver-piloft.bash
-
+to-be-deleted/bin/khaospy-run-daemons.py
 #######################################################
 # one wire thermometer stuff :
+
 
 ./install/bin/khaospy-one-wired-sender.py
 
@@ -41,13 +45,12 @@ crap.pl
 ##############################################################################
 # graphing of rrds.
 
-./install/bin/khaospy-generate-json-configs.pl
-install/bin/rrdcreategraph-2.pl
+crap.pl
+install/bin/khaospy-generate-rrd-graphs.pl
 
 to-be-deleted/bin/rrdcreategraph.sh
 to-be-deleted/bin/rrdcreategraph.pl
 to-be-deleted/bin/rrdcreategraph-orig.sh
-
 ##############################################################################
 
 ######################################################
@@ -290,8 +293,6 @@ install/hackingpython/generators/thrsend.py
 
 install-to-pi.bash
 install-to-pi-all.bash
-
-install-to-pi-bin.bash
 
 ###################################################################
 
