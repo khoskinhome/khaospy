@@ -6,6 +6,9 @@ use warnings;
 
 use Exporter qw/import/;
 
+#######
+# dirs 
+
 our $KHAOSPY_ALL_DIRS = [
     our $KHAOSPY_ROOT_DIR      = "/opt/khaospy",
     our $KHAOSPY_BIN_DIR       = "$KHAOSPY_ROOT_DIR/bin",
@@ -18,6 +21,20 @@ our $KHAOSPY_ALL_DIRS = [
     our $KHAOSPY_WWW_BIN_DIR   = "$KHAOSPY_ROOT_DIR/www-bin",
 ];
 
+#################
+# daemon scripts
+
+our $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
+    = "$KHAOSPY_BIN_DIR/khaospy-one-wired-sender.py";
+
+our $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
+    = "$KHAOSPY_BIN_DIR/khaospy-one-wired-receiver.py";
+
+our $KHAOSPY_HEATING_CONTROL_SCRIPT
+    = "$KHAOSPY_BIN_DIR/khaospy-heating-control.pl";
+
+#############
+# json confs
 our $KHAOSPY_ALL_CONFS = {
     our $KHAOSPY_DAEMON_RUNNER_CONF
         = "daemon-runner.json"       => daemon_runner_conf(),
@@ -36,6 +53,7 @@ our $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
 our $KHAOSPY_ORVIBO_S20_CONF_FULLPATH
     = "$KHAOSPY_CONF_DIR/$KHAOSPY_ORVIBO_S20_CONF";
 
+#############
 
 our @EXPORT_OK = qw(
 
@@ -59,13 +77,16 @@ our @EXPORT_OK = qw(
     $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
     $KHAOSPY_ORVIBO_S20_CONF_FULLPATH
 
+    $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
+    $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
+    $KHAOSPY_HEATING_CONTROL_SCRIPT
 );
 
-for my $dir ( @$KHAOSPY_ALL_DIRS ){
-    if ( ! -d $dir ) {
-        system("mkdir -p $dir") && print "Can't create dir $dir\n";
-    }
-}
+#for my $dir ( @$KHAOSPY_ALL_DIRS ){
+#    if ( ! -d $dir ) {
+#        system("mkdir -p $dir") && print "Can't create dir $dir\n";
+#    }
+#}
 
 ###############################################################################
 # "conf" subs
@@ -73,18 +94,18 @@ for my $dir ( @$KHAOSPY_ALL_DIRS ){
 sub daemon_runner_conf {
     return {
         piserver => [
-            "/opt/khaospy/bin/khaospy-one-wired-receiver.py --host=pioldwifi",
-            "/opt/khaospy/bin/khaospy-one-wired-receiver.py --host=piloft",
-    #        "/opt/khaospy/bin/khaospy-orvibo-s20-radiator.pl",
+            "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=pioldwifi",
+            "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=piloft",
+    #        "$KHAOSPY_HEATING_CONTROL_SCRIPT",
         ],
     #    piserver2 => [
     #    ],
         piloft => [
-            "/opt/khaospy/bin/khaospy-one-wired-sender.py --stdout_freq=890",
+            "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
             "/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
         ],
         piold => [
-            "/opt/khaospy/bin/khaospy-one-wired-sender.py --stdout_freq=890",
+            "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
         ],
     };
 }

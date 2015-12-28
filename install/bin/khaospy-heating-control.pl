@@ -13,7 +13,10 @@ FindBin::again();
 
 use lib "$FindBin::Bin/../lib-perl";
 
-use Khaospy::Utils qw/slurp/;
+use Khaospy::Utils qw/
+    slurp
+    get_one_wire_sender_hosts
+/;
 
 use Khaospy::OrviboS20 qw/signal_control/;
 
@@ -26,7 +29,7 @@ use Khaospy::Constants qw(
 
 my $json = JSON->new->allow_nonref;
 
-# 2015-12-25 . This is the current script for polling thermometers and switching the orvibo S20s.
+# 2015-12-25 . This is the current script for polling thermometers and switching the heating on/off . currently just by "orvibo S20"s wifi sockets.
 
 my $thermometer_conf = $json->decode(
     slurp ( $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH )
@@ -50,9 +53,8 @@ my $context = zmq_init();
 
 my $w = [];
 
-# TODO need a way to get the hosts to subscribe to for temperature readings
-# ( rather than this list of hosts )
-for my $host ( qw/piloft pioldwifi/ ) {
+for my $host ( get_one_wire_sender_hosts() ) {
+    print "Listening to host $host\n";
 
     my $subscriber = zmq_socket($context, ZMQ_SUB);
     zmq_connect($subscriber, "tcp://$host:5001");
@@ -100,7 +102,7 @@ sub process_thermometer_msg {
     }
 
     my $name = $tc->{name}
-        || die "name isn't defined for $owaddr in "
+        || die "name isn't defined for one-wire address $owaddr in "
             ."$KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH ";
 
     print "##########\n";
