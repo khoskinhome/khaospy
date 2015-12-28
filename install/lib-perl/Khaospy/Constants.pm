@@ -63,7 +63,7 @@ our @EXPORT_OK = qw(
 
 for my $dir ( @$KHAOSPY_ALL_DIRS ){
     if ( ! -d $dir ) {
-        system("mkdir -p $dir") && die "Can't create dir $dir\n";
+        system("mkdir -p $dir") && print "Can't create dir $dir\n";
     }
 }
 
