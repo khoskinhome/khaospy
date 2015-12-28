@@ -3,104 +3,36 @@ use strict;
 use warnings;
 use Data::Dumper;
 
+use JSON;
+use FindBin;
+FindBin::again();
+
+use lib "$FindBin::Bin/../lib-perl";
+
+use Khaospy::Utils qw/slurp/;
+use Khaospy::Constants qw(
+    $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
+    $KHAOSPY_ORVIBO_S20_CONF_FULLPATH
+);
+
+# generate the daemon-runner JSON conf file in perl !
+
+my $json = JSON->new->allow_nonref;
+
 # 2015-12-25 . This is the current script for polling thermometers and switching the orvibo S20s.
 
-############################
-#/sys/bus/w1/devices/28-00000670596d/w1_slave  bathroom
-#{"HomeAutoClass": "oneWireThermometer", "OneWireAddress": "28-00000670596d", "EpochTime": 1448811213.284851, "Celsius": 21.812}
+my $thermometer_conf = $json->decode(
+    slurp ( $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH )
+);
 
-#/sys/bus/w1/devices/28-0000066ebc74/w1_slave  alison
-#{"HomeAutoClass": "oneWireThermometer", "OneWireAddress": "28-0000066ebc74", "EpochTime": 1448811214.115049, "Celsius": 20.562}
+  ## install/bin/khaospy-generate-rrd-graphs.pl:21:my $thermometer_conf = $json->decode( # TODO rm this line
 
-#/sys/bus/w1/devices/28-021463277cff/w1_slave  loft
-#{"HomeAutoClass": "oneWireThermometer", "OneWireAddress": "28-021463277cff", "EpochTime": 1448811214.94498, "Celsius": 14.187}
+  ## install/lib-perl/Khaospy/Constants.pm:113:        '28-0000066ebc74' => { # TODO rm this line
 
-#/sys/bus/w1/devices/28-021463423bff/w1_slave  landing
-#{"HomeAutoClass": "oneWireThermometer", "OneWireAddress": "28-021463423bff", "EpochTime": 1448811215.774984, "Celsius": 20.062}
 
-#/sys/bus/w1/devices/28-0214632d16ff/w1_slave  amelia
-#{"HomeAutoClass": "oneWireThermometer", "OneWireAddress": "28-0214632d16ff", "EpochTime": 1448811216.615052, "Celsius": 20.812}
-#
-
-my $heating_config = {
-    "bathroom" => {
-        OneWireAddress => "28-00000670596d",
-        upper_room_temp => 22, # when the rads will switch off.
-        lower_room_temp => 20, # when the rads will switch on.
-        alarm_window_switch => '',
-        orviboS20_rad_hostname => '',
-    },
-    "alison"   => {
-        OneWireAddress => "28-0000066ebc74",
-        upper_room_temp => 22, # when the rads will switch off.
-        lower_room_temp => 20, # when the rads will switch on.
-        alarm_window_switch => '',
-        orviboS20_rad_hostname => 'alisonrad',
-    },
-    "loft"     => {
-        OneWireAddress => "28-021463277cff",
-        upper_room_temp => 22, # when the rads will switch off.
-        lower_room_temp => 20, # when the rads will switch on.
-        alarm_window_switch => '',
-        orviboS20_rad_hostname => '',
-    },
-    "landing"  => {
-        OneWireAddress => "28-021463423bff",
-        upper_room_temp => 22, # when the rads will switch off.
-        lower_room_temp => 20, # when the rads will switch on.
-        alarm_window_switch => '',
-        orviboS20_rad_hostname => '',
-    },
-    "amelia"   => {
-        OneWireAddress => "28-0214632d16ff",
-        upper_room_temp => 22, # when the rads will switch off.
-        lower_room_temp => 20, # when the rads will switch on.
-        alarm_window_switch => '',
-        orviboS20_rad_hostname => 'ameliarad',
-    },
-    "playhouse-1"  => {
-        OneWireAddress => "28-000006e04e8b",
-        upper_room_temp => 22, # when the rads will switch off.
-        lower_room_temp => 20, # when the rads will switch on.
-        alarm_window_switch => '',
-        orviboS20_rad_hostname => '',
-    },
-    "playhouse-2"   => {
-        OneWireAddress => "28-0000066fe99e",
-        upper_room_temp => 22, # when the rads will switch off.
-        lower_room_temp => 21, # when the rads will switch on.
-        alarm_window_switch => '',
-        orviboS20_rad_hostname => '',
-    },
-
-#    '28-000006e04e8b' => {
-#        name  => 'playhouse-1',
-#        group => 'outside',
-#    },
-#    '28-0000066fe99e' => {
-#        name  => 'playhouse-2',
-#        group => 'outside',
-#    },
-#
-
-};
-
-my $onewire2conf =  { map { $heating_config->{$_}{OneWireAddress} => $_ } keys %$heating_config };
-
-# AC-CF-23-72-F3-D4 ameliaradiator  192.168.1.160
-# AC-CF-23-72-D1-FE alisonradiator  192.168.1.161
-# AC-CF-23-8D-A4-8E dinningroomrad  192.168.1.162
-# AC-CF-23-8D-7E-D2 karlradiator    192.168.1.163
-# AC-CF-23-8D-3B-96 frontroomrad    192.168.1.164
-
-# TODO find a way of using the host name from /etc/hosts to get the ip and mac.
-my $controls = {
-    alisonrad       => { ip => '192.168.1.161', mac => 'AC:CF:23:72:D1:FE' },
-    ameliarad       => { ip => '192.168.1.160', mac => 'AC-CF-23-72-F3-D4' },
-    karlrad         => { ip => '192.168.1.163', mac => 'AC-CF-23-8D-7E-D2' },
-    dinningroomrad  => { ip => '192.168.1.162', mac => 'AC-CF-23-8D-A4-8E' },
-    frontroomrad    => { ip => '192.168.1.164', mac => 'AC-CF-23-8D-3B-96' },
-};
+my $controls = $json->decode(
+    slurp ( $KHAOSPY_ORVIBO_S20_CONF_FULLPATH )
+);
 
 #
 # Based on
@@ -317,8 +249,6 @@ use AnyEvent;
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(ZMQ_SUB ZMQ_SUBSCRIBE ZMQ_RCVMORE ZMQ_FD);
 
-use JSON;
-my $json = JSON->new->allow_nonref;
 my $quit_program = AnyEvent->condvar;
 
 my $context = zmq_init();
@@ -344,39 +274,93 @@ sub anyevent_io {
         poll => "r",
         cb   => sub {
             while ( my $recvmsg = zmq_recvmsg( $subscriber, ZMQ_RCVMORE ) ) {
-                my $msg = zmq_msg_data($recvmsg);
-                my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
+                process_thermometer_msg ( zmq_msg_data($recvmsg) );
 
-                my $msg_decoded = $json->decode( $msgdata );
-
-                my $owaddr    = $msg_decoded->{OneWireAddress};
-                my $curr_temp = $msg_decoded->{Celsius};
-
-                my $name = $onewire2conf->{"$owaddr"};
-                my $hc = $heating_config->{"$name"};
-
-                print "##########\n";
-                print "$name : Celsius = $curr_temp.\n";
-
-    #            if ( $curr_temp > $hc->{upper_room_temp} ){
-    #                if ( $hc->{orviboS20_rad_hostname} ) {
-    #                    print "$name : Switch off ".$hc->{orviboS20_rad_hostname}."\n";
-    #                    print "$name : signal_control = ".signal_control($hc->{orviboS20_rad_hostname},"off")."\n";
-    #                } else {
-    #                    print "$name : Nothing configured to switch off\n";
-    #                }
-    #            }
-    #            elsif ( $curr_temp < $hc->{lower_room_temp} ){
-    #                if ( $hc->{orviboS20_rad_hostname} ) {
-    #                    print "$name : Switch on ".$hc->{orviboS20_rad_hostname}."\n";
-    #                    print "$name : signal_control = ".signal_control($hc->{orviboS20_rad_hostname},"on")."\n";
-    #                } else {
-    #                    print "$name : Nothing configured to switch on\n";
-    #                }
-    #            }
             }
         },
     );
 }
 
+sub process_thermometer_msg {
+    my ($msg) = @_;
+    my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
 
+    my $msg_decoded = $json->decode( $msgdata );
+
+    my $owaddr    = $msg_decoded->{OneWireAddress};
+    my $curr_temp = $msg_decoded->{Celsius};
+
+    my $tc   = $thermometer_conf->{$owaddr};
+
+    if ( ! defined $tc ) {
+        print "One-wire address $owaddr isn't in "
+            ."$KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH config file\n";
+        return;
+    }
+
+    my $name = $tc->{name}
+        || die "name isn't defined for $owaddr in "
+            ."$KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH ";
+
+    print "##########\n";
+    print "$name : $owaddr : Celsius = $curr_temp.\n";
+
+    my $turn_on_command    = $tc->{turn_on_command} || '';
+    my $turn_off_command   = $tc->{turn_off_command} || '';
+    my $get_status_command = $tc->{get_status_command} || '';
+    my $upper_temp         = $tc->{upper_temp} || '';
+    my $lower_temp         = $tc->{lower_temp} || '';
+
+    if ( ! $turn_on_command && ! $turn_off_command && ! $get_status_command
+        && ! $upper_temp && ! $lower_temp
+    ){
+        print "    Nothing configured for this thermometer\n";
+        return;
+    }
+
+    if ( ! $turn_on_command || ! $turn_off_command || ! $get_status_command
+        || ! $upper_temp || ! $lower_temp
+    ){
+        print "    Not all the parameters are configured for this thermometer\n";
+        print "    See the config file $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH\n";
+        print "    Cannot operate this control.\n";
+        return;
+    }
+
+    if ( $upper_temp <= $lower_temp ) {
+        print "    Broken temperature range in $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH config.\n";
+        print "    (Upper) $upper_temp <= (Lower) $lower_temp\n";
+        print "    Upper temperature must be greater than the lower temperature\n";
+        return;
+    }
+
+    if ( $curr_temp > $upper_temp ){
+        print "    turn_off_command : ".$turn_off_command." : (Current) $curr_temp > (Upper) $upper_temp\n";
+
+    }
+    elsif ( $curr_temp < $lower_temp ){
+        print "    turn_on_command : ".$turn_on_command." : (Current) $curr_temp < (Lower) $lower_temp\n";
+
+
+    } else {
+        print "    Current temperate is in correct range : (Lower) $lower_temp < (Current) $curr_temp < (Upper) $upper_temp\n";
+    }
+
+# TODO get the dispatching to an orviboS20 command working.
+# TODO get the dispatching to the i2c connected rad-controllers.
+#
+#        if ( $hc->{orviboS20_rad_hostname} ) {
+#            print "$name : Switch off ".$hc->{orviboS20_rad_hostname}."\n";
+#            print "$name : signal_control = ".signal_control($hc->{orviboS20_rad_hostname},"off")."\n";
+#        } else {
+#            print "$name : Nothing configured to switch off\n";
+#        }
+#
+#        if ( $hc->{orviboS20_rad_hostname} ) {
+#            print "$name : Switch on ".$hc->{orviboS20_rad_hostname}."\n";
+#            print "$name : signal_control = ".signal_control($hc->{orviboS20_rad_hostname},"on")."\n";
+#        } else {
+#            print "$name : Nothing configured to switch on\n";
+#        }
+
+}
