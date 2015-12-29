@@ -40,6 +40,7 @@ for my $control_key ( keys %$controls ) {
     print "Testing $control_key\n";
 
     my $control = $controls->{$control_key};
+    next if lc($control->{type}) ne 'orvibos20';
 
     test_on_off_status($control->{host},$control->{mac});
 

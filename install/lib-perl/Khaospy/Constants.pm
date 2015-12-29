@@ -129,18 +129,11 @@ sub daemon_runner_conf {
 #           upper_temp         => 22, # when temp is higher than this the "off" command will be sent.
 #           lower_temp         => 20, # when temp is less than this, the "on" command will be sent.
 #                               if any of the switches are open an "off" command will be sent.
-#           turn_on_command    => command to switch on heating,
-#           turn_off_command   => command to switch off heating',
-#           get_status_command => command to get current status',
-
-# commands are in the format "<name> <action>" where :
-#   <name> is the name of the controller
-#   <action> is "on" "off" or "status"
-
+#           control            => control_name that to switches on heating,
+#
 #       OPTIONAL-KEYS that can be supplied with the turn-off-off ones above :
 #           closed_switches    => Array of swtiches that must be closed for "on" command.
-#
-# TODO , not sure if I need the get_status_command in this config. TO BE DECIDED.
+#           these switches will be from an "alarm_switches_conf" (yet to be written)
 #
 sub heating_thermometer_config {
     return {
@@ -150,9 +143,7 @@ sub heating_thermometer_config {
             upper_temp         => 22,
             lower_temp         => 20,
             closed_switches    => [],
-            turn_on_command    => 'alisonrad on',
-            turn_off_command   => 'alisonrad off',
-            get_status_command => 'alisonrad status',
+            control            => 'alisonrad',
         },
         '28-000006e04e8b' => {
             name               => 'Playhouse-tv',
@@ -176,9 +167,7 @@ sub heating_thermometer_config {
             upper_temp         => 22,
             lower_temp         => 20,
             closed_switches    => [],
-            turn_on_command    => 'ameliarad on',
-            turn_off_command   => 'ameliarad off',
-            get_status_command => 'ameliarad status',
+            control            => 'ameliarad',
         },
         '28-021463423bff' => {
             name               => 'Upstairs-Landing',
@@ -230,6 +219,19 @@ sub controls_conf {
             host => 'frontroomrad',
             mac  => 'AC-CF-23-8D-3B-96'
         },
+        boiler => {
+            type => "picontroller",
+            host => "piboiler",
+        },
+    };
+}
+
+sub alarm_switches_conf {
+
+    die "alarm_switches_conf NOT YET IMPLEMENTED\n";
+
+    return {
+
     };
 }
 

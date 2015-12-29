@@ -7,8 +7,6 @@ use AnyEvent;
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(ZMQ_SUB ZMQ_SUBSCRIBE ZMQ_RCVMORE ZMQ_FD);
 
-use Carp qw/croak/;
-
 use JSON;
 use FindBin;
 FindBin::again();
@@ -20,24 +18,16 @@ use Khaospy::Utils qw/
     get_one_wire_sender_hosts
 /;
 
-use Khaospy::OrviboS20 qw/signal_control/;
 
 use Khaospy::Constants qw(
     $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
-    $KHAOSPY_CONTROLS_CONF_FULLPATH
+);
+
+use Khaospy::Controls qw(
+    send_command
 );
 
 my $json = JSON->new->allow_nonref;
-
-# 2015-12-25 . This is the current script for polling thermometers and switching the heating on/off . currently just by "orvibo S20"s wifi sockets.
-
-my $thermometer_conf = $json->decode(
-    slurp ( $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH )
-);
-
-my $controls = $json->decode(
-    slurp ( $KHAOSPY_CONTROLS_CONF_FULLPATH )
-);
 
 #############################################################
 # getting the temperatures.
@@ -74,7 +64,6 @@ sub anyevent_io {
         cb   => sub {
             while ( my $recvmsg = zmq_recvmsg( $subscriber, ZMQ_RCVMORE ) ) {
                 process_thermometer_msg ( zmq_msg_data($recvmsg) );
-
             }
         },
     );
@@ -89,6 +78,7 @@ sub process_thermometer_msg {
     my $owaddr    = $msg_decoded->{OneWireAddress};
     my $curr_temp = $msg_decoded->{Celsius};
 
+    my $thermometer_conf = get_thermometer_conf();
     my $tc   = $thermometer_conf->{$owaddr};
 
     if ( ! defined $tc ) {
@@ -104,22 +94,16 @@ sub process_thermometer_msg {
     print "##########\n";
     print "$name : $owaddr : Celsius = $curr_temp.\n";
 
-    my $turn_on_command    = $tc->{turn_on_command} || '';
-    my $turn_off_command   = $tc->{turn_off_command} || '';
-    my $get_status_command = $tc->{get_status_command} || '';
+    my $control            = $tc->{control} || '';
     my $upper_temp         = $tc->{upper_temp} || '';
     my $lower_temp         = $tc->{lower_temp} || '';
 
-    if ( ! $turn_on_command && ! $turn_off_command && ! $get_status_command
-        && ! $upper_temp && ! $lower_temp
-    ){
+    if ( ! $control && ! $upper_temp && ! $lower_temp ){
         print "    Nothing configured for this thermometer\n";
         return;
     }
 
-    if ( ! $turn_on_command || ! $turn_off_command || ! $get_status_command
-        || ! $upper_temp || ! $lower_temp
-    ){
+    if ( ! $control || ! $upper_temp || ! $lower_temp ){
         print "    Not all the parameters are configured for this thermometer\n";
         print "    See the config file $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH\n";
         print "    Cannot operate this control.\n";
@@ -134,71 +118,42 @@ sub process_thermometer_msg {
     }
 
     if ( $curr_temp > $upper_temp ){
-        print "    turn_off_command : ".$turn_off_command." : (Current) $curr_temp > (Upper) $upper_temp\n";
-        run_command($turn_off_command);
+        print "    control : $control off : (Current) $curr_temp > (Upper) $upper_temp\n";
+        my $retval;
+        eval { $retval = send_command($control, "off"); };
+        if ( $@ ) { print "$@\n" }
+        else { print "   control returned '$retval'" };
 
     }
     elsif ( $curr_temp < $lower_temp ){
-        print "    turn_on_command : ".$turn_on_command." : (Current) $curr_temp < (Lower) $lower_temp\n";
-        run_command($turn_on_command);
-
+        print "    control : $control on : (Current) $curr_temp < (Lower) $lower_temp\n";
+        my $retval;
+        eval { $retval = send_command($control, "on"); };
+        if ( $@ ) { print "$@\n" }
+        else { print "   control returned '$retval'" };
     } else {
         print "    Current temperate is in correct range : (Lower) $lower_temp < (Current) $curr_temp < (Upper) $upper_temp\n";
     }
 }
 
-sub run_command {
-    my ($command) = @_;
+{
+    # TODO there should be a Khaospy::Conf for this sort of stuff.
+    my $therm_conf;
+    my $therm_conf_last_loaded;
 
-    $command = lc $command;
-    my ( $control_name, $action )
-        =~ m/(\w+) (\w+)/;
+    sub get_thermometer_conf {
+        # reload the thermometer conf every 5 mins.
+        if ( ! $therm_conf
+            or $therm_conf_last_loaded + 20 < time  # TODO FIX THIS BACK TO 300 SECONDS.
+        ) {
+            $therm_conf = $json->decode(
+                 slurp( $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH )
+            );
+            $therm_conf_last_loaded = time ;
+        }
 
-    print "      PRETEND RUN COMMAND $command\n";
-#
-#    my $commands = {
-#        orvibos20 => \&orvibo_command(),
-#        picontroller => \&picontroller_command(),
-#    };
-#
-#    if ( ! exists $commands->{$command} ){
-#        croak "Invalid command '$command'\n";
-#    }
-#
-#    $commands->{$command}($control_name, $action);
-
+        return $therm_conf;
+    }
 }
 
-sub orvibo_command {
-    my ( $name, $action ) = @_;
 
-#    sub signal_control {
-#    my ( $ip, $p_mac, $action ) = @_;
-
-
-}
-
-sub picontroller_command {
-    my ($name, $action) = @_;
-
-    croak "picontroller_command not yet implemented\n";
-
-}
-
-# TODO get the dispatching to an orviboS20 command working.
-# TODO get the dispatching to the i2c connected rad-controllers.
-#
-#        if ( $hc->{orviboS20_rad_hostname} ) {
-#            print "$name : Switch off ".$hc->{orviboS20_rad_hostname}."\n";
-#            print "$name : signal_control = ".signal_control($hc->{orviboS20_rad_hostname},"off")."\n";
-#        } else {
-#            print "$name : Nothing configured to switch off\n";
-#        }
-#
-#        if ( $hc->{orviboS20_rad_hostname} ) {
-#            print "$name : Switch on ".$hc->{orviboS20_rad_hostname}."\n";
-#            print "$name : signal_control = ".signal_control($hc->{orviboS20_rad_hostname},"on")."\n";
-#        } else {
-#            print "$name : Nothing configured to switch on\n";
-#        }
- 
