@@ -13,11 +13,11 @@ FindBin::again();
 
 use lib "$FindBin::Bin/../lib-perl";
 
-use Khaospy::Utils qw/
+use Khaospy::Utils qw(
     slurp
     get_one_wire_sender_hosts
-/;
-
+    get_controls_for_boiler
+);
 
 use Khaospy::Constants qw(
     $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
@@ -27,7 +27,17 @@ use Khaospy::Controls qw(
     send_command
 );
 
+use Khaospy::Conf qw(
+    get_heating_thermometer_conf
+);
+
 my $json = JSON->new->allow_nonref;
+
+my $controls_for_boiler_status
+    = { map { $_ => "off" } @{get_controls_for_boiler()}};
+
+print "Controls for boiler :\n";
+print Dumper ( $controls_for_boiler_status );
 
 #############################################################
 # getting the temperatures.
@@ -78,7 +88,7 @@ sub process_thermometer_msg {
     my $owaddr    = $msg_decoded->{OneWireAddress};
     my $curr_temp = $msg_decoded->{Celsius};
 
-    my $thermometer_conf = get_thermometer_conf();
+    my $thermometer_conf = get_heating_thermometer_conf();
     my $tc   = $thermometer_conf->{$owaddr};
 
     if ( ! defined $tc ) {
@@ -91,19 +101,17 @@ sub process_thermometer_msg {
         || die "name isn't defined for one-wire address $owaddr in "
             ."$KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH ";
 
-    print "##########\n";
-    print "$name : $owaddr : Celsius = $curr_temp.\n";
+    print "##\n";
+    print "$name : $owaddr : $curr_temp C\n";
 
-    my $control            = $tc->{control} || '';
-    my $upper_temp         = $tc->{upper_temp} || '';
-    my $lower_temp         = $tc->{lower_temp} || '';
+    my $control_name = $tc->{control} || '';
+    my $upper_temp   = $tc->{upper_temp} || '';
 
-    if ( ! $control && ! $upper_temp && ! $lower_temp ){
-        print "    Nothing configured for this thermometer\n";
-        return;
-    }
+    return if ( ! $control_name && ! $upper_temp );
 
-    if ( ! $control || ! $upper_temp || ! $lower_temp ){
+    my $lower_temp = $tc->{lower_temp} || ( $upper_temp - 1 );
+
+    if ( ! $control_name || ! $upper_temp || ! $lower_temp ){
         print "    Not all the parameters are configured for this thermometer\n";
         print "    See the config file $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH\n";
         print "    Cannot operate this control.\n";
@@ -117,43 +125,57 @@ sub process_thermometer_msg {
         return;
     }
 
-    if ( $curr_temp > $upper_temp ){
-        print "    control : $control off : (Current) $curr_temp > (Upper) $upper_temp\n";
+    my $send_cmd = sub {
+        my ( $action ) = @_;
         my $retval;
-        eval { $retval = send_command($control, "off"); };
+        eval { $retval = send_command($control_name, $action); };
         if ( $@ ) { print "$@\n" }
-        else { print "   control returned '$retval'" };
+        else {
+            # TODO what if retval ne $action ? what am I gonna do ?
+            # blow up , just log it ..... dunno.
+            print "   control status '$retval'\n";
 
+            if ( exists $controls_for_boiler_status->{$control_name} ){
+                $controls_for_boiler_status->{$control_name} = $retval;
+                operate_boiler();
+            }
+        };
+    };
+
+    if ( $curr_temp > $upper_temp ){
+        print "    control : $control_name off : (Current) $curr_temp > (Upper) $upper_temp\n";
+        $send_cmd->("off");
     }
     elsif ( $curr_temp < $lower_temp ){
-        print "    control : $control on : (Current) $curr_temp < (Lower) $lower_temp\n";
-        my $retval;
-        eval { $retval = send_command($control, "on"); };
-        if ( $@ ) { print "$@\n" }
-        else { print "   control returned '$retval'" };
+        print "    control : $control_name on : (Current) $curr_temp < (Lower) $lower_temp\n";
+        $send_cmd->("on");
     } else {
         print "    Current temperate is in correct range : (Lower) $lower_temp < (Current) $curr_temp < (Upper) $upper_temp\n";
+        $send_cmd->("status");
     }
 }
 
-{
-    # TODO there should be a Khaospy::Conf for this sort of stuff.
-    my $therm_conf;
-    my $therm_conf_last_loaded;
+sub operate_boiler {
+    if ( grep { $controls_for_boiler_status->{$_} eq 'on' }
+         keys %$controls_for_boiler_status
+    ){
+        #TODO the actuators take about 2 mins to operate,
+        # Do i need a configurable time to pause send the "ON"
+        # signal to the boiler ?
+        # Otherwise the boiler will be pushing hot water to a rad that is not on.
+        # This delay would only be valid when changing state from
+        # "OFF" to "ON".
+        # If the boiler is already on ( because a rad valve is open )
+        # then a 2 min delay isn't necessary.
 
-    sub get_thermometer_conf {
-        # reload the thermometer conf every 5 mins.
-        if ( ! $therm_conf
-            or $therm_conf_last_loaded + 20 < time  # TODO FIX THIS BACK TO 300 SECONDS.
-        ) {
-            $therm_conf = $json->decode(
-                 slurp( $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH )
-            );
-            $therm_conf_last_loaded = time ;
-        }
+         print " TURN BOILER ON\n";
+        # TODO actaully get this to run some code .
+        # I could use an orviboS20 for testing.
 
-        return $therm_conf;
+    } else {
+         print " TURN BOILER OFF\n";
     }
+    print Dumper ( $controls_for_boiler_status );
 }
 
 

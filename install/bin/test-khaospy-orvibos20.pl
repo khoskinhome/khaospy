@@ -46,7 +46,6 @@ for my $control_key ( keys %$controls ) {
 
 }
 
-
 sub test_on_off_status {
 
     my ( $host, $mac ) = @_;

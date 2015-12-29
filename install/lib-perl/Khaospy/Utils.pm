@@ -2,6 +2,7 @@ package Khaospy::Utils;
 use strict;
 use warnings;
 
+use Carp qw/croak/;
 use Data::Dumper;
 use Exporter qw/import/;
 use JSON;
@@ -16,17 +17,24 @@ use lib "$FindBin::Bin/../lib-perl";
 use Khaospy::Constants qw(
     $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
     $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
+
+    $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
+    $KHAOSPY_CONTROLS_CONF_FULLPATH
+);
+
+use Khaospy::Conf qw(
+    get_heating_thermometer_conf
+    get_controls_conf
 );
 
 our @EXPORT_OK = qw(
-    slurp burp
+    slurp
+    burp
     get_one_wire_sender_hosts
-    true false
+    get_controls_for_boiler
     get_hashval
 );
 
-sub true  { 1 };
-sub false { 0 };
 
 sub slurp {
     my ( $file ) = @_;
@@ -61,6 +69,35 @@ sub get_one_wire_sender_hosts {
 
     my %ret = map { $_ => 1 } @$one_wire_sender_host ;
     return keys %ret ;
+}
+
+sub get_controls_for_boiler {
+    # goes through the heating_thermometer_conf, and returns
+    # a list of control_names that need to operate the "boiler".
+
+    my $heating_thermometer_conf = get_heating_thermometer_conf();
+    my $controls_conf = get_controls_conf();
+
+    my $check_controls_conf = sub {
+        my ($control_name) = @_;
+        return $control_name
+            if exists $controls_conf->{$control_name};
+
+        croak "ERROR in config. heating_thermometer control '$control_name' doesn't exist in the controls config\n"
+                ."   check the configs :\n"
+                ."       $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH\n"
+                ."       $KHAOSPY_CONTROLS_CONF_FULLPATH\n";
+    };
+
+    return [
+        map { $check_controls_conf->($heating_thermometer_conf->{$_}{control}) }
+        grep {
+            exists $heating_thermometer_conf->{$_}{boiler}
+            && $heating_thermometer_conf->{$_}{boiler}
+        }
+        keys %$heating_thermometer_conf
+    ];
+
 }
 
 sub get_hashval {

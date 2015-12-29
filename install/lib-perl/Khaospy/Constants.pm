@@ -6,6 +6,9 @@ use warnings;
 
 use Exporter qw/import/;
 
+sub true  { 1 };
+sub false { 0 };
+
 #######
 # dirs 
 
@@ -56,6 +59,7 @@ our $KHAOSPY_CONTROLS_CONF_FULLPATH
 #############
 
 our @EXPORT_OK = qw(
+    true false
 
     $KHAOSPY_ALL_DIRS
     $KHAOSPY_ROOT_DIR
@@ -127,23 +131,31 @@ sub daemon_runner_conf {
 #
 #       OPTIONAL-KEYS that must all be supplied together :
 #           upper_temp         => 22, # when temp is higher than this the "off" command will be sent.
-#           lower_temp         => 20, # when temp is less than this, the "on" command will be sent.
-#                               if any of the switches are open an "off" command will be sent.
 #           control            => control_name that to switches on heating,
 #
 #       OPTIONAL-KEYS that can be supplied with the turn-off-off ones above :
+#           lower_temp         => 20, # when temp is less than this, the "on" command will be sent.
+#                                 if lower_temp isn't supplied it defaults to ( upper_temp -1 )
 #           closed_switches    => Array of swtiches that must be closed for "on" command.
-#           these switches will be from an "alarm_switches_conf" (yet to be written)
+#               these switches will be from an "alarm_switches_conf" (yet to be written)
+#               if any of the switches are open an "off" command will be sent.
+#           boiler             => This is flag that indicates that the control is just operating a radiator valve
+#                                 and a boiler needs to be switched on or off.
+#                                 If this key isn't supplied, then it is defaulted to "false", and the control is
+#                                 assumed to be directly controlling the heating-appliance.
+#                                 In the controls config there is a reserved control name for the "boiler".
 #
+#
+  ## install/lib-perl/Khaospy/Utils.pm:78:  ## install/lib-perl/Khaospy/Constants.pm:149:sub heating_thermometer_config { # TODO rm this line # TODO rm this line
 sub heating_thermometer_config {
     return {
         '28-0000066ebc74' => {
             name               => 'Alison',
             rrd_group          => 'upstairs',
-            upper_temp         => 22,
-            lower_temp         => 20,
+            upper_temp         => 21,
             closed_switches    => [],
             control            => 'alisonrad',
+            boiler             => true,
         },
         '28-000006e04e8b' => {
             name               => 'Playhouse-tv',
@@ -164,10 +176,10 @@ sub heating_thermometer_config {
         '28-0214632d16ff' => {
             name               => 'Amelia',
             rrd_group          => 'upstairs',
-            upper_temp         => 22,
-            lower_temp         => 20,
+            upper_temp         => 21,
             closed_switches    => [],
             control            => 'ameliarad',
+            boiler             => true,
         },
         '28-021463423bff' => {
             name               => 'Upstairs-Landing',
@@ -178,6 +190,15 @@ sub heating_thermometer_config {
 
 #################################
 # controls_conf
+#####
+# every control has a unique control-name.
+# controls can be switched "on" or "off" or have their "status" queried.
+#
+# There is one reserved control-name "boiler", this is for the control that switches
+# the central-heating "boiler" on or off.
+#
+# There is hard coding that looks for all the heating_thermometer_config controls that are "boiler => true".
+# So the "boiler" control needs to be called "boiler" for these to work.
 #
 #   <type>  can be :
 #               orviboS20 ( orvibos20 will also work )

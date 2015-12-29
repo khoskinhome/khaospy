@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use 5.14.2;
 use Data::Dumper;
 
 # This script should be run at least every 2 mins from the root crontab.
