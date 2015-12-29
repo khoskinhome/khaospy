@@ -45,7 +45,7 @@ on error will raise on of the following exceptions :
 =cut
 
 sub signal_control {
-    my ( $ip, $p_mac, $action ) = @_;
+    my ( $host, $p_mac, $action ) = @_;
 
     # TODO , must be a better way, I don't like this usleep :
     usleep(100000);
@@ -54,10 +54,10 @@ sub signal_control {
     my $p = Net::Ping->new('icmp', 1);
     do {
         if ( $n == 5 ) {
-            die "ip-unreachable $ip";
+            die "ip-unreachable $host";
         }
         $n++;
-    } until ($p->ping($ip));
+    } until ($p->ping($host));
     $p->close();
 
     my $pack_mac = get_packed_mac($p_mac);
@@ -65,7 +65,7 @@ sub signal_control {
         die "config-invalid-mac $p_mac";
     }
 
-    my $s20 = findS20( $pack_mac, $ip );
+    my $s20 = findS20( $pack_mac, $host );
 
     # TODO , must be a better way, I don't like this usleep :
     usleep(100000);
@@ -84,7 +84,7 @@ sub signal_control {
 sub findS20($$)
 {
 
-    my ($mac, $ip ) = @_;
+    my ($mac, $host ) = @_;
 
     my $s20;
     my $reversed_mac = scalar(reverse($mac));
@@ -97,7 +97,7 @@ sub findS20($$)
                      die "Could not create Select: $!\n";
 
     # my $to_addr = sockaddr_in($port, INADDR_BROADCAST);
-    my $iaddr = inet_aton($ip) || die 'Unable to resolve';
+    my $iaddr = inet_aton($host) || die 'Unable to resolve';
     my $to_addr = sockaddr_in($port, $iaddr);
 
 

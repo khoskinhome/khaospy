@@ -40,8 +40,8 @@ our $KHAOSPY_ALL_CONFS = {
         = "daemon-runner.json"       => daemon_runner_conf(),
     our $KHAOSPY_HEATING_THERMOMETER_CONF
         = "heating_thermometer.json" => heating_thermometer_config(),
-    our $KHAOSPY_ORVIBO_S20_CONF
-        = "orvibo_s20_config.json"   => orvibo_s20_config(),
+    our $KHAOSPY_CONTROLS_CONF
+        = "controls.json"            => controls_conf(),
 };
 
 our $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
@@ -50,8 +50,8 @@ our $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
 our $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
     = "$KHAOSPY_CONF_DIR/$KHAOSPY_HEATING_THERMOMETER_CONF";
 
-our $KHAOSPY_ORVIBO_S20_CONF_FULLPATH
-    = "$KHAOSPY_CONF_DIR/$KHAOSPY_ORVIBO_S20_CONF";
+our $KHAOSPY_CONTROLS_CONF_FULLPATH
+    = "$KHAOSPY_CONF_DIR/$KHAOSPY_CONTROLS_CONF";
 
 #############
 
@@ -68,14 +68,15 @@ our @EXPORT_OK = qw(
     $KHAOSPY_WWW_DIR
     $KHAOSPY_WWW_BIN_DIR
 
+    $KHAOSPY_ALL_CONFS
+
     $KHAOSPY_DAEMON_RUNNER_CONF
     $KHAOSPY_HEATING_THERMOMETER_CONF
-    $KHAOSPY_ORVIBO_S20_CONF
-    $KHAOSPY_ALL_CONFS
+    $KHAOSPY_CONTROLS_CONF
 
     $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
     $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
-    $KHAOSPY_ORVIBO_S20_CONF_FULLPATH
+    $KHAOSPY_CONTROLS_CONF_FULLPATH
 
     $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
     $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
@@ -90,6 +91,14 @@ our @EXPORT_OK = qw(
 
 ###############################################################################
 # "conf" subs
+
+###############################
+# daemon_runner_conf keys
+#
+# The primary key is the hostname on where the script should run.
+#
+# this points to an array of script names to be run by /usr/bin/daemon ( with CLI params )
+#
 
 sub daemon_runner_conf {
     return {
@@ -110,6 +119,7 @@ sub daemon_runner_conf {
     };
 }
 
+##################################
 #   Heating conf keys :
 #       COMPULSORY-KEYS :
 #           name               => 'Alison', COMPULSORY-KEY
@@ -123,8 +133,15 @@ sub daemon_runner_conf {
 #           turn_off_command   => command to switch off heating',
 #           get_status_command => command to get current status',
 
+# commands are in the format "<name> <action>" where :
+#   <name> is the name of the controller
+#   <action> is "on" "off" or "status"
+
 #       OPTIONAL-KEYS that can be supplied with the turn-off-off ones above :
 #           closed_switches    => Array of swtiches that must be closed for "on" command.
+#
+# TODO , not sure if I need the get_status_command in this config. TO BE DECIDED.
+#
 sub heating_thermometer_config {
     return {
         '28-0000066ebc74' => {
@@ -133,9 +150,9 @@ sub heating_thermometer_config {
             upper_temp         => 22,
             lower_temp         => 20,
             closed_switches    => [],
-            turn_on_command    => 'orviboS20 alisonrad on',
-            turn_off_command   => 'orviboS20 alisonrad off',
-            get_status_command => 'orviboS20 alisonrad status',
+            turn_on_command    => 'alisonrad on',
+            turn_off_command   => 'alisonrad off',
+            get_status_command => 'alisonrad status',
         },
         '28-000006e04e8b' => {
             name               => 'Playhouse-tv',
@@ -159,9 +176,9 @@ sub heating_thermometer_config {
             upper_temp         => 22,
             lower_temp         => 20,
             closed_switches    => [],
-            turn_on_command    => 'orviboS20 ameliarad on',
-            turn_off_command   => 'orviboS20 ameliarad off',
-            get_status_command => 'orviboS20 ameliarad status',
+            turn_on_command    => 'ameliarad on',
+            turn_off_command   => 'ameliarad off',
+            get_status_command => 'ameliarad status',
         },
         '28-021463423bff' => {
             name               => 'Upstairs-Landing',
@@ -170,14 +187,49 @@ sub heating_thermometer_config {
     };
 }
 
-sub orvibo_s20_config {
+#################################
+# controls_conf
+#
+#   <type>  can be :
+#               orviboS20 ( orvibos20 will also work )
+#               picontroller
+#   <host>  is either an hostname or ip-address
+#
+#   <mac>   is currently only need for Orvibo S20 controls.
+#           This might be fixed in the Khaospy::OrviboS20 module, so it just needs the hostname.
+#           Configuring orviboS20s is a whole "how-to" in itself, since they will only DHCP,
+#           and to get static ips, and hostname via say /etc/hosts takes a bit of configuring of
+#           the DHCP server, using nmap to find the orviboS20s etc..
+#           The long term plan is to try and drop <mac> for Orvibo S20s.
+
+sub controls_conf {
     ## TODO find a way of using the host name from /etc/hosts to get the ip and mac.
     return {
-        alisonrad       => { ip => '192.168.1.161', mac => 'AC:CF:23:72:D1:FE' },
-        ameliarad       => { ip => '192.168.1.160', mac => 'AC-CF-23-72-F3-D4' },
-        karlrad         => { ip => '192.168.1.163', mac => 'AC-CF-23-8D-7E-D2' },
-        dinningroomrad  => { ip => '192.168.1.162', mac => 'AC-CF-23-8D-A4-8E' },
-        frontroomrad    => { ip => '192.168.1.164', mac => 'AC-CF-23-8D-3B-96' },
+        alisonrad       => {
+            type => "orviboS20",
+            host => 'alisonrad',
+            mac  => 'AC:CF:23:72:D1:FE',
+        },
+        ameliarad       => {
+            type => "orviboS20",
+            host => 'ameliarad',
+            mac  => 'AC-CF-23-72-F3-D4'
+        },
+        karlrad         => {
+            type => "orviboS20",
+            host => 'karlrad',
+            mac  => 'AC-CF-23-8D-7E-D2'
+        },
+        dinningroomrad  => {
+            type => "orviboS20",
+            host => 'dinningroomrad',
+            mac  => 'AC-CF-23-8D-A4-8E'
+        },
+        frontroomrad    => {
+            type => "orviboS20",
+            host => 'frontroomrad',
+            mac  => 'AC-CF-23-8D-3B-96'
+        },
     };
 }
 

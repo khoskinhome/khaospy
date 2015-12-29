@@ -7,6 +7,8 @@ use AnyEvent;
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(ZMQ_SUB ZMQ_SUBSCRIBE ZMQ_RCVMORE ZMQ_FD);
 
+use Carp qw/croak/;
+
 use JSON;
 use FindBin;
 FindBin::again();
@@ -22,10 +24,8 @@ use Khaospy::OrviboS20 qw/signal_control/;
 
 use Khaospy::Constants qw(
     $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
-    $KHAOSPY_ORVIBO_S20_CONF_FULLPATH
+    $KHAOSPY_CONTROLS_CONF_FULLPATH
 );
-
-# generate the daemon-runner JSON conf file in perl !
 
 my $json = JSON->new->allow_nonref;
 
@@ -35,12 +35,8 @@ my $thermometer_conf = $json->decode(
     slurp ( $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH )
 );
 
-  ## install/bin/khaospy-generate-rrd-graphs.pl:21:my $thermometer_conf = $json->decode( # TODO rm this line
-
-  ## install/lib-perl/Khaospy/Constants.pm:113:        '28-0000066ebc74' => { # TODO rm this line
-
 my $controls = $json->decode(
-    slurp ( $KHAOSPY_ORVIBO_S20_CONF_FULLPATH )
+    slurp ( $KHAOSPY_CONTROLS_CONF_FULLPATH )
 );
 
 #############################################################
@@ -139,15 +135,55 @@ sub process_thermometer_msg {
 
     if ( $curr_temp > $upper_temp ){
         print "    turn_off_command : ".$turn_off_command." : (Current) $curr_temp > (Upper) $upper_temp\n";
+        run_command($turn_off_command);
 
     }
     elsif ( $curr_temp < $lower_temp ){
         print "    turn_on_command : ".$turn_on_command." : (Current) $curr_temp < (Lower) $lower_temp\n";
-
+        run_command($turn_on_command);
 
     } else {
         print "    Current temperate is in correct range : (Lower) $lower_temp < (Current) $curr_temp < (Upper) $upper_temp\n";
     }
+}
+
+sub run_command {
+    my ($command) = @_;
+
+    $command = lc $command;
+    my ( $control_name, $action )
+        =~ m/(\w+) (\w+)/;
+
+    print "      PRETEND RUN COMMAND $command\n";
+#
+#    my $commands = {
+#        orvibos20 => \&orvibo_command(),
+#        picontroller => \&picontroller_command(),
+#    };
+#
+#    if ( ! exists $commands->{$command} ){
+#        croak "Invalid command '$command'\n";
+#    }
+#
+#    $commands->{$command}($control_name, $action);
+
+}
+
+sub orvibo_command {
+    my ( $name, $action ) = @_;
+
+#    sub signal_control {
+#    my ( $ip, $p_mac, $action ) = @_;
+
+
+}
+
+sub picontroller_command {
+    my ($name, $action) = @_;
+
+    croak "picontroller_command not yet implemented\n";
+
+}
 
 # TODO get the dispatching to an orviboS20 command working.
 # TODO get the dispatching to the i2c connected rad-controllers.
@@ -165,5 +201,4 @@ sub process_thermometer_msg {
 #        } else {
 #            print "$name : Nothing configured to switch on\n";
 #        }
-
-}
+ 

@@ -11,7 +11,7 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Utils qw/slurp/;
 use Khaospy::Constants qw(
-    $KHAOSPY_ORVIBO_S20_CONF_FULLPATH
+    $KHAOSPY_CONTROLS_CONF_FULLPATH
 );
 
 use Khaospy::OrviboS20 qw/signal_control/;
@@ -26,14 +26,14 @@ my $json = JSON->new->allow_nonref;
   ## install/lib-perl/Khaospy/Constants.pm:113:        '28-0000066ebc74' => { # TODO rm this line
 
 my $controls = $json->decode(
-    slurp ( $KHAOSPY_ORVIBO_S20_CONF_FULLPATH )
+    slurp ( $KHAOSPY_CONTROLS_CONF_FULLPATH )
 );
 
 print Dumper ( $controls ) ;
 
-#my $ip  = '192.168.1.160';
+#my $host  = '192.168.1.160';
 #my $mac = 'AC-CF-23-72-F3-D4';
-#test_on_off_status($ip,$mac);
+#test_on_off_status($host,$mac);
 
 for my $control_key ( keys %$controls ) {
     print "##############\n";
@@ -41,14 +41,14 @@ for my $control_key ( keys %$controls ) {
 
     my $control = $controls->{$control_key};
 
-    test_on_off_status($control->{ip},$control->{mac});
+    test_on_off_status($control->{host},$control->{mac});
 
 }
 
 
 sub test_on_off_status {
 
-    my ( $ip, $mac ) = @_;
+    my ( $host, $mac ) = @_;
 
     my $tests  = [
         {on     => "on"},
@@ -71,15 +71,15 @@ sub test_on_off_status {
         my ( $action ) = keys %$test;
 
         my $return;
-        eval { $return = signal_control( $ip, $mac, $action ) };
+        eval { $return = signal_control( $host, $mac, $action ) };
 
         if ( $@ ) {
-            print "FAILED testing ($ip, $mac, $action) DIED with return = $return ; $@\n";
+            print "FAILED testing ($host, $mac, $action) DIED with return = $return ; $@\n";
         } else {
             if ($test->{$action} eq $return){
-                print "PASSED testing ($ip, $mac, $action) return = $return\n";
+                print "PASSED testing ($host, $mac, $action) return = $return\n";
             } else {
-                print "FAILED testing ($ip, $mac, $action) return = $return\n";
+                print "FAILED testing ($host, $mac, $action) return = $return\n";
             }
         }
     }
