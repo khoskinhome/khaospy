@@ -45,6 +45,9 @@ our $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
 our $KHAOSPY_HEATING_CONTROL_SCRIPT
     = "$KHAOSPY_BIN_DIR/khaospy-heating-control.pl";
 
+our $KHAOSPY_BOILER_DAEMON_SCRIPT
+    = "$KHAOSPY_BIN_DIR/khaospy-boiler-daemon.pl";
+
 #############
 # json confs
 our $KHAOSPY_ALL_CONFS = {
@@ -72,9 +75,9 @@ our $KHAOSPY_BOILERS_CONF_FULLPATH
 
 #############
 
-our $ONE_WIRE_DAEMON_PORT     = 5001;
-our $ALARM_SWITCH_DAEMON_PORT = 5051;
-our $HEATING_CONTROL_DAEMON_PUBLISH_PORT       = 5021;
+our $ONE_WIRE_DAEMON_PORT                = 5001;
+our $ALARM_SWITCH_DAEMON_PORT            = 5051;
+our $HEATING_CONTROL_DAEMON_PUBLISH_PORT = 5021;
 
 ######################
 our @EXPORT_OK = qw(
@@ -111,18 +114,13 @@ our @EXPORT_OK = qw(
     $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
     $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
     $KHAOSPY_HEATING_CONTROL_SCRIPT
+    $KHAOSPY_BOILER_DAEMON_SCRIPT
 
     $ONE_WIRE_DAEMON_PORT
     $ALARM_SWITCH_DAEMON_PORT
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT
 
 );
-
-#for my $dir ( @$KHAOSPY_ALL_DIRS ){
-#    if ( ! -d $dir ) {
-#        system("mkdir -p $dir") && print "Can't create dir $dir\n";
-#    }
-#}
 
 ###############################################################################
 # "conf" subs
@@ -141,9 +139,8 @@ sub daemon_runner_conf {
             "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=pioldwifi",
             "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=piloft",
     #        "$KHAOSPY_HEATING_CONTROL_SCRIPT",
+    #        "$KHAOSPY_BOILER_DAEMON_SCRIPT",
         ],
-    #    piserver2 => [
-    #    ],
         piloft => [
             "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
             "/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
