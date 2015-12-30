@@ -199,20 +199,20 @@ sub get_boiler_name_for_control {
 
     my ($control) = @_;
 
-    my @boilers;
+    my @boiler_list;
     for my $boiler_name ( keys %$BOILER_STATUS ) {
-        push @boilers, map { $boiler_name }
+        push @boiler_list, map { $boiler_name }
                 grep { $control eq $_ }
                 keys %{$BOILER_STATUS->{$boiler_name}{controls}}
         ;
     }
 
     croak "More than one boiler is configured to use control '$control'\n"
-            .Dumper(\@boilers)
+            .Dumper(\@boiler_list)
             ."please fix $KHAOSPY_BOILERS_CONF_FULLPATH\n"
-        if  @boilers > 1;
+        if  @boiler_list > 1;
 
-    return $boilers[0] if $boilers[0];
+    return $boiler_list[0] if $boiler_list[0];
     return;
 }
 
