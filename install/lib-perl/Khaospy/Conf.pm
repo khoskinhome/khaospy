@@ -51,17 +51,12 @@ our @EXPORT_OK = qw(
 
 {
     my $boiler_conf;
-    my $boiler_conf_last_loaded;
 
     sub get_boiler_conf {
-        # reload the boiler conf every 5 mins.
-        if ( ! $boiler_conf
-            or $boiler_conf_last_loaded + 20 < time  # TODO FIX THIS BACK TO 300 SECONDS.
-        ) {
+        if ( ! $boiler_conf ) {
             $boiler_conf = $json->decode(
                  Khaospy::Utils::slurp( $KHAOSPY_BOILERS_CONF_FULLPATH )
             );
-            $boiler_conf_last_loaded = time ;
         }
         return $boiler_conf;
     }

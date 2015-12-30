@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Carp qw/croak/;
+#use List::Util qw/any/;
 use AnyEvent;
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(ZMQ_SUB ZMQ_SUBSCRIBE ZMQ_RCVMORE ZMQ_FD);
@@ -22,6 +23,7 @@ use Khaospy::Constants qw(
     true false
     ON OFF STATUS
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT
+    $KHAOSPY_BOILERS_CONF_FULLPATH
 );
 
 use Khaospy::Controls qw(
@@ -32,21 +34,263 @@ use Khaospy::Conf qw(
     get_boiler_conf
 );
 
-my $json = JSON->new->allow_nonref;
+my $JSON = JSON->new->allow_nonref;
 
 
 use Getopt::Long;
-my $verbose = false;
+my $VERBOSE = false;
 use POSIX qw(strftime);
-GetOptions ( "verbose" => \$verbose );
+GetOptions ( "verbose" => \$VERBOSE );
 
 print "#############\n";
 print "Boiler Daemon\n";
 print "Start time ".strftime("%F %T", gmtime(time) )."\n";
-print "VERBOSE = ".($verbose ? "TRUE" : "FALSE")."\n";
+print "VERBOSE = ".( $VERBOSE ? "TRUE" : "FALSE" )."\n";
 
-my $boiler_status;
+my $BOILER_STATUS;
+
+my $BOILER_STATUS_LAST_REFRESH;
+my $BOILER_STATUS_REFRESH_EVERY_SECS = 15; # TODO put back to 60.
+
 init_boiler_status();
+
+main();
+
+exit 0;
+
+#######
+# subs
+
+sub main {
+    my $quit_program = AnyEvent->condvar;
+
+    my $context = zmq_init();
+
+    my $subscriber = zmq_socket($context, ZMQ_SUB);
+
+    # TODO this needs to be worked out from looking at the daemon-runner conf.
+    # working out the host that the heating-control is running on.
+    # currently this hard coding means the boiler-daemon has to run on the same host as the heating-control-daemon.
+    my $HEATING_CONTROL_HOST = 'localhost';
+
+    my $connect_str = "tcp://$HEATING_CONTROL_HOST:$HEATING_CONTROL_DAEMON_PUBLISH_PORT";
+
+    if ( my $zmq_state = zmq_connect($subscriber, $connect_str )){
+        croak "zmq can't connect to $connect_str. status = $zmq_state . $!\n";
+    };
+
+    # '' is because I can't work out how to get the "topic" filter sent by Khaospy::Boiler.
+    zmq_setsockopt($subscriber, ZMQ_SUBSCRIBE, '' );
+
+    my $fh = zmq_getsockopt( $subscriber, ZMQ_FD );
+
+    my $w = anyevent_io( $fh, $subscriber );
+
+    $quit_program->recv;
+
+}
+
+sub anyevent_io {
+    my ( $fh, $subscriber ) = @_;
+    return AnyEvent->io(
+        fh   => $fh,
+        poll => "r",
+        cb   => sub {
+            while ( my $recvmsg = zmq_recvmsg( $subscriber, ZMQ_RCVMORE ) ) {
+                process_boiler_message ( zmq_msg_data($recvmsg) );
+            }
+        },
+    );
+}
+
+sub process_boiler_message {
+    my ($msg) = @_ ;
+
+    #my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
+    # ^^^ can't get $topic working in perl yet. TODO
+
+    my $msg_decoded = $JSON->decode( $msg );
+
+    print Dumper($msg_decoded)."\n" if $VERBOSE;
+
+    my $epoch_time
+        = $msg_decoded->{EpochTime};
+    my $control
+        = $msg_decoded->{Control};
+    my $home_auto_class
+        = $msg_decoded->{HomeAutoClass}; # Why do I need HomeAutoClass ? TODO probably deprecate this.
+    my $action
+        = $msg_decoded->{Action};
+
+    refresh_boiler_status()
+        if $BOILER_STATUS_LAST_REFRESH + $BOILER_STATUS_REFRESH_EVERY_SECS < time ;
+
+    my $boiler_name = get_boiler_for_control($control);
+
+    boiler_delay_on();
+
+    return if ! $boiler_name;
+
+    operate_boiler($boiler_name, $control, $action);
+
+}
+
+sub operate_boiler {
+    my ($boiler_name, $control, $action) = @_;
+
+    print "Operates boiler '$boiler_name'. set control '$control' to '$action'\n";
+
+    my $boiler = $BOILER_STATUS->{$boiler_name};
+
+    # update the boiler's controls with the latest control-action.
+    $boiler->{controls}{$control}=$action;
+
+    print "Controls are \n".Dumper($boiler->{controls}) if $VERBOSE;
+
+    # Is at least one of the boiler's controls on ? :
+    if ( grep { $boiler->{controls}{$_} eq ON }
+        keys %{$boiler->{controls}}
+    ){
+        boiler_on($boiler_name);
+        return;
+    }
+
+    print "TURN BOILER OFF\n";
+
+    _sig_a_control ( $boiler_name, OFF, \$boiler->{current_status} );
+    #$boiler->{current_status} = send_command( $boiler_name , OFF );
+    print "Boiler is now ".$boiler->{current_status}."\n";
+
+    if ( $boiler->{current_status} eq OFF ) {
+        $boiler->{last_time_off} = time;
+    } else {
+        print "ERROR. Boiler is not OFF\n";
+    }
+
+
+}
+
+sub boiler_on {
+    my ($boiler_name) = @_;
+    my $boiler = $BOILER_STATUS->{$boiler_name};
+    # TODO the delay on code .
+    # set the "boiler_next_on_at" if necessary.
+
+    # my $current_boiler_state = $boiler->{current_status};
+
+    print "TURN BOILER ON\n";
+
+    _sig_a_control ( $boiler_name, ON, \$boiler->{current_status} );
+    #$boiler->{current_status} = send_command( $boiler_name , ON );
+    print "Boiler is now ".$boiler->{current_status}."\n";
+    if ( $boiler->{current_status} eq ON ) {
+        $boiler->{last_time_on} = time;
+    } else {
+        print "ERROR. Boiler is not ON\n";
+    }
+
+}
+
+sub boiler_delay_on {
+    # checks all boilers and see if there is a "boiler_next_on_at" set that is now valid.
+    print "boiler_delay_on checking....\n" if $VERBOSE;
+
+
+}
+
+sub get_boiler_for_control {
+    # goes through the $BOILER_STATUS and looks for a control.
+    # returns either the name of the boiler_control or undef.
+
+    # will croak if 2 boilers have the same sub-control.
+
+    my ($control) = @_;
+
+    my @boilers;
+    for my $boiler_control ( keys %$BOILER_STATUS ) {
+        push @boilers, map { $boiler_control }
+                grep { $control eq $_ }
+                keys %{$BOILER_STATUS->{$boiler_control}{controls}}
+        ;
+    }
+
+    croak "More than one boiler is configured to use control '$control'\n"
+            .Dumper(\@boilers)
+            ."please fix $KHAOSPY_BOILERS_CONF_FULLPATH\n"
+        if  @boilers > 1;
+
+    return $boilers[0];
+}
+
+sub init_boiler_status {
+    # clone the boiler_conf in boiler_status,
+    # and munge the "controls" array to be a hash that holds the "controls" state.
+
+    print "init boiler status\n";
+
+    my $boiler_conf = get_boiler_conf();
+
+    print "Boiler-conf :\n".Dumper ( $boiler_conf ) if $VERBOSE ;
+
+    $BOILER_STATUS = clone($boiler_conf);
+
+    for my $boiler_control ( keys %$boiler_conf ){
+        my $b_cont =  $BOILER_STATUS->{$boiler_control};
+
+        # munging controls array to be a hash
+        $b_cont->{controls}
+             = { map { $_ => undef }
+                @{$boiler_conf->{$boiler_control}{controls}} } ;
+
+        $b_cont->{last_time_on}  = 0; # Jan 1st 1970 WFM !!
+        $b_cont->{last_time_off} = 0;
+
+        _sig_a_control ( $boiler_control, STATUS ,\$b_cont->{current_status} );
+
+        $b_cont->{last_time_on}    = time
+            if ( $b_cont->{current_status} eq ON );
+
+        $b_cont->{last_time_off}   = time
+            if ( $b_cont->{current_status} eq OFF );
+    };
+
+    refresh_boiler_status();
+}
+
+sub refresh_boiler_status {
+    # refresh the controls from directly signalling the control
+
+    print "refresh boiler status\n";
+
+    for my $boiler_control ( keys %$BOILER_STATUS){
+
+        my $b_cont =  $BOILER_STATUS->{$boiler_control};
+
+        _sig_a_control ( $boiler_control, STATUS ,\$b_cont->{current_status} );
+
+        for my $control ( keys %{$b_cont->{controls}} ) {
+            _sig_a_control ( $control, STATUS, \$b_cont->{controls}{$control} );
+        }
+    };
+
+    print "boiler-status = ".Dumper($BOILER_STATUS) if $VERBOSE;
+
+    $BOILER_STATUS_LAST_REFRESH = time;
+}
+
+sub _sig_a_control {
+    my ( $control, $action, $update_scalar_ref ) = @_;
+
+    my $ret;
+    eval { $ret = send_command( $control, $action ); };
+
+    if ( $@ ) {
+        print "Error signalling control '$control' with '$action'. $@\n";
+        ${$update_scalar_ref} = undef ; # should this be OFF ?
+    } else {
+        ${$update_scalar_ref} = $ret;
+    }
+}
 
 =pod
 
@@ -69,9 +313,11 @@ The boiler daemon will listenning (subscribes) on a zero-mq port for a json mess
 If it receives a message for a control that is not associated to a radiator valve, it will just ignore it.
 So the code in the heating-control-script doesn't have to think about "is this a boiler control ?"
 
-If the boiler is in the off state, and one or more of the controls switches on, then due to the rad-actuators taking a couple of minutes to operate, the boiler-daemon will wait for $delay_boiler_off_to_on_secs before it switches on.
+If the boiler is in the off state, and one or more of the controls switches on, then due to the rad-actuators taking a couple of minutes to operate, the boiler-daemon will wait for on_delay_secs before it switches on.
 
 If all the rads go into the off state , the boiler will be switched off immediately. ( pump-over-run might be in operation on the boiler )
+
+Only 1 boiler-daemon will run . This needs to be enforced by daemon-runner.
 
 The heating-control-daemon publishes to the port that the boiler-daemon is listenning to.
 It is easiet for the boiler-daemon to run on the same host as the heating-control-daemon.
@@ -79,106 +325,6 @@ Hence the heating-control-daemon can publish to localhost and the boiler-daemon 
 So no config necessary for the host where the boiler daemon has to subscribe to.
 
 =cut
-
-#############################################################
-# http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
-
-my $quit_program = AnyEvent->condvar;
-
-my $context = zmq_init();
-
-my $subscriber = zmq_socket($context, ZMQ_SUB);
-
-#my $zmq_state = zmq_connect($subscriber, "tcp://*:$BOILER_DAEMON_PORT");
-
-# TODO this needs to be worked out from looking at the daemon-runner conf.
-# working out the host that the heating-control is running on.
-# currently this hard coding means the boiler-daemon has to run on the same host as the heating-control-daemon.
-my $HEATING_CONTROL_HOST = 'localhost';
-
-my $connect_str = "tcp://$HEATING_CONTROL_HOST:$HEATING_CONTROL_DAEMON_PUBLISH_PORT";
-
-if ( my $zmq_state = zmq_connect($subscriber, $connect_str )){
-    croak "zmq can't connect to $connect_str. status = $zmq_state . $!\n";
-};
-
-# '' is because I can't work out how to get the "topic" filter sent by Khaospy::Boiler.
-zmq_setsockopt($subscriber, ZMQ_SUBSCRIBE, '' );
-
-my $fh = zmq_getsockopt( $subscriber, ZMQ_FD );
-
-my $w = anyevent_io( $fh, $subscriber );
-
-$quit_program->recv;
-
-exit 0;
-
-#######
-# subs
-
-sub anyevent_io {
-    my ( $fh, $subscriber ) = @_;
-    return AnyEvent->io(
-        fh   => $fh,
-        poll => "r",
-        cb   => sub {
-            while ( my $recvmsg = zmq_recvmsg( $subscriber, ZMQ_RCVMORE ) ) {
-                process_boiler_message ( zmq_msg_data($recvmsg) );
-            }
-        },
-    );
-}
-
-sub process_boiler_message {
-    my ($msg) = @_ ;
-    #my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
-    # can't get $topic working in perl yet. TODO
-
-    my $msg_decoded = $json->decode( $msg );
-
-    print Dumper($msg_decoded)."\n" if $verbose;
-
-    my $epoch_time
-        = $msg_decoded->{EpochTime};
-    my $control
-        = $msg_decoded->{Control};
-    my $home_auto_class
-        = $msg_decoded->{HomeAutoClass}; # Why do I need HomeAutoClass ? TODO probably deprecate this.
-    my $action
-        = $msg_decoded->{Action};
-
-#    $heating_controls_for_boiler_status->{$control} = $action;
-    operate_boiler();
-
-}
-
-sub operate_boiler {
-}
-
-#    boiler_on
-#    boiler_off
-#    boiler_status
-
-#sub boiler_on {
-##    my ($boiler_control
-#    print "TURN BOILER ON\n";
-#
-#    # TODO get the delay_boiler_off_to_on_secs working.
-#
-##    $boiler_status = send_command( $boiler_control_name , ON );
-#}
-##
-#sub boiler_off {
-#    print "TURN BOILER OFF\n";
-##    $boiler_status = send_command( $boiler_control_name , OFF );
-#}
-#
-##
-#sub boiler   _status {
-##    $boiler_status = send_command( $boiler_control_name , STATUS );
-##    print "BOILER STATUS = $boiler_status\n";
-#}
-
 
 #sub map_boiler_control_status {
 #
@@ -205,67 +351,7 @@ sub operate_boiler {
 #
 #}
 
-sub init_boiler_status {
-    # clone the boiler_conf in boiler_status,
-    # and get the "controls" to be a hash that holds the "controls" state.
-
-    my $boiler_conf = get_boiler_conf();
-
-    print "Boiler-conf :\n".Dumper ( $boiler_conf ) if $verbose ;
-
-    $boiler_status = clone($boiler_conf);
-
-    for my $boiler_control ( keys %$boiler_conf ){
-        my $b_stat =  $boiler_status->{$boiler_control};
-        my $controls = { map { $_ => undef } @{$b_stat->{controls}} } ;
-        $b_stat->{controls} = $controls;
-        $b_stat->{current_status}  = undef;
-        _sig_a_control ( $boiler_control, STATUS ,\$b_stat->{current_status} );
-
-        $b_stat->{last_time_on}    = undef;
-        $b_stat->{last_time_off}   = undef;
-
-        $b_stat->{last_time_on}    = time
-            if ( $b_stat->{current_status} eq ON ) ;
-
-        $b_stat->{last_time_off}   = time
-            if ( $b_stat->{current_status} eq OFF );
-    };
-
-    refresh_boiler_status();
-}
-
-sub refresh_boiler_status {
-    # refresh the controls from directly signalling the control
-
-    for my $boiler_control ( keys %$boiler_status){
-
-        my $b_stat =  $boiler_status->{$boiler_control};
-        my $controls = $b_stat->{controls};
-
-        for my $control ( keys %$controls ) {
-            _sig_a_control ( $control, STATUS, \$b_stat->{controls}{$control} );
-        }
-    };
-
-    print "boiler-status = ".Dumper($boiler_status) if $verbose;
-}
-
-sub _sig_a_control {
-    my ( $control, $action, $update_scalar_ref ) = @_;
-
-    my $ret;
-    eval { $ret = send_command( $control, STATUS ); };
-
-    if ( $@ ) {
-        print "Error signalling control '$control' with '$action'. $@\n";
-        ${$update_scalar_ref} = undef ; # should this be OFF ?
-    } else {
-        ${$update_scalar_ref} = $ret;
-    }
-}
-
-sub all_controls_on {
+#############################################################
+# http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
 
 
-}
