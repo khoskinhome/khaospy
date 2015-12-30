@@ -13,10 +13,26 @@
 
 #######################################################
 
-./install/lib-perl/Khaospy/Utils.pm
+./install/lib-perl/Khaospy/BoilerMessage.pm
+./install/lib-perl/Khaospy/Conf.pm
+./install/lib-perl/Khaospy/Controls.pm
 ./install/lib-perl/Khaospy/Constants.pm
-./install/lib-perl/Khaospy/OrviboS20.pm
+./install/lib-perl/Khaospy/Utils.pm:77:
 
+./install/lib-perl/Khaospy/OrviboS20.pm
+./install/bin/test-khaospy-orvibos20.pl
+
+######################################################
+# Orvibo S20 rad control stuff.
+
+./install/bin/khaospy-heating-control.pl
+./install/bin/khaospy-boiler-daemon.pl:215:
+
+
+./to-be-deleted/bin/khaospy-orvibo-s20-radiator.pl
+./to-be-deleted/bin/orvibo-s20-control-karl-hack.pl
+./to-be-deleted/bin/zmq-subscribe-to-thermometers.pl
+./to-be-deleted/bin/orvibo-s20-control.pl
 #######################################################
 # running all the scripts
 
@@ -36,6 +52,8 @@ to-be-deleted/bin/khaospy-run-daemons.py
 ./install/bin/khaospy-one-wired-receiver.py
 ./install/bin/khaospy-one-wired-receiver-just-listen.py
 
+./install/bin/khaospy-zmq-just-listen.py
+
 
 
 ./to-be-deleted/libpy/khaospy-one-wired-daemon.py
@@ -52,16 +70,6 @@ to-be-deleted/bin/rrdcreategraph.sh
 to-be-deleted/bin/rrdcreategraph.pl
 to-be-deleted/bin/rrdcreategraph-orig.sh
 ##############################################################################
-
-######################################################
-# Orvibo S20 rad control stuff.
-./install/bin/khaospy-orvibo-s20-radiator.pl
-./install/bin/khaospy-orvibo-s20-radiator-hacking.pl
-
-
-./to-be-deleted/bin/orvibo-s20-control-karl-hack.pl
-./to-be-deleted/bin/zmq-subscribe-to-thermometers.pl
-./to-be-deleted/bin/orvibo-s20-control.pl
 
 ######################################################
 # i2c alarm polling
