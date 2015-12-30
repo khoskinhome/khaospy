@@ -9,9 +9,15 @@ use Exporter qw/import/;
 sub true  { 1 };
 sub false { 0 };
 
-sub ON     { "on"     };
-sub OFF    { "off"    };
-sub STATUS { "status" };
+sub ON      { "on"  };
+our $ON     = ON();
+
+sub OFF     { "off" };
+our $OFF    = OFF();
+
+sub STATUS  { "status" };
+our $STATUS = STATUS();
+
 #######
 # dirs
 
@@ -43,11 +49,13 @@ our $KHAOSPY_HEATING_CONTROL_SCRIPT
 # json confs
 our $KHAOSPY_ALL_CONFS = {
     our $KHAOSPY_DAEMON_RUNNER_CONF
-        = "daemon-runner.json"       => daemon_runner_conf(),
+        = "daemon-runner.json"          => daemon_runner_conf(),
     our $KHAOSPY_HEATING_THERMOMETER_CONF
-        = "heating_thermometer.json" => heating_thermometer_config(),
+        = "heating_thermometer.json"    => heating_thermometer_config(),
     our $KHAOSPY_CONTROLS_CONF
-        = "controls.json"            => controls_conf(),
+        = "controls.json"               => controls_conf(),
+    our $KHAOSPY_BOILERS_CONF
+        = "boilers.json"                => boilers_conf(),
 };
 
 our $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
@@ -59,22 +67,21 @@ our $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
 our $KHAOSPY_CONTROLS_CONF_FULLPATH
     = "$KHAOSPY_CONF_DIR/$KHAOSPY_CONTROLS_CONF";
 
-#############
-# FIX THIS . TODO #frontroomrad being used for boiler code testing currently. TODO fix this.
-#our $BOILER_CONTROL_NAME = 'boiler';
-our $BOILER_CONTROL_NAME = 'frontroomrad';
+our $KHAOSPY_BOILERS_CONF_FULLPATH
+    = "$KHAOSPY_CONF_DIR/$KHAOSPY_BOILERS_CONF";
 
 #############
 
 our $ONE_WIRE_DAEMON_PORT     = 5001;
 our $ALARM_SWITCH_DAEMON_PORT = 5051;
-our $BOILER_DAEMON_PORT       = 5021;
+our $HEATING_CONTROL_DAEMON_PUBLISH_PORT       = 5021;
 
 ######################
 our @EXPORT_OK = qw(
     true false
 
-    ON OFF STATUS
+     ON  OFF  STATUS
+    $ON $OFF $STATUS
 
     $KHAOSPY_ALL_DIRS
     $KHAOSPY_ROOT_DIR
@@ -90,22 +97,24 @@ our @EXPORT_OK = qw(
     $KHAOSPY_ALL_CONFS
 
     $KHAOSPY_DAEMON_RUNNER_CONF
-    $KHAOSPY_HEATING_THERMOMETER_CONF
-    $KHAOSPY_CONTROLS_CONF
-
     $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
+
+    $KHAOSPY_HEATING_THERMOMETER_CONF
     $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
+
+    $KHAOSPY_CONTROLS_CONF
     $KHAOSPY_CONTROLS_CONF_FULLPATH
+
+    $KHAOSPY_BOILERS_CONF
+    $KHAOSPY_BOILERS_CONF_FULLPATH
 
     $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
     $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
     $KHAOSPY_HEATING_CONTROL_SCRIPT
 
-    $BOILER_CONTROL_NAME
-
     $ONE_WIRE_DAEMON_PORT
     $ALARM_SWITCH_DAEMON_PORT
-    $BOILER_DAEMON_PORT
+    $HEATING_CONTROL_DAEMON_PUBLISH_PORT
 
 );
 
@@ -158,32 +167,34 @@ sub daemon_runner_conf {
 #       OPTIONAL-KEYS that can be supplied with the turn-off-off ones above :
 #           lower_temp         => 20, # when temp is less than this, the "on" command will be sent.
 #                                 if lower_temp isn't supplied it defaults to ( upper_temp -1 )
-#           closed_switches    => Array of swtiches that must be closed for "on" command.
-#               these switches will be from an "alarm_switches_conf" (yet to be written)
-#               if any of the switches are open an "off" command will be sent.
-#           boiler             => This is flag that indicates that the control is just operating a radiator valve
-#                                 and a boiler needs to be switched on or off.
-#                                 If this key isn't supplied, then it is defaulted to "false", and the control is
-#                                 assumed to be directly controlling the heating-appliance.
-#                                 In the controls config there is a reserved control name for the "boiler".
+#           alarm_switches     => Array of swtiches that must be closed for "on" command.
+#                                 These switches will be from an "alarm_switches_conf" (yet to be written)
+#                                 If any of the switches are open an "off" command will be sent.
+#
+#           boiler             => This is a boolean flag that indicates that the control needs
+#                                 to send a message needs to be sent to the boiler-daemon.
+#                                 This config-key might be deprecated, and heating control signals sent to the boiler daemon.
+#                                 The boiler-daemon will then decided if it needs to do anything.
 #
 #
-  ## install/lib-perl/Khaospy/Utils.pm:78:  ## install/lib-perl/Khaospy/Constants.pm:149:sub heating_thermometer_config { # TODO rm this line # TODO rm this line
+#
+# The "name" and "one-wire-address" need to swap places. This config needs to be able to cope with more than just one-wire-attached thermometers. TODO at a very much later stage.
+# Doing this would mean the rrd-graph-creator and the heating-control scripts would need to be changed.
 sub heating_thermometer_config {
     return {
         '28-0000066ebc74' => {
             name               => 'Alison',
             rrd_group          => 'upstairs',
             upper_temp         => 21,
-            closed_switches    => [],
+            alarm_switches     => [],
             control            => 'alisonrad',
-            boiler             => true,
+#            boiler             => true, # might be deprecated.
         },
         '28-000006e04e8b' => {
             name               => 'Playhouse-tv',
             rrd_group          => 'outside',
             upper_temp         => 21,
-            control            => 'karlrad', # TODO fix this deliberate mis-config.
+            control            => 'karlrad', # TODO fix this deliberate mis-config. Used for testing.
         },
         '28-0000066fe99e' => {
             name               => 'Playhouse-9e-door',
@@ -201,9 +212,9 @@ sub heating_thermometer_config {
             name               => 'Amelia',
             rrd_group          => 'upstairs',
             upper_temp         => 21,
-            closed_switches    => [],
+            alarm_switches     => [],
             control            => 'ameliarad',
-            boiler             => true,
+#            boiler             => true, # might be deprecated.
         },
         '28-021463423bff' => {
             name               => 'Upstairs-Landing',
@@ -215,15 +226,8 @@ sub heating_thermometer_config {
 #################################
 # controls_conf
 #####
-# every control has a unique control-name.
-# controls can be switched "on" or "off" or have their "status" queried.
-#
-# There is one reserved control-name "boiler", this is for the control that switches
-# the central-heating "boiler" on or off.
-#
-# There is hard coding that looks for all the heating_thermometer_config controls that are "boiler => true".
-# The name of this control can be changed in $BOILER_CONTROL_NAME . Although I can't see the point in doing that.
-# 
+# Every control has a unique control-name.
+# Controls can be switched "on" and "off" or have their "status" queried.
 #
 #   <type>  can be :
 #               orviboS20 ( orvibos20 will also work )
@@ -250,7 +254,6 @@ sub controls_conf {
             host => 'ameliarad',
             mac  => 'AC-CF-23-72-F3-D4',
         },
-
         karlrad         => {
             type => "orviboS20",
             host => 'karlrad',
@@ -268,12 +271,38 @@ sub controls_conf {
         },
 #        boiler => {
 #            type => "orviboS20",
-#            host => 'frontroomrad', # FIX THIS . TODO #frontroomrad being used for boiler code testing currently. TODO fix this.
-#            mac  => 'AC-CF-23-8D-7E-D2',
+#            host => 'theboilerhostname', # FIX THIS.
+#            mac  => '',
 #        },
         alight => {
             type => "picontroller",
             host => "piboiler",
+        },
+    };
+}
+
+########################
+# boilers conf.
+
+# The primary key is the name of the control that switches a central heating boiler on.
+#
+# The key on_delay_secs is how long the boiler should wait before switching from "off" to "on".
+# This is so the radiator-actuator-valves have been given enough time to open.
+#
+# The controls key is an array of radiator-actuator-controls that when they are on need the boiler to switch on.
+
+sub boilers_conf {
+    return {
+        # frontroomrad is being using as the boiler control. This needs fixing.
+        frontroomrad => {
+            on_delay_secs => 120,
+            controls => [qw/
+                alisonrad
+                karlrad
+                ameliarad
+                dinningroomrad
+            /],
+
         },
     };
 }

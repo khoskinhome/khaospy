@@ -32,8 +32,6 @@ our @EXPORT_OK = qw(
     slurp
     burp
     get_one_wire_sender_hosts
-    get_heating_controls_for_boiler
-    get_heating_controls_not_for_boiler
     get_hashval
 );
 
@@ -68,53 +66,6 @@ sub get_one_wire_sender_hosts {
 
     my %ret = map { $_ => 1 } @$one_wire_sender_host ;
     return keys %ret ;
-}
-
-sub get_heating_controls_not_for_boiler {
-    # goes through the heating_thermometer_conf, and returns
-    # a list of control_names that DON'T need to operate the "boiler".
-
-    return _get_heating_controls(false);
-}
-
-sub get_heating_controls_for_boiler {
-    # goes through the heating_thermometer_conf, and returns
-    # a list of control_names that need to operate the "boiler".
-
-    return _get_heating_controls(true);
-}
-
-sub _get_heating_controls {
-    my ( $is_boiler ) = @_;
-
-    my $heating_thermometer_conf = get_heating_thermometer_conf();
-    my $controls_conf = get_controls_conf();
-
-    my $check_controls_conf = sub {
-        my ($control_name) = @_;
-        return $control_name
-            if exists $controls_conf->{$control_name};
-        return;
-    };
-
-    my $check = sub {
-        my ($onewireaddr) = @_;
-
-        if ( $is_boiler ) {
-            return exists $heating_thermometer_conf->{$_}{boiler}
-            && $heating_thermometer_conf->{$_}{boiler};
-        }
-
-        return ( ! exists $heating_thermometer_conf->{$_}{boiler}
-            || ! $heating_thermometer_conf->{$_}{boiler} );
-    };
-
-    return [
-        map { $check_controls_conf->($heating_thermometer_conf->{$_}{control}) }
-        grep { $check->($_) }
-        keys %$heating_thermometer_conf
-    ];
-
 }
 
 sub get_hashval {

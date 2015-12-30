@@ -34,3 +34,5 @@ sudo pip pyzmq
 sudo pip search rrdtool
 sudo pip search yaml
 
+
+sudo cpanm Clone

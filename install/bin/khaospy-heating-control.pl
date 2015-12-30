@@ -38,6 +38,7 @@ use Khaospy::BoilerMessage qw(
 
 my $json = JSON->new->allow_nonref;
 
+
 use Getopt::Long;
 my $verbose = false;
 my $port = $ONE_WIRE_DAEMON_PORT;
@@ -183,4 +184,87 @@ sub process_thermometer_msg {
     print "#####\n";
 }
 
+
+##########################################################################
+# need this stuff if I re-implement the "boiler" flag on a heating-control
+#    get_heating_controls_for_boiler
+
+
+    # so if at least one of the heating controls that is tied to the boiler
+    # is on then the boiler needs to be switched on.
+
+    # if all the heating controls associated with the boiler are off
+    # then the boiler can be switched off.
+
+#    print "    Boiler heating controls are \n" if $verbose;
+#    print Dumper ( $heating_controls_for_boiler_status ) if $verbose;
+#
+#    if ( grep { $heating_controls_for_boiler_status->{$_} eq ON }
+#         keys %$heating_controls_for_boiler_status
+#    ){
+#        boiler_on();
+#    } else {
+#        boiler_off();
+#    }
+
+
+
+#
+#my $heating_controls_for_boiler_status
+#    = { map { $_ => OFF } @{get_heating_controls_for_boiler()}};
+#    if ( ! exists $heating_controls_for_boiler_status->{$control} ){
+#        print "control '$control' is not a boiler fed radiator control\n";
+#        return;
+#    }
+#
+#    get_heating_controls_for_boiler
+#    get_heating_controls_not_for_boiler
+#
+#sub get_heating_controls_not_for_boiler {
+#    # goes through the heating_thermometer_conf, and returns
+#    # a list of control_names that DON'T need to operate the "boiler".
+#
+#    return _get_heating_controls(false);
+#}
+#
+#sub get_heating_controls_for_boiler {
+#    # goes through the heating_thermometer_conf, and returns
+#    # a list of control_names that need to operate the "boiler".
+#
+#    return _get_heating_controls(true);
+#}
+#
+#sub _get_heating_controls {
+#    my ( $is_boiler ) = @_;
+#
+#    my $heating_thermometer_conf = get_heating_thermometer_conf();
+#    my $controls_conf = get_controls_conf();
+#
+#    my $check_controls_conf = sub {
+#        my ($control_name) = @_;
+#        return $control_name
+#            if exists $controls_conf->{$control_name};
+#        return;
+#    };
+#
+#    my $check = sub {
+#        my ($onewireaddr) = @_;
+#
+#        if ( $is_boiler ) {
+#            return exists $heating_thermometer_conf->{$_}{boiler}
+#            && $heating_thermometer_conf->{$_}{boiler};
+#        }
+#
+#        return ( ! exists $heating_thermometer_conf->{$_}{boiler}
+#            || ! $heating_thermometer_conf->{$_}{boiler} );
+#    };
+#
+#    return [
+#        map { $check_controls_conf->($heating_thermometer_conf->{$_}{control}) }
+#        grep { $check->($_) }
+#        keys %$heating_thermometer_conf
+#    ];
+#
+#}
+###############################################################
 

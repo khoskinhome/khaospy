@@ -16,6 +16,7 @@ use Khaospy::Constants qw(
     $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
     $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
     $KHAOSPY_CONTROLS_CONF_FULLPATH
+    $KHAOSPY_BOILERS_CONF_FULLPATH
 );
 
 use Khaospy::Utils; # qw( slurp );
@@ -24,6 +25,7 @@ our @EXPORT_OK = qw(
     get_heating_thermometer_conf
     get_controls_conf
     get_daemon_runner_conf
+    get_boiler_conf
 );
 
 # reads in the confs once, unless it is a conf that can change whilst the daemons
@@ -44,6 +46,24 @@ our @EXPORT_OK = qw(
             $therm_conf_last_loaded = time ;
         }
         return $therm_conf;
+    }
+}
+
+{
+    my $boiler_conf;
+    my $boiler_conf_last_loaded;
+
+    sub get_boiler_conf {
+        # reload the boiler conf every 5 mins.
+        if ( ! $boiler_conf
+            or $boiler_conf_last_loaded + 20 < time  # TODO FIX THIS BACK TO 300 SECONDS.
+        ) {
+            $boiler_conf = $json->decode(
+                 Khaospy::Utils::slurp( $KHAOSPY_BOILERS_CONF_FULLPATH )
+            );
+            $boiler_conf_last_loaded = time ;
+        }
+        return $boiler_conf;
     }
 }
 

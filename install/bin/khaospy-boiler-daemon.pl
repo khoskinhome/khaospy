@@ -7,6 +7,8 @@ use AnyEvent;
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(ZMQ_SUB ZMQ_SUBSCRIBE ZMQ_RCVMORE ZMQ_FD);
 
+use Clone 'clone';
+
 use JSON;
 use FindBin;
 FindBin::again();
@@ -14,18 +16,12 @@ FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Utils qw(
-    slurp
-    get_one_wire_sender_hosts
-    get_heating_controls_for_boiler
 );
 
 use Khaospy::Constants qw(
     true false
     ON OFF STATUS
-    $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
-    $ONE_WIRE_DAEMON_PORT
-    $BOILER_DAEMON_PORT
-    $BOILER_CONTROL_NAME
+    $HEATING_CONTROL_DAEMON_PUBLISH_PORT
 );
 
 use Khaospy::Controls qw(
@@ -33,18 +29,11 @@ use Khaospy::Controls qw(
 );
 
 use Khaospy::Conf qw(
-    get_heating_thermometer_conf
+    get_boiler_conf
 );
 
 my $json = JSON->new->allow_nonref;
 
-my $heating_controls_for_boiler_status
-    = { map { $_ => OFF } @{get_heating_controls_for_boiler()}};
-
-
-#    get_heating_controls_not_for_boiler
-#my $heating_controls_not_for_boiler_status
-#    = { map { $_ => OFF } @{get_heating_controls_not_for_boiler()}};
 
 use Getopt::Long;
 my $verbose = false;
@@ -56,11 +45,8 @@ print "Boiler Daemon\n";
 print "Start time ".strftime("%F %T", gmtime(time) )."\n";
 print "VERBOSE = ".($verbose ? "TRUE" : "FALSE")."\n";
 
-#print "Controls for boiler :\n" if $verbose ;
-print "boiler heating controls\n"
-    .Dumper ( $heating_controls_for_boiler_status ) if $verbose;
-#print "NOT boiler heating controls \n"
-#    .Dumper ( $heating_controls_not_for_boiler_status ) if $verbose;
+my $boiler_status;
+init_boiler_status();
 
 =pod
 
@@ -105,12 +91,16 @@ my $subscriber = zmq_socket($context, ZMQ_SUB);
 
 #my $zmq_state = zmq_connect($subscriber, "tcp://*:$BOILER_DAEMON_PORT");
 
-# TODO $HEATING_CONTROL_HOST needs to go in to Khaospy::Constants, if it is kept.
+# TODO this needs to be worked out from looking at the daemon-runner conf.
+# working out the host that the heating-control is running on.
+# currently this hard coding means the boiler-daemon has to run on the same host as the heating-control-daemon.
 my $HEATING_CONTROL_HOST = 'localhost';
-if ( my $zmq_state = zmq_connect($subscriber, "tcp://$HEATING_CONTROL_HOST:$BOILER_DAEMON_PORT" )){
-    croak "zmq can't connect to tcp://$HEATING_CONTROL_HOST:$BOILER_DAEMON_PORT. status = $zmq_state . $!\n";
-};
 
+my $connect_str = "tcp://$HEATING_CONTROL_HOST:$HEATING_CONTROL_DAEMON_PUBLISH_PORT";
+
+if ( my $zmq_state = zmq_connect($subscriber, $connect_str )){
+    croak "zmq can't connect to $connect_str. status = $zmq_state . $!\n";
+};
 
 # '' is because I can't work out how to get the "topic" filter sent by Khaospy::Boiler.
 zmq_setsockopt($subscriber, ZMQ_SUBSCRIBE, '' );
@@ -157,61 +147,125 @@ sub process_boiler_message {
     my $action
         = $msg_decoded->{Action};
 
-    if ( ! exists $heating_controls_for_boiler_status->{$control} ){
-        print "control '$control' is not a boiler fed radiator control\n";
-        return;
-    }
-
-    $heating_controls_for_boiler_status->{$control} = $action;
+#    $heating_controls_for_boiler_status->{$control} = $action;
     operate_boiler();
 
 }
 
 sub operate_boiler {
-    # so if at least one of the heating controls that is tied to the boiler
-    # is on then the boiler needs to be switched on.
-
-    # if all the heating controls associated with the boiler are off
-    # then the boiler can be switched off.
-
-    print "    Boiler heating controls are \n" if $verbose;
-    print Dumper ( $heating_controls_for_boiler_status ) if $verbose;
-
-    if ( grep { $heating_controls_for_boiler_status->{$_} eq ON }
-         keys %$heating_controls_for_boiler_status
-    ){
-        boiler_on();
-    } else {
-        boiler_off();
-    }
 }
 
 #    boiler_on
 #    boiler_off
 #    boiler_status
 
-my $last_off_time;
-my $last_on_time;
-my $delay_boiler_off_to_on_secs = 120 ;
-
-my $boiler_status = ON;
-
-sub boiler_on {
-    print "TURN BOILER ON\n";
-    $boiler_status = send_command( $BOILER_CONTROL_NAME , ON );
-}
+#sub boiler_on {
+##    my ($boiler_control
+#    print "TURN BOILER ON\n";
 #
-sub boiler_off {
-    print "TURN BOILER OFF\n";
-    $boiler_status = send_command( $BOILER_CONTROL_NAME , OFF );
-}
-
-
+#    # TODO get the delay_boiler_off_to_on_secs working.
 #
-#sub boiler_status {
-#    $boiler_status = send_command( $BOILER_CONTROL_NAME , STATUS );
-#    print "BOILER STATUS = $boiler_status\n";
+##    $boiler_status = send_command( $boiler_control_name , ON );
+#}
+##
+#sub boiler_off {
+#    print "TURN BOILER OFF\n";
+##    $boiler_status = send_command( $boiler_control_name , OFF );
 #}
 #
+##
+#sub boiler   _status {
+##    $boiler_status = send_command( $boiler_control_name , STATUS );
+##    print "BOILER STATUS = $boiler_status\n";
+#}
 
 
+#sub map_boiler_control_status {
+#
+##$VAR1 = {
+##          'frontroomrad' => {
+##                              'on_delay_secs' => 120,
+##                              'controls' => [
+##                                              'alisonrad',
+##                                              'karlrad',
+##                                              'ameliarad',
+##                                              'dinningroomrad'
+##                                            ]
+##                            }
+##        };
+#
+#=pod
+#    I am going to receive a control, I need to check this control against the boiler confs.
+#
+#    read in the conf .
+#    make a local copy, changing the controls arrays to hashes that point to control.status
+#    get the current control.status
+#
+#=cut
+#
+#}
+
+sub init_boiler_status {
+    # clone the boiler_conf in boiler_status,
+    # and get the "controls" to be a hash that holds the "controls" state.
+
+    my $boiler_conf = get_boiler_conf();
+
+    print "Boiler-conf :\n".Dumper ( $boiler_conf ) if $verbose ;
+
+    $boiler_status = clone($boiler_conf);
+
+    for my $boiler_control ( keys %$boiler_conf ){
+        my $b_stat =  $boiler_status->{$boiler_control};
+        my $controls = { map { $_ => undef } @{$b_stat->{controls}} } ;
+        $b_stat->{controls} = $controls;
+        $b_stat->{current_status}  = undef;
+        _sig_a_control ( $boiler_control, STATUS ,\$b_stat->{current_status} );
+
+        $b_stat->{last_time_on}    = undef;
+        $b_stat->{last_time_off}   = undef;
+
+        $b_stat->{last_time_on}    = time
+            if ( $b_stat->{current_status} eq ON ) ;
+
+        $b_stat->{last_time_off}   = time
+            if ( $b_stat->{current_status} eq OFF );
+    };
+
+    refresh_boiler_status();
+}
+
+sub refresh_boiler_status {
+    # refresh the controls from directly signalling the control
+
+    for my $boiler_control ( keys %$boiler_status){
+
+        my $b_stat =  $boiler_status->{$boiler_control};
+        my $controls = $b_stat->{controls};
+
+        for my $control ( keys %$controls ) {
+            _sig_a_control ( $control, STATUS, \$b_stat->{controls}{$control} );
+        }
+    };
+
+    print "boiler-status = ".Dumper($boiler_status) if $verbose;
+}
+
+sub _sig_a_control {
+    my ( $control, $action, $update_scalar_ref ) = @_;
+
+    my $ret;
+    eval { $ret = send_command( $control, STATUS ); };
+
+    if ( $@ ) {
+        print "Error signalling control '$control' with '$action'. $@\n";
+        ${$update_scalar_ref} = undef ; # should this be OFF ?
+    } else {
+        ${$update_scalar_ref} = $ret;
+    }
+}
+
+sub all_controls_on {
+
+
+}
