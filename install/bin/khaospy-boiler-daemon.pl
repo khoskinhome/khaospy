@@ -16,9 +16,6 @@ FindBin::again();
 
 use lib "$FindBin::Bin/../lib-perl";
 
-use Khaospy::Utils qw(
-);
-
 use Khaospy::Constants qw(
     true false
     ON OFF STATUS
@@ -125,7 +122,7 @@ sub process_boiler_message {
     refresh_boiler_status()
         if $BOILER_STATUS_LAST_REFRESH + $BOILER_STATUS_REFRESH_EVERY_SECS < time ;
 
-    my $boiler_name = get_boiler_for_control($control);
+    my $boiler_name = get_boiler_name_for_control($control);
 
     boiler_delay_on();
 
@@ -158,7 +155,6 @@ sub operate_boiler {
     print "TURN BOILER OFF\n";
 
     _sig_a_control ( $boiler_name, OFF, \$boiler->{current_status} );
-    #$boiler->{current_status} = send_command( $boiler_name , OFF );
     print "Boiler is now ".$boiler->{current_status}."\n";
 
     if ( $boiler->{current_status} eq OFF ) {
@@ -166,8 +162,6 @@ sub operate_boiler {
     } else {
         print "ERROR. Boiler is not OFF\n";
     }
-
-
 }
 
 sub boiler_on {
@@ -181,7 +175,6 @@ sub boiler_on {
     print "TURN BOILER ON\n";
 
     _sig_a_control ( $boiler_name, ON, \$boiler->{current_status} );
-    #$boiler->{current_status} = send_command( $boiler_name , ON );
     print "Boiler is now ".$boiler->{current_status}."\n";
     if ( $boiler->{current_status} eq ON ) {
         $boiler->{last_time_on} = time;
@@ -198,19 +191,19 @@ sub boiler_delay_on {
 
 }
 
-sub get_boiler_for_control {
+sub get_boiler_name_for_control {
     # goes through the $BOILER_STATUS and looks for a control.
-    # returns either the name of the boiler_control or undef.
+    # returns either the boiler_name or undef.
 
     # will croak if 2 boilers have the same sub-control.
 
     my ($control) = @_;
 
     my @boilers;
-    for my $boiler_control ( keys %$BOILER_STATUS ) {
-        push @boilers, map { $boiler_control }
+    for my $boiler_name ( keys %$BOILER_STATUS ) {
+        push @boilers, map { $boiler_name }
                 grep { $control eq $_ }
-                keys %{$BOILER_STATUS->{$boiler_control}{controls}}
+                keys %{$BOILER_STATUS->{$boiler_name}{controls}}
         ;
     }
 
@@ -219,14 +212,15 @@ sub get_boiler_for_control {
             ."please fix $KHAOSPY_BOILERS_CONF_FULLPATH\n"
         if  @boilers > 1;
 
-    return $boilers[0];
+    return $boilers[0] if $boilers[0];
+    return;
 }
 
 sub init_boiler_status {
-    # clone the boiler_conf in boiler_status,
-    # and munge the "controls" array to be a hash that holds the "controls" state.
+    # clones the boiler_conf into BOILER_STATUS,
+    # Then munges the "controls" array-ref to be a hash-ref that holds the "controls" state.
 
-    print "init boiler status\n";
+    print "init boiler status\n" if $VERBOSE;
 
     my $boiler_conf = get_boiler_conf();
 
@@ -234,18 +228,18 @@ sub init_boiler_status {
 
     $BOILER_STATUS = clone($boiler_conf);
 
-    for my $boiler_control ( keys %$boiler_conf ){
-        my $b_cont =  $BOILER_STATUS->{$boiler_control};
+    for my $boiler_name ( keys %$boiler_conf ){
+        my $b_cont =  $BOILER_STATUS->{$boiler_name};
 
         # munging controls array to be a hash
         $b_cont->{controls}
              = { map { $_ => undef }
-                @{$boiler_conf->{$boiler_control}{controls}} } ;
+                @{$boiler_conf->{$boiler_name}{controls}} } ;
 
         $b_cont->{last_time_on}  = 0; # Jan 1st 1970 WFM !!
         $b_cont->{last_time_off} = 0;
 
-        _sig_a_control ( $boiler_control, STATUS ,\$b_cont->{current_status} );
+        _sig_a_control ( $boiler_name, STATUS ,\$b_cont->{current_status} );
 
         $b_cont->{last_time_on}    = time
             if ( $b_cont->{current_status} eq ON );
@@ -262,11 +256,11 @@ sub refresh_boiler_status {
 
     print "refresh boiler status\n";
 
-    for my $boiler_control ( keys %$BOILER_STATUS){
+    for my $boiler_name ( keys %$BOILER_STATUS){
 
-        my $b_cont =  $BOILER_STATUS->{$boiler_control};
+        my $b_cont =  $BOILER_STATUS->{$boiler_name};
 
-        _sig_a_control ( $boiler_control, STATUS ,\$b_cont->{current_status} );
+        _sig_a_control ( $boiler_name, STATUS ,\$b_cont->{current_status} );
 
         for my $control ( keys %{$b_cont->{controls}} ) {
             _sig_a_control ( $control, STATUS, \$b_cont->{controls}{$control} );
