@@ -137,16 +137,16 @@ sub operate_boiler {
 
     print "Operates boiler '$boiler_name'. set control '$control' to '$action'\n";
 
-    my $boiler = $BOILER_STATUS->{$boiler_name};
+    my $boiler_state = $BOILER_STATUS->{$boiler_name};
 
     # update the boiler's controls with the latest control-action.
-    $boiler->{controls}{$control}=$action;
+    $boiler_state->{controls}{$control}=$action;
 
-    print "Controls are \n".Dumper($boiler->{controls}) if $VERBOSE;
+    print "Controls are \n".Dumper($boiler_state->{controls}) if $VERBOSE;
 
     # Is at least one of the boiler's controls on ? :
-    if ( grep { $boiler->{controls}{$_} eq ON }
-        keys %{$boiler->{controls}}
+    if ( grep { $boiler_state->{controls}{$_} eq ON }
+        keys %{$boiler_state->{controls}}
     ){
         boiler_on($boiler_name);
         return;
@@ -154,11 +154,11 @@ sub operate_boiler {
 
     print "TURN BOILER OFF\n";
 
-    _sig_a_control ( $boiler_name, OFF, \$boiler->{current_status} );
-    print "Boiler is now ".$boiler->{current_status}."\n";
+    _sig_a_control ( $boiler_name, OFF, \$boiler_state->{current_status} );
+    print "Boiler is now ".$boiler_state->{current_status}."\n";
 
-    if ( $boiler->{current_status} eq OFF ) {
-        $boiler->{last_time_off} = time;
+    if ( $boiler_state->{current_status} eq OFF ) {
+        $boiler_state->{last_time_off} = time;
     } else {
         print "ERROR. Boiler is not OFF\n";
     }
@@ -166,18 +166,16 @@ sub operate_boiler {
 
 sub boiler_on {
     my ($boiler_name) = @_;
-    my $boiler = $BOILER_STATUS->{$boiler_name};
+    my $boiler_state = $BOILER_STATUS->{$boiler_name};
     # TODO the delay on code .
     # set the "boiler_next_on_at" if necessary.
 
-    # my $current_boiler_state = $boiler->{current_status};
-
     print "TURN BOILER ON\n";
 
-    _sig_a_control ( $boiler_name, ON, \$boiler->{current_status} );
-    print "Boiler is now ".$boiler->{current_status}."\n";
-    if ( $boiler->{current_status} eq ON ) {
-        $boiler->{last_time_on} = time;
+    _sig_a_control ( $boiler_name, ON, \$boiler_state->{current_status} );
+    print "Boiler is now ".$boiler_state->{current_status}."\n";
+    if ( $boiler_state->{current_status} eq ON ) {
+        $boiler_state->{last_time_on} = time;
     } else {
         print "ERROR. Boiler is not ON\n";
     }
@@ -229,23 +227,23 @@ sub init_boiler_status {
     $BOILER_STATUS = clone($boiler_conf);
 
     for my $boiler_name ( keys %$boiler_conf ){
-        my $b_cont =  $BOILER_STATUS->{$boiler_name};
+        my $boiler_state =  $BOILER_STATUS->{$boiler_name};
 
         # munging controls array to be a hash
-        $b_cont->{controls}
+        $boiler_state->{controls}
              = { map { $_ => undef }
                 @{$boiler_conf->{$boiler_name}{controls}} } ;
 
-        $b_cont->{last_time_on}  = 0; # Jan 1st 1970 WFM !!
-        $b_cont->{last_time_off} = 0;
+        $boiler_state->{last_time_on}  = 0; # Jan 1st 1970 WFM !!
+        $boiler_state->{last_time_off} = 0;
 
-        _sig_a_control ( $boiler_name, STATUS ,\$b_cont->{current_status} );
+        _sig_a_control ( $boiler_name, STATUS ,\$boiler_state->{current_status} );
 
-        $b_cont->{last_time_on}    = time
-            if ( $b_cont->{current_status} eq ON );
+        $boiler_state->{last_time_on}    = time
+            if ( $boiler_state->{current_status} eq ON );
 
-        $b_cont->{last_time_off}   = time
-            if ( $b_cont->{current_status} eq OFF );
+        $boiler_state->{last_time_off}   = time
+            if ( $boiler_state->{current_status} eq OFF );
     };
 
     refresh_boiler_status();
@@ -258,12 +256,12 @@ sub refresh_boiler_status {
 
     for my $boiler_name ( keys %$BOILER_STATUS){
 
-        my $b_cont =  $BOILER_STATUS->{$boiler_name};
+        my $boiler_state =  $BOILER_STATUS->{$boiler_name};
 
-        _sig_a_control ( $boiler_name, STATUS ,\$b_cont->{current_status} );
+        _sig_a_control ( $boiler_name, STATUS ,\$boiler_state->{current_status} );
 
-        for my $control ( keys %{$b_cont->{controls}} ) {
-            _sig_a_control ( $control, STATUS, \$b_cont->{controls}{$control} );
+        for my $control ( keys %{$boiler_state->{controls}} ) {
+            _sig_a_control ( $control, STATUS, \$boiler_state->{controls}{$control} );
         }
     };
 
