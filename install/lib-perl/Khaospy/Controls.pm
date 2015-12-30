@@ -6,6 +6,7 @@ use Carp qw/croak/;
 use Data::Dumper;
 use Exporter qw/import/;
 use JSON;
+
 my $json = JSON->new->allow_nonref;
 
 use FindBin;
@@ -13,6 +14,8 @@ FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Constants qw(
+    true false
+    ON OFF STATUS
     $KHAOSPY_CONTROLS_CONF_FULLPATH
     $KHAOSPY_HEATING_THERMOMETER_CONF
 );
@@ -31,6 +34,8 @@ my $control_types = {
     orvibos20    => \&_orvibo_command,
     picontroller => \&_picontroller_command,
 };
+
+our $verbose = false;
 
 my $controls = $json->decode(
     slurp ( $KHAOSPY_CONTROLS_CONF_FULLPATH )
@@ -62,13 +67,12 @@ sub send_command {
     }
 
     return $control_types->{$type}($control, $control_name, $action);
-
 }
 
 sub _orvibo_command {
     my ( $control, $control_name, $action ) = @_;
 
-    print "Khaospy::Controls run orviboS20 command '$control_name $action'\n";
+    print "Khaospy::Controls run orviboS20 command '$control_name $action'\n" if $verbose;
 
     if ( ! exists $control->{host} ){
         croak "ERROR in config. Control '$control_name' doesn't have a 'host' configured\n"
@@ -81,7 +85,6 @@ sub _orvibo_command {
     }
 
     return signal_control( $control->{host} , $control->{mac}, $action );
-
 }
 
 sub _picontroller_command {

@@ -9,8 +9,11 @@ use Exporter qw/import/;
 sub true  { 1 };
 sub false { 0 };
 
+sub ON     { "on"     };
+sub OFF    { "off"    };
+sub STATUS { "status" };
 #######
-# dirs 
+# dirs
 
 our $KHAOSPY_ALL_DIRS = [
     our $KHAOSPY_ROOT_DIR      = "/opt/khaospy",
@@ -57,9 +60,21 @@ our $KHAOSPY_CONTROLS_CONF_FULLPATH
     = "$KHAOSPY_CONF_DIR/$KHAOSPY_CONTROLS_CONF";
 
 #############
+# FIX THIS . TODO #frontroomrad being used for boiler code testing currently. TODO fix this.
+#our $BOILER_CONTROL_NAME = 'boiler';
+our $BOILER_CONTROL_NAME = 'frontroomrad';
 
+#############
+
+our $ONE_WIRE_DAEMON_PORT     = 5001;
+our $ALARM_SWITCH_DAEMON_PORT = 5051;
+our $BOILER_DAEMON_PORT       = 5021;
+
+######################
 our @EXPORT_OK = qw(
     true false
+
+    ON OFF STATUS
 
     $KHAOSPY_ALL_DIRS
     $KHAOSPY_ROOT_DIR
@@ -85,6 +100,13 @@ our @EXPORT_OK = qw(
     $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
     $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
     $KHAOSPY_HEATING_CONTROL_SCRIPT
+
+    $BOILER_CONTROL_NAME
+
+    $ONE_WIRE_DAEMON_PORT
+    $ALARM_SWITCH_DAEMON_PORT
+    $BOILER_DAEMON_PORT
+
 );
 
 #for my $dir ( @$KHAOSPY_ALL_DIRS ){
@@ -160,6 +182,8 @@ sub heating_thermometer_config {
         '28-000006e04e8b' => {
             name               => 'Playhouse-tv',
             rrd_group          => 'outside',
+            upper_temp         => 21,
+            control            => 'karlrad', # TODO fix this deliberate mis-config.
         },
         '28-0000066fe99e' => {
             name               => 'Playhouse-9e-door',
@@ -198,7 +222,8 @@ sub heating_thermometer_config {
 # the central-heating "boiler" on or off.
 #
 # There is hard coding that looks for all the heating_thermometer_config controls that are "boiler => true".
-# So the "boiler" control needs to be called "boiler" for these to work.
+# The name of this control can be changed in $BOILER_CONTROL_NAME . Although I can't see the point in doing that.
+# 
 #
 #   <type>  can be :
 #               orviboS20 ( orvibos20 will also work )
@@ -223,24 +248,30 @@ sub controls_conf {
         ameliarad       => {
             type => "orviboS20",
             host => 'ameliarad',
-            mac  => 'AC-CF-23-72-F3-D4'
+            mac  => 'AC-CF-23-72-F3-D4',
         },
+
         karlrad         => {
             type => "orviboS20",
             host => 'karlrad',
-            mac  => 'AC-CF-23-8D-7E-D2'
+            mac  => 'AC-CF-23-8D-7E-D2',
         },
         dinningroomrad  => {
             type => "orviboS20",
             host => 'dinningroomrad',
-            mac  => 'AC-CF-23-8D-A4-8E'
+            mac  => 'AC-CF-23-8D-A4-8E',
         },
         frontroomrad    => {
             type => "orviboS20",
             host => 'frontroomrad',
-            mac  => 'AC-CF-23-8D-3B-96'
+            mac  => 'AC-CF-23-8D-3B-96',
         },
-        boiler => {
+#        boiler => {
+#            type => "orviboS20",
+#            host => 'frontroomrad', # FIX THIS . TODO #frontroomrad being used for boiler code testing currently. TODO fix this.
+#            mac  => 'AC-CF-23-8D-7E-D2',
+#        },
+        alight => {
             type => "picontroller",
             host => "piboiler",
         },

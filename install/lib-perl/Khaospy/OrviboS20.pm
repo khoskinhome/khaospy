@@ -35,6 +35,15 @@ my $twenties     = pack('C*', (0x20,0x20,0x20,0x20,0x20,0x20));
 my $onoff        = pack('C*', (0x68,0x64,0x00,0x17,0x73,0x66));
 my $subscribed   = pack('C*', (0x68,0x64,0x00,0x18,0x63,0x6c));
 
+# Not using Khaospy::Constants for these,
+# in case this module ever makes it onto CPAN :
+# TODO use the below const subs in the code below .
+sub ON      { "on"  };
+my  $ON     = ON();
+sub OFF     { "off" };
+my  $Off    = OFF();
+sub STATUS  { "status" };
+my  $STATUS = STATUS();
 
 =head1 signal_control
 
@@ -72,8 +81,8 @@ sub signal_control {
 
     $action = lc($action);
     if ($action eq 'status'){
-        return $s20->{on} ? "on" : "off";
-    } elsif ( $action eq 'on' or $action eq 'off' ){
+        return $s20->{$ON} ? ON : OFF;
+    } elsif ( $action eq ON or $action eq OFF ){
         controlS20($s20, $action);
         return $action;
     } else {
@@ -117,7 +126,7 @@ sub findS20($$)
                 $s20->{mac}      = $mac;
                 $s20->{saddr}    = $from;
                 $s20->{socket}   = $socket;
-                $s20->{on}       = (substr($packet,-1,1) eq chr(1));
+                $s20->{$ON}       = (substr($packet,-1,1) eq chr(1));
                 return $s20;
             }
         }
@@ -150,10 +159,10 @@ sub _controlS20($$)
         return;
     }
 
-    if ($action eq "on") {
+    if ( $action eq ON ) {
         $action   = $ctl_preamble.$mac.$twenties.$ctl_on;
     }
-    if ($action eq "off") {
+    if ( $action eq OFF ) {
         $action   = $ctl_preamble.$mac.$twenties.$ctl_off;
     }
 

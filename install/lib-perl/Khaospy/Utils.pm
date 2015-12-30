@@ -15,6 +15,7 @@ FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Constants qw(
+    true false
     $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
     $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
 
@@ -31,7 +32,8 @@ our @EXPORT_OK = qw(
     slurp
     burp
     get_one_wire_sender_hosts
-    get_controls_for_boiler
+    get_heating_controls_for_boiler
+    get_heating_controls_not_for_boiler
     get_hashval
 );
 
@@ -57,9 +59,6 @@ sub get_one_wire_sender_hosts {
 
     my $one_wire_sender_host = [];
     for my $host ( keys %$daemon_runner_conf ){
-
-        print "get_one_wire_sender_hosts host = $host \n";
-
         push @$one_wire_sender_host, $host
             if (
                 grep { $_ =~ /^$KHAOSPY_ONE_WIRED_SENDER_SCRIPT/ }
@@ -71,9 +70,22 @@ sub get_one_wire_sender_hosts {
     return keys %ret ;
 }
 
-sub get_controls_for_boiler {
+sub get_heating_controls_not_for_boiler {
+    # goes through the heating_thermometer_conf, and returns
+    # a list of control_names that DON'T need to operate the "boiler".
+
+    return _get_heating_controls(false);
+}
+
+sub get_heating_controls_for_boiler {
     # goes through the heating_thermometer_conf, and returns
     # a list of control_names that need to operate the "boiler".
+
+    return _get_heating_controls(true);
+}
+
+sub _get_heating_controls {
+    my ( $is_boiler ) = @_;
 
     my $heating_thermometer_conf = get_heating_thermometer_conf();
     my $controls_conf = get_controls_conf();
@@ -82,19 +94,24 @@ sub get_controls_for_boiler {
         my ($control_name) = @_;
         return $control_name
             if exists $controls_conf->{$control_name};
+        return;
+    };
 
-        croak "ERROR in config. heating_thermometer control '$control_name' doesn't exist in the controls config\n"
-                ."   check the configs :\n"
-                ."       $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH\n"
-                ."       $KHAOSPY_CONTROLS_CONF_FULLPATH\n";
+    my $check = sub {
+        my ($onewireaddr) = @_;
+
+        if ( $is_boiler ) {
+            return exists $heating_thermometer_conf->{$_}{boiler}
+            && $heating_thermometer_conf->{$_}{boiler};
+        }
+
+        return ( ! exists $heating_thermometer_conf->{$_}{boiler}
+            || ! $heating_thermometer_conf->{$_}{boiler} );
     };
 
     return [
         map { $check_controls_conf->($heating_thermometer_conf->{$_}{control}) }
-        grep {
-            exists $heating_thermometer_conf->{$_}{boiler}
-            && $heating_thermometer_conf->{$_}{boiler}
-        }
+        grep { $check->($_) }
         keys %$heating_thermometer_conf
     ];
 
