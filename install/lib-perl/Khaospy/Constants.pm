@@ -171,13 +171,6 @@ sub daemon_runner_conf {
 #                                 These switches will be from an "alarm_switches_conf" (yet to be written)
 #                                 If any of the switches are open an "off" command will be sent.
 #
-#           boiler             => This is a boolean flag that indicates that the control needs
-#                                 to send a message needs to be sent to the boiler-daemon.
-#                                 This config-key might be deprecated, and heating control signals sent to the boiler daemon.
-#                                 The boiler-daemon will then decided if it needs to do anything.
-#
-#
-#
 # The "name" and "one-wire-address" need to swap places. This config needs to be able to cope with more than just one-wire-attached thermometers. TODO at a very much later stage.
 # Doing this would mean the rrd-graph-creator and the heating-control scripts would need to be changed.
 sub heating_thermometer_config {
@@ -188,7 +181,6 @@ sub heating_thermometer_config {
             upper_temp         => 21,
             alarm_switches     => [],
             control            => 'alisonrad',
-#            boiler             => true, # might be deprecated.
         },
         '28-000006e04e8b' => {
             name               => 'Playhouse-tv',
@@ -214,7 +206,6 @@ sub heating_thermometer_config {
             upper_temp         => 21,
             alarm_switches     => [],
             control            => 'ameliarad',
-#            boiler             => true, # might be deprecated.
         },
         '28-021463423bff' => {
             name               => 'Upstairs-Landing',
