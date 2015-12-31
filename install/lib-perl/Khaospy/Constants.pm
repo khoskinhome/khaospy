@@ -283,7 +283,7 @@ sub boilers_conf {
     return {
         # frontroomrad is being using as the boiler control. This needs fixing.
         frontroomrad => {
-            on_delay_secs => 120,
+            on_delay_secs => 30, # TODO this should really be 120
             controls => [qw/
                 alisonrad
                 karlrad
