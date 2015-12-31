@@ -17,7 +17,7 @@ use Khaospy::Constants qw(
     true false
     ON OFF STATUS
     $KHAOSPY_CONTROLS_CONF_FULLPATH
-    $KHAOSPY_HEATING_THERMOMETER_CONF
+    $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF
 );
 
 use Khaospy::Utils qw(
@@ -49,7 +49,7 @@ sub send_command {
     if ( ! exists $controls->{$control_name} ){
         croak "ERROR in config. Control '$control_name' "
             ."doesn't exist in $KHAOSPY_CONTROLS_CONF_FULLPATH\n"
-            ."(this could be a misconfig in $KHAOSPY_HEATING_THERMOMETER_CONF )\n";
+            ."(this could be a misconfig in $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF )\n";
     }
 
     my $control = $controls->{$control_name};

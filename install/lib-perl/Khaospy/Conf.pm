@@ -14,7 +14,7 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Constants qw(
     $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
-    $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH
+    $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
     $KHAOSPY_CONTROLS_CONF_FULLPATH
     $KHAOSPY_BOILERS_CONF_FULLPATH
 );
@@ -41,7 +41,7 @@ our @EXPORT_OK = qw(
             or $therm_conf_last_loaded + 20 < time  # TODO FIX THIS BACK TO 300 SECONDS.
         ) {
             $therm_conf = $json->decode(
-                 Khaospy::Utils::slurp( $KHAOSPY_HEATING_THERMOMETER_CONF_FULLPATH )
+                 Khaospy::Utils::slurp( $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH )
             );
             $therm_conf_last_loaded = time ;
         }
