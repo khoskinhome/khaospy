@@ -49,7 +49,7 @@ use POSIX qw(strftime);
 GetOptions ( "verbose" => \$verbose );
 
 print "######################\n";
-print "Heating control Daemon\n";
+print "One-Wire Heating Control Daemon\n";
 print "Start time ".strftime("%F %T", gmtime(time) )."\n";
 print "VERBOSE = ".($verbose ? "TRUE" : "FALSE")."\n";
 
