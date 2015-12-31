@@ -2,6 +2,7 @@ package Khaospy::Utils;
 use strict;
 use warnings;
 
+use POSIX qw(strftime);
 use Carp qw/croak/;
 use Data::Dumper;
 use Exporter qw/import/;
@@ -24,7 +25,6 @@ use Khaospy::Constants qw(
 );
 
 use Khaospy::Conf qw(
-    get_heating_thermometer_conf
     get_controls_conf
 );
 
@@ -33,8 +33,11 @@ our @EXPORT_OK = qw(
     burp
     get_one_wire_sender_hosts
     get_hashval
+    timestamp
 );
 
+
+sub timestamp { return strftime("%F %T", gmtime(time))." "; }
 
 sub slurp {
     my ( $file ) = @_;

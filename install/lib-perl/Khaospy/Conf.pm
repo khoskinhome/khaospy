@@ -22,7 +22,7 @@ use Khaospy::Constants qw(
 use Khaospy::Utils; # qw( slurp );
 
 our @EXPORT_OK = qw(
-    get_heating_thermometer_conf
+    get_one_wire_heating_control_conf
     get_controls_conf
     get_daemon_runner_conf
     get_boiler_conf
@@ -35,7 +35,7 @@ our @EXPORT_OK = qw(
     my $therm_conf;
     my $therm_conf_last_loaded;
 
-    sub get_heating_thermometer_conf {
+    sub get_one_wire_heating_control_conf {
         # reload the thermometer conf every 5 mins.
         if ( ! $therm_conf
             or $therm_conf_last_loaded + 20 < time  # TODO FIX THIS BACK TO 300 SECONDS.

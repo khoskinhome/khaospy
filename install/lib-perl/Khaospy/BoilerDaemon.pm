@@ -23,17 +23,13 @@ use Khaospy::Constants qw(
     $KHAOSPY_BOILERS_CONF_FULLPATH
 );
 
-use Khaospy::Controls qw(
-    send_command
-);
+use Khaospy::Controls qw( send_command );
 
-use Khaospy::Conf qw(
-    get_boiler_conf
-);
+use Khaospy::Conf qw( get_boiler_conf );
 
-our @EXPORT_OK = qw(
-    run_boiler_daemon
-);
+use Khaospy::Utils qw( timestamp );
+
+our @EXPORT_OK = qw( run_boiler_daemon );
 
 my $JSON = JSON->new->allow_nonref;
 
@@ -56,9 +52,8 @@ sub run_boiler_daemon {
     $VERBOSE = $opts->{verbose} || false;
 
     print "#############\n";
-    print "Boiler Daemon\n";
-    print "Start time ".strftime("%F %T", gmtime(time) )."\n";
-    print "VERBOSE = ".( $VERBOSE ? "TRUE" : "FALSE" )."\n";
+    print timestamp."Boiler Daemon START\n";
+    print timestamp."VERBOSE = ".( $VERBOSE ? "TRUE" : "FALSE" )."\n";
 
     init_BOILER_STATUS();
 
@@ -111,9 +106,6 @@ sub process_boiler_message {
 
     my $msg_decoded = $JSON->decode( $msg );
 
-    print strftime("%F %T", gmtime(time))." message received\n";
-    print Dumper($msg_decoded)."\n" if $VERBOSE;
-
     my $epoch_time
         = $msg_decoded->{EpochTime};
     my $control
@@ -122,6 +114,9 @@ sub process_boiler_message {
         = $msg_decoded->{HomeAutoClass}; # Why do I need HomeAutoClass ? TODO probably deprecate this.
     my $action
         = $msg_decoded->{Action};
+
+    print "\n".timestamp."Message received. '$control' '$action' \n";
+    print Dumper($msg_decoded)."\n" if $VERBOSE;
 
     refresh_boiler_status()
         if $BOILER_STATUS_LAST_REFRESH + $BOILER_STATUS_REFRESH_EVERY_SECS < time ;
@@ -139,7 +134,7 @@ sub process_boiler_message {
 sub operate_boiler {
     my ($boiler_name, $control, $action) = @_;
 
-    print "Operate boiler '$boiler_name'. set control '$control' to '$action'\n";
+    print timestamp."Operate boiler '$boiler_name'. set control '$control' to '$action'\n";
 
     my $boiler_state = $BOILER_STATUS->{$boiler_name};
 
@@ -149,35 +144,38 @@ sub operate_boiler {
     print "Controls are \n".Dumper($boiler_state->{controls}) if $VERBOSE;
 
     # Is at least one of the boiler's controls on ? :
-    if ( grep { $boiler_state->{controls}{$_} eq ON }
-        keys %{$boiler_state->{controls}}
-    ){
+    my @controls_now_on = grep { $boiler_state->{controls}{$_} eq ON }
+        keys %{$boiler_state->{controls}};
+
+    print timestamp."The controls currently 'on' are :".Dumper( \@controls_now_on );
+
+    if ( @controls_now_on ){
         if ( $boiler_state->{current_status} eq OFF
         ){
             if ( ! exists $boiler_state->{boiler_next_on_at} ) {
                 $boiler_state->{boiler_next_on_at}
                     = $boiler_state->{on_delay_secs} + time ;
             }
-            print "Boiler $boiler_name is scheduled to go on at "
+            print timestamp."Boiler '$boiler_name' is scheduled to go on at "
                 .strftime("%F %T", gmtime($boiler_state->{boiler_next_on_at}) )."\n";
         } else {
-            print "Boiler $boiler_name is already on\n";
+            print timestamp."Boiler '$boiler_name' is already on\n";
         }
 
         return;
     }
 
-    print "TURN BOILER OFF\n";
+    print timestamp."TURN BOILER '$boiler_name' OFF\n";
 
     _sig_a_control ( $boiler_name, OFF, \$boiler_state->{current_status} );
-    print "Boiler is now ".$boiler_state->{current_status}."\n";
+    print timestamp."Boiler '$boiler_name' is now ".$boiler_state->{current_status}."\n";
 
     delete $boiler_state->{boiler_next_on_at};
 
     if ( $boiler_state->{current_status} eq OFF ) {
         $boiler_state->{last_time_off} = time;
     } else {
-        print "ERROR. Boiler is not OFF\n";
+        print timestamp."ERROR. Boiler '$boiler_name' is not OFF\n";
     }
 }
 
@@ -190,10 +188,10 @@ sub boiler_check_next_on_at {
         if ( $boiler_state->{boiler_next_on_at}
             && $boiler_state->{boiler_next_on_at} < time
         ){
-            print "TURN BOILER ON\n";
+            print timestamp."TURN BOILER '$boiler_name' ON\n";
 
             _sig_a_control ( $boiler_name, ON, \$boiler_state->{current_status} );
-            print "Boiler is now ".$boiler_state->{current_status}."\n";
+            print timestamp."Boiler '$boiler_name' is now ".$boiler_state->{current_status}."\n";
 
             if ( $boiler_state->{current_status} eq ON ) {
 
@@ -201,7 +199,7 @@ sub boiler_check_next_on_at {
                 $boiler_state->{last_time_on} = time;
 
             } else {
-                print "ERROR. Boiler is not ON\n";
+                print timestamp."ERROR. Boiler '$boiler_name' is not ON\n";
             }
         }
     }
@@ -211,7 +209,7 @@ sub get_boiler_name_for_control {
     # goes through the $BOILER_STATUS and looks for a control.
     # returns either the boiler_name or undef.
 
-    # will croak if 2 boilers have the same sub-control.
+    # will croak if 2 or more boilers have the same sub-control.
 
     my ($control) = @_;
 
@@ -270,7 +268,7 @@ sub init_BOILER_STATUS {
 sub refresh_boiler_status {
     # refresh the controls from directly signalling the control
 
-    print "refresh boiler status\n";
+    print timestamp."Refresh BOILER_STATUS\n";
 
     for my $boiler_name ( keys %$BOILER_STATUS){
 
@@ -295,7 +293,7 @@ sub _sig_a_control {
     eval { $ret = send_command( $control, $action ); };
 
     if ( $@ ) {
-        print "Error signalling control '$control' with '$action'. $@\n";
+        print timestamp."Error signalling control '$control' with '$action'. $@\n";
         ${$update_scalar_ref} = undef ; # should this be OFF ?
     } else {
         ${$update_scalar_ref} = $ret;
@@ -304,7 +302,7 @@ sub _sig_a_control {
 
 =pod
 
-The boiler daemon has a conf of all the heating controls that are associated with the boilers.
+The Boiler daemon has a conf of all the heating controls that are associated with the boilers.
 
 $conf = {
             'boiler-central-heating' => {
@@ -316,9 +314,10 @@ $conf = {
                     'dinningroomrad'
                 ]
             },
-            'boiler-hot-water' => {
+            'another-boiler-in-a-big-house' => {
+                on_delay_secs => 120,
                 'controls' => [
-                    'dummyhotwater-valve',
+                    'huge-mansion-room-rad',
                 ]
             }
         };
@@ -348,7 +347,7 @@ When all of the rad-controls for a specific boiler are off then the boiler is im
 
 If the boiler is in the off state, and one or more of the controls switches on, then due to the radiator-actuators taking a couple of minutes to operate, the boiler-daemon will wait for on_delay_secs before it switches on.
 
-You need to time the operation of a radiator-actuator-valve to get this time. The ones I have take about 2 minutes to fully open. You do not want the boiler pumping hot-water with the valve off.
+You need to time the operation of a radiator-actuator-valve to get this time. The ones I have take about 2 minutes to fully open. You do not want the boiler pumping hot-water with all the valves off. ( Usually there is always at least one radiator that is fully open to stop the boiler pump trying to push water around a fully closed system )
 
 If all the rads go into the off state , the boiler will be switched off immediately. ( pump-over-run might be in operation on the boiler )
 

@@ -43,7 +43,7 @@ our $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
     = "$KHAOSPY_BIN_DIR/khaospy-one-wired-receiver.py";
 
 our $KHAOSPY_ONE_WIRE_HEATING_DAEMON
-    = "$KHAOSPY_BIN_DIR/khaospy-heating-control.pl";
+    = "$KHAOSPY_BIN_DIR/khaospy-one-wire-heating-daemon.pl";
 
 our $KHAOSPY_BOILER_DAEMON_SCRIPT
     = "$KHAOSPY_BIN_DIR/khaospy-boiler-daemon.pl";
