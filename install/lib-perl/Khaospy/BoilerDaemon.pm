@@ -147,7 +147,7 @@ sub operate_boiler {
     my @controls_now_on = grep { $boiler_state->{controls}{$_} eq ON }
         keys %{$boiler_state->{controls}};
 
-    print timestamp."The controls currently 'on' are :".Dumper( \@controls_now_on );
+    print timestamp."Boiler '$boiler_name' currently has the controls 'on' :".Dumper( \@controls_now_on );
 
     if ( @controls_now_on ){
         if ( $boiler_state->{current_status} eq OFF
@@ -157,7 +157,7 @@ sub operate_boiler {
                     = $boiler_state->{on_delay_secs} + time ;
             }
             print timestamp."Boiler '$boiler_name' is scheduled to go on at "
-                .strftime("%F %T", gmtime($boiler_state->{boiler_next_on_at}) )."\n";
+                .timestamp($boiler_state->{boiler_next_on_at})."\n";
         } else {
             print timestamp."Boiler '$boiler_name' is already on\n";
         }
@@ -188,7 +188,8 @@ sub boiler_check_next_on_at {
         if ( $boiler_state->{boiler_next_on_at}
             && $boiler_state->{boiler_next_on_at} < time
         ){
-            print timestamp."TURN BOILER '$boiler_name' ON\n";
+            print timestamp."TURN BOILER '$boiler_name' ON ( scheduled "
+                .timestamp($boiler_state->{boiler_next_on_at}).")\n";
 
             _sig_a_control ( $boiler_name, ON, \$boiler_state->{current_status} );
             print timestamp."Boiler '$boiler_name' is now ".$boiler_state->{current_status}."\n";

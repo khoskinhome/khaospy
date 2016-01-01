@@ -16,6 +16,8 @@ use Khaospy::Constants qw(
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT
 );
 
+use Khaospy::Utils qw/timestamp/;
+
 #  http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw( ZMQ_PUB );
@@ -34,7 +36,7 @@ our @EXPORT_OK = qw(
 sub send_boiler_control_message {
     my ( $control, $action ) = @_;
 
-    print "MESSAGE TO BOILER DAEMON $control, $action\n";
+    print timestamp."Message to Boiler Daemon $control, $action\n";
     zmq_sendmsg( $publisher,
         $json->encode({
           EpochTime     => time,

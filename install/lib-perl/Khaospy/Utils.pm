@@ -37,7 +37,7 @@ our @EXPORT_OK = qw(
 );
 
 
-sub timestamp { return strftime("%F %T", gmtime(time))." "; }
+sub timestamp { return strftime("%F %T", gmtime( $_[0] || time) )." "; }
 
 sub slurp {
     my ( $file ) = @_;

@@ -18,6 +18,7 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Utils qw(
     get_one_wire_sender_hosts
+    timestamp
 );
 
 use Khaospy::Constants qw(
@@ -62,9 +63,8 @@ sub run_one_wire_heating_daemon {
     $VERBOSE = $opts->{verbose} || false;
 
     print "######################\n";
-    print "One-Wire Heating Control Daemon\n";
-    print "Start time ".strftime("%F %T", gmtime(time) )."\n";
-    print "VERBOSE = ".($VERBOSE ? "TRUE" : "FALSE")."\n";
+    print timestamp."One-Wire Heating Control Daemon START\n";
+    print timestamp."VERBOSE = ".($VERBOSE ? "TRUE" : "FALSE")."\n";
 
     my $quit_program = AnyEvent->condvar;
 
@@ -73,7 +73,7 @@ sub run_one_wire_heating_daemon {
     my $w = [];
 
     for my $host ( get_one_wire_sender_hosts() ) {
-        print "Listening to One-Wire Thermometers on host $host:$ONE_WIRE_DAEMON_PORT\n";
+        print timestamp."Listening to One-Wire Thermometers on host $host:$ONE_WIRE_DAEMON_PORT\n";
 
         my $subscriber = zmq_socket($context, ZMQ_SUB);
 
@@ -104,95 +104,109 @@ sub anyevent_io {
         },
     );
 }
+{
 
-sub process_thermometer_msg {
-    my ($msg) = @_;
-    my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
+    my $thermometer_conf;
 
-    my $msg_decoded = $json->decode( $msgdata );
-
-    # print Dumper($msg_decoded)."\n" if $VERBOSE;
-
-    my $owaddr    = $msg_decoded->{OneWireAddress};
-    my $curr_temp = $msg_decoded->{Celsius};
-
-    my $thermometer_conf = get_one_wire_heating_control_conf();
-    my $tc   = $thermometer_conf->{$owaddr};
-
-    print "One-wire address $owaddr isn't in "
-        ."$KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH config file\n"
-            if ! defined $tc ;
-;
-    my $name = $tc->{name} || '';
-    print "'name' isn't defined for one-wire address $owaddr in "
-       ."$KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH "
-            if ! $name ;
-
-    my $control_name = $tc->{control} || '';
-    my $upper_temp   = $tc->{upper_temp} || '';
-
-    if ( ! $control_name && ! $upper_temp ){
-        print "$name : $owaddr : $curr_temp C\n" if $VERBOSE;
-        return ;
+    eval { $thermometer_conf = get_one_wire_heating_control_conf();};
+    if ($@) {
+        print "ERROR. Reading in the conf.\n$@\n";
+        croak "ERROR. Please check the conf file $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
     }
 
-    my $lower_temp = $tc->{lower_temp} || ( $upper_temp - 1 );
+    sub process_thermometer_msg {
+        my ($msg) = @_;
+        my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
 
-    print "#####\n";
-    print "$name : $owaddr : $curr_temp C ";
+        my $msg_decoded = $json->decode( $msgdata );
 
-    if ( ! $control_name || ! $upper_temp || ! $lower_temp ){
-        print "\n    Not all the parameters are configured for this thermometer\n";
-        print "    Both the 'upper_temp' and 'control' need to be defined\n";
-        print "        upper_temp = $upper_temp\n";
-        print "        control    = $control_name\n";
-        print "    Please fix the config file $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
-        print "    Cannot operate this control.\n";
-        print "#####\n";
-        return;
-    }
+        my $owaddr    = $msg_decoded->{OneWireAddress};
+        my $curr_temp = $msg_decoded->{Celsius};
 
-    if ( $upper_temp <= $lower_temp ){
-        print "\n    Broken temperature range in $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH config.\n";
-        print "        (Upper) $upper_temp <= (Lower) $lower_temp\n";
-        print "    Upper temperature must be greater than the lower temperature\n";
-        print "    Please fix the config file $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
-        print "    Cannot operate this control.\n";
-        print "#####\n";
-        return;
-    }
+        my $new_thermometer_conf ;
+        eval { $new_thermometer_conf = get_one_wire_heating_control_conf();};
+        if ($@ ) {
+            print "\n\nERROR. getting the conf.\n";
+            print "ERROR. Probably a broken conf $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
+            print "ERROR. $@";
+            print "ERROR. Using the old conf\n\n";
+        }
+        $thermometer_conf = $new_thermometer_conf || $thermometer_conf ;
 
-    print " : lower = $lower_temp C : upper = $upper_temp C\n";
+        my $tc   = $thermometer_conf->{$owaddr};
 
-    my $send_cmd = sub {
-        my ( $action ) = @_;
-        my $retval;
-        print "    Send command to '$control_name' '$action' \n";
-        eval { $retval = send_command($control_name, $action); };
-        if ( $@ ) {
-            print "$@\n";
-            return
+        print "ERROR. One-wire address $owaddr isn't in "
+            ."$KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH config file\n"
+                if ! defined $tc ;
+
+        my $name = $tc->{name} || '';
+        print "ERROR. 'name' isn't defined for one-wire address $owaddr in "
+           ."$KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH "
+                if ! $name ;
+
+        my $control_name = $tc->{control} || '';
+        my $upper_temp   = $tc->{upper_temp} || '';
+
+        if ( ! $control_name && ! $upper_temp ){
+            print "\n".timestamp."$name : $owaddr : $curr_temp C\n" if $VERBOSE;
+            print Dumper($msg_decoded) if $VERBOSE;
+            return ;
         }
 
-        if ( $retval ne $action and $action ne STATUS ){
-            # Should this croak ? dunno....
-            print "    ERROR. control returned value '$retval' NOT the action '$action'\n";
+        my $lower_temp = $tc->{lower_temp} || ( $upper_temp - 1 );
+
+        print "\n".timestamp."$name : $owaddr : $curr_temp C ";
+
+        if ( ! $control_name || ! defined $upper_temp || ! defined $lower_temp ){
+            print "\nERROR. Not all the parameters are configured for this thermometer\n";
+            print "ERROR. Both the 'upper_temp' and 'control' need to be defined\n";
+            print "ERROR. upper_temp = $upper_temp C\n";
+            print "ERROR. control    = '$control_name' \n";
+            print "ERROR. Please fix the config file $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
+            print "ERROR. Cannot operate this control.\n";
             return;
         }
-        print "    Control '$control_name' is '$retval'\n";
-        send_boiler_control_message($control_name, $retval);
-    };
 
-    if ( $curr_temp > $upper_temp ){
-        $send_cmd->(OFF);
+        if ( $upper_temp <= $lower_temp ){
+            print "\nERROR. Broken temperature range in $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH config.\n";
+            print "ERROR. (Upper) $upper_temp C <= $lower_temp C (Lower)\n";
+            print "ERROR. Upper temperature must be greater than the lower temperature\n";
+            print "ERROR. Please fix the config file $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
+            print "ERROR. Cannot operate this control.\n";
+            return;
+        }
+
+        print " : lower = $lower_temp C : upper = $upper_temp C\n";
+        print Dumper($msg_decoded) if $VERBOSE;
+
+        my $send_cmd = sub {
+            my ( $action ) = @_;
+            my $retval;
+            print timestamp."Send command to '$control_name' '$action' \n";
+            eval { $retval = send_command($control_name, $action); };
+            if ( $@ ) {
+                print "$@\n";
+                return
+            }
+
+            if ( $retval ne $action and $action ne STATUS ){
+                # Should this croak ? dunno....
+                print timestamp."ERROR. control returned value '$retval' NOT the action '$action'\n";
+                return;
+            }
+            print timestamp."Control '$control_name' is '$retval'\n" if $VERBOSE;
+            send_boiler_control_message($control_name, $retval);
+        };
+
+        if ( $curr_temp > $upper_temp ){
+            $send_cmd->(OFF);
+        }
+        elsif ( $curr_temp < $lower_temp ){
+            $send_cmd->(ON);
+        } else {
+            print timestamp."Current temperate is in correct range\n";
+            $send_cmd->(STATUS);
+        }
     }
-    elsif ( $curr_temp < $lower_temp ){
-        $send_cmd->(ON);
-    } else {
-        print "    Current temperate is in correct range\n";
-        $send_cmd->(STATUS);
-    }
-    print "#####\n";
 }
-
 1;
