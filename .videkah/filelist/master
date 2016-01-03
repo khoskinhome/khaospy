@@ -13,10 +13,19 @@
 
 #######################################################
 
+
+./install/lib-perl/Khaospy/BoilerDaemon.pm
+./install/bin/khaospy-boiler-daemon.pl:215:
+
 ./install/lib-perl/Khaospy/BoilerMessage.pm
 ./install/lib-perl/Khaospy/Conf.pm
 ./install/lib-perl/Khaospy/Controls.pm
 ./install/lib-perl/Khaospy/Constants.pm
+
+./install/lib-perl/Khaospy/OneWireHeatingDaemon.pm
+./install/bin/khaospy-one-wire-heating-daemon.pl
+
+
 ./install/lib-perl/Khaospy/Utils.pm:77:
 
 ./install/lib-perl/Khaospy/OrviboS20.pm
@@ -25,10 +34,9 @@
 ######################################################
 # Orvibo S20 rad control stuff.
 
-./install/bin/khaospy-heating-control.pl
-./install/bin/khaospy-boiler-daemon.pl:215:
 
-
+./to-be-deleted/bin/khaospy-one-wire-heating-daemon-old.pl
+./to-be-deleted/bin/khaospy-boiler-daemon-old.pl
 ./to-be-deleted/bin/khaospy-orvibo-s20-radiator.pl
 ./to-be-deleted/bin/orvibo-s20-control-karl-hack.pl
 ./to-be-deleted/bin/zmq-subscribe-to-thermometers.pl
@@ -193,7 +201,12 @@ crap.js
 
 ./install/docs
 
+./install/docs/setup-pi.txt
+
 ./install/docs/dependencies.txt
+
+./install/docs/proj_khaospy-home-auto-software.txt
+
 
 
 ##############################################################################
@@ -299,6 +312,8 @@ install/hackingpython/generators/storelast.py
 install/hackingpython/generators/thrsend.py
 ###################################################################
 
+install-to-pi-pi.bash
+install-to-pi-khoskin.bash
 install-to-pi.bash
 install-to-pi-all.bash
 
@@ -309,4 +324,13 @@ install-to-pi-all.bash
 ./install/www-bin/graphs.pl
 
 ###################################################################
+
+
+grep -rin get_heating_thermometer_conf *
+install/lib-perl/Khaospy/Utils.pm:27:    get_heating_thermometer_conf
+install/lib-perl/Khaospy/OneWireHeatingDaemon.pm:37:# get_heating_thermometer_conf
+to-be-deleted/bin/khaospy-one-wire-heating-daemon-old.pl:34:    get_heating_thermometer_conf
+to-be-deleted/bin/khaospy-one-wire-heating-daemon-old.pl:110:    my $thermometer_conf = get_heating_thermometer_conf();
+
+
 

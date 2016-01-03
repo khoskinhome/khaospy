@@ -1,7 +1,9 @@
 ./iall
 
 ./install-to-pi.bash piserver
+./install-to-pi-pi.bash piboiler
 
+./install-to-pi-all.bash
 
 ./install-to-pi.bash pioldwifi && ./install-to-pi.bash piloft && ./install-to-pi.bash pimain && ./install-to-pi.bash khaospy
 ./install-to-pi.bash pioldwifi
