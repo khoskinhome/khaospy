@@ -11,7 +11,8 @@ else
     PIHOST=$1
 fi
 
-USER=khoskin
+USER=pi
+#USER=khoskin
 
 PI_INSTALL_DIR=/opt/khaospy
 

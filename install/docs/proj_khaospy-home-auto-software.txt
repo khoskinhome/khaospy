@@ -1,0 +1,246 @@
+###########################################################
+# Khaopy. Karl's Home Automation Operating System Py ( for Pi )
+# maybe it should be called Khaospi, although there might be some Python in the code as well as Perl.
+#
+
+Devices, controls, switches, sensors, rules and daemons.
+-------------------------------------------------------
+
+Khaospy has the high level concepts of devices, controls, switches, sensors, rules and daemons.
+
+Devices
+-------
+    Khaospy::Device
+    Devices must have unique names.
+    A Device is the abstract concept of either a control, switch or a sensor.
+    A Device can have an alias.
+        This alias is used when the device-name is not human-readable.
+        i.e. one-wire-sensor-devices must have the one-wire-address as the device-name.
+             mac-address-switch-devices must have the ethernet-MAC-address as the device-name.
+    A Device can have a graph of its state plotted on an RRD-graph.
+
+Switches
+--------
+    Khaospy::Switch
+    A switch only has state, either ON or OFF.
+    A switch can be an alarm-switch ( PIR, window, door, smoke, carbon-monoxide ) or pressure-seat-or-bed-sensor, manual-wall-switch )
+        These are physical switches.
+        These are supplied by various physical-switch-daemons
+        At least 2 types of physical exist ( more are likely to follow )
+            pi-i2c-mcp23017-switches.   Khaospy::Switch::Pi_I2C_MCP23017
+            pi-gpio-switches            Khaospy::Switch::Pi_GPIO
+
+    A switch can be be the detection of a MAC-address on the network.
+        If the mac-address is detected the switch is ON
+        These are supplied by the mac-attached-switch-daemon
+        Khaospy::Switch::MacAddress
+
+    A "switch" can be a timed switch.
+        These are supplied by the timer-switch-daemon
+        Khaospy::Switch::Timer
+
+    A "switch" can be the result of a rule running.
+        These are supplied by the rules-daemon
+
+    Configs and Daemons for Switches
+    --------------------------------
+    switch-main-config :
+        config : ( in perl hash style )
+            {   switch_name_pi_i2c_mcp23017 => {
+                    type => 'Khaospy::Switch::Pi_I2C_MCP23017',
+                    host => 'hostname',
+                    i2c_bus         => 0,      # can also be '1' depending on the Pi-revision.
+                    i2c_address     => "0x20", # can be '0x20' -> '0x27'
+                    mcp_port        => "a",    # can be 'a' or 'b'
+                    mcp_port_number => 0,      # can be '0' -> '7'
+                    # This is a "switch" so the MCP23017 is configured for "in" mode.
+                },
+
+                switch_name_pi_gpio => {
+                    type => 'Khaospy::Switch::Pi_GPIO',
+                    host => 'hostname',
+                    gpio => 'port-number',
+                    # This is a "switch" so the Pi GPIO is configured for "in" mode.
+                },
+
+                switch_name_timer => {
+                    type => 'Khaospy::Switch::Timer',
+                    # no other keys necessary.
+                },
+
+                switch_name_mac => {
+                    type => 'Khaospy::Switch::MacAddress',
+                    mac_address => '00-00-00-00-00-00',
+                },
+            };
+
+
+    pi-gpio-and-i2c-mcp23017-daemon :
+        reads from the switch-main-config to find the pi-gpio and pi-i2c-mcp23017 switches.
+        polls the gpio and i2c-mcp23017 ports.
+        Publishes to a zero-mq port the state of the switches.
+
+    timer-switch-daemon :
+        reads from the switch-main-config to find the "timer-switches".
+
+        config : ( in perl hash style )
+            {
+                event-name1 => {
+                    exact_time_iso8601 => '2015-12-31T20:21:53+00:00',
+                    ## OR  exact_time_epoch_secs =>'14000000',
+                    switch_name => 'entry-in-switch-config',
+                    status      => 'on', # or 'off' ( maybe also "toggle" AKA "invert" )
+                },
+                event-name2 => {
+                    minute       => 32, # obviousl 0 -> 59 . Also "0/10" just like crontab.
+                    hour         => 15, # 24 hour clock, 0 -> 23 . Also "0/2" just like crontab.
+                    day_of_month => 2, # 0 -> 31 or "last"
+                    day_of_week  => 1, # 0 -> 6 OR "Saturday" to "Sunday" . Same as crontab specs.
+                    switch_name  => 'entry-in-switch-config",
+                    status       => 'on', # or 'off' ( maybe also "toggle" AKA "invert" )
+                },
+            },
+
+        If an exact time is supplied, then the crontab like options MUST NOT be supplied. That is a config-error.
+        You cannot supply both exact_time_iso8601 and exact_time_epoch_secs. That is a config-error.
+        If using crontab-style-event then 1 or more of the keys can be supplied.
+
+        The "status" key must always be supplied. This can be "on" , "off" or maybe "toggle".
+        "toggle" ( which could be called "invert" ) just swaps the state of the switch.
+        i.e. if the switch is currently "on" then "toggle" would switch it "off", and vice-versa.
+
+        The timer daemon runs, and when the timed-event happens it will publish to a zero-mq port the state of the "timer-switches".
+
+    mac-address-switch-daemon :
+
+        reads from the switch-main-config to find the "mac-address-switches".
+
+        The mac-address-switch-daemon runs,
+        polls (nmap) the networks ip addresses and gets the mac-addresses.
+        if any of the mac-address are in the switch-main-config then publishes to a zero-mq port the state of the mac-address-switch.
+
+        There will probably have to be a config for this daemon that limits the range of IP address scanned. nmapping can be a bit slow, processor and cpu intensive.
+        The idea of seeing if a mac-address is on the network is that if someone's mobile phone attaches to the network, you can hopefully deduce that person is in the house.
+        If the person is in the house, then the system could switch on the heating in their room.
+        This of course assumes that the said person is always glued to their phone, and for teenagers at least in 2016 this does seem usually to be the case.
+
+    switch-aggregator-daemon :
+        subscribes to all the switch-publishing-daemons. works this out from the daemon-runner.conf
+            pi-gpio-and-i2c-mcp23017-daemon
+            timer-switch-daemon
+            mac-address-switch-daemon
+
+        when it receives a message it updates an rrd, and keeps the switch-state centrally.
+        An API can then supply the current switch state.
+
+
+Controls
+--------
+    Khaospy::Control
+    A control is something that switches ON or OFF an appliance ( lighting, heating, tv etc ... )
+
+    A control has state, either ON or OFF, it can also be sent a command to either switch ON or OFF.
+
+    A control can have a delay time set to its ON or OFF. This is useful for signalling a boiler that needs to be delayed because the radiator actuator takes time to operate. ( 2 mins in my case )
+    Not sure if I need the delay OFF, but for completeness I guess its just a little bit more code.
+
+    Khaospy::Control::OrviboS20
+
+
+    Khaospy::Control::Pi_I2C_MCP23017
+
+
+    Khaospy::Control::Pi_GPIO
+
+
+Controls Analogue
+-----------------
+    This is an unexplored area, where if I ever bother controls for say dimmable-lighting will live.
+    If I ever get the switched lighting working, and modern LED lights only really seem easy to switch, then I might try and do dimmable lighting.
+
+
+Sensors
+-------
+    Khaospy::Sensor
+    A sensor is something that senses a physical analogue quantity.
+    A Thermometer is a sensor.             Khaospy::Sensor::Thermometer. ( Khaospy::OneWireSensor::Thermometer ? )
+    A Light-level-meter (lux) is a sensor. Khaospy::Sensor::LightMeter
+    A humidity-level-meter is a sensor.    Khaospy::Sensor::HumidityLevel
+    A Barometric-level-meter is a sensor.  Khaospy::Sensor::BarometricLevel
+
+    Most home automation will be using thermometers.
+    humidity and light-level might be useful for certain tasks.
+    light level could control automatic security lighting ( along with PIR-switches and timer-switches )
+    Humidity level could automate extractor fans in bathrooms, kitchens or laundry-rooms ( if you live in a MANSION ! ).
+
+
+    one-wire-sensor-publisher-daemon
+        runs on a host, polls for the one-wire-sensors attached to the host.
+        publishes a ZMQ message to port.
+
+    one-wire-sensor-subscriber-aggregator-daemon
+        runs on a host, subscribes to all the one-wire-sensor-publisher-daemons it find in the daemon-runner.conf.
+        updates an rrd file.
+
+
+Daemons
+-------
+
+
+
+Rules
+-----
+
+    Rules look at the state of switches, sensors and controls they can then set either
+
+
+    if switch1 = state and sensor1 > level then set-switch-off
+
+    if sensor < level then set-control-on
+
+    
+
+
+
+        rules-config :
+            conf : ( in perl hash style )
+                {   rule_name1 =>{
+                        type => ''
+                        .....
+
+                    },
+                    rule_name2 => {
+                        type => '',
+                        
+
+                    },
+                };
+
+
+
+API
+---
+    get_device_state
+        looks at the rrd file for the latest state.
+
+
+
+
+
+
+
+        boiler / rad control
+            timed
+            detect phone connected to network.
+            alarm switch override.
+
+
+        one-wire-sensor-config :
+
+
+
+            The Boiler::Command will query this before it sends a command.
+
+
+
+

@@ -1,0 +1,38 @@
+dd image on to micro-sd card.
+
+raspi-config :
+    expand the file system
+    change user "pi" password
+    boot option to console with password
+    advanced options
+        change hostname
+        i2c enable
+        ssh-login-enable.
+
+    get the mac-address and add a dhcp config in the tp-link so it will always get the same ip-address.
+
+    copy over the ssh public key, and put in .ssh/authorized_keys
+
+    change visudo to use vim
+
+    /boot/config.txt can need editting to get one-wire working .
+    see https://www.raspberrypi.org/forums/viewtopic.php?f=37&t=98407
+        http://raspberrypi.stackexchange.com/questions/26623/ds18b20-not-listed-in-sys-bus-w1-devices
+    looks like i2c might need dtparam too.
+    one wire needs this in the /boot/config.txt :
+        dtoverlay=w1-gpio
+
+
+
+
+still to do :
+
+    add a USB flash mem stick. (small one form factor ) 16 GB.
+    get the USB mounting in /etc/fstab.
+
+
+once fully setup "dd" the micro-sd card and get an image
+
+
+
+

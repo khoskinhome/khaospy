@@ -138,6 +138,7 @@ sub daemon_runner_conf {
         piserver => [
             "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=pioldwifi",
             "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=piloft",
+            "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=piboiler",
     #        "$KHAOSPY_ONE_WIRE_HEATING_DAEMON",
     #        "$KHAOSPY_BOILER_DAEMON_SCRIPT",
         ],
@@ -148,6 +149,10 @@ sub daemon_runner_conf {
         piold => [
             "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
         ],
+        piboiler => [
+            "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
+        ],
+
     };
 }
 
@@ -181,13 +186,13 @@ sub heating_thermometer_config {
         },
         '28-000006e04e8b' => {
             name               => 'Playhouse-tv',
-            rrd_group          => 'outside',
+            rrd_group          => 'sheds',
             upper_temp         => 21,
             control            => 'karlrad', # TODO fix this deliberate mis-config. Used for testing.
         },
         '28-0000066fe99e' => {
             name               => 'Playhouse-9e-door',
-            rrd_group          => 'outside',
+            rrd_group          => 'sheds',
         },
         '28-00000670596d' => {
             name               => 'Bathroom',
@@ -208,6 +213,43 @@ sub heating_thermometer_config {
             name               => 'Upstairs-Landing',
             rrd_group          => 'upstairs',
         },
+        '28-000006e04d3c' => {
+            name               => 'Outside-front-drive',
+            rrd_group          => 'outside',
+        },
+        '28-000006e00a67' => {
+            name               => 'boiler-ch-in-cold',
+            rrd_group          => 'boiler',
+        },
+        '28-0114632f89ff' => {
+            name               => 'boiler-ch-out-hot',
+            rrd_group          => 'boiler',
+        },
+        '28-0414688dbfff' => {
+            name               => 'boiler-wh-in-cold',
+            rrd_group          => 'boiler',
+        },
+        '28-011465cb13ff' => {
+            name               => 'boiler-wh-out-hot',
+            rrd_group          => 'boiler',
+        },
+        '28-031463502eff' => {
+            name               => 'boiler-room',
+            rrd_group          => 'boiler',
+        },
+        '28-0214630558ff' => {
+            name               => 'front-room',
+            rrd_group          => 'downstairs',
+        },
+        '28-000006cafb0d' => {
+            name               => 'front-porch',
+            rrd_group          => 'downstairs',
+        },
+        '28-0000066ff2ac' => {
+            name               => 'dinning-porch',
+            rrd_group          => 'downstairs',
+        },
+
     };
 }
 

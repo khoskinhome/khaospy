@@ -1,38 +1,53 @@
+#!/bin/bash
+
+
+# manually install cpanm
+
+# TODO check for cpanm before this script runs.
+
+# apt-get installs :
 
 sudo apt-get update
 
-sudo apt-get install apache2 -y
-sudo apt-get install daemon -y
-sudo apt-get install i2c-tools -y
-sudo apt-get install libsodium -y
-sudo apt-get install libsodium-dev -y
-sudo apt-get install libzmq3-dev -y
-sudo apt-get install libzmq-dev -y
-sudo apt-get install make autoconf automake libtool -y
-sudo apt-get install perl-cpanm -y
-sudo apt-get install perl-doc -y
-sudo apt-get install perl-modules -y
-sudo apt-get install perl term-readkey-perl -y
-sudo apt-get install python-dev -y
-sudo apt-get install python-devel -y
-sudo apt-get install python-dev -y
-sudo apt-get install python-pip -y
-sudo apt-get install python-rrdtool
-sudo apt-get install python-rrdtool -y
-sudo apt-get install python-smbus -y
-sudo apt-get install python-yaml -y
-sudo apt-get install python-zmq -y
-sudo apt-get install rrdtool -y
-sudo apt-get install screen -y
-sudo apt-get -y install git
-sudo pip install python-rrdtool
-sudo pip install python-yaml
-sudo pip install pyzmq
-sudo pip install yaml
-sudo pip py
-sudo pip pyzmq
-sudo pip search rrdtool
-sudo pip search yaml
+sudo apt-get install -y make autoconf automake libtool
 
+sudo apt-get install -y rrdtool vim git
+
+sudo apt-get install -y libzmq-dev libsodium-dev libzmq3-dev
+
+sudo apt-get install -y python-dev
+
+sudo apt-get install -y \
+apache2 \
+daemon \
+i2c-tools \
+perl-doc \
+perl-modules \
+python-pip \
+python-rrdtool \
+python-smbus \
+python-yaml \
+python-zmq \
+screen \
+vim \
+git
+
+
+# libzmq-dev \
+
+#####################################
+
+# pip installs :
+
+
+# this doesn't work : sudo pip install python-yaml
+
+sudo pip install pyzmq
+
+
+#######################################
+# cpanm installs 
+#
 
 sudo cpanm Clone
+sudo cpanm JSON
