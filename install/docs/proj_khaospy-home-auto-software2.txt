@@ -1,0 +1,238 @@
+
+psql schema def
+
+table names are underlined with -------
+
+
+devices
+-------
+id   : ( integer, pk)
+name : ( unique , varchar 100 )
+type : ( integer, refs name_types.id )
+
+
+name_types
+----------
+id   : ( pk , integer )
+table_name : ( varchar 100 , unique )
+        = controls_orvibo20
+        = controls_pi_gpio
+        = controls_pi_i2c_mcp23017
+        = switches_mac_address
+        = switches_pi_gpio
+        = switches_pi_i2c_mcp20317
+        = sensors_pi_onewire_ds18b20
+
+
+switches_mac_address
+--------------------
+device_id   : ( pk, integer )
+mac_address : (
+        varchar  17, unique,
+        with the format "B8-27-EB-98-BC-C3" enforced possibly psql or code
+    )
+state  : ( enum "on" , "off" )
+
+mac_address_scanner_host
+------------------------
+id               : ( pk, integer )
+host             : ( varchar 50 )
+ip_start_address : ( varchar containing ip-v4 address )
+ip_end_address   : ( varchar containing ip-v4 address )
+
+# this is so the load of nmap-ing can be distributed over more than one Pi
+
+switches_pi_gpio
+----------------
+device_id : ( pk, integer )
+host      : ( varchar 50 )
+gpio      : ( integer )
+state     : ( enum "on", "off" and "undef" ).
+
+unique-index on "host" + "gpio"
+
+
+switches_pi_i2c_mcp23017
+------------------------
+device_id   : ( integer, pk )
+switch_port :
+    ( unique ,
+      integer, ref to pi_i2c_mcp23017_port ,
+      must configure the port io_direction as "in"
+    )
+
+
+pi_i2c_mcp23017_ports
+--------------------
+id              : ( integer, pk )
+host            : ( varchar 50  )
+i2c_bus         : ( integer     ) # should only be '0' or '1' depending on the Pi-revision.
+i2c_address     : ( integer     ) # "0x20", # can be '0x20' -> '0x27' . conversion in perl code. maybe.
+mcp_port        : ( varchar 1   ) # can only be  "a" or "b"
+mcp_port_number : ( integer or byte ) # can only be '0' -> '7'
+io_direction    : ( enum  "in" or "out" ).
+state           : ( enum "on", "off" and "undef" ).
+
+a unique-index combining "host + i2c_bus + i2c_address + mcp_port + mcp_port_number"
+
+
+controls_orvibos20
+------------------
+device_id : ( pk, integer )
+host      : ( varchar 50 , unique )
+state     : ( enum "on", "off" and "undef" ).
+
+
+
+controls_pi_gpio
+----------------
+device_id               : ( pk )
+host                    : ( varchar 50 )
+mains_detect_gpio       : ( integer )
+mains_detect_state      : ( enum "on", "off" and "undef" ).
+change_over_gpio        : ( integer )
+change_over_relay_state : ( enum "on", "off" and "undef" ).
+auto_relay_gpio         : ( integer )
+auto_relay_state        : ( enum "on", "off" and "undef" ).
+wiring_type             : ( ref on wiring_types )
+
+unique indexes :
+    host + mains_detect_gpio
+    host + change_over_gpio
+    host + auto_relay_gpio
+
+
+controls_pi_i2c_mcp23017
+------------------------
+device_id : ( pk )
+mains_detect_port : (
+        integer, ref to pi_i2c_mcp23017_port ,
+        io_direction = "in"
+    )
+change_over_relay_port : (
+        integer, ref to pi_i2c_mcp23017_port,
+        io_direction = "out"
+    )
+auto_relay_port : (
+        integer, ref to pi_i2c_mcp23017_port ,
+        io_direction = "out"
+    )
+wiring_type : ( ref on wiring_types )
+
+sensors_pi_onewire_ds18b20
+-------------------------
+device_id        : ( pk, integer )
+one_wire_address : ( varchar , unique )
+host             : ( varchar 50 )
+
+# don't need to know the host. all one-wire-address are unique,
+# but if we have the host , then  the one-wire-sender daemons
+# can be started by looking at this table.
+
+
+wiring_types
+------------
+id   : ( pk, integer )
+type : ( enum "one-way", "one-way-change-over" , "two-way" )
+
+#######
+
+User, groups and permissions for controls, switches and sensors.
+
+
+users
+-----
+id : ( pk, integer )
+name          :
+password_hash :
+email         :
+mobile_phone  :
+
+user_group_pivot
+----------------
+user_id       : ( ref on users )
+user_group_id : ( ref on user_groups )
+
+user_groups
+-----------
+id   : ( pk, integer )
+name :
+
+
+permissions
+-----------
+id              : ( pk , integer  )
+name            :
+can_read        : ( boolean )
+can_modify      : ( boolean )
+user_group_id   : ( ref on user_groups )
+device_group_id : ( ref on device_groups )
+
+
+device_groups
+-------------
+id   : ( pk , integer )
+name :
+
+device_group_pivot
+-------------------
+device_group_id : ( ref on device_groups )
+device_id       : ( ref on devices )
+
+
+
+
+
+
+
+#######
+
+Rules
+#####
+device-state , time-state, rules
+
+( time-state can be used for the delay-on of boilers )
+
+time-state checking will allow crontab-type rules, and specific-times.
+
+once a specific type has passed it will be cleared from the db.
+
+
+
+i.e.
+    if device-sensor > value then control (on|off)
+
+    if device-sensor < value then create-time-rule-for-control ( allows delay boiler on|off )
+
+    if device-sensor < value then set-control (rad valve say) and create-time-rule-for-boiler-control 
+    if device-sensor = something AND time-state = something then do-something.
+
+    if device-state = something OR time-state = something then do-something
+
+    do-something can be :
+        setting one or more controls
+        setting up another rule.
+
+
+    if time is something (crontab rules and specific time) then control ( on|off)
+
+    if time is something then change-sensor-rule-value.
+        ( i.e. at a certain time, change the temperature at which a control operates )
+
+
+    if window-switch is open then turn-off-radiator.
+
+
+This is going to be complicated.
+
+
+
+
+########################################
+extra cross table constraints :
+
+There needs to be some way of enforcing that both a record in controls_pi_i2c_mcp23017 and a record in switches_pi_i2c_mcp23017 don't both refer to the same pi_i2c_mcp23017_ports
+
+There needs to be some way of enforcing that both a record in controls_pi_gpio and switches_pi_gpio don't both have the same "host + gpio".
+
+
