@@ -4,14 +4,14 @@ psql schema def
 table names are underlined with -------
 
 
-devices
+things
 -------
 id   : ( integer, pk)
 name : ( unique , varchar 100 )
-type : ( integer, refs name_types.id )
+type : ( integer, refs thing_types.id )
 
 
-name_types
+thing_types
 ----------
 id   : ( pk , integer )
 table_name : ( varchar 100 , unique )
@@ -26,7 +26,7 @@ table_name : ( varchar 100 , unique )
 
 switches_mac_address
 --------------------
-device_id   : ( pk, integer )
+thing_id   : ( pk, integer )
 mac_address : (
         varchar  17, unique,
         with the format "B8-27-EB-98-BC-C3" enforced possibly psql or code
@@ -44,7 +44,7 @@ ip_end_address   : ( varchar containing ip-v4 address )
 
 switches_pi_gpio
 ----------------
-device_id : ( pk, integer )
+thing_id : ( pk, integer )
 host      : ( varchar 50 )
 gpio      : ( integer )
 state     : ( enum "on", "off" and "undef" ).
@@ -54,7 +54,7 @@ unique-index on "host" + "gpio"
 
 switches_pi_i2c_mcp23017
 ------------------------
-device_id   : ( integer, pk )
+thing_id   : ( integer, pk )
 switch_port :
     ( unique ,
       integer, ref to pi_i2c_mcp23017_port ,
@@ -75,53 +75,106 @@ state           : ( enum "on", "off" and "undef" ).
 
 a unique-index combining "host + i2c_bus + i2c_address + mcp_port + mcp_port_number"
 
+####################################
+CONTROLS
+####################################
 
 controls_orvibos20
 ------------------
-device_id : ( pk, integer )
+thing_id : ( pk, integer )
 host      : ( varchar 50 , unique )
 state     : ( enum "on", "off" and "undef" ).
 
+controls_pi_gpio_one_way
+------------------------
+thing_id               : ( pk )
+host                    : ( varchar 50 )
+auto_gpio         : ( integer )
+auto_state        : ( enum "on", "off" and "undef" ).
+
+unique indexes :
+    host + auto_gpio
 
 
-controls_pi_gpio
-----------------
-device_id               : ( pk )
+controls_pi_gpio_one_way_changeover
+-----------------------------------
+thing_id               : ( pk )
 host                    : ( varchar 50 )
 mains_detect_gpio       : ( integer )
 mains_detect_state      : ( enum "on", "off" and "undef" ).
 change_over_gpio        : ( integer )
-change_over_relay_state : ( enum "on", "off" and "undef" ).
-auto_relay_gpio         : ( integer )
-auto_relay_state        : ( enum "on", "off" and "undef" ).
-wiring_type             : ( ref on wiring_types )
+change_over_state : ( enum "on", "off" and "undef" ).
+auto_gpio         : ( integer )
+auto_state        : ( enum "on", "off" and "undef" ).
 
 unique indexes :
     host + mains_detect_gpio
     host + change_over_gpio
-    host + auto_relay_gpio
+    host + auto_gpio
 
 
-controls_pi_i2c_mcp23017
+controls_pi_gpio_two_way
 ------------------------
-device_id : ( pk )
+thing_id               : ( pk )
+host                    : ( varchar 50 )
+mains_detect_gpio       : ( integer )
+mains_detect_state      : ( enum "on", "off" and "undef" ).
+auto_gpio         : ( integer )
+auto_state        : ( enum "on", "off" and "undef" ).
+invert_mains_detect     : ( boolean )
+
+unique indexes :
+    host + mains_detect_gpio
+    host + auto_gpio
+
+# the two_way control type also does intermediate switching, invert_mains_detect has to be TRUE.
+# the invert_mains_detect also has to be true for two_way lighting where the mains-detector is wired across the "strappers" of the two way circuit.
+
+
+
+controls_pi_i2c_mcp23017_one_way
+--------------------------------
+thing_id : ( pk )
+auto_port : (
+        integer, ref to pi_i2c_mcp23017_port ,
+        io_direction = "out"
+    )
+
+controls_pi_i2c_mcp23017_one_way_changeover
+-------------------------------------------
+thing_id : ( pk )
 mains_detect_port : (
         integer, ref to pi_i2c_mcp23017_port ,
         io_direction = "in"
     )
-change_over_relay_port : (
+change_over_port : (
         integer, ref to pi_i2c_mcp23017_port,
         io_direction = "out"
     )
-auto_relay_port : (
+auto_port : (
         integer, ref to pi_i2c_mcp23017_port ,
         io_direction = "out"
     )
-wiring_type : ( ref on wiring_types )
+
+controls_pi_i2c_mcp23017_two_way
+--------------------------------
+thing_id : ( pk )
+mains_detect_port : (
+        integer, ref to pi_i2c_mcp23017_port ,
+        io_direction = "in"
+    )
+auto_port : (
+        integer, ref to pi_i2c_mcp23017_port ,
+        io_direction = "out"
+    )
+invert_mains_detect  : ( boolean )
+
+# the two_way control type also does intermediate switching, invert_mains_detect has to be TRUE.
+# the invert_mains_detect also has to be true for two_way lighting where the mains-detector is wired across the "strappers" of the two way circuit.
 
 sensors_pi_onewire_ds18b20
 -------------------------
-device_id        : ( pk, integer )
+thing_id         : ( pk, integer )
 one_wire_address : ( varchar , unique )
 host             : ( varchar 50 )
 
@@ -130,12 +183,23 @@ host             : ( varchar 50 )
 # can be started by looking at this table.
 
 
-wiring_types
-------------
-id   : ( pk, integer )
-type : ( enum "one-way", "one-way-change-over" , "two-way" )
+rules
+-----
+thing_id  : (pk, integer, ref to "things" )
+perl_eval : ( varchar 2048 , blob , dunno ! )
+enable    : ( boolean )
 
-#######
+
+variables
+---------
+thing_id  : (pk, integer, ref to "things" )
+value     : ( varchar 256 )
+
+
+
+
+##############
+# Not "things" but users , groups that can do stuff with "things"
 
 User, groups and permissions for controls, switches and sensors.
 
@@ -166,18 +230,18 @@ name            :
 can_read        : ( boolean )
 can_modify      : ( boolean )
 user_group_id   : ( ref on user_groups )
-device_group_id : ( ref on device_groups )
+thing_group_id : ( ref on thing_groups )
 
 
-device_groups
+thing_groups
 -------------
 id   : ( pk , integer )
 name :
 
-device_group_pivot
+thing_group_pivot
 -------------------
-device_group_id : ( ref on device_groups )
-device_id       : ( ref on devices )
+thing_group_id : ( ref on thing_groups )
+thing_id       : ( ref on devices )
 
 
 

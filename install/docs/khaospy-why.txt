@@ -1,0 +1,78 @@
+Karl's Home Automation Operating System Pi
+------------------------------------------
+
+Khaospi . Why did I bother ?
+---------------------------
+
+
+I'm a computer, electrical, electronic geek.
+I want to automate EVERYTHING.
+I also want to be in control of it, and not be tied to proprietary stuff.
+I don't like paying lots of money for stuff that I know isn't worth it.
+I enjoy doing this sort of thing.
+
+I know automating lights, heating, alarms have all been done.
+
+However what I've seen so far is some or all of the following :
+
+1) Expensive
+2) Proprietary protocols
+3) Insecure RF protocols
+4) Only RF, no hardwiring available to those that like reliability
+4) Takes over complete control, and stops old manual controls from working.
+5) Sometimes doesn't provide feedback on the state of the circuit.
+6) Limited to just doing one thing ( lights , alarm , heating )
+7) Hard to integrate with other things.
+
+
+Now to be fair what I'm creating and in the process of still creating isn't for everyone.
+Some people will be shit scared of this stuff. Computers, mains electricity and maybe even control-freakery.
+
+I do believe what I'm trying to do will appeal to some people, probably those just like me.
+If the rough edges can be polished off, and I'll probably need help, it might even become popular ( I can DREAM ! ) 
+This project is still very much "work in progress"
+
+So what I'm trying to achieve is a fully integrated system that :
+
+1) controls all lighting and heating appliances
+2) monitors all alarm-switches and PIRs
+3) monitors temperatures in all areas of the house.
+4) monitors for water leaks, gas leaks, smoke alarms.
+5) monitors fridges and freezers to say they're working.
+5) has rules that are fully controllable with very powerful scripting.
+
+6) can do things like have alarm switches utilised to do more than just alarm calls. i.e. They can also be used to switch heating off if a window in a specific room is open. One roomstat in the middle of a house could never do this. 
+
+7) can utilise alarm-pirs for automatic lighting in places like the stairs during the nightime only. You can't do that easily with the PIR light controls that will do it all the time. If the lights are automated, the alarm PIRs monitored, and there is a computer running rules, then this can be done.
+
+8) can detect the presence of a mobile phone connected to the local network, with the assumption that the owener of the phone is in the house. If they're not then their room's lights and heating can be switched off.
+
+8) can detect occupancy of a room with things like pressure sensors on beds or sofas, again lighting and heating can be switched off if a room is unoccupied.
+
+8) canenable quick security checking, i.e. are any doors or windows open ? ( I'd also like to do "locked" but this is currently a bit of a "mechanical" switch issue. In that I need window and door locks that have a switch that says they're locked.
+
+9) has annoying alarms that will get the occupants to shut windows or doors if the temperature outside is sufficiently cold enough. Nagging them just like the seat belt alarm in my car nags me to wear the seat belt.
+
+5) utilises as much off the shelf, electrical, electronic parts that aren't funding expensive marketting campaigns.
+
+10) has graphs and logging history for every control, switch or sensor.
+    What was the temperature in the living room ?
+    What are the temperature of the Boiler's central heating "in" and "out" pipes ?
+    When did the PIR at the front door trigger ?
+    Have the PIRs in my back garden been triggered ?
+    If I know when external PIRs have triggered then I can check the CCTV without scrolling through hours of tedious footage. Yes motion detection can help here. But a log of times would help.
+    When were the lights on in a particular room ?
+
+11) What is the light level outside ? For automatic security lighting , randomly switching lights on and off when the main alarm is set.
+
+12) Can monitor and control fire hazard appliances like curling tongs, steam irons, that can cause issues if left on. Especially if they get left on and every leaves the house.
+
+13) Monitor Gas and Electricity usage, again with graphs.
+
+14) Has a nice big webui that can be accessed anywhere on the internet ( securely of course ! )
+
+15) will send alerts to email, mobile phones, ring up phones
+
+
+
+

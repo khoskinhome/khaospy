@@ -1,0 +1,95 @@
+Types of lighting wiring circuits.
+---------------------------------
+
+There are 5 types of wiring that a light-controller can be arranged in.
+
+Certain wiring types make for easier installation.
+
+One thing to remember is the "mains-detector" and relays are altogther in one module that interfaces to the Pi ( You could do this with an Arduino too, but I'm not writing software for those ;) )
+
+
+One Way Control
+---------------
+
+In this circuit the wall switch is unused, there is no wall switch for users to operate the lights.
+Its the easiest circuit to understand, but in my opinion the least useful, especially for house lighting that already has wall switches. Wall switches in my opinion are great, they last for years and don't suffer the reliability issues that computer-run, with lots of transistors and software systems will always have.
+
+But if you want to control your lights from a distance, or automatically well then you're stuck with computers, transistors, relays and software. You make your choice ;)
+
+So one-way essentially discards the wall-switch and replaces it with a relay.
+If the relay is on, the light can be assumed to be on.
+
+The Pi only needs one gpio direct from its 40 pins or one pin of an MCP23017 port-expander to operate the relay. Nice and simple, but no wall switch.
+
+If you pull the plug on your Pi because of problems you will not be able to manually operate the light with this circuit. Pain for the users, who will be cursing you.
+
+
+<diagrams here, showing it on the module, and easy-to-understand-schematic >
+
+
+One Way, Change-Over
+--------------------
+In this circuit the wall switch is used. However there is a mains-detector that detects if it is on or off. The software has to "listen" to the mains-detector, and if a user operates the wall switch, then the software has to operate the "auto-relay" that operates the light in "auto" mode. To get this circuit to work there also has to be a "change-over" relay that when turned on ( and the contacts go into the "normally open" position ) disconnects the wall-light switch from the circuit.
+
+If you pull the plug on your Pi because of problems the change-over relay will drop into the normally-closed position and the 30 year old wall switch will work as if nothing had ever happened. You will have manual light control.
+
+The issue with this form of automation is the software listening to the mains-detector. There can be a lag between switch operation and the software catching up with the change in voltage on the switch.
+
+The great part about this wiring type is that the relays-and-mains-detector-module can be mounted behind the lighting ceiling rose, and no new cables need to be run. So if you have a pi running next to the moduleand via a wifi dongle you will not even need to run an ethernet or 6-wire-alarm-type cable to operate the the relays-and-mains-detector module.
+
+( mounting it all up behind the ceiling-rose will entail a bigger hole in the ceiling and probably a wooden or plastic plate to cover up the hole, or you could always pull the floorboards up or put all the stuff in the loft )
+
+<diagrams here, showing it on the module, and easy-to-understand-schematic >
+
+Two-way (non-inverted mains-detector )
+--------------------------------------
+In this circuit the wall switch is used, however depending on how you are running this, or the circuit you are converting, you are likely to start needing to run 3 core and earth 2 way lighting cable. So some mains re-wiring is likely to be involved.
+
+Since the Pi is only controlling one relay, and the wiring is two way, manual control is guarranteed. You can also pull the plug on the Pi and its controller and manual control of the light will work.
+
+The advantage of this arrangement is that the mains-detector is only there to report to the automated systems whether the circuit is on or off. The automated system doesn't have to do anything, like operating the "change-over-relay" in the one-way-change-over type of wiring. There is also therefore no lag when operating the manual switch.
+
+This type of wiring arangement would also usually put the relays-and-mains-detector-module up at the light's ceiling rose. Primarily because to detect the mains a connection to the neutral is needed.
+As previously mentioned in a lot of cases a new 3 core and earth lighting cable will need to be run from the wall switch to the ceiling rose.
+
+
+<diagrams here, showing it on the module, and easy-to-understand-schematic >
+
+Two-way ( inverted mains-detector )
+-----------------------------------
+This is very similar to the two-way non-inverted mains-detector. But now the voltage for the circuit state is being measured across the two way's circuits "strappers" . Now it is "inverted" because when a voltage is detected across the strappers then the light is actually "off".
+
+This circuit has all the same advantages as the two-way non-inverted, i.e:
+    1) no software listenning to the state of the mains-detector to operate a relay when a user operates the wall switch ( causing a lag )
+    2) full manual control if you pull the plug on the automated system
+
+It also has one crucial advantage over the two-way non-inverted in that the module doesn't need a neutral for mains-detection. Hence the module can be mounted near the existing wall switch and any new 3 core and earth wiring converting an existing one way switch to this type of operation can be very short.
+So the module doesn't end up at the ceiling rose, with bigger holes in the ceiling, or floor boards that need pulling up.
+
+In fact if I was working for an electrical controls giant company I'd try and build a manual-switch, with all the pi electronics and auto-relay all in one, drawing a small amount of current to operate the electronics, working over wifi WPA2 ( not the horrible insecure RF protocols I see in most stuff ). It would be a five minute job to install one of these.
+
+<diagrams here, showing it on the module, and easy-to-understand-schematic >
+
+
+
+Intermediate
+------------
+
+In this circuit the mains-detector works across the "strappers" just like the "two-way-inverted" so from a software point of view it is exactly the same. ( and that's what you select in web-configuration )
+
+The difference is now the two relays on the relays-mains-detector-module need to be "ganged" together. There is a jumper setting on the board that makes them both operate as the "auto-relay". ( so it only needs to use one Pi GPIO / MCP23017 pin )
+
+The likely usage of this wiring type is when converting a circuit that already has two way lighting. Like those on stairways or rooms with two doorways. So it would have to be cut into the existing 2 way lighting cable strappers that are likely to be in the loft.
+
+Existing 2 way lighting circuits ( that could also have an intermediate switch already ) can be wired in one of two ways. Neither of these affect how this circuit operates. When there is a voltage across the strappers the light is OFF.
+
+
+<diagrams here. both variants of existing 2 way lighting >
+
+
+
+
+
+
+
+
