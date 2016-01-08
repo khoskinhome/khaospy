@@ -6,8 +6,8 @@ Karl khaos Hoskin
 0 0 -1376 768
 20
 Hosts
-1179
-437
+676
+414
 2
 id int
 host varchar(32)
@@ -15,8 +15,8 @@ host varchar(32)
 id
 0
 switches_ping_host
-651
-260
+369
+197
 4
 id int
 name_id int
@@ -26,8 +26,8 @@ state int
 id
 0
 controls_one_way_auto_only
-1523
-217
+964
+205
 4
 id int
 auto_port int
@@ -37,8 +37,8 @@ port_table_name varchar(32)
 id
 0
 controls_one_way
-1537
-573
+961
+525
 6
 id int
 auto_port int
@@ -50,8 +50,8 @@ port_table_name varchar(32)
 id
 0
 controls_two_way
-1535
-376
+965
+351
 6
 id int
 auto_port int
@@ -63,8 +63,8 @@ port_table_name varchar(32)
 id
 0
 switches_mac_address
-654
-151
+351
+91
 4
 id int
 name_id int
@@ -74,8 +74,8 @@ state int
 id
 0
 switches
-652
-473
+382
+437
 4
 id int
 switch_port int
@@ -85,8 +85,8 @@ port_table_name varchar(32)
 id
 0
 pi_gpio_ports
-1179
-571
+673
+536
 5
 id int
 host_id int
@@ -97,8 +97,8 @@ state int
 id
 0
 pi_mcp23017_ports
-1182
-225
+673
+238
 8
 id int
 host_id int
@@ -112,7 +112,7 @@ state int
 id
 0
 names
-1004
+667
 21
 3
 id int
@@ -122,8 +122,8 @@ table_name varchar(32)
 id
 0
 sensors_pi_one_wire_thermometer_ds18b20
-653
-584
+195
+552
 4
 id int
 name_id int
@@ -133,8 +133,8 @@ host_id int
 id
 0
 switches_nmap_host_port
-655
-361
+327
+311
 5
 id int
 name_id int
@@ -145,8 +145,8 @@ state int
 id
 0
 rules
-385
-243
+84
+153
 8
 id int
 name_id int
@@ -160,8 +160,8 @@ enabled int
 id
 0
 values
-213
-131
+80
+40
 3
 id int
 name_id int
@@ -170,8 +170,8 @@ value varchar(32)
 id
 0
 names_groups_pivot
-1354
-16
+968
+57
 3
 id int
 name_id int
@@ -180,8 +180,8 @@ name_group_id int
 id
 0
 name_groups
-1649
-15
+1232
+55
 2
 id int
 gname varchar(32)
@@ -189,8 +189,8 @@ gname varchar(32)
 id
 0
 permissions
-1887
-20
+1329
+152
 8
 id int
 name_group_id int
@@ -204,8 +204,8 @@ pname varchar(50)
 id
 0
 user_groups
-1897
-235
+1332
+344
 2
 id int
 gname varchar(50)
@@ -213,8 +213,8 @@ gname varchar(50)
 id
 0
 users_groups_pivot
-1898
-381
+1333
+444
 3
 id int
 user_id int
@@ -223,8 +223,8 @@ user_group_id int
 id
 0
 users
-1898
-528
+1332
+568
 3
 id int
 uname varchar(50)
