@@ -1,0 +1,235 @@
+khaospi
+/home/khoskin/github.com/khaospy/install/docs/db-design.ferret.ger
+Karl khaos Hoskin
+25
+2
+0 0 -1376 768
+20
+Hosts
+1179
+437
+2
+id int
+host varchar(32)
+1
+id
+0
+switches_ping_host
+651
+260
+4
+id int
+name_id int
+host_id int
+state int
+1
+id
+0
+controls_one_way_auto_only
+1523
+217
+4
+id int
+auto_port int
+name_id int
+port_table_name varchar(32)
+1
+id
+0
+controls_one_way
+1537
+573
+6
+id int
+auto_port int
+change_over_port int
+mains_detect_port int
+name_id int
+port_table_name varchar(32)
+1
+id
+0
+controls_two_way
+1535
+376
+6
+id int
+auto_port int
+mains_detect_port int
+mains_detect_invert int
+name_id int
+port_table_name varchar(32)
+1
+id
+0
+switches_mac_address
+654
+151
+4
+id int
+name_id int
+mac_address varchar(32)
+state int
+1
+id
+0
+switches
+652
+473
+4
+id int
+switch_port int
+name_id int
+port_table_name varchar(32)
+1
+id
+0
+pi_gpio_ports
+1179
+571
+5
+id int
+host_id int
+gpio_number int
+gpio_direction int
+state int
+1
+id
+0
+pi_mcp23017_ports
+1182
+225
+8
+id int
+host_id int
+i2c_bus int
+i2c_address int
+mcp_port_name varchar(8)
+mcp_port_number int
+mcp_port_io_direction int
+state int
+1
+id
+0
+names
+1004
+21
+3
+id int
+name varchar(32)
+table_name varchar(32)
+1
+id
+0
+sensors_pi_one_wire_thermometer_ds18b20
+653
+584
+4
+id int
+name_id int
+one_wire_address varchar(32)
+host_id int
+1
+id
+0
+switches_nmap_host_port
+655
+361
+5
+id int
+name_id int
+host_id int
+host_port int
+state int
+1
+id
+0
+rules
+385
+243
+8
+id int
+name_id int
+perl_eval varchar(32)
+last_start_time int
+last_stop_time int
+last_return_status int
+last_output varchar(32)
+enabled int
+1
+id
+0
+values
+213
+131
+3
+id int
+name_id int
+value varchar(32)
+1
+id
+0
+names_groups_pivot
+1354
+16
+3
+id int
+name_id int
+name_group_id int
+1
+id
+0
+name_groups
+1649
+15
+2
+id int
+gname varchar(32)
+1
+id
+0
+permissions
+1887
+20
+8
+id int
+name_group_id int
+user_group_id int
+create boolean
+read boolean
+update boolean
+delete boolean
+pname varchar(50)
+1
+id
+0
+user_groups
+1897
+235
+2
+id int
+gname varchar(50)
+1
+id
+0
+users_groups_pivot
+1898
+381
+3
+id int
+user_id int
+user_group_id int
+1
+id
+0
+users
+1898
+528
+3
+id int
+uname varchar(50)
+email varchar(50)
+1
+id
+0
+0
