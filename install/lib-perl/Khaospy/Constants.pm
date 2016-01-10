@@ -240,14 +240,16 @@ sub heating_thermometer_config {
         '28-0214630558ff' => {
             name               => 'front-room',
             rrd_group          => 'downstairs',
+            control            => 'frontroomrad',
         },
         '28-000006cafb0d' => {
             name               => 'front-porch',
             rrd_group          => 'downstairs',
         },
         '28-0000066ff2ac' => {
-            name               => 'dinning-porch',
+            name               => 'dinning-room',
             rrd_group          => 'downstairs',
+            control            => 'dinningroomrad',
         },
 
     };
