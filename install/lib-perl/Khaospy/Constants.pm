@@ -180,7 +180,7 @@ sub heating_thermometer_config {
         '28-0000066ebc74' => {
             name               => 'Alison',
             rrd_group          => 'upstairs',
-            upper_temp         => 21,
+            upper_temp         => 22,
             alarm_switches     => [],
             control            => 'alisonrad',
         },
@@ -188,7 +188,6 @@ sub heating_thermometer_config {
             name               => 'Playhouse-tv',
             rrd_group          => 'sheds',
             upper_temp         => 21,
-            control            => 'karlrad', # TODO fix this deliberate mis-config. Used for testing.
         },
         '28-0000066fe99e' => {
             name               => 'Playhouse-9e-door',
@@ -205,7 +204,7 @@ sub heating_thermometer_config {
         '28-0214632d16ff' => {
             name               => 'Amelia',
             rrd_group          => 'upstairs',
-            upper_temp         => 21,
+            upper_temp         => 22,
             alarm_switches     => [],
             control            => 'ameliarad',
         },
@@ -240,6 +239,7 @@ sub heating_thermometer_config {
         '28-0214630558ff' => {
             name               => 'front-room',
             rrd_group          => 'downstairs',
+            upper_temp         => 22,
             control            => 'frontroomrad',
         },
         '28-000006cafb0d' => {
@@ -249,6 +249,7 @@ sub heating_thermometer_config {
         '28-0000066ff2ac' => {
             name               => 'dinning-room',
             rrd_group          => 'downstairs',
+            upper_temp         => 22,
             control            => 'dinningroomrad',
         },
 
@@ -326,11 +327,11 @@ sub controls_conf {
 sub boilers_conf {
     return {
         # frontroomrad is being using as the boiler control. This needs fixing.
-        frontroomrad => {
-            on_delay_secs => 30, # TODO this should really be 120
+        karlrad => {
+            on_delay_secs => 120, # TODO this should really be 120
             controls => [qw/
                 alisonrad
-                karlrad
+                frontroomrad
                 ameliarad
                 dinningroomrad
             /],
