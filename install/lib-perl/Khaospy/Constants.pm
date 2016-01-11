@@ -139,8 +139,8 @@ sub daemon_runner_conf {
             "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=pioldwifi",
             "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=piloft",
             "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=piboiler",
-    #        "$KHAOSPY_ONE_WIRE_HEATING_DAEMON",
-    #        "$KHAOSPY_BOILER_DAEMON_SCRIPT",
+            "$KHAOSPY_ONE_WIRE_HEATING_DAEMON",
+            "$KHAOSPY_BOILER_DAEMON_SCRIPT",
         ],
         piloft => [
             "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
@@ -187,7 +187,7 @@ sub heating_thermometer_config {
         '28-000006e04e8b' => {
             name               => 'Playhouse-tv',
             rrd_group          => 'sheds',
-            upper_temp         => 21,
+#            upper_temp         => 21,
         },
         '28-0000066fe99e' => {
             name               => 'Playhouse-9e-door',
