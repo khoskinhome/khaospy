@@ -180,7 +180,8 @@ sub heating_thermometer_config {
         '28-0000066ebc74' => {
             name               => 'Alison',
             rrd_group          => 'upstairs',
-            upper_temp         => 22,
+            upper_temp         => 20,
+            lower_temp         => 19.5,
             alarm_switches     => [],
             control            => 'alisonrad',
         },
@@ -204,7 +205,8 @@ sub heating_thermometer_config {
         '28-0214632d16ff' => {
             name               => 'Amelia',
             rrd_group          => 'upstairs',
-            upper_temp         => 22,
+            upper_temp         => 20,
+            lower_temp         => 19.5,
             alarm_switches     => [],
             control            => 'ameliarad',
         },
@@ -239,7 +241,8 @@ sub heating_thermometer_config {
         '28-0214630558ff' => {
             name               => 'front-room',
             rrd_group          => 'downstairs',
-            upper_temp         => 22,
+            upper_temp         => 20,
+            lower_temp         => 19.5,
             control            => 'frontroomrad',
         },
         '28-000006cafb0d' => {
@@ -249,7 +252,8 @@ sub heating_thermometer_config {
         '28-0000066ff2ac' => {
             name               => 'dinning-room',
             rrd_group          => 'downstairs',
-            upper_temp         => 22,
+            upper_temp         => 20,
+            lower_temp         => 19.5,
             control            => 'dinningroomrad',
         },
 

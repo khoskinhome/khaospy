@@ -89,7 +89,7 @@ while (1) :
         #RRA:AVERAGE:0.5:60:17520   730 days  datapoints every   60 mins. ( 2 years )
         #
         rrdtool.create( rrdname , '--start', 'now', '--step', '60', \
-        'DS:a:GAUGE:120:-50:50',\
+        'DS:a:GAUGE:120:-40:90',\
         'RRA:AVERAGE:0.5:1:1440',\
         'RRA:AVERAGE:0.5:4:1440',\
         'RRA:AVERAGE:0.5:8:1440',\
