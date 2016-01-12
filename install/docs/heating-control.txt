@@ -1,0 +1,26 @@
+
+
+boiler controller
+---
+1 pi server, by the boiler.
+either gpio from the pi or i2c to control the boiler.
+temp sensors on the boiler pipes.
+
+
+rad controller.
+---
+esp8266s in the rad controllers.
+
+240v thermal actuator on the rad trv valve.
+
+1 Solid state relay with override.
+the override will operate the rad for until either :
+    the room temp is 2 C above its current max before reverting to auto.
+    for 20 mins before going back to auto.
+    just keeps the rad valve open, and highlights in webui, alerts page.
+
+
+circuit is 1 ssr, 
+
+
+

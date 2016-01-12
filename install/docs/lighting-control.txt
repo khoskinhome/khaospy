@@ -1,0 +1,41 @@
+Lighting control with SSR, at the ceiling rose.
+-----------------------------------------------
+
+1 SSR , ex-or , least components. uncomplicated mains wiring.
+1 lot of software logic to control
+no code having to detect the voltage and then operate the lights.
+AWESOME !
+
+The pi/arduino can be wired or wireless.
+this is focusing on the HV / LV control electronics.
+Only takes 2 gpio pins so a Pi could control 10 to around 18 of these.
+
+design to go on to PCB, use Eagle CAD.
+
+-------------------------------------------------
+
+5v supply for more expensive SSR, cheaper psu. easier to interface with Pi , MCP23017, Arduino, ESP8266 etc.
+
+1 Solid State Relay . 5a , 4-32v switch on . 4kv insulation.
+    £4.26
+    http://www.rapidonline.com/Electronic-Components/Kudom-KSD240D5-W-PCB-SSR-4-32VDC-Input-48-280VAC-5A-Load-with-Zero-Cross-Turn-on-60-1575
+    http://www.rapidonline.com/pdf/546289_v1.PDF
+
+have a 3a 20mm cartridge fuse on the HV side of the lighting circuit.
+
+uses a mains detector. 4n25 and other stuff. 
+
+
+
+
+pcb fuse for the mains detector :
+    http://www.rapidonline.com/Electrical-Power/Schurter-0034-6001-Subminiature-Fuse-8-5mm-Quick-Acting-50mA-Pack-of-100-26-2297
+    £24 for 100. That's a lot !
+
+
+
+xor gate http://uk.farnell.com/texas-instruments/sn74ahc1g86dckr/ic-ex-or-gate-single-2-input-smd/dp/1287455
+    £0.06 each.
+    http://www.farnell.com/datasheets/1996474.pdf
+
+
