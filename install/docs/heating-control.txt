@@ -1,4 +1,6 @@
-
+Read up about :
+http://www.expertreviews.co.uk/accessories/gadgets/1402132/honeywell-evohome-review/page/0/2
+---
 
 boiler controller
 ---
@@ -7,11 +9,15 @@ either gpio from the pi or i2c to control the boiler.
 temp sensors on the boiler pipes.
 
 
-rad controller.
+
+---------------------------------------
+230 V rad controller.
 ---
 esp8266s in the rad controllers.
+http://www.banggood.com/ESP8266-ESP-12-Remote-Serial-Port-WIFI-Transceiver-Wireless-Module-p-964287.html
 
 240v thermal actuator on the rad trv valve.
+http://www.ebay.co.uk/itm/ACTUATOR-230V-2W-FOR-MANIFOLD/141654146769
 
 1 Solid state relay with override.
 the override will operate the rad for until either :
@@ -19,8 +25,52 @@ the override will operate the rad for until either :
     for 20 mins before going back to auto.
     just keeps the rad valve open, and highlights in webui, alerts page.
 
+or a 5v coil relay
 
-circuit is 1 ssr, 
+circuit is 1 ssr,
+
+
+Cost
+9.00 for actuator
+5.00 for ssr  or 1.80 for coil relay.
+2.65 for esp8266
+2.00 for box
+2.00 for 5v usb psu.
+8.00 for RCD if no RCD on fusebox.
+
+lots of issues with HV . This is my least favoured option.
+
+-------------------------------------
+24v Rad Controller version needs :
+
+esp8266s in the rad controllers.
+
+24V rad valve actuator :
+http://www.ebay.co.uk/itm/ACTUATOR-24V-2W-FOR-MANIFOLD-/141654170915?
+( if it can work on DC , getting AC psu-s is a bit more difficult. ) 
+
+24V PSU :
+http://www.ebay.co.uk/itm/AC-DC-Mains-Power-Adaptor-Supply-Charger-PSU-800MA-0-8-AMP-24-Volt-Regulated-24v-/231649354006?hash=item35ef60a116:g:TjUAAOSw9N1VkwYh
+
+
+TIP120 transistor :
+http://m.rapidonline.com/Catalogue/Search?keyword=Tip120
+http://m.instructables.com/id/Controlling-solenoids-with-arduino/?ALLSTEPS
+
+
+11.35 for 24v actuator.
+00.40 for TIP120
+02.00 for box
+
+07.00 for 24v PSU
+
+for 24v to 5v converter
+for 5v to 3.3v converter.
+
+https://www.raspberrypi.org/forums/viewtopic.php?f=37&t=94083
+
+
+
 
 
 

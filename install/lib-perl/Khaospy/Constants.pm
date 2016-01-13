@@ -180,15 +180,14 @@ sub heating_thermometer_config {
         '28-0000066ebc74' => {
             name               => 'Alison',
             rrd_group          => 'upstairs',
-            upper_temp         => 19.0,
-            lower_temp         => 18.5,
+            upper_temp         => 17.5,
+            lower_temp         => 17.0,
             alarm_switches     => [],
             control            => 'alisonrad',
         },
         '28-000006e04e8b' => {
             name               => 'Playhouse-tv',
             rrd_group          => 'sheds',
-#            upper_temp         => 21,
         },
         '28-0000066fe99e' => {
             name               => 'Playhouse-9e-door',
@@ -205,8 +204,8 @@ sub heating_thermometer_config {
         '28-0214632d16ff' => {
             name               => 'Amelia',
             rrd_group          => 'upstairs',
-            upper_temp         => 19.0,
-            lower_temp         => 18.5,
+            upper_temp         => 20.0,
+            lower_temp         => 19.5,
             alarm_switches     => [],
             control            => 'ameliarad',
         },
