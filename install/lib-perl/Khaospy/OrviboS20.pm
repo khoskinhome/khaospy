@@ -22,7 +22,7 @@ use Time::HiRes qw/usleep/;
 #
 # Tuned for Orvibo S20 by Branislav Vartik
 #
-# Put into a perl module by Karl Hoskin.
+# Put into this perl module by Karl Hoskin.
 
 my $debug = 0; # Change this to 0 to avoid debug messages
 my $port = 10000;
@@ -188,8 +188,6 @@ sub _controlS20($$)
     }
     return 0;
 }
-
-
 
 sub get_packed_mac {
     # using the XX-XX-XX-XX-XX-XX or XX:XX:XX:XX:XX:XX notation for mac.

@@ -2,10 +2,19 @@ package Khaospy::Controls;
 use strict;
 use warnings;
 
-use Carp qw/croak/;
-use Data::Dumper;
 use Exporter qw/import/;
+use Data::Dumper;
+use Carp qw/croak/;
 use JSON;
+
+use ZMQ::LibZMQ3;
+use ZMQ::Constants qw(
+    ZMQ_SUB
+    ZMQ_SUBSCRIBE
+    ZMQ_RCVMORE
+    ZMQ_FD
+    ZMQ_PUB
+);
 
 my $json = JSON->new->allow_nonref;
 
@@ -25,6 +34,7 @@ use Khaospy::Utils qw(
 );
 
 use Khaospy::OrviboS20 qw/signal_control/;
+use Khaospy::PiGPIO    qw/signal_control/;
 
 our @EXPORT_OK = qw(
     send_command

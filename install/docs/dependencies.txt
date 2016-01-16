@@ -13,7 +13,7 @@ sudo apt-get install -y make autoconf automake libtool
 
 sudo apt-get install -y rrdtool vim git
 
-sudo apt-get install -y libzmq-dev libsodium-dev libzmq3-dev
+sudo apt-get install -y  libsodium-dev libzmq3-dev
 
 sudo apt-get install -y python-dev
 
@@ -46,8 +46,10 @@ sudo pip install pyzmq
 
 
 #######################################
-# cpanm installs 
+# cpanm installs
 #
 
 sudo cpanm Clone
 sudo cpanm JSON
+sudo cpanm AnyEvent
+sudo cpanm ZMQ::LibZMQ3
