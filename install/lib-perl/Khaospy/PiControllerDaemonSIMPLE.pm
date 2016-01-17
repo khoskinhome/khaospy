@@ -18,23 +18,18 @@ So a script that wishes to operate a control needs to :
 
 =cut
 
+use strict;
 use warnings;
-
 use Exporter qw/import/;
 use Data::Dumper;
 use Carp qw/croak/;
 use JSON;
 use Sys::Hostname;
 
-use AnyEvent;
+use IO::Handle;
 use ZMQ::LibZMQ3;
-#    ZMQ_SUB
-#    ZMQ_PUSH
-
+use English qw/-no_match_vars/;
 use ZMQ::Constants qw(
-    ZMQ_RCVMORE
-    ZMQ_SUBSCRIBE
-    ZMQ_FD
     ZMQ_PUB
     ZMQ_PULL
 );
@@ -53,7 +48,7 @@ use Khaospy::Constants qw(
     $PI_CONTROLLER_DAEMON_SEND_PORT
 );
 
-use Khaospy::Controls qw( signal_control );
+#use Khaospy::Controls qw( signal_control );
 
 use Khaospy::Utils qw( timestamp );
 
@@ -62,9 +57,6 @@ our @EXPORT_OK = qw( run_controller_daemon );
 my $JSON = JSON->new->allow_nonref;
 
 our $VERBOSE;
-
-my $publisher;
-my $zmq_receiver;
 
 #######
 # subs
@@ -80,103 +72,70 @@ sub run_controller_daemon {
     print timestamp."Controller Daemon START\n";
     print timestamp."VERBOSE = ".( $VERBOSE ? "TRUE" : "FALSE" )."\n";
 
-    my $quit_program = AnyEvent->condvar;
+  ## ./install/lib-perl/Khaospy/Controls.pm:65:
+    my $zmq_receiver = zmq_socket($ZMQ_CONTEXT, ZMQ_PULL);
 
-#    $publisher  = zmq_socket($context, ZMQ_PUB);
-#    my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_SEND_PORT";
-#    zmq_bind( $publisher, $pub_to_port );
-#    print timestamp. "Publishing to $pub_to_port\n";
-
-  ## ./install/lib-perl/Khaospy/Controls.pm:65:my $zmq_context   = zmq_init(); # TODO rm this line
-    $zmq_receiver = zmq_socket($ZMQ_CONTEXT, ZMQ_PULL);
-
-    my $listen_to = "pitest";
+    my $listen_to   = "pitest";
     my $connect_str = "tcp://".$listen_to.":$PI_CONTROLLER_DAEMON_LISTEN_PORT";
-    print timestamp. "Listening to $connect_str\n";
+    print timestamp."Listening to $connect_str\n";
 
     if ( my $zmq_state = zmq_connect($zmq_receiver, $connect_str )){
         croak "zmq can't connect to $connect_str. status = $zmq_state . $!\n";
     };
 
-    #zmq_setsockopt($zmq_receiver, ZMQ_SUBSCRIBE, '' );
-    # http://funcptr.net/2012/09/10/zeromq---edge-triggered-notification/
-    # get a non blocking file-handle from zmq:
-    my $fh = zmq_getsockopt( $zmq_receiver, ZMQ_FD );
+    print "connect to socket\n";
 
-    my @w;
+    print "process forever\n";
+    while (1) {
+        my $string = zhelpers::s_recv($zmq_receiver);
+        print $string."\n";
+        STDOUT->printflush(".");
 
-    push @w, anyevent_io( $fh, $zmq_receiver );
-
-    push @w, AnyEvent->timer (after => 0.1, interval => 3 , cb => \&timer_cb );
-
-    $quit_program->recv;
-
-}
-
-sub anyevent_io {
-    my ( $fh, $zmq_receiver ) = @_;
-    return AnyEvent->io(
-        fh   => $fh,
-        poll => "r",
-        cb   => sub {
-            while (
-                my $recvmsg = zmq_recvmsg( $zmq_receiver, ZMQ_RCVMORE )
-            ){
-                process_controller_message(zmq_msg_data($recvmsg));
-            }
-        },
-    );
-}
-
-sub timer_cb {
-
-    print "in timer\n";
-    #zmq_sendmsg ( $publisher, "in the timer" );
-
-}
-
-sub process_controller_message {
-    my ($msg) = @_ ;
-
-    print "$msg\n";
-    #my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
-    # ^^^ can't get $topic working in perl yet. TODO
-
-    #zmq_sendmsg ( $publisher, "the status of whatever the control did" );
-
-    my $msg_decoded;
-    eval{$msg_decoded = $JSON->decode( $msg );};
-
-    if ($@) {
-        print "ERROR. JSON decode of message failed. \n$@\n";
-        return;
     }
-
-    my $epoch_time
-        = $msg_decoded->{EpochTime};
-    my $control
-        = $msg_decoded->{Control};
-    my $home_auto_class
-        = $msg_decoded->{HomeAutoClass}; # Why do I need HomeAutoClass ? TODO probably deprecate this.
-    my $action
-        = $msg_decoded->{Action};
-
-    print "\n".timestamp."Message received. '$control' '$action' \n";
-    print Dumper($msg_decoded)."\n" if $VERBOSE;
-
-#    refresh_boiler_status()
-#        if $BOILER_STATUS_LAST_REFRESH + $BOILER_STATUS_REFRESH_EVERY_SECS < time ;
-#
-#    my $boiler_name = get_boiler_name_for_control($control);
-#
-#    boiler_check_next_on_at();
-#
-#    return if ! $boiler_name;
-#
-#    operate_boiler($boiler_name, $control, $action);
-
 }
 
+#sub process_controller_message {
+#    my ($msg) = @_ ;
+#
+#    print "$msg\n";
+#    #my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
+#    # ^^^ can't get $topic working in perl yet. TODO
+#
+#    #zmq_sendmsg ( $publisher, "the status of whatever the control did" );
+#
+#    my $msg_decoded;
+#    eval{$msg_decoded = $JSON->decode( $msg );};
+#
+#    if ($@) {
+#        print "ERROR. JSON decode of message failed. \n$@\n";
+#        return;
+#    }
+#
+#    my $epoch_time
+#        = $msg_decoded->{EpochTime};
+#    my $control
+#        = $msg_decoded->{Control};
+#    my $home_auto_class
+#        = $msg_decoded->{HomeAutoClass}; # Why do I need HomeAutoClass ? TODO probably deprecate this.
+#    my $action
+#        = $msg_decoded->{Action};
+#
+#    print "\n".timestamp."Message received. '$control' '$action' \n";
+#    print Dumper($msg_decoded)."\n" if $VERBOSE;
+#
+##    refresh_boiler_status()
+##        if $BOILER_STATUS_LAST_REFRESH + $BOILER_STATUS_REFRESH_EVERY_SECS < time ;
+##
+##    my $boiler_name = get_boiler_name_for_control($control);
+##
+##    boiler_check_next_on_at();
+##
+##    return if ! $boiler_name;
+##
+##    operate_boiler($boiler_name, $control, $action);
+#
+#}
+#
 #sub operate_boiler {
 #    my ($boiler_name, $control, $action) = @_;
 #
