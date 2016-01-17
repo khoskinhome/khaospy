@@ -27,7 +27,7 @@ use ZMQ::Constants qw(ZMQ_SUB ZMQ_SUBSCRIBE ZMQ_POLLIN);
 
 use JSON;
 
-my $context = zmq_init();
+die "\$ZMQ_CONTEXT will need getting from Khaospy::Constants if this script is to ever be used again\n";
 my $subscriber = zmq_socket($context, ZMQ_SUB);
 zmq_connect($subscriber, 'tcp://localhost:5001');
 

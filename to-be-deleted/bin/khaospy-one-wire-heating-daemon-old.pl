@@ -20,6 +20,7 @@ use Khaospy::Utils qw(
 );
 
 use Khaospy::Constants qw(
+    $ZMQ_CONTEXT
     true false
     ON OFF STATUS
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
@@ -59,14 +60,12 @@ print "VERBOSE = ".($verbose ? "TRUE" : "FALSE")."\n";
 
 my $quit_program = AnyEvent->condvar;
 
-my $context = zmq_init();
-
 my $w = [];
 
 for my $host ( get_one_wire_sender_hosts() ) {
     print "Listening to Thermometers on host $host\n";
 
-    my $subscriber = zmq_socket($context, ZMQ_SUB);
+    my $subscriber = zmq_socket($ZMQ_CONTEXT, ZMQ_SUB);
 
     zmq_connect($subscriber, "tcp://$host:$port");
     zmq_setsockopt($subscriber, ZMQ_SUBSCRIBE, 'oneWireThermometer');

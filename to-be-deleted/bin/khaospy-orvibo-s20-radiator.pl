@@ -5,7 +5,7 @@ use Data::Dumper;
 
 # 2015-12-25 . This is the current script for polling thermometers and switching the orvibo S20s.
 
-
+die "\$ZMQ_CONTEXT will need getting from the Khaospy::Constants if this is every used again ";
 
 ############################
 #/sys/bus/w1/devices/28-00000670596d/w1_slave  bathroom
@@ -322,8 +322,7 @@ use ZMQ::Constants qw(ZMQ_SUB ZMQ_SUBSCRIBE ZMQ_RCVMORE ZMQ_FD);
 use JSON;
 my $json = JSON->new->allow_nonref;
 
-my $context = zmq_init();
-my $subscriber = zmq_socket($context, ZMQ_SUB);
+my $subscriber = zmq_socket($ZMQ_CONTEXT, ZMQ_SUB);
 zmq_connect($subscriber, 'tcp://piloft:5001');
 zmq_setsockopt($subscriber, ZMQ_SUBSCRIBE, 'oneWireThermometer');
 

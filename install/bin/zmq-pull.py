@@ -4,7 +4,7 @@
 import zmq
 context = zmq.Context()
 socket = context.socket(zmq.PULL)
-socket.bind("tcp://*:5556")
+socket.bind("tcp://*:5061")
 
 while True:
     print socket.recv()

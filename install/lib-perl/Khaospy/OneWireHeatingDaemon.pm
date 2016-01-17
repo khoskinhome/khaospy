@@ -22,6 +22,7 @@ use Khaospy::Utils qw(
 );
 
 use Khaospy::Constants qw(
+    $ZMQ_CONTEXT
     true false
     ON OFF STATUS
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
@@ -68,14 +69,13 @@ sub run_one_wire_heating_daemon {
 
     my $quit_program = AnyEvent->condvar;
 
-    my $context = zmq_init();
 
     my $w = [];
 
     for my $host ( get_one_wire_sender_hosts() ) {
         print timestamp."Listening to One-Wire Thermometers on host $host:$ONE_WIRE_DAEMON_PORT\n";
 
-        my $subscriber = zmq_socket($context, ZMQ_SUB);
+        my $subscriber = zmq_socket($ZMQ_CONTEXT, ZMQ_SUB);
 
         zmq_connect($subscriber, "tcp://$host:$ONE_WIRE_DAEMON_PORT");
         zmq_setsockopt($subscriber, ZMQ_SUBSCRIBE, 'oneWireThermometer');

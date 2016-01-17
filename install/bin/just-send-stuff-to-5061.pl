@@ -14,6 +14,7 @@ my $json = JSON->new->allow_nonref;
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(
     ZMQ_PUB
+    ZMQ_PUSH
     ZMQ_SNDHWM
 );
 
@@ -22,36 +23,38 @@ use ZMQ::Constants qw(
 #    ZMQ_RCVMORE
 #    ZMQ_FD
 
+use Khaospy::Constants qw( $ZMQ_CONTEXT );
 
-my $context   = zmq_init();
-my $publisher = zmq_socket($context, ZMQ_PUB);
+my $sender  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUSH);
 
+#zmq_setsockopt( $sender, ZMQ_SNDHWM, 2 );
+print "get sock opt ZMQ_SNDHWM ".zmq_getsockopt( $sender, ZMQ_SNDHWM )."\n";
 
-#zmq_setsockopt( $publisher, ZMQ_SNDHWM, 2 );
-print "get sock opt ZMQ_SNDHWM ".zmq_getsockopt( $publisher, ZMQ_SNDHWM )."\n";
+my $send_to_port = "tcp://localhost:5061";
 
+my $msg = "tadah !";
 
-my $pub_to_port = "tcp://*:5061";
+zmq_bind( $sender, $send_to_port );
+print "Sending to $send_to_port : \n $msg\n";
+if ( zmq_sendmsg( $sender, "$msg" ) == -1 ){ print "Error $!\n"; };
 
-#my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_LISTEN_PORT";
-zmq_bind( $publisher, $pub_to_port );
+zmq_close($sender);
 
-for my $z ( 1..10) {
-    my $msg = $json->encode({
-#      EpochTime     => time,
-#      HomeAutoClass => 'PiController',
-      cycle         => $z,
-    });
-
-    for my $blah ( 1.2 ) {
-    #    sleep 1;
-        if ( zmq_sendmsg( $publisher, "blah $msg" ) == -1 ){ print "Error $!\n"; };
-        usleep 1000000;
-        print "Sent to $pub_to_port : \n $msg\n";
-
-    }
-
-    sleep 2;
-}
-
-zmq_close($publisher);
+#sub cycle {
+#    for my $z ( 1..10) {
+#        my $msg = $json->encode({
+#          cycle         => $z,
+#        });
+#
+#        for my $blah ( 1.2 ) {
+#        #    sleep 1;
+#            print "Sending to $send_to_port : \n $msg\n";
+#            if ( zmq_sendmsg( $sender, "$msg" ) == -1 ){ print "Error $!\n"; };
+#            usleep 100000;
+#            print "Sent to $send_to_port : \n $msg\n";
+#
+#        }
+#
+#        sleep 2;
+#    }
+#}

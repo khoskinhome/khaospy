@@ -6,6 +6,9 @@ use warnings;
 
 use Exporter qw/import/;
 
+use ZMQ::LibZMQ3;
+our $ZMQ_CONTEXT = zmq_init();
+
 sub true  { 1 };
 sub false { 0 };
 
@@ -80,13 +83,15 @@ our $ALARM_SWITCH_DAEMON_PORT            = 5051;
 our $HEATING_CONTROL_DAEMON_PUBLISH_PORT = 5021;
 
 our $PI_CONTROLLER_DAEMON_LISTEN_PORT    = 5061;
-our $PI_CONTROLLER_DAEMON_PUBLISH_PORT   = 5062;
+our $PI_CONTROLLER_DAEMON_SEND_PORT      = 5062;
 
 our $MAC_SWITCH_DAEMON_PORT              = 5005;
 our $PING_SWITCH_DAEMON_PORT             = 5006;
 
 ######################
 our @EXPORT_OK = qw(
+    $ZMQ_CONTEXT
+
     true false
 
      ON  OFF  STATUS
@@ -128,7 +133,7 @@ our @EXPORT_OK = qw(
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT
 
     $PI_CONTROLLER_DAEMON_LISTEN_PORT
-    $PI_CONTROLLER_DAEMON_PUBLISH_PORT
+    $PI_CONTROLLER_DAEMON_SEND_PORT
 
     $MAC_SWITCH_DAEMON_PORT
     $PING_SWITCH_DAEMON_PORT

@@ -13,6 +13,7 @@ FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Constants qw(
+    $ZMQ_CONTEXT
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT
 );
 
@@ -21,8 +22,7 @@ use Khaospy::Utils qw/timestamp/;
 #  http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw( ZMQ_PUB );
-my $context   = zmq_init();
-my $publisher = zmq_socket( $context, ZMQ_PUB );
+my $publisher = zmq_socket( $ZMQ_CONTEXT, ZMQ_PUB );
 zmq_bind( $publisher, "tcp://*:$HEATING_CONTROL_DAEMON_PUBLISH_PORT" );
 
 our @EXPORT_OK = qw(

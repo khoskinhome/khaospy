@@ -17,6 +17,7 @@ FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Constants qw(
+    $ZMQ_CONTEXT
     true false
     ON OFF STATUS
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT
@@ -61,9 +62,7 @@ exit 0;
 sub main {
     my $quit_program = AnyEvent->condvar;
 
-    my $context = zmq_init();
-
-    my $subscriber = zmq_socket($context, ZMQ_SUB);
+    my $subscriber = zmq_socket($ZMQ_CONTEXT, ZMQ_SUB);
 
     # TODO this needs to be worked out from looking at the daemon-runner conf.
     # working out the host that the heating-control is running on.

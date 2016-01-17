@@ -12,12 +12,13 @@ use JSON;
 use Time::HiRes qw/usleep/;
 
 use ZMQ::LibZMQ3;
+#    ZMQ_SUB
+#    ZMQ_SUBSCRIBE
+#    ZMQ_RCVMORE
+#    ZMQ_FD
+
 use ZMQ::Constants qw(
-    ZMQ_SUB
-    ZMQ_SUBSCRIBE
-    ZMQ_RCVMORE
-    ZMQ_FD
-    ZMQ_PUB
+    ZMQ_PUSH
 );
 
 my $json = JSON->new->allow_nonref;
@@ -26,6 +27,8 @@ use FindBin;
 FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
+use zhelpers;
+
 use Khaospy::Constants qw(
     true false
     ON OFF STATUS
@@ -33,7 +36,7 @@ use Khaospy::Constants qw(
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF
 
     $PI_CONTROLLER_DAEMON_LISTEN_PORT
-    $PI_CONTROLLER_DAEMON_PUBLISH_PORT
+    $PI_CONTROLLER_DAEMON_SEND_PORT
 
 );
 
@@ -59,9 +62,14 @@ my $control_types = {
     'pi-mcp23017-switch'       => \&_picontroller_command,
 };
 
+## ./install/lib-perl/Khaospy/PiControllerDaemon.pm:90:
 
-my $zmq_context  = zmq_init();
-my $zmq_pub_sock = {};
+my $zmq_context   = $ZMQ_CONTEXT;
+my $zmq_push_sock = zmq_socket($zmq_context,ZMQ_PUSH);
+my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_LISTEN_PORT";
+print "zmq PUSH bound $pub_to_port \n";
+zmq_bind( $zmq_push_sock, $pub_to_port );
+
 
 our $verbose = false;
 
@@ -134,35 +142,19 @@ sub _picontroller_command {
     print "picontroller_command not yet implemented\n";
 
     # set up the listener to  :
-    # $PI_CONTROLLER_DAEMON_PUBLISH_PORT
+    # $PI_CONTROLLER_DAEMON_SEND_PORT
     my $host = $control->{host};
 
-
-    if ( ! exists $zmq_pub_sock->{$host} ){
-
-        $zmq_pub_sock->{$host}
-            = zmq_socket($zmq_context, ZMQ_PUB);
-
-        my $pub_to_port
-            = "tcp://$host:$PI_CONTROLLER_DAEMON_LISTEN_PORT";
-
-        print "bound $pub_to_port \n";
-    #my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_LISTEN_PORT";
-        zmq_bind( $zmq_pub_sock->{$host}, $pub_to_port );
-    }
 
     my $msg = $json->encode({
           EpochTime     => time,
           HomeAutoClass => 'PiController',
           Control       => $control_name,
+          Host          => $host,
           Action        => $action,
-        });
+    });
 
-    for my $i ( 1..10 ){
-        zmq_sendmsg( $zmq_pub_sock->{$host},$msg );
-        usleep 100000;
-        zmq_sendmsg( $zmq_pub_sock->{$host},$msg );
-    }
+    zhelpers::s_send( $zmq_push_sock, "$msg" );
 
     return "the status of the command got from the listener";
 
