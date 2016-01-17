@@ -190,8 +190,8 @@ sub heating_thermometer_config {
         '28-0000066ebc74' => {
             name               => 'Alison',
             rrd_group          => 'upstairs',
-            upper_temp         => 17.5,
-            lower_temp         => 17.0,
+            upper_temp         => 18.5,
+            lower_temp         => 18.0,
             control            => 'alisonrad',
         },
         '28-000006e04e8b' => {
@@ -403,49 +403,50 @@ sub controls_conf {
 
 # pi mcp23017
 
-        a_pi_mcp23017_relay_with_manual => {
-            type => "pi-mcp23017-relay-manual",
-            host => "pitest",
-            ex_or_for_state => false,
-            invert_state => false,
-            gpio_relay => {
-                i2c_bus  => 0,
-		i2c_addr => '0x20',
-		portname =>'b',
-		portnum  => 0,
-            },
-            gpio_detect => {
-                i2c_bus  => 0,
-		i2c_addr => '0x20',
-		portname =>'b',
-		portnum  => 1,
-            },
+#        a_pi_mcp23017_relay_with_manual => {
+#            type => "pi-mcp23017-relay-manual",
+#            host => "pitest",
+#            ex_or_for_state => false,
+#            invert_state => false,
+#            gpio_relay => {
+#                i2c_bus  => 0,
+#		i2c_addr => '0x20',
+#		portname =>'b',
+#		portnum  => 0,
+#            },
+#            gpio_detect => {
+#                i2c_bus  => 0,
+#		i2c_addr => '0x20',
+#		portname =>'b',
+#		portnum  => 1,
+#            },
+#
+#        },
+#
+#        a_pi_mcp23017_relay => {
+#            type => "pi-mcp23017-relay",
+#            host => "pitest",
+#            invert_state => false,
+#            gpio_relay => {
+#                i2c_bus  => 0,
+#		i2c_addr => '0x20',
+#		portname =>'b',
+#		portnum  => 0,
+#            },
+#        },
+#
+#        a_pi_mcp23017_switch => {
+#            type => "pi-mcp23017-switch",
+#            host => "pitest",
+#            invert_state => false,
+#            gpio_switch => {
+#                i2c_bus  => 0,
+#		i2c_addr => '0x20',
+#		portname =>'b',
+#		portnum  => 1,
+#            },
+#        },
 
-        },
-
-        a_pi_mcp23017_relay => {
-            type => "pi-mcp23017-relay",
-            host => "pitest",
-            invert_state => false,
-            gpio_relay => {
-                i2c_bus  => 0,
-		i2c_addr => '0x20',
-		portname =>'b',
-		portnum  => 0,
-            },
-        },
-
-        a_pi_mcp23017_switch => {
-            type => "pi-mcp23017-switch",
-            host => "pitest",
-            invert_state => false,
-            gpio_switch => {
-                i2c_bus  => 0,
-		i2c_addr => '0x20',
-		portname =>'b',
-		portnum  => 1,
-            },
-        },
     };
 }
 

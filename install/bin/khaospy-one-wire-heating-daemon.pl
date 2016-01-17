@@ -4,7 +4,6 @@ use warnings;
 
 use FindBin;
 FindBin::again();
-
 use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Constants qw(
@@ -18,7 +17,6 @@ use Khaospy::OneWireHeatingDaemon qw(
 use Getopt::Long;
 my $verbose = false;
 
-use POSIX qw(strftime);
 GetOptions ( "verbose" => \$verbose );
 
 run_one_wire_heating_daemon({ verbose => $verbose });

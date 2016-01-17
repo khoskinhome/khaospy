@@ -66,7 +66,6 @@ our @EXPORT_OK = qw(
     my $controls_conf;
 
     sub get_controls_conf {
-        # reload the thermometer conf every 5 mins.
         if ( ! $controls_conf ) {
             $controls_conf = $json->decode(
                  Khaospy::Utils::slurp( $KHAOSPY_CONTROLS_CONF_FULLPATH )

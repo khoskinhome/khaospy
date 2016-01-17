@@ -24,10 +24,6 @@ use Khaospy::Constants qw(
     $KHAOSPY_CONTROLS_CONF_FULLPATH
 );
 
-use Khaospy::Conf qw(
-    get_controls_conf
-);
-
 our @EXPORT_OK = qw(
     slurp
     burp

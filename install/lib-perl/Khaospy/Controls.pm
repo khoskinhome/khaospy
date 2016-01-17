@@ -2,10 +2,14 @@ package Khaospy::Controls;
 use strict;
 use warnings;
 
+# used for sending a signal to a control.
+
 use Exporter qw/import/;
 use Data::Dumper;
 use Carp qw/croak/;
 use JSON;
+
+use Time::HiRes qw/usleep/;
 
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(
@@ -27,39 +31,62 @@ use Khaospy::Constants qw(
     ON OFF STATUS
     $KHAOSPY_CONTROLS_CONF_FULLPATH
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF
+
+    $PI_CONTROLLER_DAEMON_LISTEN_PORT
+    $PI_CONTROLLER_DAEMON_PUBLISH_PORT
+
 );
 
-use Khaospy::Utils qw(
-    slurp
+use Khaospy::Conf qw(
+    get_controls_conf
 );
 
-use Khaospy::OrviboS20 qw/signal_control/;
-use Khaospy::PiGPIO    qw/signal_control/;
+use Khaospy::OrviboS20  qw//;
 
 our @EXPORT_OK = qw(
-    send_command
+    signal_control
 );
 
+# TODO the hard coded control types that come from the control config
+# should be in a control-types json config, or sumin' like that.
 my $control_types = {
-    orvibos20    => \&_orvibo_command,
-    picontroller => \&_picontroller_command,
+    'orvibos20'                => \&_orvibo_command,
+    'pi-gpio-relay-manual'     => \&_picontroller_command,
+    'pi-gpio-relay'            => \&_picontroller_command,
+    'pi-gpio-switch'           => \&_picontroller_command,
+    'pi-mcp23017-relay-manual' => \&_picontroller_command,
+    'pi-mcp23017-relay'        => \&_picontroller_command,
+    'pi-mcp23017-switch'       => \&_picontroller_command,
 };
+
+
+my $zmq_context  = zmq_init();
+my $zmq_pub_sock = {};
 
 our $verbose = false;
 
-my $controls = $json->decode(
-    slurp ( $KHAOSPY_CONTROLS_CONF_FULLPATH )
-);
+my $controls = get_controls_conf;
 
-sub send_command {
+sub signal_control {
     # sends an "action" to a "named" control.
 
     my ($control_name, $action) = @_;
+
+    if ( $action ne ON && $action ne OFF && $action ne STATUS ){
+        croak "ERROR. The action '-a $action' can only be 'on', 'off' or 'status'\n";
+    }
 
     if ( ! exists $controls->{$control_name} ){
         croak "ERROR in config. Control '$control_name' "
             ."doesn't exist in $KHAOSPY_CONTROLS_CONF_FULLPATH\n"
             ."(this could be a misconfig in $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF )\n";
+
+        # TODO the heating daemon will get deprecated along with its conf.
+        # the thermometers having the knowledge of their control is silly.
+        # This is the reason for the non-intuitive error message above about a misconfig
+        # in the one wire heating daemon conf.
+        # i.e. their is a non-existent control in the heating daemon conf.
+        # The heating daemon will be replaced by a rules based system where by if something = something then do something. Then thermometers will not need to know what control they're associated with.
     }
 
     my $control = $controls->{$control_name};
@@ -76,6 +103,11 @@ sub send_command {
             ."   see $KHAOSPY_CONTROLS_CONF_FULLPATH\n";
     }
 
+    if ( ! exists $control->{host} ){
+        croak "ERROR in config. Control '$control_name' doesn't have a 'host' configured\n"
+            ."   see $KHAOSPY_CONTROLS_CONF_FULLPATH\n";
+    }
+
     return $control_types->{$type}($control, $control_name, $action);
 }
 
@@ -84,17 +116,15 @@ sub _orvibo_command {
 
     print "Khaospy::Controls run orviboS20 command '$control_name $action'\n" if $verbose;
 
-    if ( ! exists $control->{host} ){
-        croak "ERROR in config. Control '$control_name' doesn't have a 'host' configured\n"
-            ."   see $KHAOSPY_CONTROLS_CONF_FULLPATH\n";
-    }
 
     if ( ! exists $control->{mac} ){
         croak "ERROR in config. Control '$control_name' doesn't have a 'mac' configured\n"
             ."   see $KHAOSPY_CONTROLS_CONF_FULLPATH\n";
     }
 
-    return signal_control( $control->{host} , $control->{mac}, $action );
+    return Khaospy::OrviboS20::signal_control(
+        $control->{host} , $control->{mac}, $action
+    );
 }
 
 sub _picontroller_command {
@@ -103,7 +133,40 @@ sub _picontroller_command {
     print "Khaospy::Controls PRETEND RUN PICONTROLLER COMMAND $control_name $action\n";
     print "picontroller_command not yet implemented\n";
 
-    return "the status of the command";
+    # set up the listener to  :
+    # $PI_CONTROLLER_DAEMON_PUBLISH_PORT
+    my $host = $control->{host};
+
+
+    if ( ! exists $zmq_pub_sock->{$host} ){
+
+        $zmq_pub_sock->{$host}
+            = zmq_socket($zmq_context, ZMQ_PUB);
+
+        my $pub_to_port
+            = "tcp://$host:$PI_CONTROLLER_DAEMON_LISTEN_PORT";
+
+        print "bound $pub_to_port \n";
+    #my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_LISTEN_PORT";
+        zmq_bind( $zmq_pub_sock->{$host}, $pub_to_port );
+    }
+
+    my $msg = $json->encode({
+          EpochTime     => time,
+          HomeAutoClass => 'PiController',
+          Control       => $control_name,
+          Action        => $action,
+        });
+
+    for my $i ( 1..10 ){
+        zmq_sendmsg( $zmq_pub_sock->{$host},$msg );
+        usleep 100000;
+        zmq_sendmsg( $zmq_pub_sock->{$host},$msg );
+    }
+
+    return "the status of the command got from the listener";
+
+
 }
 
 1;

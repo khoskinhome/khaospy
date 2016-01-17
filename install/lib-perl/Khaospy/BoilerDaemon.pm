@@ -23,7 +23,7 @@ use Khaospy::Constants qw(
     $KHAOSPY_BOILERS_CONF_FULLPATH
 );
 
-use Khaospy::Controls qw( send_command );
+use Khaospy::Controls qw( signal_control );
 
 use Khaospy::Conf qw( get_boiler_conf );
 
@@ -291,7 +291,7 @@ sub _sig_a_control {
     my ( $control, $action, $update_scalar_ref ) = @_;
 
     my $ret;
-    eval { $ret = send_command( $control, $action ); };
+    eval { $ret = signal_control( $control, $action ); };
 
     if ( $@ ) {
         print timestamp."Error signalling control '$control' with '$action'. $@\n";

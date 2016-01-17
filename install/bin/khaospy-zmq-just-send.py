@@ -2,7 +2,7 @@
 """
 khaospy-zmq-just-listen.py
 
-Karl Hoskin 30-Dec-2015
+Karl Hoskin 16-Jan-2016
 
 subscribes to hosts that are publishing zmq messages
 
@@ -10,19 +10,16 @@ subscribes to hosts that are publishing zmq messages
 
 import zmq
 import time
-import json
-import yaml
 #import rrdtool
 
 import os.path
 
 from pprint import pprint
 
+import json
 import sys
 import getopt
 
-print "#####################"
-print "Started ",(time.strftime("%Y-%m-%d %H:%M:%S"))
 
 # cli options :
 host = ''
@@ -41,15 +38,19 @@ print 'PORT      :', port
 
 # Socket to talk to server
 context = zmq.Context()
-socket = context.socket(zmq.SUB)
+socket = context.socket(zmq.PUB)
 
-print "Receiving msgs from %s:%s" % ( host, port )
-socket.connect ("tcp://%s:%s" % ( host, port))
+hostnport = "tcp://%s:%s" % ( host, port )
+socket.bind (hostnport)
 
-topicfilter = ""
-socket.setsockopt(zmq.SUBSCRIBE, topicfilter)
+print "Sending a fake json msg to %s" % ( hostnport )
 
-while (1) :
-    string = socket.recv()
-    print string
+# socket.send("somefrickin {A message}")
+jsonbody={}
+jsonbody['OneWireAddress']="blah"
+jsonbody['HomeAutoClass']="oneWireThermometer"
+jsonbody['EpochTime']=time.time()
 
+while True:
+    socket.send("%s %s" % (jsonbody['HomeAutoClass'], json.dumps( jsonbody )))
+    time.sleep(3)

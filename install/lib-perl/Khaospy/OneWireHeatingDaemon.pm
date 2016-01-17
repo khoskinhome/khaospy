@@ -29,7 +29,7 @@ use Khaospy::Constants qw(
 );
 
 use Khaospy::Controls qw(
-    send_command
+    signal_control
 );
 
 use Khaospy::Conf qw(
@@ -183,7 +183,7 @@ sub anyevent_io {
             my ( $action ) = @_;
             my $retval;
             print timestamp."Send command to '$control_name' '$action' \n";
-            eval { $retval = send_command($control_name, $action); };
+            eval { $retval = signal_control($control_name, $action); };
             if ( $@ ) {
                 print "$@\n";
                 return

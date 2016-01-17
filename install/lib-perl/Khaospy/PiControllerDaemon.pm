@@ -8,7 +8,7 @@ A daemon that runs commands on a PiController and :
     $PI_CONTROLLER_DAEMON_LISTEN_PORT = 5061
 
     publishes to tcp://127.0.0.1:5062 what the command did.
-    $PI_CONTROLLER_DAEMON_PUBLISH_PORT = 5063
+    $PI_CONTROLLER_DAEMON_PUBLISH_PORT = 5062
 
 So a script that wishes to operate a control needs to :
     publish to tcp://picontroller-hostname:5062
@@ -22,6 +22,7 @@ use Exporter qw/import/;
 use Data::Dumper;
 use Carp qw/croak/;
 use JSON;
+use Sys::Hostname;
 
 use AnyEvent;
 use ZMQ::LibZMQ3;
@@ -45,7 +46,7 @@ use Khaospy::Constants qw(
     $PI_CONTROLLER_DAEMON_PUBLISH_PORT
 );
 
-use Khaospy::Controls qw( send_command );
+use Khaospy::Controls qw( signal_control );
 
 use Khaospy::Utils qw( timestamp );
 
@@ -75,11 +76,15 @@ sub run_controller_daemon {
 
     my $context = zmq_init();
     $publisher  = zmq_socket($context, ZMQ_PUB);
-    zmq_bind( $publisher, "tcp://127.0.0.1:$PI_CONTROLLER_DAEMON_PUBLISH_PORT" );
+    my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_PUBLISH_PORT";
+    zmq_bind( $publisher, $pub_to_port );
+    print timestamp. "Publishing to $pub_to_port\n";
 
     my $subscriber = zmq_socket($context, ZMQ_SUB);
 
-    my $connect_str = "tcp://127.0.0.1:$PI_CONTROLLER_DAEMON_LISTEN_PORT";
+    my $listen_to = hostname;
+    my $connect_str = "tcp://".$listen_to.":$PI_CONTROLLER_DAEMON_LISTEN_PORT";
+    print timestamp. "Listening to $connect_str\n";
 
     if ( my $zmq_state = zmq_connect($subscriber, $connect_str )){
         croak "zmq can't connect to $connect_str. status = $zmq_state . $!\n";
@@ -94,7 +99,7 @@ sub run_controller_daemon {
 
     push @w, anyevent_io( $fh, $subscriber );
 
-    push @w, AnyEvent->timer (after => 0.1, interval => 1 , cb => \&timer_cb );
+    #push @w, AnyEvent->timer (after => 0.1, interval => 3 , cb => \&timer_cb );
 
     $quit_program->recv;
 
@@ -115,7 +120,8 @@ sub anyevent_io {
 
 sub timer_cb {
 
- print "in timer\n";
+    print "in timer\n";
+    zmq_sendmsg ( $publisher, "in the timer" );
 
 }
 
@@ -128,19 +134,25 @@ sub process_controller_message {
 
     zmq_sendmsg ( $publisher, "the status of whatever the control did" );
 
-#    my $msg_decoded = $JSON->decode( $msg );
-#
-#    my $epoch_time
-#        = $msg_decoded->{EpochTime};
-#    my $control
-#        = $msg_decoded->{Control};
-#    my $home_auto_class
-#        = $msg_decoded->{HomeAutoClass}; # Why do I need HomeAutoClass ? TODO probably deprecate this.
-#    my $action
-#        = $msg_decoded->{Action};
+    my $msg_decoded;
+    eval{$msg_decoded = $JSON->decode( $msg );};
 
-#    print "\n".timestamp."Message received. '$control' '$action' \n";
-#    print Dumper($msg_decoded)."\n" if $VERBOSE;
+    if ($@) {
+        print "ERROR. JSON decode of message failed. \n$@\n";
+        return;
+    }
+
+    my $epoch_time
+        = $msg_decoded->{EpochTime};
+    my $control
+        = $msg_decoded->{Control};
+    my $home_auto_class
+        = $msg_decoded->{HomeAutoClass}; # Why do I need HomeAutoClass ? TODO probably deprecate this.
+    my $action
+        = $msg_decoded->{Action};
+
+    print "\n".timestamp."Message received. '$control' '$action' \n";
+    print Dumper($msg_decoded)."\n" if $VERBOSE;
 
 #    refresh_boiler_status()
 #        if $BOILER_STATUS_LAST_REFRESH + $BOILER_STATUS_REFRESH_EVERY_SECS < time ;
@@ -315,7 +327,7 @@ sub process_controller_message {
 #    my ( $control, $action, $update_scalar_ref ) = @_;
 #
 #    my $ret;
-#    eval { $ret = send_command( $control, $action ); };
+#    eval { $ret = signal_control( $control, $action ); };
 #
 #    if ( $@ ) {
 #        print timestamp."Error signalling control '$control' with '$action'. $@\n";
