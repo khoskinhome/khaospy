@@ -30,7 +30,7 @@ use English qw/-no_match_vars/;
 
 use FindBin;
 FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
+use lib "$FindBin::Bin/../../lib-perl";
 use Khaospy::Constants qw(
     true false
     ON OFF STATUS

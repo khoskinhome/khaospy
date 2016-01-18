@@ -13,7 +13,7 @@ alias khaospy-one-wired-receiver-pioldwifi='nohup sudo /opt/khaospy/bin/khaospy-
 alias khaospy-ps='ps afux | egrep "(one-wired|khaospy|amelia)" | grep -v grep | grep -v generate-rrd-graphs '
 alias ps-khaospy='ps afux | egrep "(one-wired|khaospy|amelia)" | grep -v grep | grep -v generate-rrd-graphs '
 
-export PATH="$PATH:/opt/khaospy/bin"
+export PATH="$PATH:/opt/khaospy/bin:/opt/khaospy/bin/helper"
 
 alias cdkhaospy='cd /opt/khaospy/'
 alias cdkhaospybin='cd /opt/khaospy/bin/'

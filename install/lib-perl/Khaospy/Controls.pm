@@ -5,13 +5,13 @@ use warnings;
 # used for sending a signal to a control.
 
 # NOT TO BE USED in Khaospy::PiControllerDaemon
-
+use Sys::Hostname;
 use Exporter qw/import/;
 use Data::Dumper;
 use Carp qw/croak/;
 use JSON;
 
-use Time::HiRes qw/usleep/;
+use Time::HiRes qw/usleep time/;
 
 use ZMQ::LibZMQ3;
 #    ZMQ_SUB
@@ -150,11 +150,11 @@ sub _picontroller_command {
 
 
     my $msg = $json->encode({
-          EpochTime     => time,
-          HomeAutoClass => 'PiController',
-          Control       => $control_name,
-          Host          => $host,
-          Action        => $action,
+          epoch_time    => time,
+          control       => $control_name,
+          control_host  => $host,
+          action        => $action,
+          request_host  => hostname,
     });
 
     # TODO a timeout on the following send, say 5 seconds :

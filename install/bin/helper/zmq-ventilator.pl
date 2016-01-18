@@ -20,7 +20,7 @@ use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(ZMQ_PUSH);
 use FindBin;
 FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
+use lib "$FindBin::Bin/../../lib-perl";
 
 use zhelpers;
 
