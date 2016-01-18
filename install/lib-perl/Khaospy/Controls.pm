@@ -4,6 +4,8 @@ use warnings;
 
 # used for sending a signal to a control.
 
+# NOT TO BE USED in Khaospy::PiControllerDaemon
+
 use Exporter qw/import/;
 use Data::Dumper;
 use Carp qw/croak/;
@@ -30,6 +32,7 @@ use lib "$FindBin::Bin/../lib-perl";
 use zhelpers;
 
 use Khaospy::Constants qw(
+    $ZMQ_CONTEXT
     true false
     ON OFF STATUS
     $KHAOSPY_CONTROLS_CONF_FULLPATH
@@ -154,6 +157,8 @@ sub _picontroller_command {
           Action        => $action,
     });
 
+    # TODO a timeout on the following send, say 5 seconds :
+    # and log an error message.
     zhelpers::s_send( $zmq_push_sock, "$msg" );
 
     return "the status of the command got from the listener";

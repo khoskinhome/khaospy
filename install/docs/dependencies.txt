@@ -32,6 +32,8 @@ screen \
 vim \
 git
 
+sudo apt-get install -y apache2 daemon i2c-tools perl-doc perl-modules python-pip python-rrdtool python-smbus python-yaml python-zmq screen vim git
+
 
 # libzmq-dev \
 

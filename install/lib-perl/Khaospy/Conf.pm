@@ -17,19 +17,34 @@ use Khaospy::Constants qw(
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
     $KHAOSPY_CONTROLS_CONF_FULLPATH
     $KHAOSPY_BOILERS_CONF_FULLPATH
+    $KHAOSPY_PI_CONTROLLER_CONF_FULLPATH
 );
 
-use Khaospy::Utils; # qw( slurp );
+use Khaospy::Utils;
 
 our @EXPORT_OK = qw(
+    get_daemon_runner_conf
     get_one_wire_heating_control_conf
     get_controls_conf
-    get_daemon_runner_conf
     get_boiler_conf
+    get_pi_controller_conf
 );
 
 # reads in the confs once, unless it is a conf that can change whilst the daemons
 # are running. confs are thus got from a method/sub
+
+{
+    my $daemon_runner_conf;
+
+    sub get_daemon_runner_conf {
+        if ( ! $daemon_runner_conf ) {
+            $daemon_runner_conf = $json->decode(
+                 Khaospy::Utils::slurp( $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH )
+            );
+        }
+        return $daemon_runner_conf;
+    }
+}
 
 {
     my $therm_conf;
@@ -50,19 +65,6 @@ our @EXPORT_OK = qw(
 }
 
 {
-    my $boiler_conf;
-
-    sub get_boiler_conf {
-        if ( ! $boiler_conf ) {
-            $boiler_conf = $json->decode(
-                 Khaospy::Utils::slurp( $KHAOSPY_BOILERS_CONF_FULLPATH )
-            );
-        }
-        return $boiler_conf;
-    }
-}
-
-{
     my $controls_conf;
 
     sub get_controls_conf {
@@ -77,16 +79,28 @@ our @EXPORT_OK = qw(
 }
 
 {
-    my $daemon_runner_conf;
+    my $boiler_conf;
 
-    sub get_daemon_runner_conf {
-        if ( ! $daemon_runner_conf ) {
-            $daemon_runner_conf = $json->decode(
-                 Khaospy::Utils::slurp( $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH )
+    sub get_boiler_conf {
+        if ( ! $boiler_conf ) {
+            $boiler_conf = $json->decode(
+                 Khaospy::Utils::slurp( $KHAOSPY_BOILERS_CONF_FULLPATH )
             );
         }
-        return $daemon_runner_conf;
+        return $boiler_conf;
     }
 }
 
+{
+    my $pi_controller_conf;
+
+    sub get_pi_controller_conf {
+        if ( ! $pi_controller_conf ) {
+            $pi_controller_conf = $json->decode(
+                 Khaospy::Utils::slurp( $KHAOSPY_PI_CONTROLLER_CONF_FULLPATH )
+            );
+        }
+        return $pi_controller_conf;
+    }
+}
 1;

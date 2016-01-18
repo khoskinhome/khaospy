@@ -51,6 +51,9 @@ our $KHAOSPY_ONE_WIRE_HEATING_DAEMON
 our $KHAOSPY_BOILER_DAEMON_SCRIPT
     = "$KHAOSPY_BIN_DIR/khaospy-boiler-daemon.pl";
 
+our $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
+    = "$KHAOSPY_BIN_DIR/khaospy-controller-daemon.pl";
+
 #############
 # json confs
 our $KHAOSPY_ALL_CONFS = {
@@ -62,6 +65,8 @@ our $KHAOSPY_ALL_CONFS = {
         = "controls.json"               => controls_conf(),
     our $KHAOSPY_BOILERS_CONF
         = "boilers.json"                => boilers_conf(),
+    our $KHAOSPY_PI_CONTROLLER_CONF
+        = "pi_controller.json"          => pi_controller_daemon(),
 };
 
 our $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
@@ -76,8 +81,12 @@ our $KHAOSPY_CONTROLS_CONF_FULLPATH
 our $KHAOSPY_BOILERS_CONF_FULLPATH
     = "$KHAOSPY_CONF_DIR/$KHAOSPY_BOILERS_CONF";
 
+our $KHAOSPY_PI_CONTROLLER_CONF_FULLPATH
+    = "$KHAOSPY_CONF_DIR/$KHAOSPY_PI_CONTROLLER_CONF";
+
 #############
 our $ONE_WIRE_DAEMON_PORT                = 5001;
+### our $PI_CONTROLLER_DAEMON_PUBLISH_PORT = 5002;
 
 our $ALARM_SWITCH_DAEMON_PORT            = 5051;
 our $HEATING_CONTROL_DAEMON_PUBLISH_PORT = 5021;
@@ -122,10 +131,14 @@ our @EXPORT_OK = qw(
     $KHAOSPY_BOILERS_CONF
     $KHAOSPY_BOILERS_CONF_FULLPATH
 
+    $KHAOSPY_PI_CONTROLLER_CONF
+    $KHAOSPY_PI_CONTROLLER_CONF_FULLPATH
+
     $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
     $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON
     $KHAOSPY_BOILER_DAEMON_SCRIPT
+    $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
 
     $ONE_WIRE_DAEMON_PORT
     $ALARM_SWITCH_DAEMON_PORT
@@ -150,15 +163,12 @@ our @EXPORT_OK = qw(
 #
 # this points to an array of script names to be run by /usr/bin/daemon ( with CLI params )
 #
-
 sub daemon_runner_conf {
     return {
         piserver => [
             "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=pioldwifi",
             "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=piloft",
             "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=piboiler",
-            "$KHAOSPY_ONE_WIRE_HEATING_DAEMON",
-            "$KHAOSPY_BOILER_DAEMON_SCRIPT",
         ],
         piloft => [
             "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
@@ -169,10 +179,29 @@ sub daemon_runner_conf {
         ],
         piboiler => [
             "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
+            "$KHAOSPY_ONE_WIRE_HEATING_DAEMON",
+            # "$KHAOSPY_BOILER_DAEMON_SCRIPT",
+
+        ],
+        pitest => [
+#            "$KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT",
         ],
 
     };
 }
+
+sub pi_controller_daemon {
+    return {
+        pull_from_hosts => [qw/
+            pitest
+            piold
+            piserver
+            piloft
+            piboiler
+        /],
+    };
+}
+
 
 ##################################
 #   Heating conf keys :
@@ -377,8 +406,8 @@ sub controls_conf {
         },
         boiler => {
             type => "pi-gpio-relay",
-            host => 'pitest', # FIX THIS it will be piboiler when running.
-            gpio_wiringpi => 1, # NOT the BCM CPIO number.
+            host => 'piboiler', # FIX THIS it will be piboiler when running.
+            gpio_wiringpi => 4, # NOT the BCM CPIO number.
             invert_state => true,
         },
 
@@ -394,7 +423,7 @@ sub controls_conf {
 
         a_pi_gpio_relay => {
             type => "pi-gpio-relay",
-            host => "pitest",
+            host => "pitestNOT", # TODO non existant hostname.
             invert_state => false,
             gpio_relay  => 0,
         },

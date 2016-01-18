@@ -1,20 +1,21 @@
 package Khaospy::PiControllerDaemon;
 # http://stackoverflow.com/questions/6024003/why-doesnt-zeromq-work-on-localhost/8958414#8958414
 # http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
+# http://funcptr.net/2012/09/10/zeromq---edge-triggered-notification/
 
 =pod
 
 A daemon that runs commands on a PiController and :
 
-    listens to tcp://127.0.0.1:5061 for commands.
+    pulls from tcp://master-hosts:5061 for commands.
     $PI_CONTROLLER_DAEMON_LISTEN_PORT = 5061
 
-    publishes to tcp://127.0.0.1:5062 what the command did.
+    publishes to tcp://*:5062 what the command did.
     $PI_CONTROLLER_DAEMON_SEND_PORT = 5062
 
-So a script that wishes to operate a control needs to :
-    publish to tcp://picontroller-hostname:5062
-    listen to tcp://picontroller-hostname:5061 for the response.
+So a script that wishes to operate a control needs to have the controller daemons pulling from its own port 5061.
+
+If the script wishes to here the results it needs to subscribe to port 5062 of the controller hosts.
 
 =cut
 
@@ -28,9 +29,6 @@ use Sys::Hostname;
 
 use AnyEvent;
 use ZMQ::LibZMQ3;
-#    ZMQ_SUB
-#    ZMQ_PUSH
-
 use ZMQ::Constants qw(
     ZMQ_RCVMORE
     ZMQ_SUBSCRIBE
@@ -53,76 +51,92 @@ use Khaospy::Constants qw(
     $PI_CONTROLLER_DAEMON_SEND_PORT
 );
 
-use Khaospy::Controls qw( signal_control );
+use Khaospy::Conf qw(
+    get_controls_conf
+    get_pi_controller_conf
+);
 
 use Khaospy::Utils qw( timestamp );
 
 our @EXPORT_OK = qw( run_controller_daemon );
 
+our $PUBLISH_STATUS_EVERY_SECS = 5;
+
 my $JSON = JSON->new->allow_nonref;
 
 our $VERBOSE;
 
-my $publisher;
-my $zmq_receiver;
+my $zmq_publisher;
+$controls_conf;
+$pi_controller_conf;
 
 #######
 # subs
 
 sub run_controller_daemon {
     my ( $opts ) = @_;
-
     $opts = {} if ! $opts;
-
     $VERBOSE = $opts->{verbose} || false;
 
     print "#############\n";
     print timestamp."Controller Daemon START\n";
     print timestamp."VERBOSE = ".( $VERBOSE ? "TRUE" : "FALSE" )."\n";
 
-    my $quit_program = AnyEvent->condvar;
+    $controls_conf = get_controls_conf();
+    $pi_controller_conf = get_pi_controller_conf();
+    #print "\n".Dumper($controls_conf)."\n";
+    print "\n".Dumper($pi_controller_conf)."\n";
 
-#    $publisher  = zmq_socket($context, ZMQ_PUB);
-#    my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_SEND_PORT";
-#    zmq_bind( $publisher, $pub_to_port );
-#    print timestamp. "Publishing to $pub_to_port\n";
 
-  ## ./install/lib-perl/Khaospy/Controls.pm:65:my $zmq_context   = zmq_init(); # TODO rm this line
-    $zmq_receiver = zmq_socket($ZMQ_CONTEXT, ZMQ_PULL);
+    $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
+    my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_SEND_PORT";
+    zmq_bind( $zmq_publisher, $pub_to_port );
+    print timestamp. "Publishing to $pub_to_port\n";
 
-    my $listen_to = "pitest";
-    my $connect_str = "tcp://".$listen_to.":$PI_CONTROLLER_DAEMON_LISTEN_PORT";
-    print timestamp. "Listening to $connect_str\n";
-
-    if ( my $zmq_state = zmq_connect($zmq_receiver, $connect_str )){
-        croak "zmq can't connect to $connect_str. status = $zmq_state . $!\n";
-    };
-
-    #zmq_setsockopt($zmq_receiver, ZMQ_SUBSCRIBE, '' );
-    # http://funcptr.net/2012/09/10/zeromq---edge-triggered-notification/
-    # get a non blocking file-handle from zmq:
-    my $fh = zmq_getsockopt( $zmq_receiver, ZMQ_FD );
 
     my @w;
+    #my $zmq_pull_sock={};
 
-    push @w, anyevent_io( $fh, $zmq_receiver );
+    for my $pull_host ( @{$pi_controller_conf->{pull_from_hosts}} ){
 
-    push @w, AnyEvent->timer (after => 0.1, interval => 3 , cb => \&timer_cb );
+        my $zmq_puller= zmq_socket($ZMQ_CONTEXT, ZMQ_PULL);
 
+        my $connect_str = "tcp://$pull_host:$PI_CONTROLLER_DAEMON_LISTEN_PORT";
+        print timestamp. "Listening to $connect_str\n";
+
+        if ( my $zmq_state = zmq_connect($zmq_puller, $connect_str )){
+            croak "zmq can't connect to $connect_str. status = $zmq_state . $!\n";
+        };
+        # get a non blocking file-handle from zmq:
+        my $fh = zmq_getsockopt( $zmq_puller, ZMQ_FD );
+
+
+        push @w, anyevent_io( $fh, $zmq_puller );
+
+        #$zmq_pull_sock->{$pull_host}  = $zmq_puller;
+    }
+
+    push @w, AnyEvent->timer(
+        after    => 0.1,
+        interval => $PUBLISH_STATUS_EVERY_SECS,
+        cb       => \&timer_cb
+    );
+
+    my $quit_program = AnyEvent->condvar;
     $quit_program->recv;
 
 }
 
 sub anyevent_io {
-    my ( $fh, $zmq_receiver ) = @_;
+    my ( $fh, $zmq_puller ) = @_;
     return AnyEvent->io(
         fh   => $fh,
         poll => "r",
         cb   => sub {
             while (
-                my $recvmsg = zmq_recvmsg( $zmq_receiver, ZMQ_RCVMORE )
+                my $recvmsg = zmq_recvmsg( $zmq_puller, ZMQ_RCVMORE )
             ){
-                process_controller_message(zmq_msg_data($recvmsg));
+                controller_message(zmq_msg_data($recvmsg));
             }
         },
     );
@@ -130,19 +144,19 @@ sub anyevent_io {
 
 sub timer_cb {
 
-    print "in timer\n";
-    #zmq_sendmsg ( $publisher, "in the timer" );
+    print "in timer ".time."\n";
+    #zmq_sendmsg ( $zmq_publisher, "in the timer" );
 
 }
 
-sub process_controller_message {
+sub controller_message {
     my ($msg) = @_ ;
 
     print "$msg\n";
     #my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
     # ^^^ can't get $topic working in perl yet. TODO
 
-    #zmq_sendmsg ( $publisher, "the status of whatever the control did" );
+    #zmq_sendmsg ( $zmq_publisher, "the status of whatever the control did" );
 
     my $msg_decoded;
     eval{$msg_decoded = $JSON->decode( $msg );};
@@ -154,26 +168,98 @@ sub process_controller_message {
 
     my $epoch_time
         = $msg_decoded->{EpochTime};
-    my $control
+    my $control_name
         = $msg_decoded->{Control};
     my $home_auto_class
         = $msg_decoded->{HomeAutoClass}; # Why do I need HomeAutoClass ? TODO probably deprecate this.
     my $action
         = $msg_decoded->{Action};
 
-    print "\n".timestamp."Message received. '$control' '$action' \n";
+    print "\n".timestamp."Message received. '$control_name' '$action' \n";
     print Dumper($msg_decoded)."\n" if $VERBOSE;
 
-#    refresh_boiler_status()
-#        if $BOILER_STATUS_LAST_REFRESH + $BOILER_STATUS_REFRESH_EVERY_SECS < time ;
-#
-#    my $boiler_name = get_boiler_name_for_control($control);
-#
-#    boiler_check_next_on_at();
-#
-#    return if ! $boiler_name;
-#
-#    operate_boiler($boiler_name, $control, $action);
+    # TODO. All this error checking is already in Khaospy::Controls, either rely on that OR factor it out and put it in a common place so both bits of code can call it.
+
+    if ( ! exists $controls_conf->{$control_name} ){
+        print timestamp."ERROR control $control_name doesn't exist in the config\n";
+        return;
+    }
+    my $control = $controls_conf->{$control_name} ;
+
+    if ( ! exists $control->{host} ){
+        print timestamp."ERROR control $control_name doesn't have a host configured\n";
+        return;
+    }
+
+    if ( $control->{host} ne hostname ) {
+        print timestamp."control $control_name is not controlled by this host\n";
+        return;
+    }
+
+    if ( ! exists $control->{type} ){
+        print timestamp."ERROR control $control_name doesn't have a type configured\n";
+        return;
+    }
+
+    if ( $control->{type} eq 'pi-gpio-relay'){
+        return operate_pi_gpio_relay($control_name,$control, $action);
+    }
+
+    print timestamp."ERROR control $control_name with type $control->{type} could be invalid. Or maybe it hasn't been programmed yet. Some are still TODO\n";
+    return;
+
+}
+
+sub operate_pi_gpio_relay {
+    my ($control_name,$control, $action) = @_;
+
+    # TODO this should go into Khaospy::PiGPIO module.
+
+    print "OPERATE $control_name with $action\n";
+
+    if (! exists $control->{gpio_wiringpi} ){
+        print timestamp."ERROR control $control_name, type $control->{type}, doesn't have a key 'gpio_wiringpi'\n";
+        return;
+    }
+
+    my $gpio_wiringpi = $control->{gpio_wiringpi};
+
+    ##pi@pitest ~ $ gpio mode 1 out
+    ##pi@pitest ~ $ gpio mode 4 out
+    ##pi@pitest ~ $ gpio write 1 0
+    ##pi@pitest ~ $ gpio write 1 1
+    ##pi@pitest ~ $ gpio write 4 1
+    #
+    my $cmd_gpio = "/usr/bin/gpio";
+    print (timestamp.`$cmd_gpio mode $gpio_wiringpi out`."\n");
+
+
+    if ($action eq STATUS){
+        # TODO this needs to be published.
+        print (timestamp."$control_name status is ".qx("$cmd_gpio read $gpio_wiringpi")."\n");
+        return ;
+    }
+
+    my $send_number = $action;
+
+    if ($action eq ON){
+        $send_number = true
+    } elsif ($action eq OFF){
+        $send_number = false
+    }
+
+    # should use proper "complement" here ... its late...
+    # TODO need to use the invert_state on both the send_number and what "read" returns.
+
+    if ( exists $control->{invert_state} && $control->{invert_state} ){
+        if ( $send_number ) { $send_number = false }
+        else { $send_number = true }
+    }
+
+    system("$cmd_gpio write $gpio_wiringpi $send_number");
+    # TODO this needs to be published.
+    print (timestamp."$control_name status is ".qx("$cmd_gpio read $gpio_wiringpi")."\n");
+
 
 }
 
