@@ -20,7 +20,7 @@ use ZMQ::LibZMQ3;
 #    ZMQ_FD
 
 use ZMQ::Constants qw(
-    ZMQ_PUSH
+    ZMQ_REQ
 );
 
 my $json = JSON->new->allow_nonref;
@@ -68,10 +68,10 @@ my $control_types = {
 ## ./install/lib-perl/Khaospy/PiControllerDaemon.pm:90:
 
 my $zmq_context   = $ZMQ_CONTEXT;
-my $zmq_push_sock = zmq_socket($zmq_context,ZMQ_PUSH);
+my $zmq_req_sock = zmq_socket($zmq_context,ZMQ_REQ);
 my $pub_to_port = "tcp://*:$PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT";
 print "zmq PUSH bound $pub_to_port \n";
-zmq_bind( $zmq_push_sock, $pub_to_port );
+zmq_bind( $zmq_req_sock, $pub_to_port );
 
 
 our $verbose = false;
@@ -127,7 +127,6 @@ sub _orvibo_command {
 
     print "Khaospy::Controls run orviboS20 command '$control_name $action'\n" if $verbose;
 
-
     if ( ! exists $control->{mac} ){
         croak "ERROR in config. Control '$control_name' doesn't have a 'mac' configured\n"
             ."   see $KHAOSPY_CONTROLS_CONF_FULLPATH\n";
@@ -148,7 +147,6 @@ sub _picontroller_command {
     # $PI_CONTROLLER_DAEMON_SEND_PORT
     my $host = $control->{host};
 
-
     my $msg = $json->encode({
           epoch_time    => time,
           control       => $control_name,
@@ -159,10 +157,9 @@ sub _picontroller_command {
 
     # TODO a timeout on the following send, say 5 seconds :
     # and log an error message.
-    zhelpers::s_send( $zmq_push_sock, "$msg" );
+    zhelpers::s_send( $zmq_req_sock, "$msg" );
 
-    return "the status of the command got from the listener";
-
+    return "the status of the command returned ???? TODO";
 
 }
 
