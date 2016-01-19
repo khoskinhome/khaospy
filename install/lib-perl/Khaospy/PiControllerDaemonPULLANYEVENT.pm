@@ -7,7 +7,7 @@ package Khaospy::PiControllerDaemon;
 A daemon that runs commands on a PiController and :
 
     listens to tcp://127.0.0.1:5061 for commands.
-    $PI_CONTROLLER_DAEMON_LISTEN_PORT = 5061
+    $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT = 5061
 
     publishes to tcp://127.0.0.1:5062 what the command did.
     $PI_CONTROLLER_DAEMON_SEND_PORT = 5062
@@ -49,7 +49,7 @@ use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     true false
     ON OFF STATUS
-    $PI_CONTROLLER_DAEMON_LISTEN_PORT
+    $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
     $PI_CONTROLLER_DAEMON_SEND_PORT
 );
 
@@ -91,7 +91,7 @@ sub run_controller_daemon {
     $zmq_receiver = zmq_socket($ZMQ_CONTEXT, ZMQ_PULL);
 
     my $listen_to = "pitest";
-    my $connect_str = "tcp://".$listen_to.":$PI_CONTROLLER_DAEMON_LISTEN_PORT";
+    my $connect_str = "tcp://".$listen_to.":$PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT";
     print timestamp. "Listening to $connect_str\n";
 
     if ( my $zmq_state = zmq_connect($zmq_receiver, $connect_str )){

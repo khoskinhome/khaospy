@@ -34,7 +34,7 @@ use lib "$FindBin::Bin/../../lib-perl";
 use Khaospy::Constants qw(
     true false
     ON OFF STATUS
-    $PI_CONTROLLER_DAEMON_LISTEN_PORT
+    $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
     $PI_CONTROLLER_DAEMON_SEND_PORT
 );
 
@@ -46,7 +46,7 @@ my $context = zmq_init();
 my $zmq_receiver = zmq_socket($context, ZMQ_PULL);
 
 my $listen_to   = "pitest";
-my $connect_str = "tcp://".$listen_to.":$PI_CONTROLLER_DAEMON_LISTEN_PORT";
+my $connect_str = "tcp://".$listen_to.":$PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT";
 print "Listening to $connect_str\n";
 if ( my $zmq_state = zmq_connect($zmq_receiver, $connect_str )){
     croak "zmq can't connect to $connect_str. status = $zmq_state . $!\n";

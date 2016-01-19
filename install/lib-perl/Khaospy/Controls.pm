@@ -38,7 +38,7 @@ use Khaospy::Constants qw(
     $KHAOSPY_CONTROLS_CONF_FULLPATH
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF
 
-    $PI_CONTROLLER_DAEMON_LISTEN_PORT
+    $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
     $PI_CONTROLLER_DAEMON_SEND_PORT
 
 );
@@ -69,7 +69,7 @@ my $control_types = {
 
 my $zmq_context   = $ZMQ_CONTEXT;
 my $zmq_push_sock = zmq_socket($zmq_context,ZMQ_PUSH);
-my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_LISTEN_PORT";
+my $pub_to_port = "tcp://*:$PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT";
 print "zmq PUSH bound $pub_to_port \n";
 zmq_bind( $zmq_push_sock, $pub_to_port );
 
