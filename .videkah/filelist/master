@@ -12,14 +12,40 @@
 
 
 #######################################################
+./install/lib-perl/Khaospy/PiControllerDaemon.pm
+./install/bin/khaospy-controller-daemon.pl
+./install/lib-perl/t/test-picontrollerdaemon-send-msg.pl
+./install/lib-perl/t/test-picontrollerdaemon-listen.pl
 
+./install/lib-perl/Khaospy/PiGPIO.pm
+./install/lib-perl/t/KhaospyTest/PiGPIO.pm
+
+./install/lib-perl/Khaospy/PiMCP23017.pm
+./install/lib-perl/t/KhaospyTest/PiMCP23017.pm
+
+./install/bin/test-module-includes.pl
 
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
 
 ./install/lib-perl/Khaospy/BoilerMessage.pm
 ./install/lib-perl/Khaospy/Conf.pm
+
 ./install/lib-perl/Khaospy/Controls.pm
+./install/bin/khaospy-operate-control.pl
+
+./install/bin/just-send-stuff-to-5061.pl
+./install/bin/khaospy-zmq-just-listen.py
+./install/bin/khaospy-zmq-just-send.py
+
+./install/bin/zmq-req.py
+./install/bin/zmq-reply.py
+
+./install/bin/zmq-push.py
+./install/bin/zmq-pull.py
+
+
+
 ./install/lib-perl/Khaospy/Constants.pm
 
 ./install/lib-perl/Khaospy/OneWireHeatingDaemon.pm
@@ -29,12 +55,14 @@
 ./install/lib-perl/Khaospy/Utils.pm:77:
 
 ./install/lib-perl/Khaospy/OrviboS20.pm
-./install/bin/test-khaospy-orvibos20.pl
+./install/lib-perl/t-scripts/test-khaospy-orvibos20.pl
+
 
 ######################################################
-# Orvibo S20 rad control stuff.
+# 
 
 
+./to-be-deleted/bin/khaospy-operate-orvibos20.pl
 ./to-be-deleted/bin/khaospy-one-wire-heating-daemon-old.pl
 ./to-be-deleted/bin/khaospy-boiler-daemon-old.pl
 ./to-be-deleted/bin/khaospy-orvibo-s20-radiator.pl
@@ -59,8 +87,6 @@ to-be-deleted/bin/khaospy-run-daemons.py
 ## ./install/libpy/khaospy-one-wired-receiver-subscribe.py # renamed to khaospy-one-wired-receiver.py
 ./install/bin/khaospy-one-wired-receiver.py
 ./install/bin/khaospy-one-wired-receiver-just-listen.py
-
-./install/bin/khaospy-zmq-just-listen.py
 
 
 
@@ -206,6 +232,11 @@ crap.js
 ./install/docs/dependencies.txt
 
 ./install/docs/proj_khaospy-home-auto-software.txt
+./install/docs/proj_khaospy-home-auto-software2.txt
+./install/docs/lighting-wiring-circuits.txt
+./install/docs/heating-control.txt
+./install/docs/lighting-control.txt
+./install/docs/khaospy-why.txt
 
 
 
@@ -333,4 +364,14 @@ to-be-deleted/bin/khaospy-one-wire-heating-daemon-old.pl:34:    get_heating_ther
 to-be-deleted/bin/khaospy-one-wire-heating-daemon-old.pl:110:    my $thermometer_conf = get_heating_thermometer_conf();
 
 
+khoskin@khoskin-P5K-E:~/github.com/khaospy$ grep -r send_command ./ | grep Khaospy
+./install/lib-perl/Khaospy/Controls.pm:    send_command
+./install/lib-perl/Khaospy/Controls.pm:sub send_command {
+./install/lib-perl/Khaospy/BoilerDaemon.pm:use Khaospy::Controls qw( send_command );
+./install/lib-perl/Khaospy/BoilerDaemon.pm:    eval { $ret = send_command( $control, $action ); };
+Binary file ./install/lib-perl/Khaospy/.Controls.pm.swp matches
+./install/lib-perl/Khaospy/PiControllerDaemon.pm:use Khaospy::Controls qw( send_command );
+./install/lib-perl/Khaospy/PiControllerDaemon.pm:#    eval { $ret = send_command( $control, $action ); };
+./install/lib-perl/Khaospy/OneWireHeatingDaemon.pm:    send_command
+./install/lib-perl/Khaospy/OneWireHeatingDaemon.pm:            eval { $retval = send_command($control_name, $action); };
 
