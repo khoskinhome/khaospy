@@ -1,0 +1,8 @@
+#############################################################
+# Zero-mq with AnyEvent code examples got from :
+# http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
+# http://stackoverflow.com/questions/6024003/why-doesnt-zeromq-work-on-localhost/8958414#8958414
+# http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
+# http://funcptr.net/2012/09/10/zeromq---edge-triggered-notification/
+
+

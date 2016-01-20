@@ -21,8 +21,17 @@ sub WARN  {"warn"};
 sub INFO  {"info"};
 sub DEBUG {"debug"};
 
+sub klogstart ($;$) { klog(START,@_) };
+sub klogfatal ($;$) { klog(FATAL,@_) };
+sub klogerror ($;$) { klog(ERROR,@_) };
+sub klogwarn  ($;$) { klog(WARN ,@_) };
+sub kloginfo  ($;$) { klog(INFO ,@_) };
+sub klogdebug ($;$) { klog(DEBUG,@_) };
+
 our @EXPORT_OK = qw(
-    log START FATAL ERROR WARN INFO DEBUG
+    klog START FATAL ERROR WARN INFO DEBUG
+    klogstart klogfatal klogerror
+    klogwarn  kloginfo  klogdebug
 );
 =pod
     types
@@ -45,13 +54,19 @@ my $type_to_val = {
     debug =>6,
 };
 
-sub log {
+our $OVERRIDE_CONF_LOGLEVEL;
+
+sub klog {
     my ( $type, $msg, $dump ) = @_;
     $type = lc ($type);
 
     my $global_conf = get_global_conf;
-    my $conf_log_level = $type_to_val->{$global_conf->{log_level}};
-    $conf_log_level = 4 if ! $conf_log_level;
+
+    my $log_level = $OVERRIDE_CONF_LOGLEVEL || $global_conf->{log_level};
+
+    my $log_level_val = $type_to_val->{$log_level};
+
+    $log_level_val = 4 if ! $log_level_val;
 
     if (! exists $type_to_val->{$type} ){
         croak "Illegal log type of $type\n";
@@ -69,7 +84,7 @@ sub log {
 
     # only warn, info and debug can be switched off from logging
     print $line
-        if $tval <= $conf_log_level or $tval <= 3;
+        if $tval <= $log_level_val or $tval <= 3;
 }
 
 1;

@@ -27,6 +27,8 @@ use Khaospy::PiMCP23017;
 
 use Khaospy::Utils;
 
+use Khaospy::ZMQSubscribeAllPublishers;
+
 use zhelpers;
 
 #./install/lib-perl/Khaospy/PiControllerDaemonSIMPLE.pm
