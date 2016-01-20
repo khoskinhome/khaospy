@@ -12,27 +12,28 @@ my $json = JSON->new->allow_nonref;
 
 use FindBin;
 FindBin::again();
-
 use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Constants qw(
     true false
+    ON OFF STATUS
     $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
     $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
 
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
     $KHAOSPY_CONTROLS_CONF_FULLPATH
+    $MESSAGES_OVER_SECS_INVALID
 );
 
 our @EXPORT_OK = qw(
+    timestamp
     slurp
     burp
     get_one_wire_sender_hosts
     get_hashval
-    timestamp
 );
 
-
+# This to be deprecated from here once every print is a "log" (Khaospy::Log)
 sub timestamp { return strftime("%F %T", gmtime( $_[0] || time) )." "; }
 
 sub slurp {

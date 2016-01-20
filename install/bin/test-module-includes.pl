@@ -3,30 +3,36 @@ use strict;
 use warnings;
 use 5.14.2;
 
-
 use FindBin;
 FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
+use Khaospy::Conf;
+use Khaospy::Constants;
+use Khaospy::Controls;
 
+use Khaospy::BoilerDaemon;
+use Khaospy::BoilerMessage;
 
-use Khaospy::BoilerDaemon qw//;
+use Khaospy::Log;
 
-use Khaospy::BoilerMessage qw//;
+use Khaospy::OneWireHeatingDaemon;
+use Khaospy::OrviboS20;
 
-use Khaospy::Conf qw//;
+use Khaospy::PiControllerDaemon;
+use Khaospy::PiControllerQueueDaemon;
 
-use Khaospy::PiControllerDaemon qw//;
+use Khaospy::PiGPIO;
+use Khaospy::PiMCP23017;
 
-use Khaospy::Controls qw//;
-use Khaospy::Constants qw//;
+use Khaospy::Utils;
 
-use Khaospy::Utils qw//;
+use zhelpers;
 
-use Khaospy::OrviboS20 qw//;
-
-use Khaospy::PiGPIO qw//;
-use Khaospy::PiMCP23017 qw//;
+#./install/lib-perl/Khaospy/PiControllerDaemonSIMPLE.pm
+#./install/lib-perl/Khaospy/PiControllerDaemonPULLANYEVENT.pm
+#./install/lib-perl/t/KhaospyTest/PiGPIO.pm
+#./install/lib-perl/t/KhaospyTest/PiMCP23017.pm
 
 
 

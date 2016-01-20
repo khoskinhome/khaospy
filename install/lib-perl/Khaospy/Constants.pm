@@ -2,12 +2,12 @@ package Khaospy::Constants;
 use strict;
 use warnings;
 
-# install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl:sub burp {
-
+use JSON;
 use Exporter qw/import/;
 
 use ZMQ::LibZMQ3;
 our $ZMQ_CONTEXT = zmq_init();
+our $JSON = JSON->new->allow_nonref;
 
 sub true  { 1 };
 sub false { 0 };
@@ -67,6 +67,8 @@ our $KHAOSPY_ALL_CONFS = {
         = "boilers.json"                => boilers_conf(),
     our $KHAOSPY_PI_CONTROLLER_CONF
         = "pi_controller.json"          => pi_controller_daemon(),
+    our $KHAOSPY_GLOBAL_CONF
+        = "global.json"                 => global_conf(),
 };
 
 our $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
@@ -84,9 +86,11 @@ our $KHAOSPY_BOILERS_CONF_FULLPATH
 our $KHAOSPY_PI_CONTROLLER_CONF_FULLPATH
     = "$KHAOSPY_CONF_DIR/$KHAOSPY_PI_CONTROLLER_CONF";
 
+our $KHAOSPY_GLOBAL_CONF_FULLPATH
+    = "$KHAOSPY_CONF_DIR/$KHAOSPY_GLOBAL_CONF";
+
 #############
 our $ONE_WIRE_DAEMON_PORT                = 5001;
-### our $PI_CONTROLLER_DAEMON_PUBLISH_PORT = 5002;
 
 our $ALARM_SWITCH_DAEMON_PORT            = 5051;
 our $HEATING_CONTROL_DAEMON_PUBLISH_PORT = 5021;
@@ -99,9 +103,21 @@ our $PI_STATUS_DAEMON_SEND_PORT           = 5064;
 our $MAC_SWITCH_DAEMON_PORT              = 5005;
 our $PING_SWITCH_DAEMON_PORT             = 5006;
 
+our $MESSAGES_OVER_SECS_INVALID = 3600;
+our $MESSAGE_TIMEOUT            = 10; # seconds.
+our $ZMQ_REQUEST_TIMEOUT        = 10; # seconds.
+
+our $LOCALHOST = '127.0.0.1';
+
+our $PI_CONTROLLER_QUEUE_DAEMON_PUBLISH_EVERY_SECS  = .25;
+our $PI_CONTROLLER_DAEMON_PUBLISH_EVERY_SECS        = 1;
+our $STATUS_DAEMON_PUBLISH_EVERY_SECS               = 2;
+our $RULES_DAEMON_RUN_EVERY_SECS                    = 0.5;
+
 ######################
 our @EXPORT_OK = qw(
     $ZMQ_CONTEXT
+    $JSON
 
     true false
 
@@ -136,6 +152,9 @@ our @EXPORT_OK = qw(
     $KHAOSPY_PI_CONTROLLER_CONF
     $KHAOSPY_PI_CONTROLLER_CONF_FULLPATH
 
+    $KHAOSPY_GLOBAL_CONF
+    $KHAOSPY_GLOBAL_CONF_FULLPATH
+
     $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
     $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON
@@ -155,6 +174,16 @@ our @EXPORT_OK = qw(
     $MAC_SWITCH_DAEMON_PORT
     $PING_SWITCH_DAEMON_PORT
 
+    $MESSAGES_OVER_SECS_INVALID
+    $MESSAGE_TIMEOUT
+    $ZMQ_REQUEST_TIMEOUT
+
+    $LOCALHOST
+
+    $PI_CONTROLLER_QUEUE_DAEMON_PUBLISH_EVERY_SECS
+    $PI_CONTROLLER_DAEMON_PUBLISH_EVERY_SECS
+    $STATUS_DAEMON_PUBLISH_EVERY_SECS
+    $RULES_DAEMON_RUN_EVERY_SECS
 );
 
 ###############################################################################
@@ -511,6 +540,12 @@ sub boilers_conf {
             /],
 
         },
+    };
+}
+
+sub global_conf {
+    return {
+        log_level => 'debug',
     };
 }
 

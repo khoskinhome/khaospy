@@ -1,4 +1,7 @@
 package Khaospy::PiControllerDaemon;
+use strict;
+use warnings;
+
 # http://stackoverflow.com/questions/6024003/why-doesnt-zeromq-work-on-localhost/8958414#8958414
 # http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
 # http://funcptr.net/2012/09/10/zeromq---edge-triggered-notification/
@@ -18,8 +21,6 @@ So a script that wishes to operate a control needs to have the controller daemon
 If the script wishes to here the results it needs to subscribe to port 5062 of the controller hosts.
 
 =cut
-
-use warnings;
 
 use Exporter qw/import/;
 use Data::Dumper;
@@ -52,8 +53,8 @@ use Khaospy::Constants qw(
 );
 
 use Khaospy::Conf qw(
-    get_controls_conf
     get_pi_controller_conf
+    get_control_config
 );
 
 use Khaospy::Utils qw( timestamp );
@@ -67,8 +68,7 @@ my $JSON = JSON->new->allow_nonref;
 our $VERBOSE;
 
 my $zmq_publisher;
-$controls_conf;
-$pi_controller_conf;
+my $pi_controller_conf;
 
 #######
 # subs
@@ -82,9 +82,7 @@ sub run_controller_daemon {
     print timestamp."Controller Daemon START\n";
     print timestamp."VERBOSE = ".( $VERBOSE ? "TRUE" : "FALSE" )."\n";
 
-    $controls_conf = get_controls_conf();
     $pi_controller_conf = get_pi_controller_conf();
-    #print "\n".Dumper($controls_conf)."\n";
     print "\n".Dumper($pi_controller_conf)."\n";
 
 
@@ -180,24 +178,10 @@ sub controller_message {
 
     # TODO. All this error checking is already in Khaospy::Controls, either rely on that OR factor it out and put it in a common place so both bits of code can call it.
 
-    if ( ! exists $controls_conf->{$control_name} ){
-        print timestamp."ERROR control $control_name doesn't exist in the config\n";
-        return;
-    }
-    my $control = $controls_conf->{$control_name} ;
-
-    if ( ! exists $control->{host} ){
-        print timestamp."ERROR control $control_name doesn't have a host configured\n";
-        return;
-    }
+    my $control = get_control_config($control_name);
 
     if ( $control->{host} ne hostname ) {
         print timestamp."control $control_name is not controlled by this host\n";
-        return;
-    }
-
-    if ( ! exists $control->{type} ){
-        print timestamp."ERROR control $control_name doesn't have a type configured\n";
         return;
     }
 

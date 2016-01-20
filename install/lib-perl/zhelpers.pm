@@ -14,7 +14,7 @@ use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(:all);
 use Time::HiRes qw(usleep);
 
-my $MAX_MSGLEN = 255;
+my $MAX_MSGLEN = 511;
 
 sub s_recv {
     my $socket = shift;
