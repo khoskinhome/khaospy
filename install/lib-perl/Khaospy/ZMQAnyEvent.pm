@@ -5,6 +5,7 @@ use warnings;
 use Exporter qw/import/;
 use Carp qw/croak/;
 
+use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(
     ZMQ_RCVMORE
     ZMQ_SUBSCRIBE
@@ -30,12 +31,12 @@ use Khaospy::Log qw(
     kloginfo  klogdebug
 );
 
-our @EXPORT_OK = qw( anyevent_zmq );
+our @EXPORT_OK = qw( zmq_anyevent );
 
 =head2
 
     params p => {
-        connect   => string to connect to. COMPULSORY.
+        connect_str => string to connect to. COMPULSORY.
         zmq_type  => ZMQ_PUB  , ZMQ_SUB   COMPULSORY.
                      ZMQ_REQ  , ZMQ_REPLY
                      ZMQ_PUSH , ZMQ_PULL
@@ -47,30 +48,34 @@ our @EXPORT_OK = qw( anyevent_zmq );
 
         klog   => true/false . default = false
 
-        worker_ra => array_ref of AnyEvent-worker-array . COMPULSORY.
     }
 
     creates a zmq_socket of specified type.
 
-    connect to zmq_socket.
+    connects to zmq_socket.
 
-    pushes an anyevent_io() to the anyevent-worker-array-ref
+    returns an anyevent_io() to the anyevent-worker-array-ref
 
+    the msg_handler will get called like so :
+
+        $msg_handler->($zmq_sock, zmq_msg_data($recvmsg), $msg_handler_param);
 
 =cut
 
-sub anyevent_zmq{
+sub zmq_anyevent{
     my ($p) = @_;
 
     my $zmq_type = $p->{zmq_type};
-    klogfatal "Need to supply a valid zmq_type"
+    klogfatal "Need to supply a valid zmq_type '$zmq_type'"
         if ( ! $zmq_type
-             || $zmq_type != ZMQ_SUB  || $zmq_type != ZMQ_PUB
-             || $zmq_type != ZMQ_PULL || $zmq_type != ZMQ_PUSH
-             || $zmq_type != ZMQ_REQ  || $zmq_type != ZMQ_REP );
+             || ( $zmq_type != ZMQ_SUB  && $zmq_type != ZMQ_PUB
+               && $zmq_type != ZMQ_PULL && $zmq_type != ZMQ_PUSH
+               && $zmq_type != ZMQ_REQ  && $zmq_type != ZMQ_REP
+             )
+        );
 
     my $connect_str
-        = $p->{connect}
+        = $p->{connect_str}
             or klogfatal "Need to supply a 'connect' string";
 
     my $msg_handler = $p->{msg_handler};
@@ -80,9 +85,6 @@ sub anyevent_zmq{
     my $msg_handler_param = $p->{msg_handler_param};
 
     my $klog = defined $p->{klog} ? $p->{klog} : false ;
-
-    my $worker_ra = $p->{worker_ra};
-    klogfatal "Need to supply a valid worker-ra array-ref\n";
 
     my $zmq_sock = zmq_socket($ZMQ_CONTEXT, $zmq_type);
 
@@ -95,8 +97,7 @@ sub anyevent_zmq{
     my $fh = zmq_getsockopt( $zmq_sock, ZMQ_FD );
     zmq_setsockopt($zmq_sock, ZMQ_SUBSCRIBE, $p->{subscribe} || '');
 
-    push @$worker_ra,
-        anyevent_io(
+    return anyevent_io(
             $fh,
             $zmq_sock,
             $msg_handler,

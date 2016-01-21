@@ -12,10 +12,7 @@ use Sys::Hostname;
 use AnyEvent;
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(
-    ZMQ_RCVMORE
-    ZMQ_FD
     ZMQ_SUB
-    ZMQ_SUBSCRIBE
 );
 
 use FindBin;
@@ -50,6 +47,8 @@ use Khaospy::Log qw(
     DEBUG
 );
 
+use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
+
 use Khaospy::Utils qw( timestamp );
 
 our @EXPORT_OK = qw( run_subscribe_all );
@@ -76,44 +75,22 @@ sub run_subscribe_all {
     my @w;
 
     for my $port ( @subscribe_ports ){
-
-        my $zmq_sock= zmq_socket($ZMQ_CONTEXT, ZMQ_SUB);
-
-        my $connect_str = "tcp://$sub_host:$port";
-        kloginfo "Listening to $connect_str";
-
-        if ( my $zmq_state = zmq_connect($zmq_sock, $connect_str )){
-            croak "zmq can't connect to $connect_str. status = $zmq_state . $!\n";
-        };
-
-#install/lib-perl/Khaospy/OneWireHeatingDaemon.pm:81:        zmq_setsockopt($subscriber, ZMQ_SUBSCRIBE, 'oneWireThermometer');
-
-        my $fh = zmq_getsockopt( $zmq_sock, ZMQ_FD );
-        zmq_setsockopt($zmq_sock, ZMQ_SUBSCRIBE, '');
-
-        push @w, anyevent_io( $fh, $zmq_sock, $port );
+        push @w, zmq_anyevent({
+            zmq_type          => ZMQ_SUB,
+            connect_str       => "tcp://$sub_host:$port",
+            msg_handler       => \&output_msg,
+            msg_handler_param => $port,
+            klog => true,
+        });
     }
 
     my $quit_program = AnyEvent->condvar;
     $quit_program->recv;
 }
 
-sub anyevent_io {
-    my ( $fh, $zmq_sock, $port ) = @_;
-    return AnyEvent->io(
-        fh   => $fh,
-        poll => "r",
-        cb   => sub {
-            while (
-                my $recvmsg = zmq_recvmsg( $zmq_sock, ZMQ_RCVMORE )
-            ){
-                my $msg = zmq_msg_data($recvmsg);
-                kloginfo "$port : $msg";
-
-                #my $msg_decoded = $json->decode( $msgdata );
-            }
-        },
-    );
+sub output_msg {
+    my ($zmq_sock, $msg, $port ) = @_;
+    kloginfo "$port : $msg";
 }
 
 sub get_ports {
