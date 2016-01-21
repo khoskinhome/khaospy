@@ -28,6 +28,7 @@ use Khaospy::PiMCP23017;
 use Khaospy::Utils;
 
 use Khaospy::ZMQSubscribeAllPublishers;
+use Khaospy::ZMQAnyEvent;
 
 use zhelpers;
 
