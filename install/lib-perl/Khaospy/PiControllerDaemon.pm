@@ -2,30 +2,21 @@ package Khaospy::PiControllerDaemon;
 use strict;
 use warnings;
 
-# http://stackoverflow.com/questions/6024003/why-doesnt-zeromq-work-on-localhost/8958414#8958414
-# http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
-# http://funcptr.net/2012/09/10/zeromq---edge-triggered-notification/
-
 =pod
 
 A daemon that runs commands on a PiController and :
 
-    pulls from tcp://master-hosts:5061 for commands.
+    subscribes to all hosts tcp://all-hosts:5061 for commands.
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT = 5061
 
     publishes to tcp://*:5062 what the command did.
     $PI_CONTROLLER_DAEMON_SEND_PORT = 5062
-
-So a script that wishes to operate a control needs to have the controller daemons pulling from its own port 5061.
-
-If the script wishes to here the results it needs to subscribe to port 5062 of the controller hosts.
 
 =cut
 
 use Exporter qw/import/;
 use Data::Dumper;
 use Carp qw/croak/;
-use JSON;
 use Sys::Hostname;
 
 use AnyEvent;
@@ -35,17 +26,19 @@ use ZMQ::Constants qw(
     ZMQ_SUBSCRIBE
     ZMQ_FD
     ZMQ_PUB
-    ZMQ_PULL
+    ZMQ_SUB
 );
 
 use FindBin;
 FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
+use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
 use zhelpers;
 
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
+    $JSON
     true false
     ON OFF STATUS
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
@@ -55,17 +48,18 @@ use Khaospy::Constants qw(
 use Khaospy::Conf qw(
     get_pi_controller_conf
     get_control_config
+    validate_control_msg_fields
 );
 
 use Khaospy::Utils qw( timestamp );
+use Khaospy::Log qw(
+    klogstart klogfatal klogerror
+    klogwarn  kloginfo  klogdebug
+);
 
 our @EXPORT_OK = qw( run_controller_daemon );
 
 our $PUBLISH_STATUS_EVERY_SECS = 5;
-
-my $JSON = JSON->new->allow_nonref;
-
-our $VERBOSE;
 
 my $zmq_publisher;
 my $pi_controller_conf;
@@ -76,42 +70,27 @@ my $pi_controller_conf;
 sub run_controller_daemon {
     my ( $opts ) = @_;
     $opts = {} if ! $opts;
-    $VERBOSE = $opts->{verbose} || false;
 
-    print "#############\n";
-    print timestamp."Controller Daemon START\n";
-    print timestamp."VERBOSE = ".( $VERBOSE ? "TRUE" : "FALSE" )."\n";
+    klogstart "Controller Daemon START";
 
     $pi_controller_conf = get_pi_controller_conf();
-    print "\n".Dumper($pi_controller_conf)."\n";
-
+    kloginfo "Dumper of pi controller conf", $pi_controller_conf;
 
     $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
     my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_SEND_PORT";
     zmq_bind( $zmq_publisher, $pub_to_port );
-    print timestamp. "Publishing to $pub_to_port\n";
-
 
     my @w;
-    #my $zmq_pull_sock={};
 
-    for my $pull_host ( @{$pi_controller_conf->{pull_from_hosts}} ){
-
-        my $zmq_puller= zmq_socket($ZMQ_CONTEXT, ZMQ_PULL);
-
-        my $connect_str = "tcp://$pull_host:$PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT";
-        print timestamp. "Listening to $connect_str\n";
-
-        if ( my $zmq_state = zmq_connect($zmq_puller, $connect_str )){
-            croak "zmq can't connect to $connect_str. status = $zmq_state . $!\n";
-        };
-        # get a non blocking file-handle from zmq:
-        my $fh = zmq_getsockopt( $zmq_puller, ZMQ_FD );
-
-
-        push @w, anyevent_io( $fh, $zmq_puller );
-
-        #$zmq_pull_sock->{$pull_host}  = $zmq_puller;
+    for my $sub_host ( @{$pi_controller_conf->{pull_from_hosts}} ){
+         # ^^^ pull_from_host BAD NAME!
+        push @w, zmq_anyevent({
+            zmq_type          => ZMQ_SUB,
+            host              => $sub_host,
+            port              => $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT,
+            msg_handler       => \&controller_message,
+            klog              => true,
+        });
     }
 
     push @w, AnyEvent->timer(
@@ -125,34 +104,12 @@ sub run_controller_daemon {
 
 }
 
-sub anyevent_io {
-    my ( $fh, $zmq_puller ) = @_;
-    return AnyEvent->io(
-        fh   => $fh,
-        poll => "r",
-        cb   => sub {
-            while (
-                my $recvmsg = zmq_recvmsg( $zmq_puller, ZMQ_RCVMORE )
-            ){
-                controller_message(zmq_msg_data($recvmsg));
-            }
-        },
-    );
-}
-
 sub timer_cb {
-
-    print "in timer ".time."\n";
-    #zmq_sendmsg ( $zmq_publisher, "in the timer" );
-
+    klogdebug "in timer ";
 }
 
 sub controller_message {
-    my ($msg) = @_ ;
-
-    print "$msg\n";
-    #my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
-    # ^^^ can't get $topic working in perl yet. TODO
+    my ($zmq_sock, $msg, $param ) = @_;
 
     #zmq_sendmsg ( $zmq_publisher, "the status of whatever the control did" );
 
@@ -160,37 +117,50 @@ sub controller_message {
     eval{$msg_decoded = $JSON->decode( $msg );};
 
     if ($@) {
-        print "ERROR. JSON decode of message failed. \n$@\n";
+        klogerror "ERROR. JSON decode of message failed. $@";
         return;
     }
 
-    my $epoch_time
-        = $msg_decoded->{EpochTime};
-    my $control_name
-        = $msg_decoded->{Control};
-    my $home_auto_class
-        = $msg_decoded->{HomeAutoClass}; # Why do I need HomeAutoClass ? TODO probably deprecate this.
-    my $action
-        = $msg_decoded->{Action};
+    my $epoch_time   = $msg_decoded->{epoch_time};
+    my $control_name = $msg_decoded->{control_name};
+    my $control_host = $msg_decoded->{control_host};
+    my $action       = $msg_decoded->{action};
+    my $request_host = $msg_decoded->{request_host};
 
-    print "\n".timestamp."Message received. '$control_name' '$action' \n";
-    print Dumper($msg_decoded)."\n" if $VERBOSE;
-
-    # TODO. All this error checking is already in Khaospy::Controls, either rely on that OR factor it out and put it in a common place so both bits of code can call it.
+    kloginfo  "Message received. '$control_name' '$action'";
+    klogdebug "Message Dump", ($msg_decoded);
 
     my $control = get_control_config($control_name);
 
     if ( $control->{host} ne hostname ) {
-        print timestamp."control $control_name is not controlled by this host\n";
+        kloginfo "control $control_name is not controlled by this host";
         return;
     }
 
+    my $status ;
+
     if ( $control->{type} eq 'pi-gpio-relay'){
-        return operate_pi_gpio_relay($control_name,$control, $action);
+        $status = operate_pi_gpio_relay($control_name,$control, $action);
+    } else {
+
+        klogerror "Control $control_name with type $control->{type} could be invalid. Or maybe it hasn't been programmed yet. Some are still TODO\n";
+        return;
     }
 
-    print timestamp."ERROR control $control_name with type $control->{type} could be invalid. Or maybe it hasn't been programmed yet. Some are still TODO\n";
-    return;
+    my $msg = {
+      epoch_time    => $epoch_time,
+      control_name  => $control_name,
+      control_host  => $control_host,
+      action        => $action,
+      request_host  => $request_host,
+      status        => $status,
+    };
+
+    validate_control_msg_fields($msg);
+
+    my $json_msg = $JSON->encode($msg);
+
+    zhelpers::s_send( $zmq_publisher, "$json_msg" );
 
 }
 
@@ -199,10 +169,11 @@ sub operate_pi_gpio_relay {
 
     # TODO this should go into Khaospy::PiGPIO module.
 
-    print "OPERATE $control_name with $action\n";
+    kloginfo "OPERATE $control_name with $action";
 
+    # this error checking should be in the Khaospy::Conf error checking.
     if (! exists $control->{gpio_wiringpi} ){
-        print timestamp."ERROR control $control_name, type $control->{type}, doesn't have a key 'gpio_wiringpi'\n";
+        klogerror "Control $control_name, type $control->{type}, doesn't have a key 'gpio_wiringpi'\n";
         return;
     }
 
@@ -215,13 +186,13 @@ sub operate_pi_gpio_relay {
     ##pi@pitest ~ $ gpio write 4 1
     #
     my $cmd_gpio = "/usr/bin/gpio";
-    print (timestamp.`$cmd_gpio mode $gpio_wiringpi out`."\n");
+    kloginfo `$cmd_gpio mode $gpio_wiringpi out`;
 
 
     if ($action eq STATUS){
-        # TODO this needs to be published.
-        print (timestamp."$control_name status is ".qx("$cmd_gpio read $gpio_wiringpi")."\n");
-        return ;
+        kloginfo "$control_name status is ".qx("$cmd_gpio read $gpio_wiringpi");
+        # need to return the PROPER status
+        return ON; # HACK FIX THIS
     }
 
     my $send_number = $action;
@@ -242,8 +213,10 @@ sub operate_pi_gpio_relay {
 
     system("$cmd_gpio write $gpio_wiringpi $send_number");
     # TODO this needs to be published.
-    print (timestamp."$control_name status is ".qx("$cmd_gpio read $gpio_wiringpi")."\n");
+    kloginfo "$control_name status is ".qx("$cmd_gpio read $gpio_wiringpi");
 
+    # need to return the PROPER status
+    return OFF; # hack fix this
 
 }
 

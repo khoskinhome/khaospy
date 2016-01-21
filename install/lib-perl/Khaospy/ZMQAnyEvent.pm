@@ -5,14 +5,15 @@ use warnings;
 use Exporter qw/import/;
 use Carp qw/croak/;
 
+use AnyEvent;
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(
     ZMQ_RCVMORE
     ZMQ_SUBSCRIBE
     ZMQ_FD
-    ZMQ_SUB  ZMQ_PUB
-    ZMQ_PULL ZMQ_PUSH
-    ZMQ_REQ  ZMQ_REP
+    ZMQ_SUB
+    ZMQ_PULL
+    ZMQ_REP
 );
 
 use FindBin;
@@ -21,9 +22,7 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
-    $JSON
     true false
-    ON OFF STATUS
 );
 
 use Khaospy::Log qw(
@@ -36,10 +35,9 @@ our @EXPORT_OK = qw( zmq_anyevent );
 =head2
 
     params p => {
-        connect_str => string to connect to. COMPULSORY.
-        zmq_type  => ZMQ_PUB  , ZMQ_SUB   COMPULSORY.
-                     ZMQ_REQ  , ZMQ_REPLY
-                     ZMQ_PUSH , ZMQ_PULL
+        host => Host. COMPULSORY.
+        port => Port. COMPULSORY.
+        zmq_type  => ZMQ_SUB or ZMQ_REP or ZMQ_PULL. COMPULSORY.
 
         subscribe => 'channel'. defaults to ''
 
@@ -47,14 +45,13 @@ our @EXPORT_OK = qw( zmq_anyevent );
         msg_handler_param => scalar. Gets passed to msg_handler subroutine. OPTIONAL.
 
         klog   => true/false . default = false
-
     }
 
     creates a zmq_socket of specified type.
 
     connects to zmq_socket.
 
-    returns an anyevent_io() to the anyevent-worker-array-ref
+    returns the AnyEvent->io() that needs to be held in a @worker / $worker variable.
 
     the msg_handler will get called like so :
 
@@ -68,15 +65,22 @@ sub zmq_anyevent{
     my $zmq_type = $p->{zmq_type};
     klogfatal "Need to supply a valid zmq_type '$zmq_type'"
         if ( ! $zmq_type
-             || ( $zmq_type != ZMQ_SUB  && $zmq_type != ZMQ_PUB
-               && $zmq_type != ZMQ_PULL && $zmq_type != ZMQ_PUSH
-               && $zmq_type != ZMQ_REQ  && $zmq_type != ZMQ_REP
+             || ( $zmq_type != ZMQ_SUB
+               && $zmq_type != ZMQ_PULL
+               && $zmq_type != ZMQ_REP
              )
         );
 
-    my $connect_str
-        = $p->{connect_str}
-            or klogfatal "Need to supply a 'connect' string";
+    my $host
+        = $p->{host}
+            or klogfatal "Need to supply a 'host'";
+
+    my $port
+        = $p->{port}
+            or klogfatal "Need to supply a 'port'";
+
+    # do i need to have tcp protocol parameterised ?
+    my $connect_str = "tcp://$host:$port";
 
     my $msg_handler = $p->{msg_handler};
     klogfatal "Need to supply a valid msg_handler\n"
@@ -97,17 +101,6 @@ sub zmq_anyevent{
     my $fh = zmq_getsockopt( $zmq_sock, ZMQ_FD );
     zmq_setsockopt($zmq_sock, ZMQ_SUBSCRIBE, $p->{subscribe} || '');
 
-    return anyevent_io(
-            $fh,
-            $zmq_sock,
-            $msg_handler,
-            $msg_handler_param
-    );
-
-}
-
-sub anyevent_io {
-    my ( $fh, $zmq_sock, $msg_handler, $msg_handler_param ) = @_;
     return AnyEvent->io(
         fh   => $fh,
         poll => "r",

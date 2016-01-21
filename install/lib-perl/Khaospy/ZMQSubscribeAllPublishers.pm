@@ -77,10 +77,11 @@ sub run_subscribe_all {
     for my $port ( @subscribe_ports ){
         push @w, zmq_anyevent({
             zmq_type          => ZMQ_SUB,
-            connect_str       => "tcp://$sub_host:$port",
+            host              => $sub_host,
+            port              => $port,
             msg_handler       => \&output_msg,
             msg_handler_param => $port,
-            klog => true,
+            klog              => true,
         });
     }
 

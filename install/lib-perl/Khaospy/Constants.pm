@@ -435,7 +435,7 @@ sub controls_conf {
         },
         boiler => {
             type => "pi-gpio-relay",
-            host => 'piboiler', # FIX THIS it will be piboiler when running.
+            host => 'pitest', # FIX THIS it will be piboiler when running.
             gpio_wiringpi => 4, # NOT the BCM CPIO number.
             invert_state => true,
         },

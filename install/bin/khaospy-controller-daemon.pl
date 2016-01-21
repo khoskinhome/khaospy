@@ -15,12 +15,9 @@ use Khaospy::Constants qw(
     true false
 );
 
-use Getopt::Long;
+#use Getopt::Long;
+#GetOptions ( );
 
-my $VERBOSE = false;
-
-GetOptions ( "verbose" => \$VERBOSE );
-
-run_controller_daemon( { verbose => $VERBOSE } );
+run_controller_daemon( { } );
 
 exit 0;
