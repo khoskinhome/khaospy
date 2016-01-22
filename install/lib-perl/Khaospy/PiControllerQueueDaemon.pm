@@ -49,7 +49,7 @@ use Khaospy::Constants qw(
     $JSON
     true false
     ON OFF STATUS
-    $PI_RULES_DAEMON_SEND_PORT
+    $PI_CONTROL_SEND_PORT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
     $PI_CONTROLLER_QUEUE_DAEMON_PUBLISH_EVERY_SECS
     $LOCALHOST
@@ -81,7 +81,7 @@ sub run_controller_queue_daemon {
 
     my $zmq_reply_sock= zmq_socket($ZMQ_CONTEXT, ZMQ_REP);
 
-    my $connect_str = "tcp://$LOCALHOST:$PI_RULES_DAEMON_SEND_PORT";
+    my $connect_str = "tcp://$LOCALHOST:$PI_CONTROL_SEND_PORT";
     klog(INFO, "Listening (REP) to $connect_str");
 
     if ( my $zmq_state = zmq_connect($zmq_reply_sock, $connect_str )){
@@ -130,7 +130,7 @@ sub timer_cb {
         klog(INFO, "Publish message $msg_queue->{$mkey}{json}");
         zmq_sendmsg( $zmq_publisher, $msg_queue->{$mkey}{json} );
 
-        if ( $msg_rh->{epoch_time} < time - $MESSAGE_TIMEOUT ){
+        if ( $msg_rh->{request_epoch_time} < time - $MESSAGE_TIMEOUT ){
             klog(ERROR, "Msg timed out. $mkey");
             delete $msg_queue->{$mkey};
         }

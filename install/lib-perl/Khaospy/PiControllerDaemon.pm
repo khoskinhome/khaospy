@@ -14,6 +14,7 @@ A daemon that runs commands on a PiController and :
 
 =cut
 
+use Time::HiRes qw/usleep time/;
 use Exporter qw/import/;
 use Data::Dumper;
 use Carp qw/croak/;
@@ -121,11 +122,11 @@ sub controller_message {
         return;
     }
 
-    my $epoch_time   = $msg_decoded->{epoch_time};
-    my $control_name = $msg_decoded->{control_name};
-    my $control_host = $msg_decoded->{control_host};
-    my $action       = $msg_decoded->{action};
-    my $request_host = $msg_decoded->{request_host};
+    my $request_epoch_time = $msg_decoded->{request_epoch_time};
+    my $control_name       = $msg_decoded->{control_name};
+    my $control_host       = $msg_decoded->{control_host};
+    my $action             = $msg_decoded->{action};
+    my $request_host       = $msg_decoded->{request_host};
 
     kloginfo  "Message received. '$control_name' '$action'";
     klogdebug "Message Dump", ($msg_decoded);
@@ -148,12 +149,13 @@ sub controller_message {
     }
 
     my $msg = {
-      epoch_time    => $epoch_time,
-      control_name  => $control_name,
-      control_host  => $control_host,
-      action        => $action,
-      request_host  => $request_host,
-      status        => $status,
+      request_epoch_time => $request_epoch_time,
+      control_name       => $control_name,
+      control_host       => $control_host,
+      action             => $action,
+      request_host       => $request_host,
+      action_epoch_time  => time,
+      status             => $status,
     };
 
     validate_control_msg_fields($msg);

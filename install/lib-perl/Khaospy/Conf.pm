@@ -212,19 +212,19 @@ sub validate_control_msg_fields {
 
     my ( $msg_rh ) = @_;
 
-    my $epoch_time   = $msg_rh->{epoch_time};
-    my $control_name = $msg_rh->{control_name};
-    my $control_host = $msg_rh->{control_host};
-    my $action       = $msg_rh->{action};
-    my $request_host = $msg_rh->{request_host};
+    my $request_epoch_time = $msg_rh->{request_epoch_time};
+    my $control_name       = $msg_rh->{control_name};
+    my $control_host       = $msg_rh->{control_host};
+    my $action             = $msg_rh->{action};
+    my $request_host       = $msg_rh->{request_host};
 
     my $control = get_control_config($control_name);
 
-    if ( ! $epoch_time ){
-        croak "ERROR message has invalid epoch_time";
+    if ( ! $request_epoch_time ){
+        croak "ERROR message has invalid request_epoch_time";
     }
 
-    if ( $epoch_time < time - $MESSAGES_OVER_SECS_INVALID ){
+    if ( $request_epoch_time < time - $MESSAGES_OVER_SECS_INVALID ){
         croak "ERROR message is over $MESSAGES_OVER_SECS_INVALID seconds old";
     }
 
@@ -245,7 +245,7 @@ sub validate_control_msg_fields {
 #    }
 
     # return "mkey" ( message-key ) :
-    return "$control_name|$control_host|$action|$request_host|$epoch_time";
+    return "$control_name|$control_host|$action|$request_host|$request_epoch_time";
 }
 
 sub validate_action {

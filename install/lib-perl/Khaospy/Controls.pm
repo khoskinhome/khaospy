@@ -35,7 +35,7 @@ use Khaospy::Constants qw(
     ON OFF STATUS
     $KHAOSPY_CONTROLS_CONF_FULLPATH
 
-    $PI_RULES_DAEMON_SEND_PORT
+    $PI_CONTROL_SEND_PORT
 
     $ZMQ_REQUEST_TIMEOUT
 );
@@ -56,7 +56,7 @@ our $verbose = false;
 
 my $zmq_context   = $ZMQ_CONTEXT;
 my $zmq_req_sock = zmq_socket($zmq_context,ZMQ_REQ);
-my $req_to_port = "tcp://*:$PI_RULES_DAEMON_SEND_PORT";
+my $req_to_port = "tcp://*:$PI_CONTROL_SEND_PORT";
 zmq_bind( $zmq_req_sock, $req_to_port );
 
 sub signal_control {
@@ -96,11 +96,11 @@ sub _picontroller_command {
     my $host = $control->{host};
 
     my $msg = {
-          epoch_time    => time,
-          control_name  => $control_name,
-          control_host  => $host,
-          action        => $action,
-          request_host  => hostname,
+          request_epoch_time => time,
+          control_name       => $control_name,
+          control_host       => $host,
+          action             => $action,
+          request_host       => hostname,
     };
 
     validate_control_msg_fields($msg);
