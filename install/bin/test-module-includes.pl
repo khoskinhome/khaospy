@@ -9,7 +9,7 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Conf;
 use Khaospy::Constants;
-use Khaospy::Controls;
+use Khaospy::OperateControls;
 
 use Khaospy::BoilerDaemon;
 use Khaospy::BoilerMessage;

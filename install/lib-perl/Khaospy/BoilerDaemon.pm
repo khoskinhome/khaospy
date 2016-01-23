@@ -24,7 +24,7 @@ use Khaospy::Constants qw(
     $KHAOSPY_BOILERS_CONF_FULLPATH
 );
 
-use Khaospy::Controls qw( signal_control );
+use Khaospy::OperateControls qw( signal_control );
 
 use Khaospy::Conf qw( get_boiler_conf );
 

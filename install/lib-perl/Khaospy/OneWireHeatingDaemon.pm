@@ -29,7 +29,7 @@ use Khaospy::Constants qw(
     $ONE_WIRE_DAEMON_PORT
 );
 
-use Khaospy::Controls qw(
+use Khaospy::OperateControls qw(
     signal_control
 );
 

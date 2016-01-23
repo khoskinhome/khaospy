@@ -15,7 +15,7 @@ use Khaospy::Constants qw(
     STATUS
 );
 
-use Khaospy::Controls qw/signal_control/;
+use Khaospy::OperateControls qw/signal_control/;
 
 my $json = JSON->new->allow_nonref;
 

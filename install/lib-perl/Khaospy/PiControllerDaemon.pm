@@ -243,8 +243,8 @@ sub fatal_invalid_pi_gpio {
     klogfatal "gpio number can only be 0 to 7" if $gpio_num !~ /^[0-7]$/;
 }
 
-# these helper subs need to be in a Khaospy::Controls module,
-# that is when the current Khaospy::Controls.pm is renamed to Khaospy::OperateControl.pm
+# these helper subs need to be in a Khaospy::OperateControls module,
+# that is when the current Khaospy::OperateControls.pm is renamed to Khaospy::OperateControl.pm
 
 # Stating possibly the "bleedin' obvious,
 # ON eq "on" , and OFF eq "off"

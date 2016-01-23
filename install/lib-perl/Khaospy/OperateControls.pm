@@ -1,4 +1,4 @@
-package Khaospy::Controls;
+package Khaospy::OperateControls;
 use strict;
 use warnings;
 
@@ -79,7 +79,7 @@ sub signal_control {
 sub _orvibo_command {
     my ( $control_name, $action ) = @_;
 
-    print "Khaospy::Controls run orviboS20 command '$control_name $action'\n" if $verbose;
+    print "Khaospy::OperateControls run orviboS20 command '$control_name $action'\n" if $verbose;
 
     my $control = get_control_config($control_name);
     # for orviboS20 only :
@@ -96,7 +96,7 @@ sub _orvibo_command {
 sub _picontroller_command {
     my ( $control_name, $action ) = @_;
 
-    print "Khaospy::Controls PRETEND RUN PICONTROLLER COMMAND $control_name $action\n";
+    print "Khaospy::OperateControls PRETEND RUN PICONTROLLER COMMAND $control_name $action\n";
 
     my $control = get_control_config($control_name);
     my $host = $control->{host};

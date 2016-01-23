@@ -8,7 +8,7 @@ use warnings;
 
 =pod PiControllerQueueDaemon
 
-Receive's REQuests from Khaospy::Controls for Pi-run-controls
+Receive's REQuests from Khaospy::OperateControls for Pi-run-controls
 
 Queues the requests, and publishes them for a period of time.
 
