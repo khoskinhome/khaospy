@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Exporter qw/import/;
-use Carp qw/croak/;
+use Carp qw/confess/;
 use Sys::Hostname;
 use Data::Dumper;
 
@@ -69,7 +69,7 @@ sub klog {
     $log_level_val = 4 if ! $log_level_val;
 
     if (! exists $type_to_val->{$type} ){
-        croak "Illegal log type of $type\n";
+        confess "Illegal log type of $type\n";
     }
 
     my $line = timestamp."|".uc($type)."|".hostname."|$msg|";
@@ -77,7 +77,7 @@ sub klog {
     $line .= "\n";
 
     if ( $type eq "fatal" ) {
-        croak $line;
+        confess $line;
     }
 
     my $tval = $type_to_val->{$type};

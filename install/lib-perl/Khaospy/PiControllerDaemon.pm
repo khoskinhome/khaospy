@@ -38,6 +38,7 @@ use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
 use zhelpers;
 
 use Khaospy::Constants qw(
+    $PI_GPIO_CMD
     $ZMQ_CONTEXT
     $JSON
     true false
@@ -47,8 +48,10 @@ use Khaospy::Constants qw(
 );
 
 use Khaospy::Conf qw(
-    get_pi_controller_conf
     get_control_config
+);
+
+use Khaospy::Message qw(
     validate_control_msg_fields
 );
 
@@ -58,15 +61,18 @@ use Khaospy::Log qw(
     klogwarn  kloginfo  klogdebug
 );
 
+use Khaospy::PiHostPublishers qw(
+    get_pi_controller_queue_daemon_hosts
+);
+
 our @EXPORT_OK = qw( run_controller_daemon );
 
 our $PUBLISH_STATUS_EVERY_SECS = 5;
 
-my $zmq_publisher;
-my $pi_controller_conf;
+# TODO use this to log messages received and only action them once.
+# my $msg_received = {};
 
-#######
-# subs
+my $zmq_publisher;
 
 sub run_controller_daemon {
     my ( $opts ) = @_;
@@ -74,17 +80,14 @@ sub run_controller_daemon {
 
     klogstart "Controller Daemon START";
 
-    $pi_controller_conf = get_pi_controller_conf();
-    kloginfo "Dumper of pi controller conf", $pi_controller_conf;
-
     $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
     my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_SEND_PORT";
     zmq_bind( $zmq_publisher, $pub_to_port );
 
     my @w;
 
-    for my $sub_host ( @{$pi_controller_conf->{pull_from_hosts}} ){
-         # ^^^ pull_from_host BAD NAME!
+    for my $sub_host ( @{get_pi_controller_queue_daemon_hosts()} ){
+
         push @w, zmq_anyevent({
             zmq_type          => ZMQ_SUB,
             host              => $sub_host,
@@ -95,18 +98,20 @@ sub run_controller_daemon {
     }
 
     push @w, AnyEvent->timer(
-        after    => 0.1,
+        after    => 0.1, # TODO. MAGIC NUMBER . should be in Constants.pm or a json-config. dunno. but not here.
         interval => $PUBLISH_STATUS_EVERY_SECS,
         cb       => \&timer_cb
     );
 
     my $quit_program = AnyEvent->condvar;
     $quit_program->recv;
-
 }
 
 sub timer_cb {
     klogdebug "in timer ";
+
+    # TODO clean up $msg_received with messages over timeout.
+
 }
 
 sub controller_message {
@@ -140,7 +145,10 @@ sub controller_message {
 
     my $status ;
 
-    if ( $control->{type} eq 'pi-gpio-relay'){
+# TODO check in msg_received has already been actioned. 
+
+
+    if ( $control->{type} eq 'pi-gpio-relay' ){
         $status = operate_pi_gpio_relay($control_name,$control, $action);
     } else {
 
@@ -148,7 +156,7 @@ sub controller_message {
         return;
     }
 
-    my $msg = {
+    my $return_msg = {
       request_epoch_time => $request_epoch_time,
       control_name       => $control_name,
       control_host       => $control_host,
@@ -158,18 +166,20 @@ sub controller_message {
       status             => $status,
     };
 
-    validate_control_msg_fields($msg);
+# TODO log msg just actioned in :
+#    $msg_received = {};
 
-    my $json_msg = $JSON->encode($msg);
+    validate_control_msg_fields($return_msg);
+
+    my $json_msg = $JSON->encode($return_msg);
 
     zhelpers::s_send( $zmq_publisher, "$json_msg" );
 
 }
 
+# TODO the xxx_pi_gpio_xxx subs should go into Khaospy::PiGPIO module.
 sub operate_pi_gpio_relay {
     my ($control_name,$control, $action) = @_;
-
-    # TODO this should go into Khaospy::PiGPIO module.
 
     kloginfo "OPERATE $control_name with $action";
 
@@ -179,280 +189,101 @@ sub operate_pi_gpio_relay {
         return;
     }
 
-    my $gpio_wiringpi = $control->{gpio_wiringpi};
+    my $gpio_num = $control->{gpio_wiringpi};
 
-    ##pi@pitest ~ $ gpio mode 1 out
-    ##pi@pitest ~ $ gpio mode 4 out
-    ##pi@pitest ~ $ gpio write 1 0
-    ##pi@pitest ~ $ gpio write 1 1
-    ##pi@pitest ~ $ gpio write 4 1
-    #
-    my $cmd_gpio = "/usr/bin/gpio";
-    kloginfo `$cmd_gpio mode $gpio_wiringpi out`;
+    # Initialising port IN or OUT
+    # should be done when PiControllerDaemon first starts :
+    init_pi_gpio($gpio_num, "out");
 
+    write_pi_gpio($gpio_num, trans_ON_to_true(invert_state($control,$action)))
+        if $action ne STATUS;
 
-    if ($action eq STATUS){
-        kloginfo "$control_name status is ".qx("$cmd_gpio read $gpio_wiringpi");
-        # need to return the PROPER status
-        return ON; # HACK FIX THIS
-    }
-
-    my $send_number = $action;
-
-    if ($action eq ON){
-        $send_number = true
-    } elsif ($action eq OFF){
-        $send_number = false
-    }
-
-    # should use proper "complement" here ... its late...
-    # TODO need to use the invert_state on both the send_number and what "read" returns.
-
-    if ( exists $control->{invert_state} && $control->{invert_state} ){
-        if ( $send_number ) { $send_number = false }
-        else { $send_number = true }
-    }
-
-    system("$cmd_gpio write $gpio_wiringpi $send_number");
-    # TODO this needs to be published.
-    kloginfo "$control_name status is ".qx("$cmd_gpio read $gpio_wiringpi");
-
-    # need to return the PROPER status
-    return OFF; # hack fix this
-
+    return
+        trans_true_to_ON(
+            invert_state($control,read_pi_gpio($gpio_num))
+        );
 }
 
-#sub operate_boiler {
-#    my ($boiler_name, $control, $action) = @_;
-#
-#    print timestamp."Operate boiler '$boiler_name'. set control '$control' to '$action'\n";
-#
-#    my $boiler_state = $BOILER_STATUS->{$boiler_name};
-#
-#    # update the boiler's controls with the latest control-action.
-#    $boiler_state->{controls}{$control}=$action;
-#
-#    print "Controls are \n".Dumper($boiler_state->{controls}) if $VERBOSE;
-#
-#    # Is at least one of the boiler's controls on ? :
-#    my @controls_now_on = grep { $boiler_state->{controls}{$_} eq ON }
-#        keys %{$boiler_state->{controls}};
-#
-#    print timestamp."Boiler '$boiler_name' currently has the controls 'on' :".Dumper( \@controls_now_on );
-#
-#    if ( @controls_now_on ){
-#        if ( $boiler_state->{current_status} eq OFF
-#        ){
-#            if ( ! exists $boiler_state->{boiler_next_on_at} ) {
-#                $boiler_state->{boiler_next_on_at}
-#                    = $boiler_state->{on_delay_secs} + time ;
-#            }
-#            print timestamp."Boiler '$boiler_name' is scheduled to go on at "
-#                .timestamp($boiler_state->{boiler_next_on_at})."\n";
-#        } else {
-#            print timestamp."Boiler '$boiler_name' is already on\n";
-#        }
-#
-#        return;
-#    }
-#
-#    print timestamp."TURN BOILER '$boiler_name' OFF\n";
-#
-#    _sig_a_control ( $boiler_name, OFF, \$boiler_state->{current_status} );
-#    print timestamp."Boiler '$boiler_name' is now ".$boiler_state->{current_status}."\n";
-#
-#    delete $boiler_state->{boiler_next_on_at};
-#
-#    if ( $boiler_state->{current_status} eq OFF ) {
-#        $boiler_state->{last_time_off} = time;
-#    } else {
-#        print timestamp."ERROR. Boiler '$boiler_name' is not OFF\n";
-#    }
-#}
-#
-#sub boiler_check_next_on_at {
-#    # checks all boilers and see if there is a "boiler_next_on_at" set that is now valid.
-#    print "boiler_check_next_on_at ..\n" if $VERBOSE;
-#    for my $boiler_name ( keys %$BOILER_STATUS ){
-#        my $boiler_state =  $BOILER_STATUS->{$boiler_name};
-#
-#        if ( $boiler_state->{boiler_next_on_at}
-#            && $boiler_state->{boiler_next_on_at} < time
-#        ){
-#            print timestamp."TURN BOILER '$boiler_name' ON ( scheduled "
-#                .timestamp($boiler_state->{boiler_next_on_at}).")\n";
-#
-#            _sig_a_control ( $boiler_name, ON, \$boiler_state->{current_status} );
-#            print timestamp."Boiler '$boiler_name' is now ".$boiler_state->{current_status}."\n";
-#
-#            if ( $boiler_state->{current_status} eq ON ) {
-#
-#                delete $boiler_state->{boiler_next_on_at};
-#                $boiler_state->{last_time_on} = time;
-#
-#            } else {
-#                print timestamp."ERROR. Boiler '$boiler_name' is not ON\n";
-#            }
-#        }
-#    }
-#}
-#
-#sub get_boiler_name_for_control {
-#    # goes through the $BOILER_STATUS and looks for a control.
-#    # returns either the boiler_name or undef.
-#
-#    # will croak if 2 or more boilers have the same sub-control.
-#
-#    my ($control) = @_;
-#
-#    my @boiler_list;
-#    for my $boiler_name ( keys %$BOILER_STATUS ) {
-#        push @boiler_list, map { $boiler_name }
-#                grep { $control eq $_ }
-#                keys %{$BOILER_STATUS->{$boiler_name}{controls}}
-#        ;
-#    }
-#
-#    croak "More than one boiler is configured to use control '$control'\n"
-#            .Dumper(\@boiler_list)
-#            ."please fix $KHAOSPY_BOILERS_CONF_FULLPATH\n"
-#        if  @boiler_list > 1;
-#
-#    return $boiler_list[0] if $boiler_list[0];
-#    return;
-#}
-#
-#sub init_BOILER_STATUS {
-#    # clones the boiler_conf into BOILER_STATUS,
-#    # Then munges the "controls" array-ref to be a hash-ref that holds the "controls" state.
-#
-#    print "init boiler status\n" if $VERBOSE;
-#
-#    my $boiler_conf = get_boiler_conf();
-#
-#    print "Boiler-conf :\n".Dumper ( $boiler_conf ) if $VERBOSE ;
-#
-#    $BOILER_STATUS = clone($boiler_conf);
-#
-#    for my $boiler_name ( keys %$boiler_conf ){
-#        my $boiler_state =  $BOILER_STATUS->{$boiler_name};
-#
-#        # munging controls array to be a hash
-#        $boiler_state->{controls}
-#             = { map { $_ => undef }
-#                @{$boiler_conf->{$boiler_name}{controls}} } ;
-#
-#        $boiler_state->{last_time_on}  = 0; # Jan 1st 1970 WFM !!
-#        $boiler_state->{last_time_off} = 0;
-#
-#        _sig_a_control ( $boiler_name, STATUS ,\$boiler_state->{current_status} );
-#
-#        $boiler_state->{last_time_on}    = time
-#            if ( $boiler_state->{current_status} eq ON );
-#
-#        $boiler_state->{last_time_off}   = time
-#            if ( $boiler_state->{current_status} eq OFF );
-#    };
-#
-#    refresh_boiler_status();
-#}
-#
-#sub refresh_boiler_status {
-#    # refresh the controls from directly signalling the control
-#
-#    print timestamp."Refresh BOILER_STATUS\n";
-#
-#    for my $boiler_name ( keys %$BOILER_STATUS){
-#
-#        my $boiler_state =  $BOILER_STATUS->{$boiler_name};
-#
-#        _sig_a_control ( $boiler_name, STATUS ,\$boiler_state->{current_status} );
-#
-#        for my $control ( keys %{$boiler_state->{controls}} ) {
-#            _sig_a_control ( $control, STATUS, \$boiler_state->{controls}{$control} );
-#        }
-#    };
-#
-#    print "boiler-status = ".Dumper($BOILER_STATUS) if $VERBOSE;
-#
-#    $BOILER_STATUS_LAST_REFRESH = time;
-#}
-#
-#sub _sig_a_control {
-#    my ( $control, $action, $update_scalar_ref ) = @_;
-#
-#    my $ret;
-#    eval { $ret = signal_control( $control, $action ); };
-#
-#    if ( $@ ) {
-#        print timestamp."Error signalling control '$control' with '$action'. $@\n";
-#        ${$update_scalar_ref} = undef ; # should this be OFF ?
-#    } else {
-#        ${$update_scalar_ref} = $ret;
-#    }
-#}
+# For the initialisation, reading and writing of Pi GPIO pins.
+# I should possibly use https://github.com/WiringPi/WiringPi-Perl
+# but that needs compiling etc. No CPAN module. hmmm.
+# From the CLI this init, read and write are done like so :
+#  /usr/bin/gpio mode  4 out
+#  /usr/bin/gpio write 4 0
+#  /usr/bin/gpio write 4 1
+#  /usr/bin/gpio read  4
 
+sub init_pi_gpio {
+    my ($gpio_num, $IN_OUT) = @_;
+    $IN_OUT = lc( $IN_OUT );
+    fatal_invalid_pi_gpio($gpio_num);
+    klogfatal "Can only set a Pi GPIO mode ($IN_OUT) to 'in' or 'out'"
+        if $IN_OUT ne "in" and $IN_OUT ne "out";
 
-=pod
+    system("$PI_GPIO_CMD mode $gpio_num $IN_OUT");
+}
 
-The Boiler daemon has a conf of all the heating controls that are associated with the boilers.
+sub read_pi_gpio {
+    my ($gpio_num) = @_;
+    fatal_invalid_pi_gpio($gpio_num);
+    my $r = qx( $PI_GPIO_CMD read $gpio_num );
+    chomp $r;
+    return $r;
+}
 
-$conf = {
-            'boiler-central-heating' => {
-                'on_delay_secs' => 120,
-                'controls' => [
-                    'alisonrad',
-                    'karlrad',
-                    'ameliarad',
-                    'dinningroomrad'
-                ]
-            },
-            'another-boiler-in-a-big-house' => {
-                on_delay_secs => 120,
-                'controls' => [
-                    'huge-mansion-room-rad',
-                ]
-            }
-        };
+sub write_pi_gpio {
+    my ($gpio_num, $val) = @_;
+    fatal_invalid_pi_gpio($gpio_num);
+    system("$PI_GPIO_CMD write $gpio_num $val");
+    return;
+}
 
+sub fatal_invalid_pi_gpio {
+    my ($gpio_num) = @_;
+    klogfatal "gpio number can only be 0 to 7" if $gpio_num !~ /^[0-7]$/;
+}
 
-Thermometer-monitor-daemons
-###########################
+# these helper subs need to be in a Khaospy::Controls module,
+# that is when the current Khaospy::Controls.pm is renamed to Khaospy::OperateControl.pm
 
-The the various thermometer monitor daemons publish to a zero-mq-port the current state of any thermometer that has an associated control to the boiler daemon.
+# Stating possibly the "bleedin' obvious,
+# ON eq "on" , and OFF eq "off"
+# true == 1 , false == 0
+# These subs translate both ways from ON to true and OFF to false.
 
-The boiler-daemon listens to the zero-mq-ports of the various thermometer-monitor-daemons for json messages structured like :
-    {
-      EpochTime'     => '1451416995.77076',
-      HomeAutoClass' => 'boilerControl',
-      Control'       => 'a-control-name',
-      Action         => 'on'
-    };
+sub trans_true_to_ON { # and false to OFF
+    my ($truefalse) = @_;
+    return ON  if $truefalse == true;
+    return OFF if $truefalse == false;
+    klogfatal "Can't translate a non true or false value ($truefalse) to ON or OFF";
+}
 
-The boiler-daemon, with its config, has the knowledge of which if any of controls published by the thermometer-monitor deamons are radiator-controls for which the boiler-daemon has to switch on the boilers it is configured to control.
+sub trans_ON_to_true { # and OFF to false
+    my ($ONOFF) = @_;
+    return true  if $ONOFF eq ON;
+    return false if $ONOFF eq OFF;
+    klogfatal "Can't translate a non ON or OFF value ($ONOFF) to true or false";
+}
+sub invert_state {
+    # if a control has "invert_state" option set then this
+    # inverts both ON/OFF and true/false
+    my ( $control, $val ) = @_;
 
-The boiler-daemon ignores any messages for controls that it doesn't know about.
+    return $val
+        if ! exists $control->{invert_state}
+            || $control->{invert_state} eq false ;
 
-boiler ON or OFF.
-################
+    if ( $val eq ON || $val eq OFF ){
 
-When all of the rad-controls for a specific boiler are off then the boiler is immediately be switched off.
+        return ($val eq ON) ? OFF : ON ;
 
-If the boiler is in the off state, and one or more of the controls switches on, then due to the radiator-actuators taking a couple of minutes to operate, the boiler-daemon will wait for on_delay_secs before it switches on.
+    } elsif ($val eq true or $val eq false) {
 
-You need to time the operation of a radiator-actuator-valve to get this time. The ones I have take about 2 minutes to fully open. You do not want the boiler pumping hot-water with all the valves off. ( Usually there is always at least one radiator that is fully open to stop the boiler pump trying to push water around a fully closed system )
+        return ( $val ) ? false : true ;
 
-If all the rads go into the off state , the boiler will be switched off immediately. ( pump-over-run might be in operation on the boiler )
+    }
 
-Only 1 boiler-daemon will run . This is enforced by daemon-runner ( not yet implemented ).
-
-The boiler daemon will work out the hosts of the thermometer-monitor-daemons it has to subscribe to from the daemon-runner conf. This is not yet implemented, and the boiler-daemon currently has to run on the same host as the thermometer-monitor-daemons.
-
-=cut
-
-#############################################################
-# Zero-mq with AnyEvent code examples got from :
-# http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
-
+    klogfatal "Unrecognised value ($val) passed to invert_state()";
+}
 
 1;

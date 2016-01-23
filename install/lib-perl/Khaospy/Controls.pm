@@ -2,12 +2,15 @@ package Khaospy::Controls;
 use strict;
 use warnings;
 
-# used for sending a signal to a control.
-# either signals orviboS20 directly or puts a message on a Queue Daemon for PiControls.
+# TODO . This needs renaming to Khaospy::OperateControl
+# ( So Khaospy::Control package name can be used for something else )
+#
+# Used for sending a signal to a control.
+#
+# either signals orviboS20 directly or ZMQ_REQs the Khaospy::PiControlQueueDaemon with a message.
 
 # exports one method, signal_control.
 
-# NOT TO BE USED in Khaospy::PiControllerDaemon
 use Sys::Hostname;
 use Exporter qw/import/;
 use Data::Dumper;
@@ -41,8 +44,11 @@ use Khaospy::Constants qw(
 );
 
 use Khaospy::Conf qw(
-    validate_action
     get_control_config
+);
+
+use Khaospy::Message qw(
+    validate_action
     validate_control_msg_fields
 );
 
@@ -114,5 +120,6 @@ sub _picontroller_command {
     zhelpers::s_send( $zmq_req_sock, "$json_msg" );
     return zhelpers::s_recv($zmq_req_sock);
 }
+
 
 1;

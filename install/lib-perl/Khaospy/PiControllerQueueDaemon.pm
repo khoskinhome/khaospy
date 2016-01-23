@@ -30,6 +30,7 @@ use ZMQ::Constants qw(
     ZMQ_SUBSCRIBE
     ZMQ_FD
     ZMQ_PUB
+    ZMQ_SUB
     ZMQ_REP
 );
 
@@ -39,7 +40,7 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use zhelpers;
 
-use Khaospy::Conf qw/
+use Khaospy::Message qw/
     validate_control_msg_json
     validate_control_msg_fields
 /;
@@ -50,13 +51,26 @@ use Khaospy::Constants qw(
     true false
     ON OFF STATUS
     $PI_CONTROL_SEND_PORT
+    $PI_CONTROLLER_DAEMON_SEND_PORT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
     $PI_CONTROLLER_QUEUE_DAEMON_PUBLISH_EVERY_SECS
     $LOCALHOST
     $MESSAGE_TIMEOUT
 );
 
-use Khaospy::Log qw/ klog START FATAL ERROR WARN INFO DEBUG /;
+use Khaospy::PiHostPublishers qw(
+    get_pi_controller_daemon_hosts
+);
+
+use Khaospy::ZMQAnyEvent qw(
+    zmq_anyevent
+);
+
+use Khaospy::Log qw(
+    klog START FATAL ERROR WARN INFO DEBUG
+    kloginfo
+);
+
 our @EXPORT_OK = qw( run_controller_queue_daemon );
 
 my $msg_queue = {};
@@ -72,25 +86,35 @@ sub run_controller_queue_daemon {
     klog(START,"Controller Queue Daemon START");
     klog(START,"VERBOSE = ".( $VERBOSE ? "TRUE" : "FALSE" ));
 
+    my @w;
+
+    # Listen for messages to go onto the queue.
+    push @w, zmq_anyevent({
+        zmq_type          => ZMQ_REP,
+        host              => $LOCALHOST,
+        port              => $PI_CONTROL_SEND_PORT,
+        msg_handler       => \&queue_message,
+        klog              => true,
+    });
+
+    # Publisher to push the queue out to controllers.
     $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
     my $pub_to_port = "tcp://*:$PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT";
     zmq_bind( $zmq_publisher, $pub_to_port );
     klog(INFO, "Publishing to $pub_to_port");
 
-    my @w;
 
-    my $zmq_reply_sock= zmq_socket($ZMQ_CONTEXT, ZMQ_REP);
-
-    my $connect_str = "tcp://$LOCALHOST:$PI_CONTROL_SEND_PORT";
-    klog(INFO, "Listening (REP) to $connect_str");
-
-    if ( my $zmq_state = zmq_connect($zmq_reply_sock, $connect_str )){
-        klog(FATAL, "zmq can't connect to $connect_str. status = $zmq_state. $!");
-    };
-
-    my $fh = zmq_getsockopt( $zmq_reply_sock, ZMQ_FD );
-
-    push @w, anyevent_io( $fh, $zmq_reply_sock, \&queue_message );
+    # Listen for the Controllers return messages.
+    for my $sub_host ( @{get_pi_controller_daemon_hosts()} ){
+        push @w, zmq_anyevent({
+            zmq_type          => ZMQ_SUB,
+            host              => $sub_host,
+            port              => $PI_CONTROLLER_DAEMON_SEND_PORT,
+            msg_handler       => \&message_from_controller,
+            msg_handler_param => "JUNK",
+            klog              => true,
+        });
+    }
 
     push @w, AnyEvent->timer(
         after    => 0.1,
@@ -102,21 +126,6 @@ sub run_controller_queue_daemon {
     my $quit_program = AnyEvent->condvar;
     $quit_program->recv;
 
-}
-
-sub anyevent_io {
-    my ( $fh, $zmq_sock, $msg_handler ) = @_;
-    return AnyEvent->io(
-        fh   => $fh,
-        poll => "r",
-        cb   => sub {
-            while (
-                my $recvmsg = zmq_recvmsg( $zmq_sock, ZMQ_RCVMORE )
-            ){
-                $msg_handler->($zmq_sock, zmq_msg_data($recvmsg));
-            }
-        },
-    );
 }
 
 sub timer_cb {
@@ -137,8 +146,23 @@ sub timer_cb {
     }
 }
 
+sub message_from_controller {
+    my ($zmq_sock, $msg, $param ) = @_;
+
+    kloginfo "$param FROM CONTROLLER : $msg";
+
+    my $mkey = validate_control_msg_json($msg)->{mkey};
+
+    if ( exists $msg_queue->{$mkey} ){
+        kloginfo "Deleting message $mkey";
+        delete $msg_queue->{$mkey};
+    } else {
+        kloginfo "Don't have message $mkey in queue";
+    }
+}
+
 sub queue_message {
-    my ($zmq_sock, $msg) = @_ ;
+    my ($zmq_sock, $msg, $param ) = @_;
 
     klog(INFO, "Queuing message $msg");
     #my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
@@ -160,15 +184,6 @@ sub queue_message {
     # publish this message for control-daemons to grab :
     klog(DEBUG, "Publish (first) message $msg");
     zmq_sendmsg( $zmq_publisher, $msg );
-
-}
-
-sub message_acknowleged_by_controller {
-    my ($msg) = @_ ;
-    # needs to be subscribed to all the control-daemons.
-    klog(INFO, "Control Daemon Acknowledges message $msg");
-    #my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
-
 }
 
 1;

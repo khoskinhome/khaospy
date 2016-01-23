@@ -33,7 +33,6 @@ our @EXPORT_OK = qw(
     get_hashval
 );
 
-# This to be deprecated from here once every print is a "log" (Khaospy::Log)
 sub timestamp { return strftime("%F %T", gmtime( $_[0] || time) )." "; }
 
 sub slurp {
@@ -49,6 +48,9 @@ sub burp {
     print $fh @_ ;
 }
 
+
+# TODO this is going to be done PiHostPublishers.pm
+# this code needs moving there.
 sub get_one_wire_sender_hosts {
 
     my $daemon_runner_conf = $json->decode(

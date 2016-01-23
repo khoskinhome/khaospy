@@ -54,8 +54,6 @@ our @EXPORT_OK = qw( run_subscribe_all );
 
 our $LOGLEVEL;
 
-my $pi_controller_conf;
-
 sub run_subscribe_all {
     my ( $opts ) = @_;
     $opts = {} if ! $opts;

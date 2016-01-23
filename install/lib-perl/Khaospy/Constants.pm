@@ -6,6 +6,9 @@ use JSON;
 use Exporter qw/import/;
 
 use ZMQ::LibZMQ3;
+
+our $PI_GPIO_CMD = "/usr/bin/gpio";
+
 our $ZMQ_CONTEXT = zmq_init();
 our $JSON = JSON->new->allow_nonref;
 
@@ -22,6 +25,7 @@ sub STATUS  { "status" };
 our $STATUS = STATUS();
 
 our $CODE_VERSION="0.01.001";
+
 #######
 # dirs
 
@@ -66,8 +70,6 @@ our $KHAOSPY_ALL_CONFS = {
         = "controls.json"               => controls_conf(),
     our $KHAOSPY_BOILERS_CONF
         = "boilers.json"                => boilers_conf(),
-    our $KHAOSPY_PI_CONTROLLER_CONF
-        = "pi_controller.json"          => pi_controller_daemon(),
     our $KHAOSPY_GLOBAL_CONF
         = "global.json"                 => global_conf(),
 };
@@ -84,9 +86,6 @@ our $KHAOSPY_CONTROLS_CONF_FULLPATH
 our $KHAOSPY_BOILERS_CONF_FULLPATH
     = "$KHAOSPY_CONF_DIR/$KHAOSPY_BOILERS_CONF";
 
-our $KHAOSPY_PI_CONTROLLER_CONF_FULLPATH
-    = "$KHAOSPY_CONF_DIR/$KHAOSPY_PI_CONTROLLER_CONF";
-
 our $KHAOSPY_GLOBAL_CONF_FULLPATH
     = "$KHAOSPY_CONF_DIR/$KHAOSPY_GLOBAL_CONF";
 
@@ -94,6 +93,8 @@ our $KHAOSPY_GLOBAL_CONF_FULLPATH
 our $HEATING_CONTROL_DAEMON_PUBLISH_PORT = 5021;
 
 our $ONE_WIRE_DAEMON_PORT                 = 5001;
+
+# TOOD PI_CONTROL_SEND_PORT needs renaming to PI_OPERATE_CONTROL_SEND_PORT
 our $PI_CONTROL_SEND_PORT                 = 5063;
 our $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT = 5061;
 our $PI_CONTROLLER_DAEMON_SEND_PORT       = 5062;
@@ -115,6 +116,9 @@ our $RULES_DAEMON_RUN_EVERY_SECS                    = 0.5;
 
 ######################
 our @EXPORT_OK = qw(
+
+    $PI_GPIO_CMD
+
     $ZMQ_CONTEXT
     $JSON
 
@@ -147,9 +151,6 @@ our @EXPORT_OK = qw(
 
     $KHAOSPY_BOILERS_CONF
     $KHAOSPY_BOILERS_CONF_FULLPATH
-
-    $KHAOSPY_PI_CONTROLLER_CONF
-    $KHAOSPY_PI_CONTROLLER_CONF_FULLPATH
 
     $KHAOSPY_GLOBAL_CONF
     $KHAOSPY_GLOBAL_CONF_FULLPATH
@@ -217,18 +218,6 @@ sub daemon_runner_conf {
 #            "$KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT",
         ],
 
-    };
-}
-
-sub pi_controller_daemon {
-    return {
-        pull_from_hosts => [qw/
-            pitest
-            piold
-            piserver
-            piloft
-            piboiler
-        /],
     };
 }
 
