@@ -398,35 +398,134 @@ sub heating_thermometer_config {
 sub controls_conf {
     ## TODO find a way of using the host name from /etc/hosts to get the ip and mac.
     return {
+
+        'therm-alison-door' => {
+            type          => "onewire-thermometer",
+            alias         => 'Alison',
+            onewire_addr  => '28-0000066ebc74'  ,
+        },
+        'therm-playhouse' => {
+            type          => "onewire-thermometer",
+            alias         => 'Playhouse-tv',
+            onewire_addr  => '28-000006e04e8b' ,
+        },
+        'therm-playhouse-door' => {
+            type          => "onewire-thermometer",
+            alias         => 'Playhouse-9e-door',
+            onewire_addr  => '28-0000066fe99e' ,
+        },
+        'therm-bathroom' => {
+            type          => "onewire-thermometer",
+            alias         => 'Bathroom',
+            onewire_addr  => '28-00000670596d'  ,
+        },
+        'therm-loft' => {
+            type          => "onewire-thermometer",
+            alias         => 'Loft',
+            onewire_addr  => '28-021463277cff'  ,
+        },
+        'therm-amelia-door' => {
+            type          => "onewire-thermometer",
+            alias         => 'Amelia',
+            onewire_addr  => '28-0214632d16ff',
+        },
+        'therm-upstairs-landing' => {
+            type          => "onewire-thermometer",
+            alias         => 'Upstairs-Landing',
+            onewire_addr  => '28-021463423bff',
+        },
+        'therm-outside-front-drive' => {
+            type          => "onewire-thermometer",
+            alias         => 'Outside-front-drive',
+            onewire_addr  => '28-000006e04d3c',
+        },
+        'therm-boiler-ch-in-cold' => {
+            type          => "onewire-thermometer",
+            alias         => 'boiler-ch-in-cold',
+            onewire_addr  => '28-000006e00a67',
+        },
+        'therm-boiler-ch-out-hot' => {
+            type          => "onewire-thermometer",
+            alias         => 'boiler-ch-out-hot',
+            onewire_addr  => '28-0114632f89ff',
+        },
+        'therm-boiler-wh-in-cold' => {
+            type          => "onewire-thermometer",
+            alias         => 'boiler-wh-in-cold',
+            onewire_addr  => '28-0414688dbfff',
+        },
+        'therm-boiler-wh-out-hot' => {
+            type          => "onewire-thermometer",
+            alias         => 'boiler-wh-out-hot',
+            onewire_addr  => '28-011465cb13ff',
+        },
+        'therm-boiler-room' => {
+            type          => "onewire-thermometer",
+            alias         => 'boiler-room',
+            onewire_addr  => '28-031463502eff',
+        },
+        'therm-front-room' => {
+            type          => "onewire-thermometer",
+            alias         => 'front-room',
+            onewire_addr  => '28-0214630558ff',
+        },
+        'therm-front-porch' => {
+            type          => "onewire-thermometer",
+            alias         => 'front-porch',
+            onewire_addr  => '28-000006cafb0d',
+        },
+        'therm-dining-room-near-boiler' => {
+            type          => "onewire-thermometer",
+            alias         => 'dining-room',
+            onewire_addr  => '28-0000066ff2ac',
+        },
+
         alisonrad       => {
-            type => "orviboS20",
-            host => 'alisonrad',
-            mac  => 'AC:CF:23:72:D1:FE',
+            alias => 'Alison Radiator',
+            type  => "orviboS20",
+            host  => 'alisonrad',
+            mac   => 'AC:CF:23:72:D1:FE',
         },
         ameliarad       => {
-            type => "orviboS20",
-            host => 'ameliarad',
-            mac  => 'AC-CF-23-72-F3-D4',
+            alias => 'Amelia Radiator',
+            type  => "orviboS20",
+            host  => 'ameliarad',
+            mac   => 'AC-CF-23-72-F3-D4',
         },
         karlrad         => {
-            type => "orviboS20",
-            host => 'karlrad',
-            mac  => 'AC-CF-23-8D-7E-D2',
+            alias => 'Karl Radiator',
+            type  => "orviboS20",
+            host  => 'karlrad',
+            mac   => 'AC-CF-23-8D-7E-D2',
         },
         dinningroomrad  => {
-            type => "orviboS20",
-            host => 'dinningroomrad',
-            mac  => 'AC-CF-23-8D-A4-8E',
+            alias => 'Dining Room Radiator',
+            type  => "orviboS20",
+            host  => 'dinningroomrad',
+            mac   => 'AC-CF-23-8D-A4-8E',
         },
         frontroomrad    => {
-            type => "orviboS20",
-            host => 'frontroomrad',
-            mac  => 'AC-CF-23-8D-3B-96',
+            alias => 'Front Room Radiator',
+            type  => "orviboS20",
+            host  => 'frontroomrad',
+            mac   => 'AC-CF-23-8D-3B-96',
         },
+
+
+#        broken_frontroomrad    => {
+#            alias => 'Front Room Radiator',
+#            type  => "orviboS20",
+#            host  => 'frontroomrad',
+#            mac   => 'ACCF-23-8D-3B-96',
+#            extra => "bah",
+#
+#        },
+
         boiler => {
-            type => "pi-gpio-relay",
-            host => 'pitest', # FIX THIS it will be piboiler when running.
-            gpio_wiringpi => 4, # NOT the BCM CPIO number.
+            alias => 'Boiler Central Heating',
+            type  => "pi-gpio-relay",
+            host  => 'pitest', # FIX THIS it will be piboiler when running.
+            gpio_relay   => 4, # NOT the BCM CPIO number.
             invert_state => true,
         },
 
@@ -532,15 +631,6 @@ sub boilers_conf {
 sub global_conf {
     return {
         log_level => 'debug',
-    };
-}
-
-sub alarm_switches_conf {
-
-    die "alarm_switches_conf NOT YET IMPLEMENTED\n";
-
-    return {
-
     };
 }
 

@@ -1,15 +1,14 @@
 package Khaospy::Log;
 use strict;
 use warnings;
+use FindBin;
+FindBin::again();
+use lib "$FindBin::Bin/../lib-perl";
 
 use Exporter qw/import/;
 use Carp qw/confess/;
 use Sys::Hostname;
 use Data::Dumper;
-
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Conf qw/get_global_conf/;
 use Khaospy::Utils qw/timestamp/;

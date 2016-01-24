@@ -1,9 +1,13 @@
 package Khaospy::OperateControls;
 use strict;
 use warnings;
+use FindBin;
+FindBin::again();
+use lib "$FindBin::Bin/../lib-perl";
 
-# TODO . This needs renaming to Khaospy::OperateControl
-# ( So Khaospy::Control package name can be used for something else )
+# TODO . This needs renaming to either :
+# Khaospy::OperateControlRequest
+# Khaospy::ControlRequest
 #
 # Used for sending a signal to a control.
 #
@@ -14,8 +18,6 @@ use warnings;
 use Sys::Hostname;
 use Exporter qw/import/;
 use Data::Dumper;
-use Carp qw/croak/;
-use JSON;
 
 use Time::HiRes qw/usleep time/;
 
@@ -24,15 +26,10 @@ use ZMQ::Constants qw(
     ZMQ_REQ
 );
 
-my $json = JSON->new->allow_nonref;
-
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
-
 use zhelpers;
 
 use Khaospy::Constants qw(
+    $JSON
     $ZMQ_CONTEXT
     true false
     ON OFF STATUS
@@ -52,13 +49,15 @@ use Khaospy::Message qw(
     validate_control_msg_fields
 );
 
-use Khaospy::OrviboS20  qw//;
+use Khaospy::Log qw(
+    kloginfo
+);
+
+use Khaospy::OrviboS20;
 
 our @EXPORT_OK = qw(
     signal_control
 );
-
-our $verbose = false;
 
 my $zmq_context   = $ZMQ_CONTEXT;
 my $zmq_req_sock = zmq_socket($zmq_context,ZMQ_REQ);
@@ -79,14 +78,9 @@ sub signal_control {
 sub _orvibo_command {
     my ( $control_name, $action ) = @_;
 
-    print "Khaospy::OperateControls run orviboS20 command '$control_name $action'\n" if $verbose;
+    kloginfo "Khaospy::OperateControls run orviboS20 command '$control_name $action'";
 
     my $control = get_control_config($control_name);
-    # for orviboS20 only :
-    if ( ! exists $control->{mac} ){
-        croak "ERROR in config. Control '$control_name' doesn't have a 'mac' configured\n"
-            ."   see $KHAOSPY_CONTROLS_CONF_FULLPATH\n";
-    }
 
     return Khaospy::OrviboS20::signal_control(
         $control->{host} , $control->{mac}, $action
@@ -99,19 +93,18 @@ sub _picontroller_command {
     print "Khaospy::OperateControls PRETEND RUN PICONTROLLER COMMAND $control_name $action\n";
 
     my $control = get_control_config($control_name);
-    my $host = $control->{host};
 
     my $msg = {
           request_epoch_time => time,
           control_name       => $control_name,
-          control_host       => $host,
+          control_host       => $control->{host},
           action             => $action,
           request_host       => hostname,
     };
 
     validate_control_msg_fields($msg);
 
-    my $json_msg = $json->encode($msg);
+    my $json_msg = $JSON->encode($msg);
 
     # TODO a $ZMQ_REQUEST_TIMEOUT on the following
     # and if it times out then log an error message.

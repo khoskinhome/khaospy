@@ -183,13 +183,7 @@ sub operate_pi_gpio_relay {
 
     kloginfo "OPERATE $control_name with $action";
 
-    # this error checking should be in the Khaospy::Conf error checking.
-    if (! exists $control->{gpio_wiringpi} ){
-        klogerror "Control $control_name, type $control->{type}, doesn't have a key 'gpio_wiringpi'\n";
-        return;
-    }
-
-    my $gpio_num = $control->{gpio_wiringpi};
+    my $gpio_num = $control->{gpio_relay};
 
     # Initialising port IN or OUT
     # should be done when PiControllerDaemon first starts :
