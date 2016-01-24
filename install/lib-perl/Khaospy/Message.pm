@@ -16,7 +16,7 @@ use Khaospy::Constants qw(
     $MESSAGES_OVER_SECS_INVALID
 );
 
-use Khaospy::Conf qw(
+use Khaospy::Conf::Controls qw(
     get_control_config
 );
 

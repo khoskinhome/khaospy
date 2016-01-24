@@ -47,7 +47,7 @@ use Khaospy::Constants qw(
     $PI_CONTROLLER_DAEMON_SEND_PORT
 );
 
-use Khaospy::Conf qw(
+use Khaospy::Conf::Controls qw(
     get_control_config
 );
 
@@ -145,7 +145,7 @@ sub controller_message {
 
     my $status ;
 
-# TODO check in msg_received has already been actioned. 
+# TODO check in msg_received has already been actioned. Is this necessary? 
 
 
     if ( $control->{type} eq 'pi-gpio-relay' ){

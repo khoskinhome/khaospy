@@ -40,7 +40,7 @@ use Khaospy::Constants qw(
     $ZMQ_REQUEST_TIMEOUT
 );
 
-use Khaospy::Conf qw(
+use Khaospy::Conf::Controls qw(
     get_control_config
 );
 

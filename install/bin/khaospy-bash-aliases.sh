@@ -32,3 +32,5 @@ alias bashrc='. ~/.bashrc'
 alias la='ls --color=auto -la'
 alias lart='ls --color=auto -lart'
 alias l1='ls --color=auto -1'
+
+cd /opt/khaospy/bin

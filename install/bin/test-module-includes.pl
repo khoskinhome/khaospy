@@ -8,6 +8,9 @@ FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Conf;
+use Khaospy::Conf::Controls;
+use Khaospy::Conf::HardCoded;
+
 use Khaospy::Constants;
 use Khaospy::OperateControls;
 

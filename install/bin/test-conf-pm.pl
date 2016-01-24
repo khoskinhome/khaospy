@@ -7,7 +7,7 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use Data::Dumper;
 
-use Khaospy::Conf qw/get_controls_conf/;
+use Khaospy::Conf::Controls qw/get_controls_conf/;
 
 my $c = get_controls_conf;
 
