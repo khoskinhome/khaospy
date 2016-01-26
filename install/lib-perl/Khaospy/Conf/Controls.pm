@@ -5,6 +5,8 @@ use FindBin;
 FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
+
+use Try::Tiny;
 use Carp qw/confess croak/;
 use Data::Dumper;
 use Exporter qw/import/;
@@ -23,6 +25,7 @@ our @EXPORT_OK = qw(
     get_controls_conf
     get_control_config
 );
+
 
 # ALL Control must have a key called "type".
 # The $types below names the only keys allowed for each "type" of control
@@ -44,15 +47,24 @@ my $check_boolean = check_regex(qr/^[01]$/);
 # to try and work out its model and revision.
 # This would then need to work out when GPIOs are used for other functions. SPI/I2C etc.
 #
-# The first 8 gpios are generally available on all Pi-s. ( 0-7 )
-# I guess one easy way for me to code this is to allow an override in the config, on a
-# per-pi-host basis. TODO , what I've just said.
+# The first 8 gpios are generally available on all Pi-s, ( 0-7 ), all the way back to the first Pi in 2012.
+# 
+# I guess one easy way for me to code this is to allow an override in the config, on a per-pi-host basis. TODO , what I've just said.
+# So, not in the control config, but in a pi-host config as option something like :
+# { hostname => {
+#        valid_gpio => [0,1,2,3,4,5,6,7,8,9,10,11,12]
+# }
 
-# Also a gpio should only be used once per host.
-# so this should be checked to.
-# Going to need more than a regex.
-# Need to keep track of what host has used gpio pins
-my $check_pi_gpio = check_regex(qr/^[0-7]$/);
+######################################
+# Checking the values of the Pi i2cBus
+######################################
+# for the Pi-i2cBus, this needs to be configured on a per-pi-host basis.
+# sometimes the bus is 0 , sometimes its 1 . If you muck around with wiring and other stuff, its possible to run them both.
+#
+# So a config option something like :
+# { hostname => {
+#        valid_i2c_bus => [0,1,2,3,4,5,6,7,8,9,10,11,12]
+# }
 
 my $check_types = {
     "orvibos20" => {
@@ -71,20 +83,20 @@ my $check_types = {
         host            => \&check_host_runs_pi_controls,
         ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
-        gpio_relay      => $check_pi_gpio,
-        gpio_detect     => $check_pi_gpio,
+        gpio_relay      => \&check_pi_gpio,
+        gpio_detect     => \&check_pi_gpio,
     },
     "pi-gpio-relay" => {
         alias           => \&check_optional,
         host            => \&check_host_runs_pi_controls,
         invert_state    => $check_boolean,
-        gpio_relay      => $check_pi_gpio,
+        gpio_relay      => \&check_pi_gpio,
     },
     "pi-gpio-switch" => {
         alias           => \&check_optional,
         host            => \&check_host_runs_pi_controls,
         invert_state    => $check_boolean,
-        gpio_switch     => $check_pi_gpio,
+        gpio_switch     => \&check_pi_gpio,
     },
     "pi-mcp23017-relay-manual" => {
         alias           => \&check_optional,
@@ -117,6 +129,8 @@ my $check_types = {
         host            => \&check_host,
     }
 };
+
+get_controls_conf();
 
 my $controls_conf;
 
@@ -153,12 +167,17 @@ sub _validate_controls_conf {
     my $collate_errors = '';
 
     for my $control_name ( keys %$controls_conf ){
-        eval{check_config($control_name);};
-        check_config($control_name);
-        $collate_errors .= "$@\n" if $@;
+        try {
+            check_config($control_name)
+        } catch {
+            $collate_errors .= "$_\n";
+        }
     }
 
-    croak $collate_errors if $collate_errors;
+    croak "Errors checking the controls config".
+        " $KHAOSPY_CONTROLS_CONF_FULLPATH\n\n".
+        "$collate_errors\n"
+            if $collate_errors;
 }
 
 sub check_config {
@@ -166,35 +185,41 @@ sub check_config {
 
     my $control = $controls_conf->{$control_name};
 
-    croak "ERROR in config. Control '$control_name' doesn't have a 'type' key\n"
-        ."   see $KHAOSPY_CONTROLS_CONF_FULLPATH\n"
+    die "Control '$control_name' doesn't have a 'type' key"
         if ! exists $control->{type};
 
     my $type_from_file = lc($control->{type});
 
-    croak "ERROR in config. Control '$control_name' has an invalid 'type' of $type_from_file\n"
-        ."   see $KHAOSPY_CONTROLS_CONF_FULLPATH\n"
+    die "Control '$control_name' has an invalid 'type' of $type_from_file"
         if ! exists $check_types->{$type_from_file};
+
+
+    my $collate_errors = '';
 
     my $chk_type = $check_types->{$type_from_file};
     $chk_type->{type} = ''; # to make the List::Compare work
 
     my $lc = List::Compare->new ( '-u', [ keys %$chk_type ], [ keys %$control ] );
     if ( ! $lc->is_LequivalentR && ! $lc->is_RsubsetL ){
-        croak "The control '$control_name' has unknown keys in the config ( ".join ("," , $lc->get_Ronly)." )";
+        $collate_errors .= "Control '$control_name' has unknown keys in the config ( ".join ("," , $lc->get_Ronly)." )\n";
     } else {
-        # so no extra keys in $control . Good.
+        # No extra keys in $control. Good.
         delete $chk_type->{type}; # only needed for List::Compare.
         for my $chk ( keys %$chk_type ) {
-            $chk_type->{$chk}->($control_name, $control, $chk);
+            try {
+                $chk_type->{$chk}->($control_name, $control, $chk);
+            } catch {
+                $collate_errors .= "$_\n";
+            }
         }
     }
+    die $collate_errors if $collate_errors;
 }
 
 sub check_exists {
     my ($control_name, $control, $chk, $extra ) = @_;
-    croak "ERROR control $control_name doesn't have a $chk configured. $extra"
-        ."   see $KHAOSPY_CONTROLS_CONF_FULLPATH\n"
+    $extra = "" if ! $extra;
+    die "Control '$control_name' doesn't have a '$chk' configured. $extra"
         if ! exists $control->{$chk};
 }
 
@@ -202,10 +227,10 @@ sub check_regex {
     my ($regex) = @_;
     return sub {
         my ($control_name, $control, $chk, $extra) = @_;
+        $extra = "" if ! $extra;
         check_exists(@_);
         my $val = $control->{$chk};
-        croak "ERROR control $control_name has an invalid $chk ($val) configured. $extra"
-            ."   see $KHAOSPY_CONTROLS_CONF_FULLPATH\n"
+        die "Control '$control_name' has an invalid '$chk' ($val) configured. $extra"
             if ( $val !~ $regex );
     }
 }
@@ -214,7 +239,7 @@ sub check_host {
     my ($control_name, $control, $chk) = @_;
     check_exists(@_);
     my $val = $control->{$chk};
-    # TODO could check if its resolvable.
+    # TODO could check if the host is resolvable.
 }
 
 sub check_host_runs_pi_controls {
@@ -225,13 +250,29 @@ sub check_host_runs_pi_controls {
     # that run pi-controller-daemons.
 }
 
+
+sub check_pi_gpio {
+    my ($control_name, $control, $chk) = @_;
+    check_exists(@_);
+    my $val = $control->{$chk};
+    check_regex(qr/^[0-7]$/)->(@_);
+
+    my $uniq = "host=$control->{host}|gpio=$val";
+
+    die "Control '$control_name' is using the same "
+        ."pi_gpio as control '$pi_gpio_unique->{$uniq}'"
+        .". unique-key = '$uniq'"
+        if exists $pi_gpio_unique->{$uniq};
+
+    $pi_gpio_unique->{$uniq} = $control_name;
+}
+
 sub check_pi_mcp23017 {
     my ($control_name, $control, $chk) = @_;
     check_exists(@_);
     my $val = $control->{$chk};
 
-    croak "ERROR control $control_name has an invalid $chk ($val) configured. Should be a hashref"
-        ."   see $KHAOSPY_CONTROLS_CONF_FULLPATH\n"
+    die "Control '$control_name' has an invalid '$chk' ($val) configured. Should be a hashref"
         if ( ref $val ne 'HASH' );
 
     # need to check the sub keys.
@@ -243,7 +284,7 @@ sub check_pi_mcp23017 {
     # Need to keep track of what mcp23017 gpios have been used on a host basis.
     # The unique key is :
     #   host | i2c_bus | i2c_addr | portname | portnum
-    # A gpio can only be used for one control.
+    # A gpio can only be used for one control. OBVIOUSLY !
 
     my $uniq = "host=".$control->{host}
           ."|i2c_bus=".$control->{$chk}{i2c_bus}
@@ -251,20 +292,17 @@ sub check_pi_mcp23017 {
           ."|portname".lc($control->{$chk}{portname})
           ."|portnum".$control->{$chk}{portnum};
 
-    croak "ERROR control $control_name is using the same "
-        ."pi_mcp23017 gpio as control ".$pi_mcp23017_unique->{$uniq}
-        .". unique-key = ".$uniq
+    die "Control '$control_name' is using the same "
+        ."pi_mcp23017 gpio as control '$pi_mcp23017_unique->{$uniq}'"
+        .". unique-key = '$uniq'"
         if exists $pi_mcp23017_unique->{$uniq};
 
     $pi_mcp23017_unique->{$uniq} = $control_name;
 }
 
 sub check_optional {
-    # do absolutely "nuffin" !
+    # Do absolutely "nuffin MATE !"
+    # aka "null op".
 }
-
-
-
-
 
 1;

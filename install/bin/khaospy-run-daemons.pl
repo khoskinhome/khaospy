@@ -1,19 +1,18 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use FindBin;
+FindBin::again();
+use lib "$FindBin::Bin/../lib-perl";
+
 use Data::Dumper;
 
 # This script should be run at least every 2 mins from the root crontab.
 # TODO insist this script is run as root.
 
-use JSON;
-
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
-
 use Khaospy::Utils qw/slurp/;
 use Khaospy::Constants qw(
+    $JSON
     $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
     $KHAOSPY_LOG_DIR
     $KHAOSPY_PID_DIR
@@ -23,8 +22,7 @@ use Sys::Hostname qw/hostname/;
 my $thishost = hostname;
 print "This host is $thishost\n";
 
-my $json = JSON->new->allow_nonref;
-my $conf = $json->decode( slurp ($KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH) );
+my $conf = $JSON->decode( slurp ($KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH) );
 
 if ( ! exists $conf->{$thishost} ) {
     print "This hostname $thishost not found in the config file"
