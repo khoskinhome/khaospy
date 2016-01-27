@@ -4,6 +4,14 @@ use warnings;
 use FindBin;
 FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
+# by Karl Kount-Khaos Hoskin. 2015-2016
+
+# Reads in most of the confs once.
+#
+# Some confs are read in every once in a while,
+# so they can change whilst the daemons are running.
+#
+# The rest of Khaospy should get to the confs from here.
 
 use Carp qw/confess croak/;
 use Data::Dumper;
@@ -29,9 +37,6 @@ our @EXPORT_OK = qw(
     get_global_conf
 );
 
-# reads in the confs once, unless it is a conf that can change whilst the daemons
-# are running. confs are thus got from a method/sub
-
 {
     my $daemon_runner_conf;
 
@@ -52,7 +57,7 @@ our @EXPORT_OK = qw(
     sub get_one_wire_heating_control_conf {
         # reload the thermometer conf every 5 mins.
         if ( ! $therm_conf
-            or $therm_conf_last_loaded + 20 < time  # TODO FIX THIS BACK TO 300 SECONDS.
+            or $therm_conf_last_loaded + 20 < time # TODO. Magic number. needs going into a conf or constant, somewhere.
         ) {
             $therm_conf = $JSON->decode(
                  Khaospy::Utils::slurp( $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH )
@@ -88,6 +93,5 @@ our @EXPORT_OK = qw(
         return $global_conf;
     }
 }
-
 
 1;

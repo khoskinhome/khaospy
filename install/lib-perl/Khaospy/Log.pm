@@ -40,7 +40,7 @@ our @EXPORT_OK = qw(
         DEBUG
 
     format of a log line :
-        timestamp|type|host|message
+        timestamp|type|host|pid|message
 
 =cut
 
@@ -71,7 +71,7 @@ sub klog {
         confess "Illegal log type of $type\n";
     }
 
-    my $line = timestamp."|".uc($type)."|".hostname."|$msg|";
+    my $line = timestamp."|".uc($type)."|".hostname."|$$|$msg|";
     $line .= "Dump :\n".Dumper($dump) if $dump;
     $line .= "\n";
 
