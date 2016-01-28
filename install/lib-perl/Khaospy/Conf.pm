@@ -20,12 +20,16 @@ use Exporter qw/import/;
 use Khaospy::Constants qw(
     $JSON
     ON OFF STATUS
+    true false
+
     $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
+
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
+    $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_RELOAD_SECS
+
     $KHAOSPY_BOILERS_CONF_FULLPATH
     $KHAOSPY_GLOBAL_CONF_FULLPATH
 
-    $MESSAGES_OVER_SECS_INVALID
 );
 
 use Khaospy::Utils;
@@ -35,63 +39,67 @@ our @EXPORT_OK = qw(
     get_one_wire_heating_control_conf
     get_boiler_conf
     get_global_conf
+    get_conf
 );
 
-{
-    my $daemon_runner_conf;
+sub get_conf {
+    my ($conf_rs, $conf_path, $force_reload, $validate_rc, $last_reload_rs, $reload_every ) = @_;
 
-    sub get_daemon_runner_conf {
-        if ( ! $daemon_runner_conf ) {
-            $daemon_runner_conf = $JSON->decode(
-                 Khaospy::Utils::slurp( $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH )
-            );
-        }
-        return $daemon_runner_conf;
+    die "get_conf: force_reload can only be true, false or undefined and not '$force_reload'\n"
+        if defined $force_reload
+            and $force_reload != true
+            and $force_reload != false;
+
+    if ( ! $$conf_rs || $force_reload
+        || ( defined $last_reload_rs && defined $reload_every
+            && $$last_reload_rs + $reload_every < time
+        )
+    ) {
+        $$conf_rs = $JSON->decode(
+             Khaospy::Utils::slurp( $conf_path )
+        );
+
+        $$last_reload_rs = time if defined $reload_every;
+
+        $validate_rc->($$last_reload_rs) if defined $validate_rc;
     }
+    return $$conf_rs;
 }
 
-{
-    my $therm_conf;
-    my $therm_conf_last_loaded;
-
-    sub get_one_wire_heating_control_conf {
-        # reload the thermometer conf every 5 mins.
-        if ( ! $therm_conf
-            or $therm_conf_last_loaded + 20 < time # TODO. Magic number. needs going into a conf or constant, somewhere.
-        ) {
-            $therm_conf = $JSON->decode(
-                 Khaospy::Utils::slurp( $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH )
-            );
-            $therm_conf_last_loaded = time ;
-        }
-        return $therm_conf;
-    }
+my $daemon_runner_conf;
+sub get_daemon_runner_conf {
+    my ($force_reload) = @_;
+    get_conf(
+        \$daemon_runner_conf,
+        $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH,
+        $force_reload,
+    );
 }
 
-{
-    my $boiler_conf;
-
-    sub get_boiler_conf {
-        if ( ! $boiler_conf ) {
-            $boiler_conf = $JSON->decode(
-                 Khaospy::Utils::slurp( $KHAOSPY_BOILERS_CONF_FULLPATH )
-            );
-        }
-        return $boiler_conf;
-    }
+my $heating_conf;
+my $heating_conf_last_loaded;
+sub get_one_wire_heating_control_conf {
+    my ($force_reload) = @_;
+    get_conf(
+        \$heating_conf,
+        $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH,
+        $force_reload,
+        undef,
+        \$$heating_conf_last_loaded,
+        $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_RELOAD_SECS
+    )
 }
 
-{
-    my $global_conf;
+my $boiler_conf;
+sub get_boiler_conf {
+    my ($force_reload) = @_;
+    get_conf(\$boiler_conf, $KHAOSPY_BOILERS_CONF_FULLPATH, $force_reload);
+}
 
-    sub get_global_conf {
-        if ( ! $global_conf ) {
-            $global_conf = $JSON->decode(
-                 Khaospy::Utils::slurp( $KHAOSPY_GLOBAL_CONF_FULLPATH )
-            );
-        }
-        return $global_conf;
-    }
+my $global_conf;
+sub get_global_conf {
+    my ($force_reload) = @_;
+    get_conf( \$global_conf, $KHAOSPY_GLOBAL_CONF_FULLPATH, $force_reload);
 }
 
 1;

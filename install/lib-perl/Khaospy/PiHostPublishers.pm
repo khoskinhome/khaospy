@@ -13,10 +13,11 @@ our @EXPORT_OK = qw(
     get_mac_daemon_hosts
 );
 
+# TODO This should get deprecated , and all the methods go into Khaospy::Conf::PiHosts.
+
 # Has methods that return what Pi Hosts are running what services.
 # Hence other hosts know which ones to subscribe to when receiving messages.
 
-# TODO this will use the daemon_runner_config, but at present its hard coded for testing.
 
 sub get_onewire_thermometer_daemon_hosts {
 

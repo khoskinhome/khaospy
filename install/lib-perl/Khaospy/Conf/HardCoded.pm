@@ -25,7 +25,7 @@ use Khaospy::Constants qw(
     $KHAOSPY_CONTROLS_CONF
     $KHAOSPY_BOILERS_CONF
     $KHAOSPY_GLOBAL_CONF
-    $KHAOSPY_PI_HOST_CONF
+    $KHAOSPY_PI_HOSTS_CONF
 
     $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
     $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
@@ -59,7 +59,7 @@ my $live_confs = {
         => live_boilers_conf(),
     $KHAOSPY_GLOBAL_CONF
         => live_global_conf(),
-    $KHAOSPY_PI_HOST_CONF
+    $KHAOSPY_PI_HOSTS_CONF
         => live_pi_host_conf(),
 };
 
@@ -74,7 +74,7 @@ my $test_confs = {
         => test_boilers_conf(),
     $KHAOSPY_GLOBAL_CONF
         => test_global_conf(),
-    $KHAOSPY_PI_HOST_CONF
+    $KHAOSPY_PI_HOSTS_CONF
         => test_pi_host_conf(),
 };
 
@@ -571,7 +571,7 @@ sub live_controls_conf {
 
         a_pi_gpio_relay => {
             type => "pi-gpio-relay",
-            host => "pitestNOT", # TODO non existant hostname.
+            host => "pitest",
             invert_state => false,
             gpio_relay  => 0,
         },
@@ -605,18 +605,18 @@ sub live_controls_conf {
 #
 #        },
 #
-#        a_pi_mcp23017_relay => {
-#            type => "pi-mcp23017-relay",
-#            host => "pitest",
-#            invert_state => false,
-#            gpio_relay => {
-#                i2c_bus  => 0,
-#		i2c_addr => '0x20',
-#		portname =>'b',
-#		portnum  => 0,
-#            },
-#        },
-#
+        a_pi_mcp23017_relay => {
+            type => "pi-mcp23017-relay",
+            host => "pitest",
+            invert_state => false,
+            gpio_relay => {
+                i2c_bus  => 0,
+		i2c_addr => '0x20',
+		portname =>'b',
+		portnum  => 0,
+            },
+        },
+
 #        a_pi_mcp23017_switch => {
 #            type => "pi-mcp23017-switch",
 #            host => "pitest",
@@ -903,17 +903,28 @@ sub test_global_conf {
     };
 }
 
+
+#####################################################
+# Pi Host conf.
 # the daemon-runner conf will get migrated to this pi_host conf.
 # The daemons will also not have CLI switches. These will be read from this conf.
 #
 # the log_level will get migrated to the pi_host conf
+
+# The valid_gpio key is COMPULSORY if the specific Pi-host has controls configured that use GPIO. This is used in Khaospy::Conf::Controls for validation.
+
+# The valid_i2c_bus key is COMPULSORY if the specific Pi-host has controls configured that uses i2c_bus (MCP23017 chips). This is used in Khaospy::Conf::Controls for validation.
 sub live_pi_host_conf {
     return {
         pitest => {
-            log_level       => 'debug',
-            valid_gpio      => [ 0..7 ],
-            valid_i2c_bus   => [0],
+            log_level         => 'debug',
+            valid_gpios       => [ 0..7 ],
+            valid_i2c_buses   => [ 0 ],
             daemons => [
+                $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT => {
+                    option => "blah",
+                    log_level => "debug", # over-ride per host setting.
+                },
 
             ],
         },
@@ -923,12 +934,13 @@ sub live_pi_host_conf {
 sub test_pi_host_conf {
     return {
         pitest => {
-            log_level       => 'debug',
-            valid_gpio      => [ 0..7 ],
-            valid_i2c_bus   => [0],
+            log_level         => 'debug',
+            valid_gpios       => [ 0..7 ],
+            valid_i2c_buses   => [ 0 ],
             daemons => [
                 $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT => {
                     option => "blah",
+                    log_level => "debug", # over-ride per host setting.
                 },
 
             ],

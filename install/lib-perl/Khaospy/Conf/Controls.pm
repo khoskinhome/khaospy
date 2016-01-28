@@ -4,7 +4,7 @@ use warnings;
 use FindBin;
 FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
-
+# by Karl Kount-Khaos Hoskin. 2015-2016
 
 use Try::Tiny;
 use Carp qw/confess croak/;
@@ -17,15 +17,22 @@ use Khaospy::Constants qw(
     $JSON
     ON OFF STATUS
     $KHAOSPY_CONTROLS_CONF_FULLPATH
+    $KHAOSPY_PI_HOSTS_CONF_FULLPATH
+);
+
+use Khaospy::Conf qw(
+    get_conf
+);
+
+use Khaospy::Conf::PiHosts qw(
+    get_pi_host_config
 );
 
 use Khaospy::Utils;
 
 our @EXPORT_OK = qw(
-    get_controls_conf
     get_control_config
 );
-
 
 # ALL Control must have a key called "type".
 # The $types below names the only keys allowed for each "type" of control
@@ -37,34 +44,6 @@ my $check_mac = check_regex(
 
 my $check_boolean = check_regex(qr/^[01]$/);
 
-#################################
-# Checking the values of Pi GPIOs
-#################################
-# This isn't valid for all Pi-s some have more
-# Also different configurations change the amount of GPIOs available.
-
-# I would need someway for the code when running on the specific Pi
-# to try and work out its model and revision.
-# This would then need to work out when GPIOs are used for other functions. SPI/I2C etc.
-#
-# The first 8 gpios are generally available on all Pi-s, ( 0-7 ), all the way back to the first Pi in 2012.
-# 
-# I guess one easy way for me to code this is to allow an override in the config, on a per-pi-host basis. TODO , what I've just said.
-# So, not in the control config, but in a pi-host config as option something like :
-# { hostname => {
-#        valid_gpio => [0,1,2,3,4,5,6,7,8,9,10,11,12]
-# }
-
-######################################
-# Checking the values of the Pi i2cBus
-######################################
-# for the Pi-i2cBus, this needs to be configured on a per-pi-host basis.
-# sometimes the bus is 0 , sometimes its 1 . If you muck around with wiring and other stuff, its possible to run them both.
-#
-# So a config option something like :
-# { hostname => {
-#        valid_i2c_bus => [0,1,2,3,4,5,6,7,8,9,10,11,12]
-# }
 
 my $check_types = {
     "orvibos20" => {
@@ -109,14 +88,12 @@ my $check_types = {
     "pi-mcp23017-relay" => {
         alias           => \&check_optional,
         host            => \&check_host_runs_pi_controls,
-        ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
         gpio_relay      => \&check_pi_mcp23017,
     },
     "pi-mcp23017-switch" => {
         alias           => \&check_optional,
         host            => \&check_host_runs_pi_controls,
-        ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
         gpio_switch     => \&check_pi_mcp23017,
     },
@@ -135,24 +112,21 @@ get_controls_conf();
 my $controls_conf;
 
 sub get_controls_conf {
-    my ($not_needed) = @_;
-    confess "get_controls_conf doesn't need a parameter. Probably need to call get_control_config\n" if $not_needed;
-
-    if ( ! $controls_conf ) {
-        $controls_conf = $JSON->decode(
-             Khaospy::Utils::slurp( $KHAOSPY_CONTROLS_CONF_FULLPATH )
-        );
-        _validate_controls_conf();
-    }
-    return $controls_conf;
+    my ($force_reload) = @_;
+    get_conf(
+        \$controls_conf,
+        $KHAOSPY_CONTROLS_CONF_FULLPATH,
+        $force_reload,
+        \&_validate_controls_conf,
+    );
 }
 
 sub get_control_config {
-    my ( $control_name ) = @_;
+    my ( $control_name, $force_reload ) = @_;
 
-    get_controls_conf() if ! $controls_conf ;
+    get_controls_conf($force_reload);
 
-    confess "Control '$control_name' doesn't exist in $KHAOSPY_CONTROLS_CONF_FULLPATH\n"
+    die "Control '$control_name' doesn't exist in $KHAOSPY_CONTROLS_CONF_FULLPATH\n"
         if ! exists $controls_conf->{$control_name};
 
     return $controls_conf->{$control_name};
@@ -246,16 +220,28 @@ sub check_host_runs_pi_controls {
     my ($control_name, $control, $chk) = @_;
     check_host(@_);
     my $val = $control->{$chk};
-    # TODO check the daemon-runner-conf for all the known hosts.
+    # TODO check the pi-host-conf for all the known hosts.
     # that run pi-controller-daemons.
 }
-
 
 sub check_pi_gpio {
     my ($control_name, $control, $chk) = @_;
     check_exists(@_);
     my $val = $control->{$chk};
-    check_regex(qr/^[0-7]$/)->(@_);
+
+    my $host = $control->{host};
+
+    my $valid_gpios = get_pi_host_config($host)->{valid_gpios};
+
+    die "Pi-host '$host' doesn't have 'valid_gpios' configured.\n"
+        ."The valid_gpios are defined in the pi-host config $KHAOSPY_PI_HOSTS_CONF_FULLPATH.\n"
+        ."Control '$control_name' cannot be checked for the validity of '$chk'"
+            if ! defined $valid_gpios;
+
+    die "Control '$control_name' has an invalid gpio for '$chk' of '$val'\n"
+        ."The valid_gpios defined for the pi-host '$host'"
+        ." in $KHAOSPY_PI_HOSTS_CONF_FULLPATH are (".join(',', @$valid_gpios).")"
+            if ! grep { $_ == $val } @$valid_gpios;
 
     my $uniq = "host=$control->{host}|gpio=$val";
 
@@ -276,7 +262,26 @@ sub check_pi_mcp23017 {
         if ( ref $val ne 'HASH' );
 
     # need to check the sub keys.
-    check_regex(qr/^01$/)->(       $control_name , $val, "i2c_bus",  "(on $chk)");
+
+    # first check i2c_bus sub-key against valid ones in pi-host config.
+    my $host = $control->{host};
+
+    my $i2c_bus = $val->{i2c_bus};
+
+    my $valid_i2c_buses = get_pi_host_config($host)->{valid_i2c_buses};
+
+    die "Pi-host '$host' doesn't have 'valid_i2c_buses' configured.\n"
+        ."The valid_i2c_buses are defined in the pi-host config $KHAOSPY_PI_HOSTS_CONF_FULLPATH.\n"
+        ."Control '$control_name' cannot be checked for the validity of '$chk' (i2c_bus)"
+            if ! defined $valid_i2c_buses;
+
+    die "Control '$control_name' has an invalid i2c_bus for '$chk' of '$val'\n"
+        ."The valid_i2c_buses defined for the pi-host '$host'"
+        ." in $KHAOSPY_PI_HOSTS_CONF_FULLPATH are (".join(',', @$valid_i2c_buses).")"
+            if ! grep { $_ == $i2c_bus } @$valid_i2c_buses;
+
+
+    # check the reset of the sub-keys :
     check_regex(qr/^0x2[0-7]$/)->( $control_name , $val, "i2c_addr", "(on $chk)");
     check_regex(qr/^[abAB]$/)->(   $control_name , $val, "portname", "(on $chk)");
     check_regex(qr/^[0-7]$/)->(    $control_name , $val, "portnum",  "(on $chk)");
