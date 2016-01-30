@@ -49,10 +49,14 @@ sudo pip install pyzmq
 
 #######################################
 # cpanm installs
-#
 
 sudo cpanm Clone
 sudo cpanm JSON
 sudo cpanm AnyEvent
 sudo cpanm ZMQ::LibZMQ3
 sudo cpanm List::Compare;
+sudo cpanm Sub::Override;
+sudo cpanm Test::More;
+sudo cpanm Test::Exception;
+sudo cpanm Test::Deep;
+

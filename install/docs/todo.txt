@@ -1,0 +1,38 @@
+
+
+conf checking in Khaospy::Conf::Controls
+     write some tests.
+
+conf.
+
+    get daemon-runner using the pi-host.json
+        make the daemons use the conf options here rather than CLI params.
+
+        deprecate Khaospy::PiHostPublishers. move its stuff into Khaospy::Conf::PiHosts
+
+
+    move the PiGPIO stuff out from PiControllerDaemon and into PiGPIO.
+
+    Go over the Controller and ControllerQueue and tidy up. proper exception handling. Try::Tiny.
+
+starting writing the PiMCP23017 module . need this  for th alarm switch panel.  with tests. lots of work.
+
+    daemons need locking. the "/usr/bin/daemon" should do this , but it looked broken recently.
+
+
+
+
+Low prio
+--------
+
+    onewire sender in perl. low priority. python one is working.
+
+    rrd-creater in perl. low prio. python one is working.
+        temp rrds
+        switch / relay / control rrds.
+
+
+    conf-dist-daemon in perl. very low prio. I can do this with tar-over-ssh, scp etc.
+
+    daemon-monitor. long way off. i.e. when I've got the reset of the stuff working.
+

@@ -9,8 +9,9 @@ use Exporter qw/import/;
 use Carp qw/confess/;
 use Sys::Hostname;
 use Data::Dumper;
+use Try::Tiny;
 
-use Khaospy::Conf qw/get_global_conf/;
+use Khaospy::Conf::PiHosts qw/get_this_pi_host_config/;
 use Khaospy::Utils qw/timestamp/;
 
 sub START {"start"};
@@ -59,31 +60,33 @@ sub klog {
     my ( $type, $msg, $dump ) = @_;
     $type = lc ($type);
 
-    my $global_conf = get_global_conf;
+    my $pi_host_log_level ;
+    try {
+        $pi_host_log_level = get_this_pi_host_config()->{log_level};
+    } catch {
+        
+        $pi_host_log_level = "debug";
+    };
 
-    my $log_level = $OVERRIDE_CONF_LOGLEVEL || $global_conf->{log_level};
+    my $log_level = $OVERRIDE_CONF_LOGLEVEL || $pi_host_log_level;
 
     my $log_level_val = $type_to_val->{$log_level};
 
-    $log_level_val = 4 if ! $log_level_val;
+    $log_level_val = 6 if ! $log_level_val;
 
-    if (! exists $type_to_val->{$type} ){
-        confess "Illegal log type of $type\n";
-    }
+    confess "Illegal log type of $type\n"
+        if ! exists $type_to_val->{$type};
 
     my $line = timestamp."|".uc($type)."|".hostname."|$$|$msg|";
     $line .= "Dump :\n".Dumper($dump) if $dump;
     $line .= "\n";
 
-    if ( $type eq "fatal" ) {
-        confess $line;
-    }
+    confess $line if $type eq "fatal" ;
 
     my $tval = $type_to_val->{$type};
 
     # only warn, info and debug can be switched off from logging
-    print $line
-        if $tval <= $log_level_val or $tval <= 3;
+    print $line if $tval <= $log_level_val or $tval <= 3;
 }
 
 1;

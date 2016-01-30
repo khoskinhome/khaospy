@@ -11,6 +11,8 @@ use Carp qw/confess croak/;
 use Data::Dumper;
 use Exporter qw/import/;
 
+use Sys::Hostname;
+
 use List::Compare;
 
 use Khaospy::Constants qw(
@@ -25,16 +27,22 @@ use Khaospy::Utils;
 
 our @EXPORT_OK = qw(
     get_pi_host_config
+    get_this_pi_host_config
 );
 
 my $pi_hosts_conf;
 
+sub _set_pi_hosts_conf {
+    # needed for testing.
+    $pi_hosts_conf = $_[0];
+}
 sub get_pi_hosts_conf {
     my ($force_reload) = @_;
     get_conf(
         \$pi_hosts_conf,
         $KHAOSPY_PI_HOSTS_CONF_FULLPATH,
         $force_reload,
+        \&_validate_pi_hosts_conf
     );
 }
 sub get_pi_host_config {
@@ -48,6 +56,13 @@ sub get_pi_host_config {
 
 }
 
+sub get_this_pi_host_config {
+    get_pi_host_config( hostname, @_ );
+}
+
+sub _validate_pi_hosts_conf {
+    #TODO !
+}
 
 #################################
 # Checking the values of Pi GPIOs

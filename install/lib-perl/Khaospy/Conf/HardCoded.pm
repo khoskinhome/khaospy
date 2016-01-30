@@ -917,7 +917,7 @@ sub test_global_conf {
 sub live_pi_host_conf {
     return {
         pitest => {
-            log_level         => 'debug',
+            log_level         => 'info',
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 0 ],
             daemons => [

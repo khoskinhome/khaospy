@@ -107,9 +107,16 @@ my $check_types = {
     }
 };
 
-get_controls_conf();
+# TODO need a better way of forcing the loading of the control config
+# doing the following makes testing hard :
+#get_controls_conf();
 
 my $controls_conf;
+
+sub _set_controls_conf {
+    # needed for testing.
+    $controls_conf = $_[0];
+}
 
 sub get_controls_conf {
     my ($force_reload) = @_;
@@ -193,7 +200,7 @@ sub check_config {
 sub check_exists {
     my ($control_name, $control, $chk, $extra ) = @_;
     $extra = "" if ! $extra;
-    die "Control '$control_name' doesn't have a '$chk' configured. $extra"
+    die "Control '$control_name' doesn't have a '$chk' configured. (non-existent-key). $extra"
         if ! exists $control->{$chk};
 }
 
@@ -213,6 +220,7 @@ sub check_host {
     my ($control_name, $control, $chk) = @_;
     check_exists(@_);
     my $val = $control->{$chk};
+    _is_host_resolvable($val);
     # TODO could check if the host is resolvable.
 }
 
@@ -308,6 +316,16 @@ sub check_pi_mcp23017 {
 sub check_optional {
     # Do absolutely "nuffin MATE !"
     # aka "null op".
+}
+
+sub _is_host_resolvable {
+    my ($host) = @_;
+    #TODO use Net::DNS / gethostbyname etc....
+    # will die / raise excepiton if host isn't resolvable.
+
+    # die "$host is not resolvable";
+
+    return;
 }
 
 1;

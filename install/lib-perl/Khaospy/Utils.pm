@@ -33,7 +33,7 @@ our @EXPORT_OK = qw(
     get_hashval
 );
 
-sub timestamp { return strftime("%F %T", gmtime( $_[0] || time) )." "; }
+sub timestamp { return strftime("%F %T", gmtime( $_[0] || time) ); }
 
 sub slurp {
     my ( $file ) = @_;
