@@ -10,8 +10,7 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use Data::Dumper;
 
-# This script should be run at least every 2 mins from the root crontab.
-# TODO insist this script is run as root.
+die "Not root user" if $>;
 
 use Khaospy::Constants qw(
     $JSON

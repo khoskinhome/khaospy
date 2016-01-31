@@ -43,22 +43,26 @@ my $check_mac = check_regex(
 );
 
 my $check_boolean = check_regex(qr/^[01]$/);
-
+my $check_optional_boolean
+    = check_optional_regex(qr/^[01]$/);
 
 my $check_types = {
     "orvibos20" => {
-        alias => \&check_optional,
-        host  => \&check_host,
-        mac   => $check_mac,
+        alias     => \&check_optional,
+        rrd_graph => $check_optional_boolean,
+        host      => \&check_host,
+        mac       => $check_mac,
     },
     "onewire-thermometer" => {
         alias         => \&check_optional,
+        rrd_graph     => $check_optional_boolean,
         onewire_addr  => check_regex(
             qr/^[0-9A-Fa-f]{2}-[0-9A-Fa-f]{12}$/
         ),
     },
     "pi-gpio-relay-manual" => {
         alias           => \&check_optional,
+        rrd_graph       => $check_optional_boolean,
         host            => \&check_host_runs_pi_controls,
         ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
@@ -67,18 +71,21 @@ my $check_types = {
     },
     "pi-gpio-relay" => {
         alias           => \&check_optional,
+        rrd_graph       => $check_optional_boolean,
         host            => \&check_host_runs_pi_controls,
         invert_state    => $check_boolean,
         gpio_relay      => \&check_pi_gpio,
     },
     "pi-gpio-switch" => {
         alias           => \&check_optional,
+        rrd_graph       => $check_optional_boolean,
         host            => \&check_host_runs_pi_controls,
         invert_state    => $check_boolean,
         gpio_switch     => \&check_pi_gpio,
     },
     "pi-mcp23017-relay-manual" => {
         alias           => \&check_optional,
+        rrd_graph       => $check_optional_boolean,
         host            => \&check_host_runs_pi_controls,
         ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
@@ -87,22 +94,26 @@ my $check_types = {
     },
     "pi-mcp23017-relay" => {
         alias           => \&check_optional,
+        rrd_graph       => $check_optional_boolean,
         host            => \&check_host_runs_pi_controls,
         invert_state    => $check_boolean,
         gpio_relay      => \&check_pi_mcp23017,
     },
     "pi-mcp23017-switch" => {
         alias           => \&check_optional,
+        rrd_graph       => $check_optional_boolean,
         host            => \&check_host_runs_pi_controls,
         invert_state    => $check_boolean,
         gpio_switch     => \&check_pi_mcp23017,
     },
     "mac-switch" => {
         alias           => \&check_optional,
+        rrd_graph       => $check_optional_boolean,
         mac             => $check_mac,
     },
     "ping-switch" => {
         alias           => \&check_optional,
+        rrd_graph       => $check_optional_boolean,
         host            => \&check_host,
     }
 };
@@ -216,6 +227,19 @@ sub check_regex {
     }
 }
 
+sub check_optional_regex {
+    my ($regex) = @_;
+    return sub {
+        my ($control_name, $control, $chk, $extra) = @_;
+        return if ! exists $control->{$chk};
+
+        $extra = "" if ! $extra;
+        my $val = $control->{$chk};
+        die "Control '$control_name' has an invalid '$chk' ($val) configured. $extra"
+            if ( $val !~ $regex );
+    }
+}
+
 sub check_host {
     my ($control_name, $control, $chk) = @_;
     check_exists(@_);
@@ -317,6 +341,8 @@ sub check_optional {
     # Do absolutely "nuffin MATE !"
     # aka "null op".
 }
+
+
 
 sub _is_host_resolvable {
     my ($host) = @_;

@@ -93,6 +93,7 @@ throws_ok { get_control_config('blahdeblah') }
 $controls_return = {
     'therm-loft' => {
         type          => "onewire-thermometer",
+        rrd_graph     => true,
         alias         => 'Loft',
         onewire_addr  => '28-021463277cff'  ,
     },
@@ -100,6 +101,18 @@ $controls_return = {
 
 ok ( $cont_cfg = get_control_config('therm-loft') , "Can get onewire-thermometer control");
 cmp_deeply( $cont_cfg, $controls_return->{'therm-loft'} , "Got the control data" );
+
+$controls_return = {
+    'therm-loft' => {
+        type          => "onewire-thermometer",
+        rrd_graph     => 9, # not a boolean value !
+        alias         => 'Loft',
+        onewire_addr  => '28-021463277cff'  ,
+    },
+};
+throws_ok { get_control_config('therm-loft') }
+    qr/invalid.*?rrd_graph/,
+    "dies on invalid boolean for rrd_graph";
 
 # remove the optional "alias" field :
 $controls_return = {

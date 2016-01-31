@@ -39,7 +39,7 @@ our $VERBOSE;
 our $BOILER_STATUS;
 
 our $BOILER_STATUS_LAST_REFRESH;
-our $BOILER_STATUS_REFRESH_EVERY_SECS = 15; # TODO put back to 60.
+our $BOILER_STATUS_REFRESH_EVERY_SECS = 60;
 
 #######
 # subs
@@ -99,9 +99,6 @@ sub anyevent_io {
 
 sub process_boiler_message {
     my ($msg) = @_ ;
-
-    #my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
-    # ^^^ can't get $topic working in perl yet. TODO
 
     my $msg_decoded = $JSON->decode( $msg );
 
