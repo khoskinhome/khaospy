@@ -4,44 +4,54 @@ use warnings;
 use FindBin;
 FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
+# by Karl Kount-Khaos Hoskin. 2015-2016
+
+# uses the pi-hosts config file.
 
 use Data::Dumper;
 
 # This script should be run at least every 2 mins from the root crontab.
 # TODO insist this script is run as root.
 
-use Khaospy::Utils qw/slurp/;
 use Khaospy::Constants qw(
     $JSON
-    $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
     $KHAOSPY_LOG_DIR
     $KHAOSPY_PID_DIR
 );
 
-use Sys::Hostname qw/hostname/;
-my $thishost = hostname;
-print "This host is $thishost\n";
+use Khaospy::Conf::PiHosts qw(
+    get_this_pi_host_config
+);
 
-my $conf = $JSON->decode( slurp ($KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH) );
+my $conf = get_this_pi_host_config;
 
-if ( ! exists $conf->{$thishost} ) {
-    print "This hostname $thishost not found in the config file"
-        ." $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH . Dumper of conf = \n";
-    die Dumper ($conf);
-}
+die "daemons key doesn't exist in conf\n".Dumper($conf)
+    if ! exists $conf->{daemons};
 
-for my $cfg_entry ( @{$conf->{$thishost}} ){
+for my $daemon_cfg ( @{$conf->{daemons}} ){
 
-    my ( $scriptname_short ) = $cfg_entry =~ /.*\/(.*)$/;
-    $scriptname_short =~ s/[=\/\s]/_/g;
+    my $script = $daemon_cfg->{script};
+    my ( $script_short ) = $script =~ /.*\/(.*)$/;
 
-    my $command = "$cfg_entry";
+    my $pid_log_name = $script_short;
+    my $cli_opts     = '';
+
+    my $options_rh = $daemon_cfg->{options};
+    for my $opt ( keys %{$options_rh} ){
+        $pid_log_name .= "_${opt}_$options_rh->{$opt}";
+        # TODO could get quoting issues with the following :
+        $cli_opts     .= " $opt=$options_rh->{$opt}";
+    }
+
+    my $command = "$script $cli_opts";
+
     print "Checking $command\n";
 
-    my $log_file = "$KHAOSPY_LOG_DIR/${scriptname_short}";
-    my $pid_file = "${scriptname_short}.pid";
+    my $log_file = "$KHAOSPY_LOG_DIR/$pid_log_name";
+    my $pid_file = "$pid_log_name.pid";
 
-    # currently the directory /opt/khaospy/bin is unsafe . so "/usr/bin/daemon" needs
+    # currently the directory /opt/khaospy/bin is "unsafe"
+    # hence "/usr/bin/daemon" needs
     # to be run with -U switch. TODO this needs fixing.
     my $syscall = <<"    EOCOMMAND";
         sudo /usr/bin/daemon

@@ -906,14 +906,11 @@ sub test_global_conf {
 
 #####################################################
 # Pi Host conf.
-# the daemon-runner conf will get migrated to this pi_host conf.
-# The daemons will also not have CLI switches. These will be read from this conf.
-#
-# the log_level will get migrated to the pi_host conf
 
 # The valid_gpio key is COMPULSORY if the specific Pi-host has controls configured that use GPIO. This is used in Khaospy::Conf::Controls for validation.
 
 # The valid_i2c_bus key is COMPULSORY if the specific Pi-host has controls configured that uses i2c_bus (MCP23017 chips). This is used in Khaospy::Conf::Controls for validation.
+
 sub live_pi_host_conf {
     return {
         pitest => {
@@ -921,11 +918,76 @@ sub live_pi_host_conf {
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 0 ],
             daemons => [
-                $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT => {
-                    option => "blah",
-                    log_level => "debug", # over-ride per host setting.
+                {
+                    script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT,
+                    options => { },
                 },
+            ],
+        },
+        piserver => {
+            log_level         => 'info',
+            valid_gpios       => [ 0..7 ],
+            valid_i2c_buses   => [ 0 ],
+            daemons => [
+                {
+                    script  => $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT,
+                    options => { '--host' => "pioldwifi" },
+                },
+                {
+                    script  => $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT,
+                    options => { '--host' => "piloft" },
+                },
+                {
+                    script  => $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT,
+                    options => { '--host' => "piboiler" },
+                },
+            ],
+        },
+        piloft => {
+            log_level         => 'info',
+            valid_gpios       => [ 0..7 ],
+            valid_i2c_buses   => [ 0 ],
+            daemons => [
+                {
+                    script  =>$KHAOSPY_ONE_WIRED_SENDER_SCRIPT,
+                    options => { '--stdout_freq' => '890' },
+                },
+                {
+                    script  =>"/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
+                    options => { },
+                },
+            ],
+        },
+        piold => {
+            log_level         => 'info',
+            valid_gpios       => [ 0..7 ],
+            valid_i2c_buses   => [ 0 ],
+            daemons => [
+                {
+                    script  =>$KHAOSPY_ONE_WIRED_SENDER_SCRIPT,
+                    options => { '--stdout_freq' => '890' },
+                },
+            ],
+        },
+        piboiler => {
+            log_level         => 'info',
+            valid_gpios       => [ 0..7 ],
+            valid_i2c_buses   => [ 0 ],
+            daemons => [
+                {
+                    script  =>$KHAOSPY_ONE_WIRED_SENDER_SCRIPT,
+                    options => { '--stdout_freq' => '890' },
+                },
+                {
+                    script  => "$KHAOSPY_ONE_WIRE_HEATING_DAEMON",
+                    options => {
 
+                    },
+                },
+#                {
+#                    script  => "$KHAOSPY_BOILER_DAEMON_SCRIPT",
+#                    options => { },
+#                },
             ],
         },
     };
@@ -938,9 +1000,12 @@ sub test_pi_host_conf {
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 0 ],
             daemons => [
-                $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT => {
-                    option => "blah",
-                    log_level => "debug", # over-ride per host setting.
+                {
+                    script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT,
+                    options => {
+## TODO implement --log_level cli-opt on daemon-scripts.
+##                      '--log_level' => "debug", # over-ride per host setting.
+                    },
                 },
 
             ],
