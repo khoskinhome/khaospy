@@ -17,7 +17,6 @@ use lib "$FindBin::Bin/../lib-perl";
 use Khaospy::Constants qw(
     true false
     ON OFF STATUS
-    $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
     $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
 
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
@@ -49,25 +48,31 @@ sub burp {
 }
 
 
-# TODO this is going to be done PiHostPublishers.pm
-# this code needs moving there.
+## TODO this is going to be done PiHostss.pm
+## this code needs moving there.
 sub get_one_wire_sender_hosts {
 
-    my $daemon_runner_conf = $json->decode(
-        slurp ( $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH )
-    );
+    # TODO fix this hack,
+    return qw/
+        piold piloft piboiler
+    /;
 
-    my $one_wire_sender_host = [];
-    for my $host ( keys %$daemon_runner_conf ){
-        push @$one_wire_sender_host, $host
-            if (
-                grep { $_ =~ /^$KHAOSPY_ONE_WIRED_SENDER_SCRIPT/ }
-                @{$daemon_runner_conf->{$host}}
-            );
-    }
 
-    my %ret = map { $_ => 1 } @$one_wire_sender_host ;
-    return keys %ret ;
+#    my $daemon_runner_conf = $json->decode(
+#        slurp ( $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH )
+#    );
+#
+#    my $one_wire_sender_host = [];
+#    for my $host ( keys %$daemon_runner_conf ){
+#        push @$one_wire_sender_host, $host
+#            if (
+#                grep { $_ =~ /^$KHAOSPY_ONE_WIRED_SENDER_SCRIPT/ }
+#                @{$daemon_runner_conf->{$host}}
+#            );
+#    }
+#
+#    my %ret = map { $_ => 1 } @$one_wire_sender_host ;
+#    return keys %ret ;
 }
 
 sub get_hashval {

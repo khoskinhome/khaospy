@@ -22,8 +22,6 @@ use Khaospy::Constants qw(
     ON OFF STATUS
     true false
 
-    $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
-
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_RELOAD_SECS
 
@@ -35,7 +33,6 @@ use Khaospy::Constants qw(
 use Khaospy::Utils;
 
 our @EXPORT_OK = qw(
-    get_daemon_runner_conf
     get_one_wire_heating_control_conf
     get_boiler_conf
     get_global_conf
@@ -64,16 +61,6 @@ sub get_conf {
         $validate_rc->($$last_reload_rs) if defined $validate_rc;
     }
     return $$conf_rs;
-}
-
-my $daemon_runner_conf;
-sub get_daemon_runner_conf {
-    my ($force_reload) = @_;
-    get_conf(
-        \$daemon_runner_conf,
-        $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH,
-        $force_reload,
-    );
 }
 
 my $heating_conf;

@@ -20,7 +20,6 @@ use Khaospy::Constants qw(
 
     $KHAOSPY_CONF_DIR
 
-    $KHAOSPY_DAEMON_RUNNER_CONF
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF
     $KHAOSPY_CONTROLS_CONF
     $KHAOSPY_BOILERS_CONF
@@ -49,8 +48,7 @@ our @EXPORT_OK = qw(
 
 
 my $live_confs = {
-    $KHAOSPY_DAEMON_RUNNER_CONF
-        => live_daemon_runner_conf(),
+
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF
         => live_heating_thermometer_config(),
     $KHAOSPY_CONTROLS_CONF
@@ -61,11 +59,10 @@ my $live_confs = {
         => live_global_conf(),
     $KHAOSPY_PI_HOSTS_CONF
         => live_pi_host_conf(),
+
 };
 
 my $test_confs = {
-    $KHAOSPY_DAEMON_RUNNER_CONF
-        => test_daemon_runner_conf(),
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF
         => test_heating_thermometer_config(),
     $KHAOSPY_CONTROLS_CONF
@@ -106,69 +103,6 @@ sub write_out_conf {
 # "conf" subs
 
 ###############################
-# daemon_runner_conf keys
-#
-# The primary key is the hostname on where the script should run.
-#
-# this points to an array of script names to be run by /usr/bin/daemon ( with CLI params )
-#
-# TODO to be deprecated, and migrated to the pi_host conf
-sub live_daemon_runner_conf {
-    return {
-        piserver => [
-            "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=pioldwifi",
-            "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=piloft",
-            "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=piboiler",
-        ],
-        piloft => [
-            "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
-            "/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
-        ],
-        piold => [
-            "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
-        ],
-        piboiler => [
-            "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
-            "$KHAOSPY_ONE_WIRE_HEATING_DAEMON",
-            # "$KHAOSPY_BOILER_DAEMON_SCRIPT",
-
-        ],
-        pitest => [
-#            "$KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT",
-        ],
-
-    };
-}
-
-# TODO to be deprecated, and migrated to the pi_host conf
-sub test_daemon_runner_conf {
-    return {
-        piserver => [
-            "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=pioldwifi",
-            "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=piloft",
-            "$KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT --host=piboiler",
-        ],
-        piloft => [
-            "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
-            "/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
-        ],
-        piold => [
-            "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
-        ],
-        piboiler => [
-            "$KHAOSPY_ONE_WIRED_SENDER_SCRIPT --stdout_freq=890",
-            "$KHAOSPY_ONE_WIRE_HEATING_DAEMON",
-            # "$KHAOSPY_BOILER_DAEMON_SCRIPT",
-
-        ],
-        pitest => [
-#            "$KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT",
-        ],
-
-    };
-}
-
-
 
 ##################################
 #   Heating conf keys :

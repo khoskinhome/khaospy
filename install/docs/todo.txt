@@ -11,6 +11,10 @@ conf.
 
 
 
+    add option in config to graph-controls
+
+    need an rrd-config. for grouping. maybe.
+
 
         deprecate Khaospy::PiHostPublishers. move its stuff into Khaospy::Conf::PiHosts
 

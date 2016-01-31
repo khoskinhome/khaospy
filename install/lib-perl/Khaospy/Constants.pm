@@ -65,8 +65,6 @@ our $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
 #############
 # json confs
 
-# TODO KHAOSPY_DAEMON_RUNNER_CONF to be deprecated. migrate to PI_HOST conf.
-our $KHAOSPY_DAEMON_RUNNER_CONF             = "daemon-runner.json";
 our $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF   = "heating_thermometer.json";
 our $KHAOSPY_CONTROLS_CONF                  = "controls.json";
 our $KHAOSPY_BOILERS_CONF                   = "boilers.json";
@@ -74,10 +72,6 @@ our $KHAOSPY_BOILERS_CONF                   = "boilers.json";
 # TODO KHAOSPY_GLOBAL_CONF to be deprecated. migrate to PI_HOST conf.
 our $KHAOSPY_GLOBAL_CONF                    = "global.json";
 our $KHAOSPY_PI_HOSTS_CONF                  = "pi-host.json";
-
-# TODO KHAOSPY_DAEMON_RUNNER_CONF to be deprecated. migrate to PI_HOST conf.
-our $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
-    = "$KHAOSPY_CONF_DIR/$KHAOSPY_DAEMON_RUNNER_CONF";
 
 our $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
     = "$KHAOSPY_CONF_DIR/$KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF";
@@ -145,9 +139,6 @@ our @EXPORT_OK = qw(
     $KHAOSPY_RRD_IMAGE_DIR
     $KHAOSPY_WWW_DIR
     $KHAOSPY_WWW_BIN_DIR
-
-    $KHAOSPY_DAEMON_RUNNER_CONF
-    $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
 
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF
     $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
