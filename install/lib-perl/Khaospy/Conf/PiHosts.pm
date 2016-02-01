@@ -12,7 +12,7 @@ use Sys::Hostname;
 
 use List::Compare;
 
-use Khaospy::Exception;
+use Khaospy::Exception qw/KhaospyExcept::InvalidDaemonScriptName/;
 
 use Khaospy::Constants qw(
     $KHAOSPY_PI_HOSTS_CONF_FULLPATH
@@ -46,6 +46,7 @@ sub _set_pi_hosts_conf {
     # needed for testing.
     $pi_hosts_conf = $_[0];
 }
+
 sub get_pi_hosts_conf {
     my ($force_reload) = @_;
     get_conf(
@@ -73,16 +74,24 @@ sub get_this_pi_host_config {
 sub get_pi_hosts_running_daemon {
     my ( $daemon_script_full_path ) = @_;
 
-    # return [
-    #   pihostname1, pihostname2
-    # ]
-
-    Khaospy::Exception::InvalidDaemonScriptName->throw(
+    KhaospyExcept::InvalidDaemonScriptName->throw(
         error => "Invalid script name '$daemon_script_full_path'"
     )
-        if ! grep  { $daemon_script_full_path } @$KHAOSPY_ALL_SCRIPTS;
+        if ! grep { $_ eq $daemon_script_full_path } @$KHAOSPY_ALL_SCRIPTS;
 
-    return [];
+    get_pi_hosts_conf();
+
+    my $pi_hosts_run_d = [];
+
+    for my $host ( keys %$pi_hosts_conf ){
+        for my $daemon ( @{$pi_hosts_conf->{$host}{daemons}} ){
+            my $script = $daemon->{script};
+            push @$pi_hosts_run_d, $host
+                if $script eq $daemon_script_full_path;
+        }
+    }
+
+    return $pi_hosts_run_d;
 }
 
 sub _validate_pi_hosts_conf {

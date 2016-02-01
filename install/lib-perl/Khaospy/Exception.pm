@@ -4,7 +4,7 @@ use warnings;
 
 use Exception::Class (
 
-    'InvalidDaemonScriptName',
+    'KhaospyExcept::InvalidDaemonScriptName',
 
 
 
