@@ -1,9 +1,6 @@
 package Khaospy::Conf::PiHosts;
 use strict;
 use warnings;
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
 # by Karl Kount-Khaos Hoskin. 2015-2016
 
 use Try::Tiny;
@@ -15,8 +12,20 @@ use Sys::Hostname;
 
 use List::Compare;
 
+use Khaospy::Exception;
+
 use Khaospy::Constants qw(
     $KHAOSPY_PI_HOSTS_CONF_FULLPATH
+
+    $KHAOSPY_ALL_SCRIPTS
+
+    $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
+    $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
+    $KHAOSPY_ONE_WIRE_HEATING_DAEMON
+    $KHAOSPY_BOILER_DAEMON_SCRIPT
+    $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
+    $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
+
 );
 
 use Khaospy::Conf qw(
@@ -28,6 +37,7 @@ use Khaospy::Utils;
 our @EXPORT_OK = qw(
     get_pi_host_config
     get_this_pi_host_config
+    get_pi_hosts_running_daemon
 );
 
 my $pi_hosts_conf;
@@ -58,6 +68,21 @@ sub get_pi_host_config {
 
 sub get_this_pi_host_config {
     get_pi_host_config( hostname, @_ );
+}
+
+sub get_pi_hosts_running_daemon {
+    my ( $daemon_script_full_path ) = @_;
+
+    # return [
+    #   pihostname1, pihostname2
+    # ]
+
+    Khaospy::Exception::InvalidDaemonScriptName->throw(
+        error => "Invalid script name '$daemon_script_full_path'"
+    )
+        if ! grep  { $daemon_script_full_path } @$KHAOSPY_ALL_SCRIPTS;
+
+    return [];
 }
 
 sub _validate_pi_hosts_conf {

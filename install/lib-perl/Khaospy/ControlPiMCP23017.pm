@@ -1,9 +1,6 @@
 package Khaospy::ControlPiMCP23017;
 use strict;
 use warnings;
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
 
 # This module is used by the Khaospy::PiControllerDaemon;
 

@@ -1,10 +1,6 @@
 package Khaospy::Conf::HardCoded;
 use strict;
 use warnings;
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
-
 # by Karl Kount-Khaos Hoskin. 2015-2016
 
 # for the hard coded live and test confs whilst dev-ing khaospy.

@@ -1,9 +1,6 @@
 package Khaospy::Log;
 use strict;
 use warnings;
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
 
 use Exporter qw/import/;
 use Carp qw/confess/;

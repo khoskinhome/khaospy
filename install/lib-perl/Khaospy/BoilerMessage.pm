@@ -8,10 +8,6 @@ use Exporter qw/import/;
 use JSON;
 my $json = JSON->new->allow_nonref;
 
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
-
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT

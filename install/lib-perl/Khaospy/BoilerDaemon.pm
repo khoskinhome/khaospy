@@ -11,11 +11,6 @@ use Clone 'clone';
 use JSON;
 use POSIX qw(strftime);
 
-use FindBin;
-FindBin::again();
-
-use lib "$FindBin::Bin/../lib-perl";
-
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     true false

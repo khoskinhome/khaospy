@@ -10,10 +10,6 @@ use JSON;
 
 my $json = JSON->new->allow_nonref;
 
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
-
 use Khaospy::Constants qw(
     true false
     ON OFF STATUS

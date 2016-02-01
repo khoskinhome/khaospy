@@ -5,8 +5,17 @@ use FindBin;
 FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 # by Karl Kount-Khaos Hoskin. 2015-2016
-
+#
 # uses the pi-hosts config file.
+#
+# this is usually run from the root crontab . i.e.
+#
+#       sudo crontab -e
+#
+# then add the line something like to the crontab :
+#
+#       */1  * * * * /opt/khaospy/bin/khaospy-run-daemons.pl  2>&1  > /dev/null
+#
 
 use Data::Dumper;
 

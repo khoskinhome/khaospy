@@ -1,9 +1,6 @@
 package Khaospy::ControlPiGPIO;
 use strict;
 use warnings;
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
 
 # This applies to all the "relay-manual" controls where there is override.
 # maybe even the orviboS20s

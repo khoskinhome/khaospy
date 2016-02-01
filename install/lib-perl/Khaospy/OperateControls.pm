@@ -1,9 +1,6 @@
 package Khaospy::OperateControls;
 use strict;
 use warnings;
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
 
 # TODO . This needs renaming to either :
 # Khaospy::OperateControlRequest

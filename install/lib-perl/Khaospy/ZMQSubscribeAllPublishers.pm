@@ -15,10 +15,6 @@ use ZMQ::Constants qw(
     ZMQ_SUB
 );
 
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
-
 use zhelpers;
 
 use Khaospy::Constants qw(

@@ -6,10 +6,6 @@ use Carp qw/confess/;
 use Data::Dumper;
 use Exporter qw/import/;
 
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
-
 use Khaospy::Constants qw(
     $JSON
     ON OFF STATUS

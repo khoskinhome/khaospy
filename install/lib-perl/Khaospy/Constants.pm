@@ -43,24 +43,25 @@ our $KHAOSPY_ALL_DIRS = [
 
 #################
 # daemon scripts
+our $KHAOSPY_ALL_SCRIPTS = [
+    our $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
+        = "$KHAOSPY_BIN_DIR/khaospy-one-wired-sender.py",
 
-our $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
-    = "$KHAOSPY_BIN_DIR/khaospy-one-wired-sender.py";
+    our $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
+        = "$KHAOSPY_BIN_DIR/khaospy-one-wired-receiver.py",
 
-our $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
-    = "$KHAOSPY_BIN_DIR/khaospy-one-wired-receiver.py";
+    our $KHAOSPY_ONE_WIRE_HEATING_DAEMON
+        = "$KHAOSPY_BIN_DIR/khaospy-one-wire-heating-daemon.pl",
 
-our $KHAOSPY_ONE_WIRE_HEATING_DAEMON
-    = "$KHAOSPY_BIN_DIR/khaospy-one-wire-heating-daemon.pl";
+    our $KHAOSPY_BOILER_DAEMON_SCRIPT
+        = "$KHAOSPY_BIN_DIR/khaospy-boiler-daemon.pl",
 
-our $KHAOSPY_BOILER_DAEMON_SCRIPT
-    = "$KHAOSPY_BIN_DIR/khaospy-boiler-daemon.pl";
+    our $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
+        = "$KHAOSPY_BIN_DIR/khaospy-controller-daemon.pl",
 
-our $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
-    = "$KHAOSPY_BIN_DIR/khaospy-controller-daemon.pl";
-
-our $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
-    = "$KHAOSPY_BIN_DIR/khaospy-controller-queue-d.pl";
+    our $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
+        = "$KHAOSPY_BIN_DIR/khaospy-controller-queue-d.pl",
+];
 
 #############
 # json confs
@@ -155,6 +156,8 @@ our @EXPORT_OK = qw(
 
     $KHAOSPY_PI_HOSTS_CONF
     $KHAOSPY_PI_HOSTS_CONF_FULLPATH
+
+    $KHAOSPY_ALL_SCRIPTS
 
     $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
     $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT

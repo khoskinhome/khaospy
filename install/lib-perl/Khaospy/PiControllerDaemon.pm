@@ -30,10 +30,6 @@ use ZMQ::Constants qw(
     ZMQ_SUB
 );
 
-use FindBin;
-FindBin::again();
-use lib "$FindBin::Bin/../lib-perl";
-
 use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
 use zhelpers;
 

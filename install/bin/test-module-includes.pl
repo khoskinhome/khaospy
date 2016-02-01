@@ -12,11 +12,18 @@ use Khaospy::Conf::Controls;
 use Khaospy::Conf::HardCoded;
 use Khaospy::Conf::PiHosts;
 
+use Khaospy::Exception;
+
 use Khaospy::Constants;
 use Khaospy::OperateControls;
 
 use Khaospy::BoilerDaemon;
 use Khaospy::BoilerMessage;
+ 
+use Khaospy::Controls;
+use Khaospy::ControlOrviboS20;
+use Khaospy::ControlPiGPIO;
+use Khaospy::ControlPiMCP23017;
 
 use Khaospy::Log;
 
@@ -28,8 +35,6 @@ use Khaospy::OrviboS20;
 use Khaospy::PiControllerDaemon;
 use Khaospy::PiControllerQueueDaemon;
 
-use Khaospy::PiGPIO;
-use Khaospy::PiMCP23017;
 
 use Khaospy::PiHostPublishers;
 

@@ -10,11 +10,12 @@ use AnyEvent;
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(ZMQ_SUB ZMQ_SUBSCRIBE ZMQ_RCVMORE ZMQ_FD);
 
-use JSON;
-use FindBin;
-FindBin::again();
+# TODO . This will be deprecated with a rules based system.
+# There will be no KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
+# There will be a rules daemons that can get the status of thermometer type controls,
+# window-switch type controls and then issue commands to radiator-controllers.
 
-use lib "$FindBin::Bin/../lib-perl";
+use JSON;
 
 use Khaospy::Utils qw(
     get_one_wire_sender_hosts

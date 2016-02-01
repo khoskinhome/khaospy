@@ -1,24 +1,15 @@
 High Prio
 ---------
 
-raise proper exceptions and don't just die.
+raise proper named exceptions and don't just die.
 
 
 Conf::PiHosts.
     write the code that will detect on what hosts what daemons should be running.
 
-conf.
+            ## install/lib-perl/Khaospy/Conf/PiHosts.pm:76:sub get_pi_hosts_running_daemon { # TODO rm this line
+            ## install/lib-perl-t/KhaospyConfPiHosts.t:56:throws_ok { get_pi_hosts_running_daemon('bad-daemon-name') } # TODO rm this line
 
-    get daemon-runner using the pi-host.json
-    new khaospy-run-daemons-from-pi-hosts.pl
-        generate the cli-opts from the config.
-
-
-    add option in config to graph-controls
-        make it optional, but if defined have to be boolean.
-
-
-    need an rrd-config. for grouping. maybe.
 
 
         deprecate Khaospy::PiHostPublishers. move its stuff into Khaospy::Conf::PiHosts
@@ -26,15 +17,33 @@ conf.
 
     move the PiGPIO stuff out from PiControllerDaemon and into PiGPIO.
 
-    Go over the Controller and ControllerQueue and tidy up. proper exception handling. Try::Tiny.
+    Go over the Controller and ControllerQueue and tidy up. proper exception handling. Try::Tiny. and raise proper exeptions. not dies. give them a name.
+
 
 starting writing the PiMCP23017 module . need this  for th alarm switch panel.  with tests. lots of work.
 
     daemons need locking. the "/usr/bin/daemon" should do this , but it looked broken recently.
 
+    fix the quoting of CLI params in khaospy-run-daemons.pl
+
+
+    Khaospy::RRDGraphDaemon
+        need an rrd-config. for grouping. maybe.
+        use the control config "rrd_graph" for what to graph.
+        has to listen to all different message status streams.
+
+    a better way of distributing the /etc/hosts. preferably just go for a DNS server for my local hostnames.
+
+    make boiler on/off with rad states page.
+
+why are there a lot of tmpfs using up lots of ram on jessie version of raspibian ?
 
 Medium Prio
 -----------
+
+pi dns and dhcp server.
+
+pibastion that I can open to the net and just get stats.
 
 redo the raspian image on the piold in the playhouse.
     have to get the frickin wifi thing working .
