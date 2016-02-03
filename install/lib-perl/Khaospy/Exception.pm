@@ -6,10 +6,24 @@ use Exception::Class (
 
     'KhaospyExcept::InvalidDaemonScriptName',
 
+    'KhaospyExcept::ControlsConfig',
+    'KhaospyExcept::ControlDoesnotExist',
+    'KhaospyExcept::ControlsConfigNoType',
+    'KhaospyExcept::ControlsConfigInvalidType',
 
+    'KhaospyExcept::ControlsConfigUnknownKeys',
+    'KhaospyExcept::ControlsConfigNoKey',
+    'KhaospyExcept::ControlsConfigKeysInvalidValue',
 
+    'KhaospyExcept::PiHostsNoValidGPIO',
+    'KhaospyExcept::ControlsConfigInvalidGPIO',
+    'KhaospyExcept::ControlsConfigDuplicateGPIO',
 
+    'KhaospyExcept::PiHostsNoValidI2CBus',
+    'KhaospyExcept::ControlsConfigInvalidI2CBus',
+    'KhaospyExcept::ControlsConfigDuplicateMCP23017GPIO',
 
+    'KhaospyExcept::ControlsConfigHostUnresovlable',
 
 );
 

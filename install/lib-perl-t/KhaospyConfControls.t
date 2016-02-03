@@ -19,6 +19,26 @@ sub false { 0 };
 use_ok ( "Khaospy::Conf::Controls", 'get_control_config' );
 use_ok ( "Khaospy::Conf::PiHosts" , 'get_pi_host_config' );
 
+use Khaospy::Exception qw(
+    KhaospyExcept::ControlDoesnotExist
+    KhaospyExcept::ControlsConfig
+    KhaospyExcept::ControlsConfigNoType
+    KhaospyExcept::ControlsConfigInvalidType
+    KhaospyExcept::ControlsConfigUnknownKeys
+    KhaospyExcept::ControlsConfigNoKey
+    KhaospyExcept::ControlsConfigKeysInvalidValue
+
+    KhaospyExcept::PiHostsNoValidGPIO
+    KhaospyExcept::ControlsConfigInvalidGPIO
+    KhaospyExcept::ControlsConfigDuplicateGPIO
+
+    KhaospyExcept::PiHostsNoValidI2CBus
+    KhaospyExcept::ControlsConfigInvalidI2CBus
+    KhaospyExcept::ControlsConfigDuplicateMCP23017GPIO
+
+    KhaospyExcept::ControlsConfigHostUnresovlable
+);
+
 # TODO test the loading of a JSON file, for the pi-hosts and controls.
 
 # stop the host resolution from dying.
@@ -65,17 +85,17 @@ my $override_get_controls_conf
         }
 );
 
-
-=pod
-Testing pi-hosts
-
-
-
-=cut
-
 #######################
 # Testing Khaospy::Conf::Controls
 my $cont_cfg ;
+
+$controls_return = {
+    'blahdeblah' => {
+    },
+};
+throws_ok { get_control_config('blahdeblah') }
+    qr/KhaospyExcept::ControlsConfigNoType/,
+    "dies on no type";
 
 $controls_return = {
     'blahdeblah' => {
@@ -84,7 +104,7 @@ $controls_return = {
 };
 
 throws_ok { get_control_config('blahdeblah') }
-    qr/invalid.*?type/,
+    qr/KhaospyExcept::ControlsConfigInvalidType/,
     "dies on invalid type";
 
 #############################
@@ -113,6 +133,9 @@ $controls_return = {
 throws_ok { get_control_config('therm-loft') }
     qr/invalid.*?rrd_graph/,
     "dies on invalid boolean for rrd_graph";
+throws_ok { get_control_config('therm-loft') }
+    qr/KhaospyExcept::ControlsConfigKeysInvalidValue/,
+    "dies on invalid boolean for rrd_graph";
 
 # remove the optional "alias" field :
 $controls_return = {
@@ -125,7 +148,7 @@ ok ( $cont_cfg = get_control_config('therm-loft') , "Can get control onewire-the
 cmp_deeply( $cont_cfg, $controls_return->{'therm-loft'} , "Got the control data" );
 
 throws_ok { get_control_config('not-a-control-in-conf') }
-    qr/doesn't exist/,
+    KhaospyExcept::ControlDoesnotExist->new,
     "dies on non-existent control";
 ##
 $controls_return = {
@@ -137,7 +160,7 @@ $controls_return = {
     },
 };
 throws_ok { get_control_config('therm-loft') }
-    qr/unknown key/,
+    qr/KhaospyExcept::ControlsConfigUnknownKeys/,
     "dies on an unknown key in onewire-thermometer type";
 
 ##
@@ -150,6 +173,9 @@ $controls_return = {
 };
 throws_ok { get_control_config('therm-loft') }
     qr/invalid.*?onewire_addr/,
+    "dies on an invalid onewire_addr in onewire-thermometer type";
+throws_ok { get_control_config('therm-loft') }
+    qr/KhaospyExcept::ControlsConfigKeysInvalidValue/,
     "dies on an invalid onewire_addr in onewire-thermometer type";
 
 ###########################
@@ -185,7 +211,10 @@ $controls_return = {
         },
 };
 throws_ok { get_control_config('alisonrad') }
-    qr/mac.*?non-existent-key/,
+    qr/KhaospyExcept::ControlsConfigNoKey/,
+    "dies on an non-existent-key 'mac' in OrviboS20 type";
+throws_ok { get_control_config('alisonrad') }
+    qr/doesn't have.*?mac/,
     "dies on an non-existent-key 'mac' in OrviboS20 type";
 
 $controls_return = {
@@ -197,6 +226,9 @@ $controls_return = {
 };
 throws_ok { get_control_config('alisonrad') }
     qr/invalid.*?mac/,
+    "dies on an invalid 'mac' in OrviboS20 type";
+throws_ok { get_control_config('alisonrad') }
+    qr/KhaospyExcept::ControlsConfigKeysInvalidValue/,
     "dies on an invalid 'mac' in OrviboS20 type";
 
 
@@ -228,6 +260,10 @@ $pi_hosts_return = {
 throws_ok { get_control_config('boiler') }
     qr/invalid gpio.*?gpio_relay/,
     "For a pi-gpio-relay control type, dies on an invalid gpio. gpio not defined in pi-hosts.";
+throws_ok { get_control_config('boiler') }
+    qr/KhaospyExcept::ControlsConfigInvalidGPIO/,
+    "For a pi-gpio-relay control type, dies on an invalid gpio. gpio not defined in pi-hosts.";
+
 
 
 $pi_hosts_return = {
@@ -260,7 +296,9 @@ $controls_return = {
 throws_ok { get_control_config('boiler') }
     qr/boiler.*?same.*?pi_gpio.*boiler/,
     "dies on two controls using same p_gpio on the same pi-host";
-
+throws_ok { get_control_config('boiler') }
+    qr/KhaospyExcept::ControlsConfigDuplicateGPIO/,
+    "dies on two controls using same p_gpio on the same pi-host";
 
 # test 2 controls using the same gpio on different pi-hosts lives
 $pi_hosts_return = {
@@ -324,6 +362,9 @@ $controls_return = {
 throws_ok { get_control_config('a_pi_gpio_relay_manual') }
     qr/invalid.*?invert_state/,
     "pi-gpio-relay-manual must have a valid boolean for invert_state";
+throws_ok { get_control_config('a_pi_gpio_relay_manual') }
+    qr/KhaospyExcept::ControlsConfigKeysInvalidValue/,
+    "pi-gpio-relay-manual must have a valid boolean for invert_state";
 
 # check on a pi-gpio-relay-manual that invert_state must be boolean
 $controls_return = {
@@ -339,6 +380,9 @@ $controls_return = {
 throws_ok { get_control_config('a_pi_gpio_relay_manual') }
     qr/invalid.*?ex_or_for_state/,
     "pi-gpio-relay-manual must have a valid boolean for ex_or_for_state";
+throws_ok { get_control_config('a_pi_gpio_relay_manual') }
+    qr/KhaospyExcept::ControlsConfigKeysInvalidValue/,
+    "pi-gpio-relay-manual must have a valid boolean for ex_or_for_state";
 
 # check on a pi-gpio-relay-manual can't have both the gpio_relay and gpio_detect set to the same gpio number.
 $controls_return = {
@@ -353,6 +397,9 @@ $controls_return = {
 };
 throws_ok { get_control_config('a_pi_gpio_relay_manual') }
     qr/pi_gpio_relay_manual.*?same.*?pi_gpio.*pi_gpio_relay_manual/,
+    "pi_gpio_relay_manual cannot use the same gpio on gpio_relay and gpio_detect";
+throws_ok { get_control_config('a_pi_gpio_relay_manual') }
+    qr/KhaospyExcept::ControlsConfigDuplicateGPIO/,
     "pi_gpio_relay_manual cannot use the same gpio on gpio_relay and gpio_detect";
 
 # simple validity check on a pi-gpio-relay-manual
@@ -411,6 +458,9 @@ $controls_return = {
 throws_ok { get_control_config('a_pi_mcp23017_relay') }
     qr/invalid.*?invert_state/,
     "pi-mcp23017-relay must have a valid boolean for invert_state";
+throws_ok { get_control_config('a_pi_mcp23017_relay') }
+    qr/KhaospyExcept::ControlsConfigKeysInvalidValue/,
+    "pi-mcp23017-relay must have a valid boolean for invert_state";
 
 $controls_return = {
     a_pi_mcp23017_relay => {
@@ -427,6 +477,9 @@ $controls_return = {
 };
 throws_ok { get_control_config('a_pi_mcp23017_relay') }
     qr/invalid.*?i2c_addr/,
+    "pi-mcp23017-relay must have a i2c_addr";
+throws_ok { get_control_config('a_pi_mcp23017_relay') }
+    qr/KhaospyExcept::ControlsConfigKeysInvalidValue/,
     "pi-mcp23017-relay must have a i2c_addr";
 
 ####
@@ -456,6 +509,9 @@ $controls_return = {
 throws_ok { get_control_config('a_pi_mcp23017_relay') }
     qr/invalid.*?i2c_bus.*?gpio_relay/,
     "pi-mcp23017-relay must have a i2c_bus";
+throws_ok { get_control_config('a_pi_mcp23017_relay') }
+    qr/KhaospyExcept::ControlsConfigInvalidI2CBus/,
+    "pi-mcp23017-relay must have a i2c_bus";
 
 ####
 $pi_hosts_return = {
@@ -482,6 +538,10 @@ $controls_return = {
 throws_ok { get_control_config('a_pi_mcp23017_relay') }
     qr/invalid.*?portname.*?gpio_relay/,
     "pi-mcp23017-relay must have a portname";
+throws_ok { get_control_config('a_pi_mcp23017_relay') }
+    qr/KhaospyExcept::ControlsConfigKeysInvalidValue/,
+    "pi-mcp23017-relay must have a portname";
+
 ###
 
 $controls_return = {
@@ -500,6 +560,10 @@ $controls_return = {
 throws_ok { get_control_config('a_pi_mcp23017_relay') }
     qr/invalid.*?portnum.*?gpio_relay/,
     "pi-mcp23017-relay must have a portnum";
+throws_ok { get_control_config('a_pi_mcp23017_relay') }
+    qr/KhaospyExcept::ControlsConfigKeysInvalidValue/,
+    "pi-mcp23017-relay must have a portnum";
+
 ###
 
 $controls_return = {
@@ -571,6 +635,9 @@ $controls_return = {
 throws_ok { get_control_config('a_pi_mcp23017_relay_with_manual') }
     qr/a_pi_mcp23017_relay_with_manual.*?same.*?pi_mcp23017.*a_pi_mcp23017_relay_with_manual/,
     "dies on two mcp23017 gpios using same gpio on the same pi-host";
+throws_ok { get_control_config('a_pi_mcp23017_relay_with_manual') }
+    qr/KhaospyExcept::ControlsConfigDuplicateMCP23017GPIO/,
+    "dies on two mcp23017 gpios using same gpio on the same pi-host";
 
 
 ## check mcp23017 gpios can be the same i2c_bus, i2c_addr, portname and portnum on different pi-hosts for 2 different controls.
@@ -634,8 +701,5 @@ $controls_return = {
 
 ok ( $cont_cfg = get_control_config('a_pi_mcp23017_relay_with_manual') , "pi-mcp23017-relay-manual config is okay");
 cmp_deeply( $cont_cfg, $controls_return->{'a_pi_mcp23017_relay_with_manual'} , "Got the control data" );
-
-ok ( $cont_cfg = get_control_config('a_pi_mcp23017_relay_with_manual2') , "pi-mcp23017-relay-manual config is okay");
-cmp_deeply( $cont_cfg, $controls_return->{'a_pi_mcp23017_relay_with_manual2'} , "Got the control data" );
 
 

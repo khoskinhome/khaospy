@@ -3,6 +3,8 @@ High Prio
 
 raise proper named exceptions and don't just die.
 
+Khaospy . Fix the Control Config tests to use the Exceptions ( rather than a regex )
+
 
 Conf::PiHosts.
     write the code that will detect on what hosts what daemons should be running.

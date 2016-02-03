@@ -64,7 +64,7 @@ my $return ;
 # TODO actually test this.
 
 throws_ok { get_pi_hosts_running_daemon('bad-daemon-name') }
-    'KhaospyExcept::InvalidDaemonScriptName',
+    KhaospyExcept::InvalidDaemonScriptName->new,
     "dies with bad script name";
 
 lives_ok { get_pi_hosts_running_daemon( $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT ) }

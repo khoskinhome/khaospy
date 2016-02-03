@@ -23,15 +23,12 @@ design to go on to PCB, use Eagle CAD.
 
 have a 3a 20mm cartridge fuse on the HV side of the lighting circuit.
 
-uses a mains detector. 4n25 and other stuff. 
-
-
+uses a mains detector. 4n25 and other stuff.
 
 
 pcb fuse for the mains detector :
     http://www.rapidonline.com/Electrical-Power/Schurter-0034-6001-Subminiature-Fuse-8-5mm-Quick-Acting-50mA-Pack-of-100-26-2297
     £24 for 100. That's a lot !
-
 
 
 xor gate http://uk.farnell.com/texas-instruments/sn74ahc1g86dckr/ic-ex-or-gate-single-2-input-smd/dp/1287455
