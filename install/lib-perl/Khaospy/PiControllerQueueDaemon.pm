@@ -50,13 +50,20 @@ use Khaospy::Constants qw(
     $PI_CONTROLLER_DAEMON_SEND_PORT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
     $PI_CONTROLLER_QUEUE_DAEMON_PUBLISH_EVERY_SECS
+    $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
+    $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
     $LOCALHOST
     $MESSAGE_TIMEOUT
 );
 
-use Khaospy::PiHostPublishers qw(
-    get_pi_controller_daemon_hosts
+use Khaospy::Conf::Controls qw(
+    get_controls_conf
 );
+
+use Khaospy::Conf::PiHosts qw/
+    get_pi_hosts_running_daemon
+    get_pi_hosts_conf
+/;
 
 use Khaospy::ZMQAnyEvent qw(
     zmq_anyevent
@@ -82,6 +89,11 @@ sub run_controller_queue_daemon {
     klog(START,"Controller Queue Daemon START");
     klog(START,"VERBOSE = ".( $VERBOSE ? "TRUE" : "FALSE" ));
 
+    # TODO only running these to validate the confs.
+    # could possibly do with a "validate_all_confs" or sumin' like that.
+    get_controls_conf();
+    get_pi_hosts_conf();
+
     my @w;
 
     # Listen for messages to go onto the queue.
@@ -101,13 +113,17 @@ sub run_controller_queue_daemon {
 
 
     # Listen for the Controllers return messages.
-    for my $sub_host ( @{get_pi_controller_daemon_hosts()} ){
+    for my $sub_host (
+        @{get_pi_hosts_running_daemon(
+            $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
+        )}
+    ){
         push @w, zmq_anyevent({
             zmq_type          => ZMQ_SUB,
             host              => $sub_host,
             port              => $PI_CONTROLLER_DAEMON_SEND_PORT,
             msg_handler       => \&message_from_controller,
-            msg_handler_param => "JUNK",
+            msg_handler_param => "",
             klog              => true,
         });
     }

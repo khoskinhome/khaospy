@@ -12,7 +12,10 @@ use Sys::Hostname;
 
 use List::Compare;
 
-use Khaospy::Exception qw/KhaospyExcept::InvalidDaemonScriptName/;
+use Khaospy::Exception qw(
+    KhaospyExcept::InvalidDaemonScriptName
+    KhaospyExcept::PiHostsNoHostsRunningDaemon
+);
 
 use Khaospy::Constants qw(
     $KHAOSPY_PI_HOSTS_CONF_FULLPATH
@@ -36,6 +39,7 @@ use Khaospy::Utils;
 
 our @EXPORT_OK = qw(
     get_pi_host_config
+    get_pi_hosts_conf
     get_this_pi_host_config
     get_pi_hosts_running_daemon
 );
@@ -90,6 +94,10 @@ sub get_pi_hosts_running_daemon {
                 if $script eq $daemon_script_full_path;
         }
     }
+
+    KhaospyExcept::PiHostsNoHostsRunningDaemon->throw(
+        error => "No Hosts are running the script $daemon_script_full_path",
+    ) if ! @$pi_hosts_run_d;
 
     return $pi_hosts_run_d;
 }

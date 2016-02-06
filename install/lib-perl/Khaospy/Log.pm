@@ -19,7 +19,7 @@ sub INFO  {"info"};
 sub DEBUG {"debug"};
 
 sub klogstart ($;$) { klog(START,@_) };
-sub klogfatal ($;$) { klog(FATAL,@_) };
+sub klogfatal ($;$$){ klog(FATAL,@_) };
 sub klogerror ($;$) { klog(ERROR,@_) };
 sub klogwarn  ($;$) { klog(WARN ,@_) };
 sub kloginfo  ($;$) { klog(INFO ,@_) };
@@ -54,14 +54,13 @@ my $type_to_val = {
 our $OVERRIDE_CONF_LOGLEVEL;
 
 sub klog {
-    my ( $type, $msg, $dump ) = @_;
+    my ( $type, $msg, $dump, $exception ) = @_;
     $type = lc ($type);
 
     my $pi_host_log_level ;
     try {
         $pi_host_log_level = get_this_pi_host_config()->{log_level};
     } catch {
-        
         $pi_host_log_level = "debug";
     };
 
@@ -78,6 +77,7 @@ sub klog {
     $line .= "Dump :\n".Dumper($dump) if $dump;
     $line .= "\n";
 
+    $exception->throw($line) if $exception;
     confess $line if $type eq "fatal" ;
 
     my $tval = $type_to_val->{$type};

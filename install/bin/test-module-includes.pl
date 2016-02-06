@@ -19,9 +19,9 @@ use Khaospy::OperateControls;
 
 use Khaospy::BoilerDaemon;
 use Khaospy::BoilerMessage;
- 
-use Khaospy::Controls;
+
 use Khaospy::ControlOrviboS20;
+use Khaospy::ControlPi;
 use Khaospy::ControlPiGPIO;
 use Khaospy::ControlPiMCP23017;
 
@@ -34,9 +34,6 @@ use Khaospy::OrviboS20;
 
 use Khaospy::PiControllerDaemon;
 use Khaospy::PiControllerQueueDaemon;
-
-
-use Khaospy::PiHostPublishers;
 
 use Khaospy::Utils;
 

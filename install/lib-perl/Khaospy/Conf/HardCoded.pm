@@ -645,7 +645,6 @@ sub test_controls_conf {
             type          => "onewire-thermometer",
             alias         => 'dining-room',
             onewire_addr  => '28-0000066ff2ac',
-            extra_key_err => "yuck !",
         },
 
         alisonrad       => {
@@ -680,21 +679,21 @@ sub test_controls_conf {
         },
 
 
-        broken_frontroomrad    => {
-            alias => 'Front Room Radiator',
-            type  => "orviboS20",
-            host  => 'frontroomrad',
-            mac   => 'ACCF-23-8D-3B-96',
-            extra => "bah",
-
-        },
+#        broken_frontroomrad    => {
+#            alias => 'Front Room Radiator',
+#            type  => "orviboS20",
+#            host  => 'frontroomrad',
+#            mac   => 'ACCF-23-8D-3B-96',
+#            extra => "bah",
+#
+#        },
 
         boiler => {
             alias => 'Boiler Central Heating',
             type  => "pi-gpio-relay",
             host  => 'pitest', # FIX THIS it will be piboiler when running.
+            invert_state => false,
             gpio_relay   => 4, # NOT the BCM CPIO number.
-#            invert_state => true,  ERROR ! 
         },
 
 # pi gpio
@@ -703,30 +702,30 @@ sub test_controls_conf {
             host => "pitest",
             ex_or_for_state => false,
             invert_state => false,
-            gpio_relay  => 4,
+            gpio_relay  => 1,
             gpio_detect => 5,
         },
 
-        a_pi_gpio_relay => {
-            type => "pi-gpio-relay",
-            host => "pitestNOT", # TODO non existant hostname.
-            invert_state => false,
-            gpio_relay  => 0,
-        },
-
-        duplicate_gpio_a_pi_gpio_relay => {
-            type => "pi-gpio-relay",
-            host => "pitestNOT", # TODO non existant hostname.
-            invert_state => false,
-            gpio_relay  => 0,
-        },
-
-        a_pi_gpio_switch => {
-            type => "pi-gpio-switch",
-            host => "pitest",
-            invert_state => false,
-            gpio_switch => 9, # ERROR !
-        },
+#        a_pi_gpio_relay => {
+#            type => "pi-gpio-relay",
+#            host => "pitestNOT", # TODO non existant hostname.
+#            invert_state => false,
+#            gpio_relay  => 0,
+#        },
+#
+#        duplicate_gpio_a_pi_gpio_relay => {
+#            type => "pi-gpio-relay",
+#            host => "pitestNOT", # TODO non existant hostname.
+#            invert_state => false,
+#            gpio_relay  => 0,
+#        },
+#
+#        a_pi_gpio_switch => {
+#            type => "pi-gpio-switch",
+#            host => "pitest",
+#            invert_state => false,
+#            gpio_switch => 9, # ERROR !
+#        },
 
 # pi mcp23017
 
@@ -932,6 +931,13 @@ sub test_pi_host_conf {
             daemons => [
                 {
                     script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT,
+                    options => {
+## TODO implement --log_level cli-opt on daemon-scripts.
+##                      '--log_level' => "debug", # over-ride per host setting.
+                    },
+                },
+                {
+                    script  => $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT,
                     options => {
 ## TODO implement --log_level cli-opt on daemon-scripts.
 ##                      '--log_level' => "debug", # over-ride per host setting.

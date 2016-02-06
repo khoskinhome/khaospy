@@ -1,22 +1,31 @@
 package Khaospy::ControlPiMCP23017;
 use strict;
 use warnings;
+# by Karl Kount-Khaos Hoskin. 2015-2016
 
 # This module is used by the Khaospy::PiControllerDaemon;
+use Try::Tiny;
+use Exporter qw/import/;
+use Data::Dumper;
+use Carp qw/croak/;
 
-#use Exporter qw/import/;
-#use Data::Dumper;
-#use Carp qw/croak/;
-#use JSON;
+use Khaospy::Log qw(
+    klogstart klogfatal klogerror
+    klogwarn  kloginfo  klogdebug
+);
+
+our @EXPORT_OK = qw(
+    init_pi_mcp23017_controls
+);
+
+
+sub init_pi_mcp23017_controls {
+
+    kloginfo  "Initialise PiMCP23017 controls";
+
+}
+
 #
-#use ZMQ::LibZMQ3;
-#use ZMQ::Constants qw(
-#    ZMQ_SUB
-#    ZMQ_SUBSCRIBE
-#    ZMQ_RCVMORE
-#    ZMQ_FD
-#    ZMQ_PUB
-#);
 #
 #my $json = JSON->new->allow_nonref;
 #

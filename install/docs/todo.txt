@@ -3,21 +3,14 @@ High Prio
 
 raise proper named exceptions and don't just die.
 
-Khaospy . Fix the Control Config tests to use the Exceptions ( rather than a regex )
+
+Test that PiControllerDaemon.pm subscribes to the correct hosts.
+
+
 
 
 Conf::PiHosts.
-    write the code that will detect on what hosts what daemons should be running.
 
-            ## install/lib-perl/Khaospy/Conf/PiHosts.pm:76:sub get_pi_hosts_running_daemon { # TODO rm this line
-            ## install/lib-perl-t/KhaospyConfPiHosts.t:56:throws_ok { get_pi_hosts_running_daemon('bad-daemon-name') } # TODO rm this line
-
-
-
-        deprecate Khaospy::PiHostPublishers. move its stuff into Khaospy::Conf::PiHosts
-
-
-    move the PiGPIO stuff out from PiControllerDaemon and into PiGPIO.
 
     Go over the Controller and ControllerQueue and tidy up. proper exception handling. Try::Tiny. and raise proper exeptions. not dies. give them a name.
 

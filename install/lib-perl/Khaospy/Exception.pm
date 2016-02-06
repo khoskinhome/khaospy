@@ -25,6 +25,8 @@ use Exception::Class (
 
     'KhaospyExcept::ControlsConfigHostUnresovlable',
 
+    'KhaospyExcept::PiHostsNoHostsRunningDaemon',
+
 );
 
 

@@ -49,6 +49,7 @@ use Khaospy::Utils;
 
 our @EXPORT_OK = qw(
     get_control_config
+    get_controls_conf
 );
 
 # ALL Control must have a key called "type".

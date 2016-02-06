@@ -6,7 +6,7 @@ FindBin::again();
 use lib "$FindBin::Bin/../lib-perl/";
 # by Karl Kount-Khaos Hoskin. 2015-2016
 
-use Test::More 'no_plan';
+use Test::More tests => 60;
 use Test::Exception;
 use Test::Deep;
 

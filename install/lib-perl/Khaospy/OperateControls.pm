@@ -87,7 +87,7 @@ sub _orvibo_command {
 sub _picontroller_command {
     my ( $control_name, $action ) = @_;
 
-    print "Khaospy::OperateControls PRETEND RUN PICONTROLLER COMMAND $control_name $action\n";
+    print "Khaospy::OperateControls Run PiController COMMAND '$control_name $action'\n";
 
     my $control = get_control_config($control_name);
 
