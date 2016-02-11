@@ -6,16 +6,18 @@ raise proper named exceptions and don't just die.
 
 Test that PiControllerDaemon.pm subscribes to the correct hosts.
 
+Test that the pigpio-relay stuff works
 
+write the
+    get the port initialisation code moved in PiGPIO.
+    pigpio relay-manual
 
 
 Conf::PiHosts.
 
+    Go over the PiControllerDaemon and PiControllerQueueDaemon and tidy up. proper exception handling. Try::Tiny. and raise proper exeptions. not dies. give them a name.
 
-    Go over the Controller and ControllerQueue and tidy up. proper exception handling. Try::Tiny. and raise proper exeptions. not dies. give them a name.
-
-
-starting writing the PiMCP23017 module . need this  for th alarm switch panel.  with tests. lots of work.
+Starting writing the PiMCP23017 module . need this  for th alarm switch panel.  with tests. lots of work. ( finish of the PiGPIO first )
 
     daemons need locking. the "/usr/bin/daemon" should do this , but it looked broken recently.
 

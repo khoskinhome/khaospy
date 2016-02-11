@@ -692,8 +692,15 @@ sub test_controls_conf {
             alias => 'Boiler Central Heating',
             type  => "pi-gpio-relay",
             host  => 'pitest', # FIX THIS it will be piboiler when running.
-            invert_state => false,
+            invert_state => true,
             gpio_relay   => 4, # NOT the BCM CPIO number.
+        },
+
+        a_pi_gpio_switch => {
+            type => "pi-gpio-switch",
+            host => "pitest",
+            invert_state => false,
+            gpio_switch => 0, # ERROR !
         },
 
 # pi gpio
@@ -720,12 +727,6 @@ sub test_controls_conf {
 #            gpio_relay  => 0,
 #        },
 #
-#        a_pi_gpio_switch => {
-#            type => "pi-gpio-switch",
-#            host => "pitest",
-#            invert_state => false,
-#            gpio_switch => 9, # ERROR !
-#        },
 
 # pi mcp23017
 

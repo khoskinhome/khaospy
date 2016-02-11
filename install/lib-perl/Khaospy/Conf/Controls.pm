@@ -66,7 +66,7 @@ our @EXPORT_OK = qw(
 # a "relay" is something the Pi Controls to operate (should I say "switch", sorry!) a circuit.
 #   hence it uses a gpio in "output" mode.
 #
-# a "switch" is a "input" from something.
+# a "switch" is a "input" (from Khaospy's perspective) from something.
 #   The "input" can be a gpio ( pi direct or i2c-MCP23017-gpio ) in "input" mode.
 #   The "input" can be seeing if a mac-address is nmap-able on the local network.
 #   The "input" can be if an IP is pingable.
@@ -79,6 +79,45 @@ our @EXPORT_OK = qw(
 #   There are several ways of doing this wiring.
 #   All are useful under certain circumstances.
 # The summary is a "relay-manual" is a circuit that is controlled by a Pi and a manual-switch somewhere.
+
+#########################################
+# invert_state
+#########################################
+#
+# invert_state is needed to make 0's (false) in khaospy truly represent that the electrical circuit is OFF . Also that 1, true, ON the electrical circuit is truly ON.
+#
+# This is needed because certain circuit configurations work in reverse, in several different ways.
+#
+# The simplest to understand is that some relay modules ( facilla ones for Arduino's / Pi-s ) when you drive them with a 3.3v or 5v signal actually turn the relay off.
+# Even if this was the more logical 3.3v output on the Pi GPIO turns the relay on , you could have wired up the Normally-Closed contacts of the circuit to energise the light ( or other load ) that you are driving.
+# 
+# When we get to the case of the relay-manual circuit, with several different wiring types it gets even more complicated.
+#
+# Even the "switch" type control can suffer from a 5v signal on the GPIO pin actually meaning the electrical load is really off.
+#
+# So invert_state solves these issues. It works differently depending on whether the control type is a simple "relay", "switch" or whether it is the more complicated "relay-manual".
+#
+# "relay" and invert-state.
+# ---------------------
+# For this type of control invert_state just changes 0 to 1 ( and vice-versa ) when the # signal is sent to the GPIO.
+#
+# "switch" and invert-state.
+# ----------------------
+# This is pretty much the same as the "relay" . Only here the GPIO is polled for its value, and a 0 is returned as 1 in the code ( and vice-versa )
+#
+# "relay-manual" and invert_state and ex_or_for_state.
+# --------------------------------
+# This is where the real fun begins.
+# Here the invert_state works almost like the "switch".
+# It only operates on the status value that is going to be returned in the code.
+# It doesn't operate on the "relay" output. That doesn't matter.
+# It only works on the "gpio_detect" input. This is because the gpio_detect should represent the voltage on the circuit. In most cases it does.
+# However there is one extra part to this ..... ex_or_for_state.
+#
+# The wiring diagrams of some controls the voltage that is applied to the "gpio_detect" pin is the voltage of what is being applied to another relay. ( makes for less wiring, and simpler control electronics ! )
+# Now on this circuit the gpio_relay output and the gpio_relay have to be exclusively-or-ed to get the circuit state ( 2 way lighting control is effectively an ex-or ), it is the result of this ex_or that invert_state operates on, this is what will be returned as the state of the control.
+#
+# This is best shown with some diagrams. That will be somewhere !
 
 my $check_mac = check_regex(
     qr/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/

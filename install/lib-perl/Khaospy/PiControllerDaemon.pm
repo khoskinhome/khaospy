@@ -161,7 +161,7 @@ sub controller_message {
       action             => $action,
       request_host       => $request_host,
       action_epoch_time  => time,
-      status             => $status,
+      %$status,
     };
 
 # TODO log msg just actioned in :

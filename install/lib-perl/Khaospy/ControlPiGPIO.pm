@@ -12,6 +12,13 @@ use Khaospy::Constants qw(
     $PI_GPIO_CMD
     true false
     ON OFF STATUS
+    IN $IN OUT $OUT
+);
+
+use Khaospy::ControlPiUtils qw(
+    trans_true_to_ON
+    trans_ON_to_true
+    invert_state
 );
 
 use Khaospy::Log qw(
@@ -21,8 +28,14 @@ use Khaospy::Log qw(
 
 our @EXPORT_OK = qw(
     init_pi_gpio_controls
+    operate_pi_gpio_switch
     operate_pi_gpio_relay
+    operate_pi_gpio_relay_manual
 );
+
+
+# TODO pi_relay_manual_state will need to be initialised.
+my $pi_relay_manual_state = {};
 
 sub init_pi_gpio_controls {
     kloginfo  "Initialise PiGPIO controls";
@@ -32,23 +45,54 @@ sub init_pi_gpio_controls {
 
 }
 
+sub operate_pi_gpio_switch {
+    my ($control_name,$control, $action) = @_;
+
+    kloginfo "OPERATE  $control_name ( Pi GPIO Switch ) with $action";
+
+    klogerror "Can only operate a switch with 'status'. ( not '$action' )"
+        if $action ne STATUS;
+
+    my $gpio_num = $control->{gpio_switch};
+
+    # Initialising port IN or OUT
+    # should be done when PiControllerDaemon first starts :
+    init_pi_gpio($gpio_num, IN);
+
+    return {
+        status => trans_true_to_ON(
+            invert_state($control,read_pi_gpio($gpio_num))
+        )
+    };
+}
+
 sub operate_pi_gpio_relay {
     my ($control_name,$control, $action) = @_;
 
-    kloginfo "OPERATE $control_name with $action";
+    kloginfo "OPERATE $control_name ( Pi Relay ) with $action";
 
     my $gpio_num = $control->{gpio_relay};
 
     # Initialising port IN or OUT
     # should be done when PiControllerDaemon first starts :
-    init_pi_gpio($gpio_num, "out");
+    init_pi_gpio($gpio_num, OUT);
 
     write_pi_gpio($gpio_num, trans_ON_to_true(invert_state($control,$action)))
         if $action ne STATUS;
 
-    return trans_true_to_ON(
-        invert_state($control,read_pi_gpio($gpio_num))
-    );
+    return {
+        status => trans_true_to_ON(
+            invert_state($control,read_pi_gpio($gpio_num))
+        )
+    };
+}
+
+sub operate_pi_gpio_relay_manual {
+    my ($control_name,$control, $action) = @_;
+
+    klogerror "operate_pi_gpio_relay_manual not yet implemented";
+
+    return {};
 }
 
 # For the initialisation, reading and writing of Pi GPIO pins.
@@ -63,16 +107,14 @@ sub operate_pi_gpio_relay {
 sub init_pi_gpio {
     my ($gpio_num, $IN_OUT) = @_;
     $IN_OUT = lc( $IN_OUT );
-    fatal_invalid_pi_gpio($gpio_num);
     klogfatal "Can only set a Pi GPIO mode ($IN_OUT) to 'in' or 'out'"
-        if $IN_OUT ne "in" and $IN_OUT ne "out";
+        if $IN_OUT ne IN and $IN_OUT ne OUT;
 
     system("$PI_GPIO_CMD mode $gpio_num $IN_OUT");
 }
 
 sub read_pi_gpio {
     my ($gpio_num) = @_;
-    fatal_invalid_pi_gpio($gpio_num);
     my $r = qx( $PI_GPIO_CMD read $gpio_num );
     chomp $r;
     return $r;
@@ -80,57 +122,8 @@ sub read_pi_gpio {
 
 sub write_pi_gpio {
     my ($gpio_num, $val) = @_;
-    fatal_invalid_pi_gpio($gpio_num);
     system("$PI_GPIO_CMD write $gpio_num $val");
     return;
-}
-
-sub fatal_invalid_pi_gpio {
-    my ($gpio_num) = @_;
-    klogfatal "gpio number can only be 0 to 7" if $gpio_num !~ /^[0-7]$/;
-}
-
-# these helper subs need to be in a Khaospy::OperateControls module,
-# that is when the current Khaospy::OperateControls.pm is renamed to Khaospy::OperateControl.pm
-
-# Stating possibly the "bleedin' obvious,
-# ON eq "on" , and OFF eq "off"
-# true == 1 , false == 0
-# These subs translate both ways from ON to true and OFF to false.
-
-sub trans_true_to_ON { # and false to OFF
-    my ($truefalse) = @_;
-    return ON  if $truefalse == true;
-    return OFF if $truefalse == false;
-    klogfatal "Can't translate a non true or false value ($truefalse) to ON or OFF";
-}
-
-sub trans_ON_to_true { # and OFF to false
-    my ($ONOFF) = @_;
-    return true  if $ONOFF eq ON;
-    return false if $ONOFF eq OFF;
-    klogfatal "Can't translate a non ON or OFF value ($ONOFF) to true or false";
-}
-sub invert_state {
-    # if a control has "invert_state" option set then this
-    # inverts both ON/OFF and true/false
-    my ( $control, $val ) = @_;
-
-    return $val
-        if ! exists $control->{invert_state}
-            || $control->{invert_state} eq false ;
-
-    if ( $val eq ON || $val eq OFF ){
-
-        return ($val eq ON) ? OFF : ON ;
-
-    } elsif ($val eq true or $val eq false) {
-
-        return ( $val ) ? false : true ;
-
-    }
-
-    klogfatal "Unrecognised value ($val) passed to invert_state()";
 }
 
 # This applies to all the "relay-manual" controls where there is override.
@@ -209,6 +202,5 @@ sub invert_state {
 #
 #
 #}
-
 
 1;

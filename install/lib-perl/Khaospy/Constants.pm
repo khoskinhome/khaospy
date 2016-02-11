@@ -21,6 +21,13 @@ our $ON     = ON();
 sub OFF     { "off" };
 our $OFF    = OFF();
 
+sub IN {"in"};
+our $IN = IN();
+
+sub OUT {"out"};
+our $OUT = OUT();
+
+
 sub STATUS  { "status" };
 our $STATUS = STATUS();
 
@@ -126,6 +133,8 @@ our @EXPORT_OK = qw(
     $JSON
 
     true false
+
+    IN $IN OUT $OUT
 
      ON  OFF  STATUS
     $ON $OFF $STATUS
