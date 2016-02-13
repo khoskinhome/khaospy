@@ -26,11 +26,17 @@ alias cdkhaospywwwbin='cd /opt/khaospy/www-bin/'
 alias cdkhaospypid='cd /opt/khaospy/pid/'
 alias cdkhaospylog='cd /opt/khaospy/log/'
 
-
 alias bashrc='. ~/.bashrc'
 
 alias la='ls --color=auto -la'
 alias lart='ls --color=auto -lart'
 alias l1='ls --color=auto -1'
+
+alias s.reboot='sudo reboot'
+alias s.shutdown='sudo shutdown'
+alias s.khaospy_zmq_subscribe='sudo /opt/khaospy/bin/khaospy-zmq-subscribe.pl'
+alias s.khaospy_controller_daemon='sudo /opt/khaospy/bin/khaospy-controller-daemon.pl'
+alias s.khaospy_controller_queue_d='sudo /opt/khaospy/bin/khaospy-controller-queue-d.pl'
+alias s.khaospy_operate_control='sudo /opt/khaospy/bin/khaospy-operate-control.pl'
 
 cd /opt/khaospy/bin

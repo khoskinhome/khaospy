@@ -27,11 +27,15 @@ our $IN = IN();
 sub OUT {"out"};
 our $OUT = OUT();
 
-
 sub STATUS  { "status" };
 our $STATUS = STATUS();
 
+sub AUTO   {"auto"};
+sub MANUAL {"manual"};
+
 our $CODE_VERSION="0.01.001";
+
+
 
 #######
 # dirs
@@ -50,12 +54,25 @@ our $KHAOSPY_ALL_DIRS = [
 
 #################
 # daemon scripts
+
+our $ONE_WIRE_SENDER            = 'khaospy-one-wired-sender.py';
+our $ONE_WIRE_RECEIVER          = 'khaospy-one-wired-receiver.py';
+our $PI_CONTROLLER_DAEMON       = 'khaospy-controller-daemon.pl';
+our $PI_CONTROLLER_QUEUE_DAEMON = 'khaospy-controller-queue-d.pl';
+#our $PI_STATUS_DAEMON           =
+#our $MAC_SWITCH_DAEMON          =
+#our $PING_SWITCH_DAEMON         =
+#    $PI_STATUS_DAEMON
+#    $MAC_SWITCH_DAEMON
+#    $PING_SWITCH_DAEMON
+
+
 our $KHAOSPY_ALL_SCRIPTS = [
     our $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
-        = "$KHAOSPY_BIN_DIR/khaospy-one-wired-sender.py",
+        = "$KHAOSPY_BIN_DIR/$ONE_WIRE_SENDER",
 
     our $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
-        = "$KHAOSPY_BIN_DIR/khaospy-one-wired-receiver.py",
+        = "$KHAOSPY_BIN_DIR/$ONE_WIRE_RECEIVER",
 
     our $KHAOSPY_ONE_WIRE_HEATING_DAEMON
         = "$KHAOSPY_BIN_DIR/khaospy-one-wire-heating-daemon.pl",
@@ -64,10 +81,10 @@ our $KHAOSPY_ALL_SCRIPTS = [
         = "$KHAOSPY_BIN_DIR/khaospy-boiler-daemon.pl",
 
     our $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
-        = "$KHAOSPY_BIN_DIR/khaospy-controller-daemon.pl",
+        = "$KHAOSPY_BIN_DIR/$PI_CONTROLLER_DAEMON",
 
     our $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
-        = "$KHAOSPY_BIN_DIR/khaospy-controller-queue-d.pl",
+        = "$KHAOSPY_BIN_DIR/$PI_CONTROLLER_QUEUE_DAEMON",
 ];
 
 #############
@@ -139,6 +156,8 @@ our @EXPORT_OK = qw(
      ON  OFF  STATUS
     $ON $OFF $STATUS
 
+    AUTO MANUAL
+
     $KHAOSPY_ALL_DIRS
     $KHAOSPY_ROOT_DIR
     $KHAOSPY_BIN_DIR
@@ -176,6 +195,11 @@ our @EXPORT_OK = qw(
     $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
 
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT
+
+    $ONE_WIRE_SENDER
+    $ONE_WIRE_RECEIVER
+    $PI_CONTROLLER_DAEMON
+    $PI_CONTROLLER_QUEUE_DAEMON
 
     $ONE_WIRE_DAEMON_PORT
     $PI_CONTROL_SEND_PORT

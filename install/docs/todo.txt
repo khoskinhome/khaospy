@@ -4,6 +4,12 @@ raise proper named exceptions and don't just die.
 
 Test that PiControllerDaemon.pm subscribes to the correct hosts.
 
+
+fix the PiGPIO-relay-manual detection of manual state changes.
+
+abstract out the relay, switch and relay-manual logic into the ControlPi.pm
+
+
 Test that the following stuff works
     pi-gpio-relay
     pi-gpio-relay-manual

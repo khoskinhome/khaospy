@@ -121,6 +121,13 @@ our @EXPORT_OK = qw(
 # Now on this circuit the gpio_relay output and the gpio_relay have to be exclusively-or-ed to get the circuit state ( 2 way lighting control is effectively an ex-or ), it is the result of this ex_or that invert_state operates on, this is what will be returned as the state of the control.
 #
 # This is best shown with some diagrams. That will be somewhere !
+#
+####
+# relay-manual : manual_auto_timeout
+####
+# this optional setting says "if a relay-manual control has been manually operated then do not auto-control for this many seconds"
+
+
 
 my $check_mac = check_regex(
     qr/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/
@@ -129,6 +136,8 @@ my $check_mac = check_regex(
 my $check_boolean = check_regex(qr/^[01]$/);
 my $check_optional_boolean
     = check_optional_regex(qr/^[01]$/);
+my $check_optional_integer
+    = check_optional_regex(qr/^\d+$/);
 
 my $check_types = {
     "orvibos20" => {
@@ -150,6 +159,7 @@ my $check_types = {
         host            => \&check_host_runs_pi_controls,
         ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
+        manual_auto_timeout => $check_optional_integer,
         gpio_relay      => \&check_pi_gpio,
         gpio_detect     => \&check_pi_gpio,
     },
@@ -173,6 +183,7 @@ my $check_types = {
         host            => \&check_host_runs_pi_controls,
         ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
+        manual_auto_timeout => $check_optional_integer,
         gpio_relay      => \&check_pi_mcp23017,
         gpio_detect     => \&check_pi_mcp23017,
     },

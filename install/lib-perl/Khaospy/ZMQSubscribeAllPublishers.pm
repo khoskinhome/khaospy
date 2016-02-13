@@ -8,6 +8,7 @@ use Exporter qw/import/;
 use Data::Dumper;
 use Carp qw/croak/;
 use Sys::Hostname;
+use POSIX qw/strftime/;
 
 use AnyEvent;
 use ZMQ::LibZMQ3;
@@ -83,8 +84,37 @@ sub run_subscribe_all {
 }
 
 sub output_msg {
-    my ($zmq_sock, $msg, $port ) = @_;
-    kloginfo "$port : $msg";
+    my ( $zmq_sock, $msg, $port ) = @_;
+    kloginfo "msg on port $port";
+
+    my $dec = $JSON->decode($msg);
+
+    my $convert_times = sub {
+        my ( $key, $value ) = @_;
+
+        my $r_val = $value;
+
+        if ($key =~ /_time$/){
+            my $fraction = $value - int($value);
+
+            my ($frac_str) = $fraction
+                =~ /^0\.(\d{4})/;
+
+            $r_val = sprintf("%s.%s GMT",
+                strftime("%F %T", gmtime($value)),
+                $frac_str
+            );
+        }
+
+        my $spaces = 36 - length($key);
+        my $pad = " " x ($spaces > 0 ? $spaces : 1 );
+
+        return sprintf("  %s%s=> %s", $key, $pad, $r_val);
+    };
+
+    my @out = map { $convert_times->($_, $dec->{$_}) } keys %$dec;
+    print join( "\n" , sort @out )."\n";
+
 }
 
 sub get_ports {

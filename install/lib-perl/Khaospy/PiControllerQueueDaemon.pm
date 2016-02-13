@@ -22,6 +22,7 @@ use Exporter qw/import/;
 use Data::Dumper;
 use JSON;
 use Sys::Hostname;
+use Clone qw/clone/;
 
 use AnyEvent;
 use ZMQ::LibZMQ3;
@@ -46,6 +47,9 @@ use Khaospy::Constants qw(
     $JSON
     true false
     ON OFF STATUS
+
+    $PI_CONTROLLER_QUEUE_DAEMON
+
     $PI_CONTROL_SEND_PORT
     $PI_CONTROLLER_DAEMON_SEND_PORT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
@@ -148,8 +152,8 @@ sub timer_cb {
     for my $mkey ( keys %$msg_queue ){
         my $msg_rh = $msg_queue->{$mkey}{hashref};
 
-        klog(INFO, "Publish message $msg_queue->{$mkey}{json}");
-        zmq_sendmsg( $zmq_publisher, $msg_queue->{$mkey}{json} );
+        klog(INFO, "Publish message $msg_queue->{$mkey}{json_from}");
+        zmq_sendmsg( $zmq_publisher, $msg_queue->{$mkey}{json_from} );
 
         if ( $msg_rh->{request_epoch_time} < time - $MESSAGE_TIMEOUT ){
             klog(ERROR, "Msg timed out. $mkey");
@@ -187,7 +191,13 @@ sub queue_message {
         return;
     }
 
-    $msg_queue->{$msg_p->{mkey}} = $msg_p;
+    my $mkey = $msg_p->{mkey};
+
+    my $new_msg = clone($msg_p->{hashref});
+    $new_msg->{message_from} = $PI_CONTROLLER_QUEUE_DAEMON;
+    $msg_p->{json_from} = $JSON->encode($new_msg);
+
+    $msg_queue->{$mkey} = $msg_p;
 
     # have to reply to the requestor :
     klog(DEBUG, "Reply to requestor $msg");
@@ -195,8 +205,11 @@ sub queue_message {
 
     # publish this message for control-daemons to grab :
     klog(DEBUG, "Publish (first) message $msg");
-    zmq_sendmsg( $zmq_publisher, $msg );
+    zmq_sendmsg( $zmq_publisher, $msg_queue->{$mkey}{json_from} );
+
 }
+
+
 
 1;
 

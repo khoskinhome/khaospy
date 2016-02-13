@@ -20,10 +20,23 @@ our @EXPORT_OK = qw(
 
 
 sub init_pi_mcp23017_controls {
-
     kloginfo  "Initialise PiMCP23017 controls";
 
 }
+
+
+
+my $mcp23017_state = {};
+
+sub read_mcp23017 {
+    # reads from the MCP23017
+}
+
+sub write_mcp23017 {
+
+}
+
+sub init_mcp23017 {}
 
 #
 #

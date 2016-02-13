@@ -43,6 +43,8 @@ use Khaospy::Constants qw(
     $JSON
     true false
 
+    $PI_CONTROLLER_DAEMON
+
     $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
 
@@ -161,6 +163,7 @@ sub controller_message {
       action             => $action,
       request_host       => $request_host,
       action_epoch_time  => time,
+      message_from       => $PI_CONTROLLER_DAEMON,
       %$status,
     };
 
