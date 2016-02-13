@@ -20,6 +20,7 @@ use Khaospy::Constants qw(
 
 use Khaospy::ControlPiGPIO qw(
     init_pi_gpio_controls
+    poll_pi_gpio_controls
     operate_pi_gpio_relay
     operate_pi_gpio_relay_manual
     operate_pi_gpio_switch
@@ -27,6 +28,7 @@ use Khaospy::ControlPiGPIO qw(
 
 use Khaospy::ControlPiMCP23017 qw(
     init_pi_mcp23017_controls
+    poll_pi_mcp23017_controls
 );
 
 use Khaospy::Log qw(
@@ -35,14 +37,21 @@ use Khaospy::Log qw(
 );
 
 our @EXPORT_OK = qw(
+    poll_pi_controls
     init_pi_controls
     operate_control
 );
 
 sub init_pi_controls {
-    get_controls_conf
+    get_controls_conf();
     init_pi_gpio_controls();
     init_pi_mcp23017_controls();
+}
+
+sub poll_pi_controls {
+    my ($callback) = @_;
+    poll_pi_gpio_controls($callback);
+    poll_pi_mcp23017_controls($callback);
 }
 
 my $dispatch = {

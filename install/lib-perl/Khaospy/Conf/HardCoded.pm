@@ -709,6 +709,7 @@ sub test_controls_conf {
             host => "pitest",
             ex_or_for_state => false,
             invert_state => false,
+            manual_auto_timeout => 20,
             gpio_relay  => 4,
             gpio_detect => 0,
         },

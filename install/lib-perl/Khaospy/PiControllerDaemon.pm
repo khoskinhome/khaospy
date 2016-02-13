@@ -42,8 +42,10 @@ use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     $JSON
     true false
+    STATUS
 
     $PI_CONTROLLER_DAEMON
+    $PI_CONTROLLER_DAEMON_TIMER
 
     $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
@@ -53,6 +55,7 @@ use Khaospy::Constants qw(
 
 use Khaospy::ControlPi qw(
     init_pi_controls
+    poll_pi_controls
     operate_control
 );
 
@@ -71,8 +74,6 @@ use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
 use zhelpers;
 
 our @EXPORT_OK = qw( run_controller_daemon );
-
-our $PUBLISH_STATUS_EVERY_SECS = 5;
 
 # TODO use this to log messages received and only action them once.
 # my $msg_received = {};
@@ -99,17 +100,17 @@ sub run_controller_daemon {
         )}
     ){
         push @w, zmq_anyevent({
-            zmq_type          => ZMQ_SUB,
-            host              => $sub_host,
-            port              => $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT,
-            msg_handler       => \&controller_message,
-            klog              => true,
+            zmq_type    => ZMQ_SUB,
+            host        => $sub_host,
+            port        => $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT,
+            msg_handler => \&controller_message,
+            klog        => true,
         });
     }
 
     push @w, AnyEvent->timer(
         after    => 0.1, # TODO. MAGIC NUMBER . should be in Constants.pm or a json-config. dunno. but not here.
-        interval => $PUBLISH_STATUS_EVERY_SECS,
+        interval => $PI_CONTROLLER_DAEMON_TIMER,
         cb       => \&timer_cb
     );
 
@@ -122,6 +123,19 @@ sub timer_cb {
 
     # TODO clean up $msg_received with messages over timeout.
 
+    poll_pi_controls(\&poll_callback);
+
+}
+
+sub poll_callback {
+    my ( $poll_state ) = @_;
+
+    $poll_state->{request_epoch_time} = time;
+    $poll_state->{action}             = STATUS;
+    $poll_state->{poll_epoch_time}    = time;
+    $poll_state->{message_from}       = $PI_CONTROLLER_DAEMON;
+    my $json_msg = $JSON->encode($poll_state);
+    zhelpers::s_send( $zmq_publisher, "$json_msg" );
 }
 
 sub controller_message {

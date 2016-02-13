@@ -49,11 +49,11 @@ use Khaospy::Constants qw(
     ON OFF STATUS
 
     $PI_CONTROLLER_QUEUE_DAEMON
+    $PI_CONTROLLER_QUEUE_DAEMON_TIMER
 
     $PI_CONTROL_SEND_PORT
     $PI_CONTROLLER_DAEMON_SEND_PORT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
-    $PI_CONTROLLER_QUEUE_DAEMON_PUBLISH_EVERY_SECS
     $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
     $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
     $LOCALHOST
@@ -134,7 +134,7 @@ sub run_controller_queue_daemon {
 
     push @w, AnyEvent->timer(
         after    => 0.1,
-        interval => $PI_CONTROLLER_QUEUE_DAEMON_PUBLISH_EVERY_SECS,
+        interval => $PI_CONTROLLER_QUEUE_DAEMON_TIMER,
         cb       => \&timer_cb
     );
 

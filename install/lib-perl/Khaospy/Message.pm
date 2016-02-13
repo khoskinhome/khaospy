@@ -71,20 +71,8 @@ sub validate_control_msg_fields {
     validate_action($action);
 
     # TODO check :
-    #   control_host is a valid host in the config.
     #   request_host is a valid host in the config.
-    #   action is valid
 
-#    if ( $control->{type} eq 'pi-gpio-relay'){
-#        return operate_pi_gpio_relay($control_name,$control, $action);
-#    }
-#
-#    if ( $control->{host} ne hostname ) {
-#        print timestamp."control $control_name is not controlled by this host\n";
-#        return;
-#    }
-
-    # return "mkey" ( message-key ) :
     return get_control_message_key($msg_rh);
 }
 
@@ -97,7 +85,7 @@ sub get_control_message_key {
     my $control_name       = $msg_rh->{control_name};
     my $control_host       = $msg_rh->{control_host};
     my $action             = $msg_rh->{action};
-    my $request_host       = $msg_rh->{request_host};
+    my $request_host       = $msg_rh->{request_host} || "";
 
     return "$control_name|$control_host|$action|$request_host|$request_epoch_time";
 }

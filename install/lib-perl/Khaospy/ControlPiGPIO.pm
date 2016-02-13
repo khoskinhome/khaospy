@@ -37,6 +37,7 @@ use Khaospy::Log qw(
 );
 
 our @EXPORT_OK = qw(
+    poll_pi_gpio_controls
     init_pi_gpio_controls
     operate_pi_gpio_switch
     operate_pi_gpio_relay
@@ -51,27 +52,46 @@ my $init_dispatch = {
     'pi-gpio-relay-manual' => \&init_pi_gpio_relay_manual,
 };
 
+my $poll_dispatch = {
+    'pi-gpio-relay'        => undef,
+    'pi-gpio-switch'       => \&poll_pi_gpio_switch,
+    'pi-gpio-relay-manual' => \&poll_pi_gpio_relay_manual,
+};
+
+my $controls_for_host;
+
 sub init_pi_gpio_controls {
-    kloginfo  "Initialise PiGPIO controls";
+    kloginfo "Initialise PiGPIO controls";
+    $controls_for_host = get_controls_conf_for_host();
+    _dispatch($init_dispatch, "Initialise");
+}
 
-    my $controls = get_controls_conf_for_host();
+sub poll_pi_gpio_controls {
+    my ($callback) = @_;
+    klogdebug "Poll Pi GPIO controls";
+    _dispatch($poll_dispatch, "Poll", $callback);
+}
 
-    for my $control_name ( keys %$controls ){
-        kloginfo "Initialise control $control_name";
+sub _dispatch {
+    my ($dispatch,$dispatch_name, $callback) = @_;
+    for my $control_name ( keys %$controls_for_host ){
 
-        my $control = $controls->{$control_name};
+        my $control = $controls_for_host->{$control_name};
         my $type = $control->{type};
 
-        if ( exists $init_dispatch->{$type} ){
-            $init_dispatch->{$type}->(
+        if ( exists $dispatch->{$type} ){
+            next if ! defined $dispatch->{$type};
+            klogdebug "$dispatch_name control $control_name";
+            $dispatch->{$type}->(
                 $control_name,
                 $control,
+                $callback
             );
             next;
         }
 
         KhaospyExcept::ControlsConfigInvalidType->throw(
-            error => "Can't initialise unknown control type ($type)"
+            error => "Can't $dispatch_name unknown control type ($type)"
         );
     }
 }
@@ -82,6 +102,7 @@ sub init_pi_gpio_controls {
 #         last_change_state_time   ( timestamp )
 #     }
 # }
+
 sub _get_and_set_switch_or_relay_state {
     # NOT for relay-manual .only "relay" or "switch" controls.
     # ( where invert_state is simpler, and no "ex_or_for_state". )
@@ -120,6 +141,29 @@ sub init_pi_gpio_switch {
     );
 }
 
+sub poll_pi_gpio_switch {
+    my ($control_name,$control,$callback) = @_;
+
+    my $pi_c_state = $pi_controls_state->{$control_name};
+
+    my $current_state = trans_true_to_ON(
+        invert_state($control,read_pi_gpio($control->{gpio_switch}))
+    );
+
+    if ( $pi_c_state->{last_change_state} ne $current_state ){
+        $pi_c_state->{last_change_state} = $current_state;
+        $pi_c_state->{last_change_state_time} = time;
+        kloginfo "Control $control_name has changed to $current_state";
+
+        $callback->({
+            control_name  => $control_name,
+            control_host  => $control->{host},
+            current_state => $current_state,
+            %{$pi_c_state},
+        }) if defined $callback;
+    }
+}
+
 sub operate_pi_gpio_switch {
     my ($control_name,$control, $action) = @_;
 
@@ -136,6 +180,9 @@ sub operate_pi_gpio_switch {
         $gpio_num,
     );
 }
+
+###################
+# pi gpio relay
 
 sub init_pi_gpio_relay {
     my ($control_name,$control) = @_;
@@ -202,7 +249,7 @@ sub init_pi_gpio_relay_manual {
     $pi_c_state->{last_auto_gpio_relay_change} =
         read_pi_gpio($gpio_relay_num);
 
-    $pi_c_state->{last_manual_gpio_detect_change_time} = time;
+    $pi_c_state->{last_manual_gpio_detect_change_time} = 0;
     $pi_c_state->{last_manual_gpio_detect_change} =
         read_pi_gpio($gpio_detect_num);
 
@@ -237,6 +284,32 @@ sub _calc_current_relay_manual_circuit_state {
 #     }
 # }
 
+sub poll_pi_gpio_relay_manual {
+    my ($control_name,$control,$callback) = @_;
+
+    my $pi_c_state = $pi_controls_state->{$control_name};
+
+    my $gpio_detect_num = $control->{gpio_detect};
+    my $gpio_detect_value = read_pi_gpio($gpio_detect_num);
+
+    if ( $gpio_detect_value != $pi_c_state->{last_manual_gpio_detect_change} ){
+        kloginfo "Control $control_name has been manually operated";
+        $pi_c_state->{last_change_state_time} = time;
+        $pi_c_state->{last_change_state_by}   = MANUAL;
+        $pi_c_state->{last_manual_gpio_detect_change_time} = time;
+        $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
+
+        $callback->({
+            control_name  => $control_name,
+            control_host  => $control->{host},
+            current_state => _calc_current_relay_manual_circuit_state (
+                $control_name, $control
+            ),
+            %{$pi_c_state},
+        }) if defined $callback;
+    }
+}
+
 sub operate_pi_gpio_relay_manual {
     my ($control_name,$control, $action) = @_;
 
@@ -252,15 +325,7 @@ sub operate_pi_gpio_relay_manual {
 
     kloginfo "OPERATE $control_name ( Pi Relay Manual ) with $action ( current state = $current_state )";
 
-    # check if manual control state has changed .
-    my $gpio_detect_value = read_pi_gpio($gpio_detect_num);
-    if ( $gpio_detect_value != $pi_c_state->{last_manual_gpio_detect_change} ){
-        kloginfo "Control $control_name has been manually operated";
-        $pi_c_state->{last_change_state_time} = time;
-        $pi_c_state->{last_change_state_by}   = MANUAL;
-        $pi_c_state->{last_manual_gpio_detect_change_time} = time;
-        $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
-    }
+    poll_pi_gpio_relay_manual($control_name,$control);
 
     if ( $action eq STATUS
         ||  ( exists $control->{manual_auto_timeout}
@@ -275,61 +340,68 @@ sub operate_pi_gpio_relay_manual {
                     + $control->{manual_auto_timeout} - time
             );
 
-            kloginfo "Control $control_name cannot be automatically operated for another $timeout_left seconds ( manual_auto_timeout )";
-
+            kloginfo sprintf(
+                "Control %s cannot be automatically operated for "
+                ."another %.2f seconds ( manual_auto_timeout )",
+                $control_name,
+                $timeout_left
+            );
         }
 
         return {
             current_state => $current_state,
             %{$pi_c_state},
         };
-    } elsif ( $current_state ne $action ){
-        # There are potential race-conditions here.
-        # where the Auto is trying to control, and someone operates the manual switch.
+    } elsif ( $current_state eq $action ){
+        kloginfo "Control $control_name doesn't need to be changed";
 
-        # The "auto" gpio_relay needs its state inverting/toggling :
-        write_pi_gpio(
-            $gpio_relay_num,
-            read_pi_gpio($gpio_relay_num) ? false : true,
-        );
+        return {
+            current_state => $current_state,
+            %{$pi_c_state},
+        };
+    }
 
-        $current_state =
-            _calc_current_relay_manual_circuit_state(
-                $control_name, $control
-            );
+    # The "auto" gpio_relay needs its state inverting/toggling
+    # There are potential race-conditions here if someone operates
+    # the manual switch at this point in the code.
 
-        $pi_c_state->{last_change_state_time} = time;
-        $pi_c_state->{last_change_state_by}   = AUTO;
+    write_pi_gpio(
+        $gpio_relay_num,
+        read_pi_gpio($gpio_relay_num) ? false : true,
+    );
 
-        $pi_c_state->{last_auto_gpio_relay_change_time} = time;
-        $pi_c_state->{last_auto_gpio_relay_change}
-            = read_pi_gpio($gpio_relay_num);
+    $current_state = _calc_current_relay_manual_circuit_state(
+        $control_name, $control
+    );
 
-        # update the last_manual_gpio_detect_change[_time] states
-        $gpio_detect_value = read_pi_gpio($gpio_detect_num);
-        if ( $control->{ex_or_for_state} ) {
-            # the voltage input on gpio_detect should NOT have changed.
-            if ( $gpio_detect_value != $pi_c_state->{last_manual_gpio_detect_change} ){
-                # not okay change man
-                # race condition ? has the manual control been changed ?
-                $pi_c_state->{last_manual_gpio_detect_change_time} = time;
-                $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
-                klogwarn "Control $control_name (exor = true) had its manual unexpectedly gpio_detect change. Could be a problem, could be someone changing the control mid auto-operation"
-            }
-        } else {
-            # the voltage input on the gpio_detect SHOULD have changed.
-            if ( $gpio_detect_value == $pi_c_state->{last_manual_gpio_detect_change} ){
-                # race condition ? has the manual control been changed ?
-                klogwarn "Control $control_name (exor = false) had its manual unexpectedly gpio_detect change. Could be a problem, could be someone changing the control mid auto-operation"
-            }
-            # either way this needs updating :
+    $pi_c_state->{last_change_state_time} = time;
+    $pi_c_state->{last_change_state_by}   = AUTO;
+
+    $pi_c_state->{last_auto_gpio_relay_change_time} = time;
+    $pi_c_state->{last_auto_gpio_relay_change}
+        = read_pi_gpio($gpio_relay_num);
+
+    # Update the last_manual_gpio_detect_change[_time] states
+    my $gpio_detect_value = read_pi_gpio($gpio_detect_num);
+    if ( $control->{ex_or_for_state} ) {
+        # The auto operation should NOT have changed the voltage input on gpio_detect.
+        if ( $gpio_detect_value != $pi_c_state->{last_manual_gpio_detect_change} ){
             $pi_c_state->{last_manual_gpio_detect_change_time} = time;
             $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
+            klogwarn "Control $control_name (exor = true) had its manual unexpectedly gpio_detect change. Could be a problem, could be someone changing the control mid auto-operation"
         }
-        kloginfo "Control $control_name has been automatically operated";
     } else {
-        kloginfo "Control $control_name doesn't need to be changed";
+        # The auto operation should have changed the voltage input on the gpio_detect
+        if ( $gpio_detect_value == $pi_c_state->{last_manual_gpio_detect_change} ){
+            # Race condition ? Has the manual control been changed ?
+            klogwarn "Control $control_name (exor = false) had its manual unexpectedly gpio_detect change. Could be a problem, could be someone changing the control mid auto-operation";
+            $pi_c_state->{last_manual_gpio_detect_change_time} = time;
+        }
+        # Either way this needs updating :
+        $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
     }
+
+    kloginfo "Control $control_name has been automatically operated";
 
     return {
         current_state => $current_state,

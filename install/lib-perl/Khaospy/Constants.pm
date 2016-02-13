@@ -56,9 +56,17 @@ our $KHAOSPY_ALL_DIRS = [
 # daemon scripts
 
 our $ONE_WIRE_SENDER            = 'khaospy-one-wired-sender.py';
+#our $ONE_WIRE_SENDER_TIMER      =
 our $ONE_WIRE_RECEIVER          = 'khaospy-one-wired-receiver.py';
+#our $ONE_WIRE_RECEIVER_TIMER    =
 our $PI_CONTROLLER_DAEMON       = 'khaospy-controller-daemon.pl';
+our $PI_CONTROLLER_DAEMON_TIMER = 2; # TODO in Prod this can be 0.2 secs
 our $PI_CONTROLLER_QUEUE_DAEMON = 'khaospy-controller-queue-d.pl';
+our $PI_CONTROLLER_QUEUE_DAEMON_TIMER = 2;# TODO in Prod this can be 0.2 secs
+
+#our $STATUS_DAEMON_PUBLISH_EVERY_SECS               = 2;
+#our $RULES_DAEMON_RUN_EVERY_SECS                    = 0.5;
+
 #our $PI_STATUS_DAEMON           =
 #our $MAC_SWITCH_DAEMON          =
 #our $PING_SWITCH_DAEMON         =
@@ -136,10 +144,6 @@ our $ZMQ_REQUEST_TIMEOUT        = 10; # seconds.
 
 our $LOCALHOST = '127.0.0.1';
 
-our $PI_CONTROLLER_QUEUE_DAEMON_PUBLISH_EVERY_SECS  = .25;
-our $PI_CONTROLLER_DAEMON_PUBLISH_EVERY_SECS        = 1;
-our $STATUS_DAEMON_PUBLISH_EVERY_SECS               = 2;
-our $RULES_DAEMON_RUN_EVERY_SECS                    = 0.5;
 
 ######################
 our @EXPORT_OK = qw(
@@ -199,7 +203,9 @@ our @EXPORT_OK = qw(
     $ONE_WIRE_SENDER
     $ONE_WIRE_RECEIVER
     $PI_CONTROLLER_DAEMON
+    $PI_CONTROLLER_DAEMON_TIMER
     $PI_CONTROLLER_QUEUE_DAEMON
+    $PI_CONTROLLER_QUEUE_DAEMON_TIMER
 
     $ONE_WIRE_DAEMON_PORT
     $PI_CONTROL_SEND_PORT
@@ -216,10 +222,6 @@ our @EXPORT_OK = qw(
 
     $LOCALHOST
 
-    $PI_CONTROLLER_QUEUE_DAEMON_PUBLISH_EVERY_SECS
-    $PI_CONTROLLER_DAEMON_PUBLISH_EVERY_SECS
-    $STATUS_DAEMON_PUBLISH_EVERY_SECS
-    $RULES_DAEMON_RUN_EVERY_SECS
 );
 
 1;

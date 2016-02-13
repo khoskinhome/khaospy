@@ -16,6 +16,7 @@ use Khaospy::Log qw(
 
 our @EXPORT_OK = qw(
     init_pi_mcp23017_controls
+    poll_pi_mcp23017_controls
 );
 
 
@@ -24,6 +25,11 @@ sub init_pi_mcp23017_controls {
 
 }
 
+sub poll_pi_mcp23017_controls {
+    klogdebug "Poll PiMCP23017 controls";
+
+
+}
 
 
 my $mcp23017_state = {};
