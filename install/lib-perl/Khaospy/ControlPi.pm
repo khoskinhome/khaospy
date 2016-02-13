@@ -59,6 +59,7 @@ sub operate_control {
     return $dispatch->{$type}->($control_name,$control, $action)
         if exists $dispatch->{$type};
 
+    # TODO change this to a fatal / exception once MCP23017 controls are implemented.
     klogerror "Control $control_name with type $control->{type} could be invalid. Or maybe it hasn't been programmed yet. Some are still TODO\n";
     return {};
 }

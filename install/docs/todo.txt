@@ -1,28 +1,31 @@
 High Prio
 ---------
-
 raise proper named exceptions and don't just die.
-
 
 Test that PiControllerDaemon.pm subscribes to the correct hosts.
 
-Test that the pigpio-relay stuff works
+Test that the following stuff works
+    pi-gpio-relay
+    pi-gpio-relay-manual
+        make an ex-or type circuit and test that.
 
-write the
-    get the port initialisation code moved in PiGPIO.
-    pigpio relay-manual
+write the :
+    stuff to get boiler control actaully running on a pi-gpio-relay-manual.
 
+    a quick CH Webpage.
+
+
+Implement for the OrviboS20 : remember the last state, and if its been manually operated by something other than khaospy. just like the PiGPIO relay-manual controls. Useful for "rules".
 
 Conf::PiHosts.
 
     Go over the PiControllerDaemon and PiControllerQueueDaemon and tidy up. proper exception handling. Try::Tiny. and raise proper exeptions. not dies. give them a name.
 
-Starting writing the PiMCP23017 module . need this  for th alarm switch panel.  with tests. lots of work. ( finish of the PiGPIO first )
+Starting writing the PiMCP23017 module . need this  for th alarm switch panel.  with tests. lots of work. ( finish of the PiGPIO first, some of the logic could be shared. )
 
     daemons need locking. the "/usr/bin/daemon" should do this , but it looked broken recently.
 
     fix the quoting of CLI params in khaospy-run-daemons.pl
-
 
     Khaospy::RRDGraphDaemon
         need an rrd-config. for grouping. maybe.
@@ -42,11 +45,6 @@ pi dns and dhcp server.
 
 pibastion that I can open to the net and just get stats.
 
-redo the raspian image on the piold in the playhouse.
-    have to get the frickin wifi thing working .
-
-
-
 Low prio
 --------
 
@@ -59,5 +57,5 @@ Low prio
 
     conf-dist-daemon in perl. very low prio. I can do this with tar-over-ssh, scp etc.
 
-    daemon-monitor. long way off. i.e. when I've got the reset of the stuff working.
+    daemon-monitor. long way off. i.e. when I've got the rest of the stuff working, with some sort of webui (or openhab)
 

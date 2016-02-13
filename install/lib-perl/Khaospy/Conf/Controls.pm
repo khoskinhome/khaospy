@@ -8,6 +8,8 @@ use Carp qw/confess croak/;
 use Data::Dumper;
 use Exporter qw/import/;
 
+use Sys::Hostname;
+
 use List::Compare;
 
 use Khaospy::Exception qw(
@@ -50,6 +52,7 @@ use Khaospy::Utils;
 our @EXPORT_OK = qw(
     get_control_config
     get_controls_conf
+    get_controls_conf_for_host
 );
 
 # ALL Control must have a key called "type".
@@ -220,6 +223,24 @@ sub get_controls_conf {
     );
 }
 
+sub get_controls_conf_for_host {
+    my ($host) = @_;
+    $host = $host || hostname;
+    get_controls_conf();
+    my $ret_controls = {};
+
+    for my $control_name ( keys %$controls_conf ){
+        my $control = $controls_conf->{$control_name};
+
+        next if ! exists $control->{host};
+
+        $ret_controls->{$control_name} = $control
+            if $host eq $control->{host};
+    }
+
+    return $ret_controls;
+}
+
 sub get_control_config {
     my ( $control_name, $force_reload ) = @_;
 
@@ -233,6 +254,8 @@ sub get_control_config {
 
     return $controls_conf->{$control_name};
 }
+
+
 
 my $pi_mcp23017_unique;
 my $pi_gpio_unique;

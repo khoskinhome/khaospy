@@ -6,7 +6,7 @@ FindBin::again();
 use lib "$FindBin::Bin/../lib-perl/";
 # by Karl Kount-Khaos Hoskin. 2015-2016
 
-use Test::More tests => 60;
+use Test::More tests => 63;
 use Test::Exception;
 use Test::Deep;
 
@@ -16,7 +16,10 @@ use Data::Dumper;
 sub true  { 1 };
 sub false { 0 };
 
-use_ok ( "Khaospy::Conf::Controls", 'get_control_config' );
+use_ok  ( "Khaospy::Conf::Controls",
+            'get_control_config',
+            'get_controls_conf_for_host',
+        );
 use_ok ( "Khaospy::Conf::PiHosts" , 'get_pi_host_config' );
 
 use Khaospy::Exception qw(
@@ -702,4 +705,39 @@ $controls_return = {
 ok ( $cont_cfg = get_control_config('a_pi_mcp23017_relay_with_manual') , "pi-mcp23017-relay-manual config is okay");
 cmp_deeply( $cont_cfg, $controls_return->{'a_pi_mcp23017_relay_with_manual'} , "Got the control data" );
 
+## test get_controls_conf_for_host
 
+$pi_hosts_return = {
+    pitest => {
+        log_level         => 'info',
+        valid_gpios       => [ 0..7 ],
+        valid_i2c_buses   => [ 0 ],
+        daemons => [],
+    },
+    pianother => {
+        log_level         => 'info',
+        valid_gpios       => [ 0..7 ],
+        valid_i2c_buses   => [ 0 ],
+        daemons => [],
+    },
+
+};
+
+$controls_return = {
+    pitest_pi_gpio_switch => {
+        type => "pi-gpio-switch",
+        host => "pitest",
+        invert_state => true,
+        gpio_switch => 6,
+    },
+    pianother_pi_gpio_switch => {
+        type => "pi-gpio-switch",
+        host => "pianother",
+        invert_state => true,
+        gpio_switch => 7,
+    },
+};
+
+ok ( exists get_controls_conf_for_host("pitest")->{pitest_pi_gpio_switch} );
+ok ( ! exists get_controls_conf_for_host("pitest")->{pianother_pi_gpio_switch} );
+ok ( exists get_controls_conf_for_host("pianother")->{pianother_pi_gpio_switch} );

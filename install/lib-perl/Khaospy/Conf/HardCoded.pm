@@ -481,29 +481,29 @@ sub live_controls_conf {
 #
 #        },
 
-        boiler => {
+        relman => {
             alias => 'Boiler Central Heating',
             type  => "pi-gpio-relay",
             host  => 'pitest', # FIX THIS it will be piboiler when running.
-            gpio_relay   => 4, # NOT the BCM CPIO number.
+            gpio_relay   => 3, # NOT the BCM CPIO number.
             invert_state => true,
         },
 
 # pi gpio
-        a_pi_gpio_relay_manual => {
+        boiler => {
             type => "pi-gpio-relay-manual",
             host => "pitest",
             ex_or_for_state => false,
             invert_state => false,
-            gpio_relay  => 3,
-            gpio_detect => 5,
+            gpio_relay  => 4,
+            gpio_detect => 0,
         },
 
         a_pi_gpio_relay => {
             type => "pi-gpio-relay",
             host => "pitest",
             invert_state => false,
-            gpio_relay  => 0,
+            gpio_relay  => 1,
         },
 
         a_pi_gpio_switch => {
@@ -688,29 +688,29 @@ sub test_controls_conf {
 #
 #        },
 
-        boiler => {
-            alias => 'Boiler Central Heating',
+        a_pi_gpio_relay2 => {
+            alias => 'pi gpio relay 2',
             type  => "pi-gpio-relay",
             host  => 'pitest', # FIX THIS it will be piboiler when running.
             invert_state => true,
-            gpio_relay   => 4, # NOT the BCM CPIO number.
+            gpio_relay   => 2, # NOT the BCM CPIO number.
         },
 
         a_pi_gpio_switch => {
             type => "pi-gpio-switch",
             host => "pitest",
             invert_state => false,
-            gpio_switch => 0, # ERROR !
+            gpio_switch => 7, # ERROR !
         },
 
 # pi gpio
-        a_pi_gpio_relay_manual => {
+        boiler => {
             type => "pi-gpio-relay-manual",
             host => "pitest",
             ex_or_for_state => false,
             invert_state => false,
-            gpio_relay  => 1,
-            gpio_detect => 5,
+            gpio_relay  => 4,
+            gpio_detect => 0,
         },
 
 #        a_pi_gpio_relay => {
