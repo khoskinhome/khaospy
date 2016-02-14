@@ -3,7 +3,9 @@ use strict;
 use warnings;
 # By Karl Kount-Khaos Hoskin. 2015-2016
 
-# Does the dispatch to either ControlPiGPIO or ControlPiMCP23017
+# Has the main logic for "relay" , "switch" and "relay-manual" controls
+# and the dispatch to either ControlPiGPIO or ControlPiMCP23017
+# for the setting of the gpio pins.
 
 use Try::Tiny;
 use Carp qw/confess croak/;
@@ -50,14 +52,13 @@ sub poll_pi_controls {
     poll_pi_gpio_controls($callback);
 }
 
-my $dispatch = {
+my $operate_dispatch = {
     'pi-gpio-relay'             => operate_relay('Khaospy::ControlPiGPIO'),
     'pi-gpio-switch'            => operate_switch('Khaospy::ControlPiGPIO'),
     'pi-gpio-relay-manual'      => operate_relay_manual('Khaospy::ControlPiGPIO'),
     'pi-mcp23017-relay'         => operate_relay('Khaospy::ControlPiMCP23017'),
     'pi-mcp23017-switch'        => operate_switch('Khaospy::ControlPiMCP23017'),
     'pi-mcp23017-relay-manual'  => operate_relay_manual('Khaospy::ControlPiMCP23017'),
-
 };
 
 my $init_dispatch = {
@@ -67,7 +68,6 @@ my $init_dispatch = {
     'pi-mcp23017-relay'         => init_relay('Khaospy::ControlPiMCP23017'),
     'pi-mcp23017-switch'        => init_switch('Khaospy::ControlPiMCP23017'),
     'pi-mcp23017-relay-manual'  => init_relay_manual('Khaospy::ControlPiMCP23017'),
-
 };
 
 my $poll_dispatch = {
@@ -84,8 +84,8 @@ sub operate_control {
 
     my $type = $control->{type};
 
-    return $dispatch->{$type}->($control_name,$control, $action)
-        if exists $dispatch->{$type};
+    return $operate_dispatch->{$type}->($control_name,$control, $action)
+        if exists $operate_dispatch->{$type};
 
     KhaospyExcept::ControlsConfigInvalidType->throw(
         error => "Control $control_name, can't operate. Unknown control type ($type)"
@@ -493,7 +493,6 @@ sub trans_true_to_ON { # and false to OFF
     klogfatal "Can't translate a non true or false value ($truefalse) to ON or OFF";
 }
 
-
 sub trans_ON_to_true { # and OFF to false
     my ($ONOFF) = @_;
     return true  if $ONOFF eq ON;
@@ -501,6 +500,7 @@ sub trans_ON_to_true { # and OFF to false
     klogfatal "Can't translate a non ON or OFF value ($ONOFF) to true or false";
 
 }
+
 sub invert_state {
     # if a control has "invert_state" option set then this
     # inverts both ON/OFF and true/false

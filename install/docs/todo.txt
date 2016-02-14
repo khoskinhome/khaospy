@@ -4,24 +4,24 @@ raise proper named exceptions and don't just die.
 
 Test that PiControllerDaemon.pm subscribes to the correct hosts.
 
-
-fix the PiGPIO-relay-manual detection of manual state changes.
-
-abstract out the relay, switch and relay-manual logic into the ControlPi.pm
-
-
 Test that the following stuff works
     pi-gpio-relay
     pi-gpio-relay-manual
         make an ex-or type circuit and test that.
+
+Get the electronic/physical PiMCP23017 interface working
+
+write the code in Khaospy::PiControlMCP23017
+
+run it on PiServer for the Alarm Interface board.
+
+wire up some alarm-sensors.
 
 write the :
     stuff to get boiler control actaully running on a pi-gpio-relay-manual.
 
     a quick CH Webpage.
 
-
-Implement for the OrviboS20 : remember the last state, and if its been manually operated by something other than khaospy. just like the PiGPIO relay-manual controls. Useful for "rules".
 
 Conf::PiHosts.
 
@@ -42,10 +42,12 @@ Starting writing the PiMCP23017 module . need this  for th alarm switch panel.  
 
     make boiler on/off with rad states page.
 
-why are there a lot of tmpfs using up lots of ram on jessie version of raspibian ?
+Why are there a lot of tmpfs using up lots of ram on jessie version of raspibian ?
 
 Medium Prio
 -----------
+
+Implement for the OrviboS20 : remember the last state, and if its been manually operated by something other than khaospy. just like the PiGPIO relay-manual controls. Useful for "rules". Useful if I use them for light-switches.
 
 pi dns and dhcp server.
 
