@@ -22,7 +22,6 @@ use Khaospy::BoilerMessage;
 
 use Khaospy::ControlOrviboS20;
 use Khaospy::ControlPi;
-use Khaospy::ControlPiUtils;
 use Khaospy::ControlPiGPIO;
 use Khaospy::ControlPiMCP23017;
 

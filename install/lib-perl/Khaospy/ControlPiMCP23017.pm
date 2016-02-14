@@ -15,9 +15,9 @@ use Khaospy::Log qw(
 );
 
 our @EXPORT_OK = qw(
-    init_pi_gpio
-    read_pi_gpio
-    write_pi_gpio
+    init_gpio
+    read_gpio
+    write_gpio
 );
 
 #sub init_pi_mcp23017_controls {
@@ -33,7 +33,7 @@ our @EXPORT_OK = qw(
 
 my $mcp23017_pins_state = {};
 
-sub init_pi_gpio {
+sub init_gpio {
     my ($class, $gpio_num, $IN_OUT) = @_;
 #    $IN_OUT = lc( $IN_OUT );
 #    klogfatal "Can only set a Pi GPIO mode ($IN_OUT) to 'in' or 'out'"
@@ -42,14 +42,14 @@ sub init_pi_gpio {
 #    system("$PI_GPIO_CMD mode $gpio_num $IN_OUT");
 }
 
-sub read_pi_gpio {
+sub read_gpio {
     my ($class, $gpio_num) = @_;
 #    my $r = qx( $PI_GPIO_CMD read $gpio_num );
 #    chomp $r;
 #    return $r;
 }
 
-sub write_pi_gpio {
+sub write_gpio {
     my ($class, $gpio_num, $val) = @_;
 #    system("$PI_GPIO_CMD write $gpio_num $val");
 #    return;

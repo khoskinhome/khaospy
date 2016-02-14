@@ -22,15 +22,8 @@ use Khaospy::Constants qw(
     IN $IN OUT $OUT
 );
 
-use Khaospy::ControlPiUtils qw(
-    trans_true_to_ON
-    trans_ON_to_true
-    invert_state
-);
-
-use Khaospy::ControlPiGPIO qw();
-
-use Khaospy::ControlPiMCP23017 qw();
+use Khaospy::ControlPiGPIO;
+use Khaospy::ControlPiMCP23017;
 
 use Khaospy::Exception qw(
     KhaospyExcept::ControlsConfigInvalidType
@@ -49,7 +42,7 @@ our @EXPORT_OK = qw(
 
 sub init_pi_controls {
     get_controls_conf();
-    init_pi_gpio_controls();
+    init_gpio_controls();
 }
 
 sub poll_pi_controls {
@@ -103,7 +96,7 @@ my $pi_controls_state = {};
 
 my $controls_for_host;
 
-sub init_pi_gpio_controls {
+sub init_gpio_controls {
     kloginfo "Initialise PiGPIO controls";
     $controls_for_host = get_controls_conf_for_host();
     _dispatch($init_dispatch, "Initialise");
@@ -152,7 +145,7 @@ sub _get_and_set_switch_or_relay_state {
     my ($pin_class,$control_name,$control, $gpio_num) = @_;
 
     my $current_state = trans_true_to_ON(
-        invert_state($control,read_pi_gpio($pin_class,$gpio_num))
+        invert_state($control,read_gpio($pin_class,$gpio_num))
     );
 
     $pi_controls_state->{$control_name} = {}
@@ -178,7 +171,7 @@ sub init_switch {
     return sub {
         my ($control_name,$control) = @_;
         my $gpio_num = $control->{gpio_switch};
-        init_pi_gpio($pin_class,$gpio_num, IN);
+        init_gpio($pin_class,$gpio_num, IN);
         _get_and_set_switch_or_relay_state(
             $pin_class,
             $control_name,
@@ -196,7 +189,7 @@ sub poll_switch {
         my $pi_c_state = $pi_controls_state->{$control_name};
 
         my $current_state = trans_true_to_ON(
-            invert_state($control,read_pi_gpio($pin_class,$control->{gpio_switch}))
+            invert_state($control,read_gpio($pin_class,$control->{gpio_switch}))
         );
 
         if ( $pi_c_state->{last_change_state} ne $current_state ){
@@ -243,7 +236,7 @@ sub init_relay {
     return sub {
         my ($control_name,$control) = @_;
         my $gpio_num = $control->{gpio_relay};
-        init_pi_gpio($pin_class,$gpio_num, OUT);
+        init_gpio($pin_class,$gpio_num, OUT);
         _get_and_set_switch_or_relay_state(
             $pin_class,
             $control_name,
@@ -262,7 +255,7 @@ sub operate_relay {
 
         my $gpio_num = $control->{gpio_relay};
 
-        write_pi_gpio(
+        write_gpio(
             $pin_class,
             $gpio_num,
             trans_ON_to_true(invert_state($control,$action))
@@ -305,10 +298,10 @@ sub init_relay_manual {
         my ($control_name,$control) = @_;
 
         my $gpio_relay_num = $control->{gpio_relay};
-        init_pi_gpio($pin_class,$gpio_relay_num, OUT);
+        init_gpio($pin_class,$gpio_relay_num, OUT);
 
         my $gpio_detect_num = $control->{gpio_detect};
-        init_pi_gpio($pin_class,$gpio_detect_num, IN);
+        init_gpio($pin_class,$gpio_detect_num, IN);
 
         $pi_controls_state->{$control_name} = {};
 
@@ -316,11 +309,11 @@ sub init_relay_manual {
 
         $pi_c_state->{last_auto_gpio_relay_change_time} = time;
         $pi_c_state->{last_auto_gpio_relay_change} =
-            read_pi_gpio($pin_class,$gpio_relay_num);
+            read_gpio($pin_class,$gpio_relay_num);
 
         $pi_c_state->{last_manual_gpio_detect_change_time} = 0;
         $pi_c_state->{last_manual_gpio_detect_change} =
-            read_pi_gpio($pin_class,$gpio_detect_num);
+            read_gpio($pin_class,$gpio_detect_num);
 
         $pi_c_state->{last_change_state_time} = time;
         $pi_c_state->{last_change_state_by} = AUTO;
@@ -331,8 +324,8 @@ sub _calc_current_relay_manual_circuit_state {
     # returns ON or OFF
     my ($pin_class, $control_name, $control) = @_;
 
-    my $relay_state  = read_pi_gpio($pin_class,$control->{gpio_relay});
-    my $detect_state = read_pi_gpio($pin_class,$control->{gpio_detect});
+    my $relay_state  = read_gpio($pin_class,$control->{gpio_relay});
+    my $detect_state = read_gpio($pin_class,$control->{gpio_detect});
 
     return trans_true_to_ON(
             invert_state($control, ( $relay_state xor $detect_state) )
@@ -351,7 +344,7 @@ sub poll_relay_manual {
         my $pi_c_state = $pi_controls_state->{$control_name};
 
         my $gpio_detect_num = $control->{gpio_detect};
-        my $gpio_detect_value = read_pi_gpio($pin_class,$gpio_detect_num);
+        my $gpio_detect_value = read_gpio($pin_class,$gpio_detect_num);
 
         if ( $gpio_detect_value != $pi_c_state->{last_manual_gpio_detect_change} ){
             kloginfo "Control $control_name has been manually operated";
@@ -432,10 +425,10 @@ sub operate_relay_manual {
         # There are potential race-conditions here if someone operates
         # the manual switch at this point in the code.
 
-        write_pi_gpio(
+        write_gpio(
             $pin_class,
             $gpio_relay_num,
-            read_pi_gpio($pin_class,$gpio_relay_num) ? false : true,
+            read_gpio($pin_class,$gpio_relay_num) ? false : true,
         );
 
         $current_state = _calc_current_relay_manual_circuit_state(
@@ -447,10 +440,10 @@ sub operate_relay_manual {
 
         $pi_c_state->{last_auto_gpio_relay_change_time} = time;
         $pi_c_state->{last_auto_gpio_relay_change}
-            = read_pi_gpio($pin_class,$gpio_relay_num);
+            = read_gpio($pin_class,$gpio_relay_num);
 
         # Update the last_manual_gpio_detect_change[_time] states
-        my $gpio_detect_value = read_pi_gpio($pin_class,$gpio_detect_num);
+        my $gpio_detect_value = read_gpio($pin_class,$gpio_detect_num);
         if ( $control->{ex_or_for_state} ) {
             # The auto operation should NOT have changed the voltage input on gpio_detect.
             if ( $gpio_detect_value != $pi_c_state->{last_manual_gpio_detect_change} ){
@@ -478,19 +471,55 @@ sub operate_relay_manual {
     }
 }
 
-sub init_pi_gpio{
+sub init_gpio{
     my ($pin_class) = shift @_;
-    return $pin_class->init_pi_gpio(@_);
+    return $pin_class->init_gpio(@_);
 }
 
-sub read_pi_gpio{
+sub read_gpio{
     my ($pin_class) = shift @_;
-    return $pin_class->read_pi_gpio(@_);
+    return $pin_class->read_gpio(@_);
 }
 
-sub write_pi_gpio{
+sub write_gpio{
     my ($pin_class) = shift @_;
-    return $pin_class->write_pi_gpio(@_);
+    return $pin_class->write_gpio(@_);
 }
 
+sub trans_true_to_ON { # and false to OFF
+    my ($truefalse) = @_;
+    return ON  if $truefalse == true;
+    return OFF if $truefalse == false;
+    klogfatal "Can't translate a non true or false value ($truefalse) to ON or OFF";
+}
+
+
+sub trans_ON_to_true { # and OFF to false
+    my ($ONOFF) = @_;
+    return true  if $ONOFF eq ON;
+    return false if $ONOFF eq OFF;
+    klogfatal "Can't translate a non ON or OFF value ($ONOFF) to true or false";
+
+}
+sub invert_state {
+    # if a control has "invert_state" option set then this
+    # inverts both ON/OFF and true/false
+    my ( $control, $val ) = @_;
+
+    return $val
+        if ! exists $control->{invert_state}
+            || $control->{invert_state} eq false ;
+
+    if ( $val eq ON || $val eq OFF ){
+
+        return ($val eq ON) ? OFF : ON ;
+
+    } elsif ($val eq true or $val eq false) {
+
+        return ( $val ) ? false : true ;
+
+    }
+
+    klogfatal "Unrecognised value ($val) passed to invert_state()";
+}
 1;
