@@ -28,16 +28,9 @@ use Khaospy::ControlPiUtils qw(
     invert_state
 );
 
-use Khaospy::ControlPiGPIO qw(
-    init_pi_gpio
-    read_pi_gpio
-    write_pi_gpio
-);
+use Khaospy::ControlPiGPIO qw();
 
-use Khaospy::ControlPiMCP23017 qw(
-    init_pi_mcp23017_controls
-    poll_pi_mcp23017_controls
-);
+use Khaospy::ControlPiMCP23017 qw();
 
 use Khaospy::Exception qw(
     KhaospyExcept::ControlsConfigInvalidType
@@ -57,48 +50,56 @@ our @EXPORT_OK = qw(
 sub init_pi_controls {
     get_controls_conf();
     init_pi_gpio_controls();
-    init_pi_mcp23017_controls();
 }
 
 sub poll_pi_controls {
     my ($callback) = @_;
     poll_pi_gpio_controls($callback);
-    poll_pi_mcp23017_controls($callback);
 }
 
 my $dispatch = {
-    'pi-gpio-relay'        => \&operate_pi_gpio_relay,
-    'pi-gpio-switch'       => \&operate_pi_gpio_switch,
-    'pi-gpio-relay-manual' => \&operate_pi_gpio_relay_manual,
+    'pi-gpio-relay'             => operate_relay('Khaospy::ControlPiGPIO'),
+    'pi-gpio-switch'            => operate_switch('Khaospy::ControlPiGPIO'),
+    'pi-gpio-relay-manual'      => operate_relay_manual('Khaospy::ControlPiGPIO'),
+    'pi-mcp23017-relay'         => operate_relay('Khaospy::ControlPiMCP23017'),
+    'pi-mcp23017-switch'        => operate_switch('Khaospy::ControlPiMCP23017'),
+    'pi-mcp23017-relay-manual'  => operate_relay_manual('Khaospy::ControlPiMCP23017'),
+
 };
 
 my $init_dispatch = {
-    'pi-gpio-relay'        => \&init_pi_gpio_relay,
-    'pi-gpio-switch'       => \&init_pi_gpio_switch,
-    'pi-gpio-relay-manual' => \&init_pi_gpio_relay_manual,
+    'pi-gpio-relay'             => init_relay('Khaospy::ControlPiGPIO'),
+    'pi-gpio-switch'            => init_switch('Khaospy::ControlPiGPIO'),
+    'pi-gpio-relay-manual'      => init_relay_manual('Khaospy::ControlPiGPIO'),
+    'pi-mcp23017-relay'         => init_relay('Khaospy::ControlPiMCP23017'),
+    'pi-mcp23017-switch'        => init_switch('Khaospy::ControlPiMCP23017'),
+    'pi-mcp23017-relay-manual'  => init_relay_manual('Khaospy::ControlPiMCP23017'),
+
 };
 
 my $poll_dispatch = {
-    'pi-gpio-relay'        => undef,
-    'pi-gpio-switch'       => \&poll_pi_gpio_switch,
-    'pi-gpio-relay-manual' => \&poll_pi_gpio_relay_manual,
+    'pi-gpio-relay'             => undef,
+    'pi-gpio-switch'            => poll_switch('Khaospy::ControlPiGPIO'),
+    'pi-gpio-relay-manual'      => poll_relay_manual('Khaospy::ControlPiGPIO'),
+    'pi-mcp23017-relay'         => undef,
+    'pi-mcp23017-switch'        => poll_switch('Khaospy::ControlPiMCP23017'),
+    'pi-mcp23017-relay-manual'  => poll_relay_manual('Khaospy::ControlPiMCP23017'),
 };
 
 sub operate_control {
-    my ($control_name, $control, $action ) = @_;
+    my ($control_name, $control, $action) = @_;
 
     my $type = $control->{type};
 
     return $dispatch->{$type}->($control_name,$control, $action)
         if exists $dispatch->{$type};
 
-    # TODO change this to a fatal / exception once MCP23017 controls are implemented.
-    klogerror "Control $control_name with type $control->{type} could be invalid. Or maybe it hasn't been programmed yet. Some are still TODO\n";
-    return {};
+    KhaospyExcept::ControlsConfigInvalidType->throw(
+        error => "Control $control_name, can't operate. Unknown control type ($type)"
+    );
 }
 
 my $pi_controls_state = {};
-
 
 my $controls_for_host;
 
@@ -148,10 +149,10 @@ sub _dispatch {
 sub _get_and_set_switch_or_relay_state {
     # NOT for relay-manual .only "relay" or "switch" controls.
     # ( where invert_state is simpler, and no "ex_or_for_state". )
-    my ($control_name,$control, $gpio_num) = @_;
+    my ($pin_class,$control_name,$control, $gpio_num) = @_;
 
     my $current_state = trans_true_to_ON(
-        invert_state($control,read_pi_gpio($gpio_num))
+        invert_state($control,read_pi_gpio($pin_class,$gpio_num))
     );
 
     $pi_controls_state->{$control_name} = {}
@@ -172,86 +173,109 @@ sub _get_and_set_switch_or_relay_state {
     };
 }
 
-sub init_pi_gpio_switch {
-    my ($control_name,$control) = @_;
-    my $gpio_num = $control->{gpio_switch};
-    init_pi_gpio($gpio_num, IN);
-    _get_and_set_switch_or_relay_state(
-        $control_name,
-        $control,
-        $gpio_num,
-    );
-}
-
-sub poll_pi_gpio_switch {
-    my ($control_name,$control,$callback) = @_;
-
-    my $pi_c_state = $pi_controls_state->{$control_name};
-
-    my $current_state = trans_true_to_ON(
-        invert_state($control,read_pi_gpio($control->{gpio_switch}))
-    );
-
-    if ( $pi_c_state->{last_change_state} ne $current_state ){
-        $pi_c_state->{last_change_state} = $current_state;
-        $pi_c_state->{last_change_state_time} = time;
-        kloginfo "Control $control_name has changed to $current_state";
-
-        $callback->({
-            control_name  => $control_name,
-            control_host  => $control->{host},
-            current_state => $current_state,
-            %{$pi_c_state},
-        }) if defined $callback;
+sub init_switch {
+    my ($pin_class) = @_;
+    return sub {
+        my ($control_name,$control) = @_;
+        my $gpio_num = $control->{gpio_switch};
+        init_pi_gpio($pin_class,$gpio_num, IN);
+        _get_and_set_switch_or_relay_state(
+            $pin_class,
+            $control_name,
+            $control,
+            $gpio_num,
+        );
     }
 }
 
-sub operate_pi_gpio_switch {
-    my ($control_name,$control, $action) = @_;
+sub poll_switch {
+    my ($pin_class) = @_;
+    return sub {
+        my ($control_name,$control,$callback) = @_;
 
-    kloginfo "OPERATE  $control_name ( Pi GPIO Switch ) with $action";
+        my $pi_c_state = $pi_controls_state->{$control_name};
 
-    klogerror "Can only operate a switch with 'status'. ( not '$action' )"
-        if $action ne STATUS;
+        my $current_state = trans_true_to_ON(
+            invert_state($control,read_pi_gpio($pin_class,$control->{gpio_switch}))
+        );
 
-    my $gpio_num = $control->{gpio_switch};
+        if ( $pi_c_state->{last_change_state} ne $current_state ){
+            $pi_c_state->{last_change_state} = $current_state;
+            $pi_c_state->{last_change_state_time} = time;
+            kloginfo "Control $control_name has changed to $current_state";
 
-    return _get_and_set_switch_or_relay_state(
-        $control_name,
-        $control,
-        $gpio_num,
-    );
+            $callback->({
+                control_name  => $control_name,
+                control_host  => $control->{host},
+                current_state => $current_state,
+                %{$pi_c_state},
+            }) if defined $callback;
+        }
+    };
+}
+
+sub operate_switch {
+    my ($pin_class) = @_;
+    return sub {
+        my ($control_name,$control, $action) = @_;
+
+        kloginfo "OPERATE  $control_name ( Pi GPIO Switch ) with $action";
+
+        klogerror "Can only operate a switch with 'status'. ( not '$action' )"
+            if $action ne STATUS;
+
+        my $gpio_num = $control->{gpio_switch};
+
+        return _get_and_set_switch_or_relay_state(
+            $pin_class,
+            $control_name,
+            $control,
+            $gpio_num,
+        );
+    };
 }
 
 ###################
 # pi gpio relay
 
-sub init_pi_gpio_relay {
-    my ($control_name,$control) = @_;
-    my $gpio_num = $control->{gpio_relay};
-    init_pi_gpio($gpio_num, OUT);
-    _get_and_set_switch_or_relay_state(
-        $control_name,
-        $control,
-        $gpio_num,
-    );
+sub init_relay {
+    my ($pin_class) = @_;
+    return sub {
+        my ($control_name,$control) = @_;
+        my $gpio_num = $control->{gpio_relay};
+        init_pi_gpio($pin_class,$gpio_num, OUT);
+        _get_and_set_switch_or_relay_state(
+            $pin_class,
+            $control_name,
+            $control,
+            $gpio_num,
+        );
+    };
 }
 
-sub operate_pi_gpio_relay {
-    my ($control_name,$control, $action) = @_;
+sub operate_relay {
+    my ($pin_class) = @_;
+    return sub {
+        my ($control_name,$control, $action) = @_;
 
-    kloginfo "OPERATE $control_name ( Pi Relay ) with $action";
+        kloginfo "OPERATE $control_name ( Pi Relay ) with $action";
 
-    my $gpio_num = $control->{gpio_relay};
+        my $gpio_num = $control->{gpio_relay};
 
-    write_pi_gpio($gpio_num, trans_ON_to_true(invert_state($control,$action)))
-        if $action ne STATUS;
+        write_pi_gpio(
+            $pin_class,
+            $gpio_num,
+            trans_ON_to_true(invert_state($control,$action))
+        )
+            if $action ne STATUS;
 
-    return _get_and_set_switch_or_relay_state(
-        $control_name,
-        $control,
-        $gpio_num,
-    );
+        return _get_and_set_switch_or_relay_state(
+            $pin_class,
+            $control_name,
+            $control,
+            $gpio_num,
+        );
+    };
 }
 
 #############################
@@ -274,37 +298,41 @@ sub operate_pi_gpio_relay {
 #     }
 # }
 
-sub init_pi_gpio_relay_manual {
-    my ($control_name,$control) = @_;
+sub init_relay_manual {
+    my ($pin_class) = @_;
+    return sub {
 
-    my $gpio_relay_num = $control->{gpio_relay};
-    init_pi_gpio($gpio_relay_num, OUT);
+        my ($control_name,$control) = @_;
 
-    my $gpio_detect_num = $control->{gpio_detect};
-    init_pi_gpio($gpio_detect_num, IN);
+        my $gpio_relay_num = $control->{gpio_relay};
+        init_pi_gpio($pin_class,$gpio_relay_num, OUT);
 
-    $pi_controls_state->{$control_name} = {};
+        my $gpio_detect_num = $control->{gpio_detect};
+        init_pi_gpio($pin_class,$gpio_detect_num, IN);
 
-    my $pi_c_state = $pi_controls_state->{$control_name};
+        $pi_controls_state->{$control_name} = {};
 
-    $pi_c_state->{last_auto_gpio_relay_change_time} = time;
-    $pi_c_state->{last_auto_gpio_relay_change} =
-        read_pi_gpio($gpio_relay_num);
+        my $pi_c_state = $pi_controls_state->{$control_name};
 
-    $pi_c_state->{last_manual_gpio_detect_change_time} = 0;
-    $pi_c_state->{last_manual_gpio_detect_change} =
-        read_pi_gpio($gpio_detect_num);
+        $pi_c_state->{last_auto_gpio_relay_change_time} = time;
+        $pi_c_state->{last_auto_gpio_relay_change} =
+            read_pi_gpio($pin_class,$gpio_relay_num);
 
-    $pi_c_state->{last_change_state_time} = time;
-    $pi_c_state->{last_change_state_by} = AUTO;
+        $pi_c_state->{last_manual_gpio_detect_change_time} = 0;
+        $pi_c_state->{last_manual_gpio_detect_change} =
+            read_pi_gpio($pin_class,$gpio_detect_num);
+
+        $pi_c_state->{last_change_state_time} = time;
+        $pi_c_state->{last_change_state_by} = AUTO;
+    };
 }
 
 sub _calc_current_relay_manual_circuit_state {
     # returns ON or OFF
-    my ($control_name,$control) = @_;
+    my ($pin_class, $control_name, $control) = @_;
 
-    my $relay_state  = read_pi_gpio($control->{gpio_relay});
-    my $detect_state = read_pi_gpio($control->{gpio_detect});
+    my $relay_state  = read_pi_gpio($pin_class,$control->{gpio_relay});
+    my $detect_state = read_pi_gpio($pin_class,$control->{gpio_detect});
 
     return trans_true_to_ON(
             invert_state($control, ( $relay_state xor $detect_state) )
@@ -315,140 +343,154 @@ sub _calc_current_relay_manual_circuit_state {
         );
 }
 
-# pi_control_state for "relay-manual" = {
-#     control_name => {
-#         last_change_state_time              ( on/off )
-#         last_change_state_by                ( auto/manual )
-#         last_manual_gpio_detect_change      ( true / false )
-#         last_manual_gpio_detect_change_time ( time )
-#         last_auto_gpio_relay_change         ( true / false )
-#         last_auto_gpio_relay_change_time    ( time )
-#     }
-# }
+sub poll_relay_manual {
+    my ($pin_class) = @_;
+    return sub {
+        my ($control_name,$control,$callback) = @_;
 
-sub poll_pi_gpio_relay_manual {
-    my ($control_name,$control,$callback) = @_;
+        my $pi_c_state = $pi_controls_state->{$control_name};
 
-    my $pi_c_state = $pi_controls_state->{$control_name};
+        my $gpio_detect_num = $control->{gpio_detect};
+        my $gpio_detect_value = read_pi_gpio($pin_class,$gpio_detect_num);
 
-    my $gpio_detect_num = $control->{gpio_detect};
-    my $gpio_detect_value = read_pi_gpio($gpio_detect_num);
+        if ( $gpio_detect_value != $pi_c_state->{last_manual_gpio_detect_change} ){
+            kloginfo "Control $control_name has been manually operated";
+            $pi_c_state->{last_change_state_time} = time;
+            $pi_c_state->{last_change_state_by}   = MANUAL;
+            $pi_c_state->{last_manual_gpio_detect_change_time} = time;
+            $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
 
-    if ( $gpio_detect_value != $pi_c_state->{last_manual_gpio_detect_change} ){
-        kloginfo "Control $control_name has been manually operated";
+            $callback->({
+                control_name  => $control_name,
+                control_host  => $control->{host},
+                current_state => _calc_current_relay_manual_circuit_state (
+                    $pin_class, $control_name, $control
+                ),
+                %{$pi_c_state},
+            }) if defined $callback;
+        }
+    };
+}
+
+sub operate_relay_manual {
+    my ($pin_class) = @_;
+    return sub {
+        my ($control_name,$control, $action) = @_;
+
+        my $pi_c_state = $pi_controls_state->{$control_name};
+
+        my $gpio_relay_num  = $control->{gpio_relay};
+        my $gpio_detect_num = $control->{gpio_detect};
+
+        my $current_state =
+            _calc_current_relay_manual_circuit_state (
+                $pin_class, $control_name, $control
+            );
+
+        kloginfo "OPERATE $control_name ( Pi Relay Manual ) with $action ( current state = $current_state )";
+
+        poll_relay_manual($pin_class)->($control_name,$control);
+
+        if ( $action eq STATUS
+            ||  ( exists $control->{manual_auto_timeout}
+                    && $pi_c_state->{last_manual_gpio_detect_change_time}
+                         + $control->{manual_auto_timeout} > time
+                )
+        ){
+
+            my %extra_msg = ();
+            if ( $action ne STATUS ){
+                my $timeout_left = (
+                    $pi_c_state->{last_manual_gpio_detect_change_time}
+                        + $control->{manual_auto_timeout} - time
+                );
+
+                kloginfo sprintf(
+                    "Control %s cannot be automatically operated for "
+                    ."another %.2f seconds ( manual_auto_timeout )",
+                    $control_name,
+                    $timeout_left
+                );
+                $extra_msg{manual_auto_timeout_left} = $timeout_left;
+            }
+
+            return {
+                %extra_msg,
+                current_state => $current_state,
+                %{$pi_c_state},
+            };
+        } elsif ( $current_state eq $action ){
+            kloginfo "Control $control_name doesn't need to be changed";
+
+            return {
+                current_state => $current_state,
+                %{$pi_c_state},
+            };
+        }
+
+        # The "auto" gpio_relay needs its state inverting/toggling
+        # There are potential race-conditions here if someone operates
+        # the manual switch at this point in the code.
+
+        write_pi_gpio(
+            $pin_class,
+            $gpio_relay_num,
+            read_pi_gpio($pin_class,$gpio_relay_num) ? false : true,
+        );
+
+        $current_state = _calc_current_relay_manual_circuit_state(
+            $pin_class, $control_name, $control
+        );
+
         $pi_c_state->{last_change_state_time} = time;
-        $pi_c_state->{last_change_state_by}   = MANUAL;
-        $pi_c_state->{last_manual_gpio_detect_change_time} = time;
-        $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
+        $pi_c_state->{last_change_state_by}   = AUTO;
 
-        $callback->({
-            control_name  => $control_name,
-            control_host  => $control->{host},
-            current_state => _calc_current_relay_manual_circuit_state (
-                $control_name, $control
-            ),
+        $pi_c_state->{last_auto_gpio_relay_change_time} = time;
+        $pi_c_state->{last_auto_gpio_relay_change}
+            = read_pi_gpio($pin_class,$gpio_relay_num);
+
+        # Update the last_manual_gpio_detect_change[_time] states
+        my $gpio_detect_value = read_pi_gpio($pin_class,$gpio_detect_num);
+        if ( $control->{ex_or_for_state} ) {
+            # The auto operation should NOT have changed the voltage input on gpio_detect.
+            if ( $gpio_detect_value != $pi_c_state->{last_manual_gpio_detect_change} ){
+                $pi_c_state->{last_manual_gpio_detect_change_time} = time;
+                $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
+                klogwarn "Control $control_name (exor = true) had its manual unexpectedly gpio_detect change. Could be a problem, could be someone changing the control mid auto-operation"
+            }
+        } else {
+            # The auto operation should have changed the voltage input on the gpio_detect
+            if ( $gpio_detect_value == $pi_c_state->{last_manual_gpio_detect_change} ){
+                # Race condition ? Has the manual control been changed ?
+                klogwarn "Control $control_name (exor = false) had its manual unexpectedly gpio_detect change. Could be a problem, could be someone changing the control mid auto-operation";
+                $pi_c_state->{last_manual_gpio_detect_change_time} = time;
+            }
+            # Either way this needs updating :
+            $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
+        }
+
+        kloginfo "Control $control_name has been automatically operated";
+
+        return {
+            current_state => $current_state,
             %{$pi_c_state},
-        }) if defined $callback;
+        };
     }
 }
 
-sub operate_pi_gpio_relay_manual {
-    my ($control_name,$control, $action) = @_;
+sub init_pi_gpio{
+    my ($pin_class) = shift @_;
+    return $pin_class->init_pi_gpio(@_);
+}
 
-    my $pi_c_state = $pi_controls_state->{$control_name};
+sub read_pi_gpio{
+    my ($pin_class) = shift @_;
+    return $pin_class->read_pi_gpio(@_);
+}
 
-    my $gpio_relay_num  = $control->{gpio_relay};
-    my $gpio_detect_num = $control->{gpio_detect};
-
-    my $current_state =
-        _calc_current_relay_manual_circuit_state (
-            $control_name, $control
-        );
-
-    kloginfo "OPERATE $control_name ( Pi Relay Manual ) with $action ( current state = $current_state )";
-
-    poll_pi_gpio_relay_manual($control_name,$control);
-
-    if ( $action eq STATUS
-        ||  ( exists $control->{manual_auto_timeout}
-                && $pi_c_state->{last_manual_gpio_detect_change_time}
-                     + $control->{manual_auto_timeout} > time
-            )
-    ){
-
-        if ( $action ne STATUS ){
-            my $timeout_left = (
-                $pi_c_state->{last_manual_gpio_detect_change_time}
-                    + $control->{manual_auto_timeout} - time
-            );
-
-            kloginfo sprintf(
-                "Control %s cannot be automatically operated for "
-                ."another %.2f seconds ( manual_auto_timeout )",
-                $control_name,
-                $timeout_left
-            );
-        }
-
-        return {
-            current_state => $current_state,
-            %{$pi_c_state},
-        };
-    } elsif ( $current_state eq $action ){
-        kloginfo "Control $control_name doesn't need to be changed";
-
-        return {
-            current_state => $current_state,
-            %{$pi_c_state},
-        };
-    }
-
-    # The "auto" gpio_relay needs its state inverting/toggling
-    # There are potential race-conditions here if someone operates
-    # the manual switch at this point in the code.
-
-    write_pi_gpio(
-        $gpio_relay_num,
-        read_pi_gpio($gpio_relay_num) ? false : true,
-    );
-
-    $current_state = _calc_current_relay_manual_circuit_state(
-        $control_name, $control
-    );
-
-    $pi_c_state->{last_change_state_time} = time;
-    $pi_c_state->{last_change_state_by}   = AUTO;
-
-    $pi_c_state->{last_auto_gpio_relay_change_time} = time;
-    $pi_c_state->{last_auto_gpio_relay_change}
-        = read_pi_gpio($gpio_relay_num);
-
-    # Update the last_manual_gpio_detect_change[_time] states
-    my $gpio_detect_value = read_pi_gpio($gpio_detect_num);
-    if ( $control->{ex_or_for_state} ) {
-        # The auto operation should NOT have changed the voltage input on gpio_detect.
-        if ( $gpio_detect_value != $pi_c_state->{last_manual_gpio_detect_change} ){
-            $pi_c_state->{last_manual_gpio_detect_change_time} = time;
-            $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
-            klogwarn "Control $control_name (exor = true) had its manual unexpectedly gpio_detect change. Could be a problem, could be someone changing the control mid auto-operation"
-        }
-    } else {
-        # The auto operation should have changed the voltage input on the gpio_detect
-        if ( $gpio_detect_value == $pi_c_state->{last_manual_gpio_detect_change} ){
-            # Race condition ? Has the manual control been changed ?
-            klogwarn "Control $control_name (exor = false) had its manual unexpectedly gpio_detect change. Could be a problem, could be someone changing the control mid auto-operation";
-            $pi_c_state->{last_manual_gpio_detect_change_time} = time;
-        }
-        # Either way this needs updating :
-        $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
-    }
-
-    kloginfo "Control $control_name has been automatically operated";
-
-    return {
-        current_state => $current_state,
-        %{$pi_c_state},
-    };
+sub write_pi_gpio{
+    my ($pin_class) = shift @_;
+    return $pin_class->write_pi_gpio(@_);
 }
 
 1;

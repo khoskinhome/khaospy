@@ -38,7 +38,7 @@ our @EXPORT_OK = qw(
 #  /usr/bin/gpio read  4
 
 sub init_pi_gpio {
-    my ($gpio_num, $IN_OUT) = @_;
+    my ($class, $gpio_num, $IN_OUT) = @_;
     $IN_OUT = lc( $IN_OUT );
     klogfatal "Can only set a Pi GPIO mode ($IN_OUT) to 'in' or 'out'"
         if $IN_OUT ne IN and $IN_OUT ne OUT;
@@ -47,14 +47,14 @@ sub init_pi_gpio {
 }
 
 sub read_pi_gpio {
-    my ($gpio_num) = @_;
+    my ($class, $gpio_num) = @_;
     my $r = qx( $PI_GPIO_CMD read $gpio_num );
     chomp $r;
     return $r;
 }
 
 sub write_pi_gpio {
-    my ($gpio_num, $val) = @_;
+    my ($class, $gpio_num, $val) = @_;
     system("$PI_GPIO_CMD write $gpio_num $val");
     return;
 }
