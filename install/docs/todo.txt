@@ -47,6 +47,9 @@ Why are there a lot of tmpfs using up lots of ram on jessie version of raspibian
 Medium Prio
 -----------
 
+
+control config. an option for db-logging of state changes. ( already have the rrd_graph option )
+
 Implement for the OrviboS20 : remember the last state, and if its been manually operated by something other than khaospy. just like the PiGPIO relay-manual controls. Useful for "rules". Useful if I use them for light-switches.
 
 pi dns and dhcp server.

@@ -8,6 +8,8 @@ use Exporter qw/import/;
 use ZMQ::LibZMQ3;
 
 our $PI_GPIO_CMD = "/usr/bin/gpio";
+our $PI_I2C_GET  = "/usr/sbin/i2cget";
+our $PI_I2C_SET  = "/usr/sbin/i2cset";
 
 our $ZMQ_CONTEXT = zmq_init();
 our $JSON = JSON->new->allow_nonref;
@@ -149,6 +151,8 @@ our $LOCALHOST = '127.0.0.1';
 our @EXPORT_OK = qw(
 
     $PI_GPIO_CMD
+    $PI_I2C_GET
+    $PI_I2C_SET
 
     $ZMQ_CONTEXT
     $JSON

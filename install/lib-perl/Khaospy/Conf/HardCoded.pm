@@ -731,49 +731,48 @@ sub test_controls_conf {
 
 # pi mcp23017
 
-#        a_pi_mcp23017_relay_with_manual => {
-#            type => "pi-mcp23017-relay-manual",
-#            host => "pitest",
-#            ex_or_for_state => false,
-#            invert_state => false,
-#            gpio_relay => {
-#                i2c_bus  => 0,
-#		i2c_addr => '0x20',
-#		portname =>'b',
-#		portnum  => 0,
-#            },
-#            gpio_detect => {
-#                i2c_bus  => 0,
-#		i2c_addr => '0x20',
-#		portname =>'b',
-#		portnum  => 1,
-#            },
-#
-#        },
-#
-#        a_pi_mcp23017_relay => {
-#            type => "pi-mcp23017-relay",
-#            host => "pitest",
-#            invert_state => false,
-#            gpio_relay => {
-#                i2c_bus  => 0,
-#		i2c_addr => '0x20',
-#		portname =>'b',
-#		portnum  => 0,
-#            },
-#        },
-#
-#        a_pi_mcp23017_switch => {
-#            type => "pi-mcp23017-switch",
-#            host => "pitest",
-#            invert_state => false,
-#            gpio_switch => {
-#                i2c_bus  => 0,
-#		i2c_addr => '0x20',
-#		portname =>'b',
-#		portnum  => 1,
-#            },
-#        },
+        a_pi_mcp23017_relay_with_manual => {
+            type => "pi-mcp23017-relay-manual",
+            host => "pitest",
+            ex_or_for_state => false,
+            invert_state => false,
+            gpio_relay => {
+                i2c_bus  => 1,
+		i2c_addr => '0x27',
+		portname =>'b',
+		portnum  => 6,
+            },
+            gpio_detect => {
+                i2c_bus  => 1,
+		i2c_addr => '0x27',
+		portname =>'b',
+		portnum  => 7,
+            },
+        },
+
+        a_pi_mcp23017_relay => {
+            type => "pi-mcp23017-relay",
+            host => "pitest",
+            invert_state => false,
+            gpio_relay => {
+                i2c_bus  => 1,
+		i2c_addr => '0x27',
+		portname =>'b',
+		portnum  => 0,
+            },
+        },
+
+        a_pi_mcp23017_switch => {
+            type => "pi-mcp23017-switch",
+            host => "pitest",
+            invert_state => false,
+            gpio_switch => {
+                i2c_bus  => 1,
+		i2c_addr => '0x27',
+		portname =>'b',
+		portnum  => 1,
+            },
+        },
 
     };
 }
@@ -847,7 +846,7 @@ sub live_pi_host_conf {
         pitest => {
             log_level         => 'info',
             valid_gpios       => [ 0..7 ],
-            valid_i2c_buses   => [ 0 ],
+            valid_i2c_buses   => [ 1 ],
             daemons => [
                 {
                     script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT,
@@ -858,7 +857,7 @@ sub live_pi_host_conf {
         piserver => {
             log_level         => 'info',
             valid_gpios       => [ 0..7 ],
-            valid_i2c_buses   => [ 0 ],
+            valid_i2c_buses   => [ 1 ],
             daemons => [
                 {
                     script  => $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT,
@@ -877,7 +876,7 @@ sub live_pi_host_conf {
         piloft => {
             log_level         => 'info',
             valid_gpios       => [ 0..7 ],
-            valid_i2c_buses   => [ 0 ],
+            valid_i2c_buses   => [ 1 ],
             daemons => [
                 {
                     script  =>$KHAOSPY_ONE_WIRED_SENDER_SCRIPT,
@@ -903,7 +902,7 @@ sub live_pi_host_conf {
         piboiler => {
             log_level         => 'info',
             valid_gpios       => [ 0..7 ],
-            valid_i2c_buses   => [ 0 ],
+            valid_i2c_buses   => [ 1 ],
             daemons => [
                 {
                     script  =>$KHAOSPY_ONE_WIRED_SENDER_SCRIPT,
@@ -929,7 +928,7 @@ sub test_pi_host_conf {
         pitest => {
             log_level         => 'debug',
             valid_gpios       => [ 0..7 ],
-            valid_i2c_buses   => [ 0 ],
+            valid_i2c_buses   => [ 1 ],
             daemons => [
                 {
                     script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT,

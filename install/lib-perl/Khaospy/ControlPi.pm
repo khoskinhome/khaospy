@@ -25,7 +25,9 @@ use Khaospy::Constants qw(
 );
 
 use Khaospy::ControlPiGPIO;
-use Khaospy::ControlPiMCP23017;
+use Khaospy::ControlPiMCP23017 qw (
+    init_mcp23017
+);
 
 use Khaospy::Exception qw(
     KhaospyExcept::ControlsConfigInvalidType
@@ -45,6 +47,7 @@ our @EXPORT_OK = qw(
 sub init_pi_controls {
     get_controls_conf();
     init_gpio_controls();
+    init_mcp23017();
 }
 
 sub poll_pi_controls {
