@@ -74,8 +74,10 @@ sub get_one_wire_sender_hosts {
 sub get_hashval {
     my ($hash, $key, $allow_undef) = @_;
 
+    die "Not a hash" if ref $hash ne "HASH";
+
     die "key '$key' not in HASH\n"
-        if ! exists $hash->{key};
+        if ! exists $hash->{$key};
 
     die "key '$key' is not defined in HASH"
         if ! $allow_undef and ! defined $hash->{$key};
