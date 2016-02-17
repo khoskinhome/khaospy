@@ -1,5 +1,8 @@
 High Prio
 ---------
+write the code in Khaospy::PiControlMCP23017
+
+
 raise proper named exceptions and don't just die.
 
 Test that PiControllerDaemon.pm subscribes to the correct hosts.
@@ -11,7 +14,6 @@ Test that the following stuff works
 
 Get the electronic/physical PiMCP23017 interface working
 
-write the code in Khaospy::PiControlMCP23017
 
 run it on PiServer for the Alarm Interface board.
 
