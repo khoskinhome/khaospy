@@ -1,0 +1,233 @@
+./install/bin/khaospy-bash-aliases.sh
+
+#######################################################
+# Amelia's light hackit daemon
+
+./install/bin/khaospy-amelia-hackit-daemon.pl
+install/www-bin/lightba.pl
+##./install/www/img/ where the images are
+
+#######################################################
+
+./install/lib-perl/Khaospy/BoilerDaemon.pm
+./install/bin/khaospy-boiler-daemon.pl:215:
+
+./install/lib-perl/Khaospy/BoilerMessage.pm
+
+./install/lib-perl/Khaospy/Conf.pm
+./install/lib-perl/Khaospy/Conf/Controls.pm
+
+./install/lib-perl-t/KhaospyConfControls.t
+
+./install/lib-perl/Khaospy/Conf/PiHosts.pm
+./install/lib-perl-t/KhaospyConfPiHosts.t
+
+./install/bin/test-dump-all-confs.pl
+
+./install/lib-perl/Khaospy/Conf/HardCoded.pm
+
+./install/lib-perl-t/crap.t
+
+./install/bin/khaospy-test-conf-generate.pl
+./install/bin/khaospy-live-conf-generate.pl
+
+./install/lib-perl/Khaospy/Constants.pm
+
+./install/lib-perl/Khaospy/ControlPi.pm
+./install/lib-perl/Khaospy/ControlPiGPIO.pm
+./install/lib-perl/Khaospy/ControlPiMCP23017.pm
+./install/lib-perl-t/KhaospyControlPiMCP23017.t
+
+install/lib-perl/Khaospy/PiControllerDaemon.pm
+
+./install/lib-perl/Khaospy/ControlOrviboS20.pm
+
+./install/lib-perl/Khaospy/Exception.pm
+
+./install/lib-perl/Khaospy/Log.pm
+
+./install/lib-perl/Khaospy/Message.pm
+
+./install/lib-perl/Khaospy/OneWireHeatingDaemon.pm
+./install/bin/khaospy-one-wire-heating-daemon.pl
+
+./install/lib-perl/Khaospy/OrviboS20.pm
+./install/lib-perl/t-scripts/test-khaospy-orvibos20.pl
+
+./install/lib-perl/Khaospy/OperateControls.pm
+./install/bin/khaospy-operate-control.pl
+
+./install/lib-perl/Khaospy/PiControllerDaemon.pm
+./install/bin/khaospy-controller-daemon.pl
+
+./install/lib-perl/Khaospy/PiControllerQueueDaemon.pm
+./install/bin/khaospy-controller-queue-d.pl
+
+./install/lib-perl/Khaospy/Utils.pm
+
+./install/lib-perl/Khaospy/ZMQSubscribeAllPublishers.pm
+./install/bin/khaospy-zmq-subscribe.pl
+
+./install/lib-perl/Khaospy/ZMQAnyEvent.pm
+
+./install/lib-perl/zhelpers.pm
+
+./install/bin/test-module-includes.pl
+
+./install/lib-perl/t/test-picontrollerdaemon-send-msg.pl
+./install/lib-perl/t/test-picontrollerdaemon-listen.pl
+
+######################################################
+#
+#######################################################
+# running all the scripts
+
+./install/bin/khaospy-run-daemons.pl
+
+#######################################################
+# one wire thermometer stuff :
+
+./install/bin/khaospy-one-wired-sender.py
+
+## ./install/libpy/khaospy-one-wired-receiver-subscribe.py # renamed to khaospy-one-wired-receiver.py
+./install/bin/khaospy-one-wired-receiver.py
+./install/bin/khaospy-one-wired-receiver-just-listen.py
+
+##############################################################################
+# graphing of rrds.
+
+install/bin/khaospy-generate-rrd-graphs.pl
+
+##############################################################################
+
+
+######################################################
+
+
+######################################################
+
+# this still has more stuff under /home/khoskin/github.com//k-ha-os/amelia-light/
+# the web page stuff.
+# plus there is setup with the /tmp/
+./install/bin/helper/get-all-rad-status.sh
+
+./install/bin/helper/gpio-1-relay-on.sh
+./install/bin/helper/gpio-1-relay-off.sh
+./install/bin/helper/gpio-4-relay-on.sh
+./install/bin/helper/gpio-4-relay-off.sh
+./install/bin/helper/gpio-0-input-status.sh
+
+./install/bin/helper/zmq-get-version.pl
+
+./install/bin/helper/zmq-ventilator.pl
+./install/bin/helper/zmq-worker.pl
+
+./install/bin/helper/zmq-req.py
+./install/bin/helper/zmq-reply.py
+
+./install/bin/helper/zmq-push.py
+./install/bin/helper/zmq-pull.py
+
+
+
+##############################################################################
+
+##############################################################################
+# ./install/www
+
+##############################################################################
+# ./install/conf
+
+##############################################################################
+# ./install/www-bin
+
+##############################################################################
+# ./install/bin
+
+##############################################################################
+# libpy .......
+
+./install/libpy/khaospy-one-wired-daemon.py
+./install/libpy/khaospy-one-wired-receiver-subscribe.py
+./install/libpy/khaospy-one-wired-receiver-subscribe-just-listen.py
+./install/libpy/khaospy-one-wired-receiver-subscribe-CRAP.py
+### DEVICE = 0x20
+
+
+# working here 28th Oct 15.
+./install/libpy/khaospy-i2c-alarm-poller-daemon.py
+./install/libpy/khaospy-i2c-alarm-poller-daemon-test-crap.py
+./install/libpy/khaospy-i2c-alarm-poller-receiver.py
+
+######################################################
+# i2c alarm polling
+
+./install/libpy/khaospy-i2c-alarm-poller-sender.py
+./install/libpy/khaospy-i2c-alarm-poller-daemon.py
+./install/libpy/khaospy-i2c-alarm-poller-daemon-test-crap.py
+./install/libpy/khaospy-i2c-alarm-poller-receiver.py
+
+mapping-i2c-alarm-board.py
+
+
+##############################################################################
+# DOCS
+##############################################################################
+
+./install/docs
+
+./install/docs/todo.txt
+
+./install/docs/setup-pi.txt
+
+./install/docs/pi-gpio-pins-wiringpi.txt
+
+./install/docs/dependencies.txt
+./install/docs/anyevent-zmq-links.txt
+./install/docs/proj_khaospy-home-auto-software.txt
+./install/docs/proj_khaospy-home-auto-software2.txt
+./install/docs/lighting-wiring-circuits.txt
+./install/docs/heating-control.txt
+./install/docs/lighting-control.txt
+./install/docs/khaospy-why.txt
+
+./install/docs/apache2-sites-enabled-orig-pi.txt
+
+./install/docs/to-be-deleted-file-list
+
+
+##############################################################################
+
+./install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl
+
+
+./install/bin/orvibo-s20-control.pl
+./install/bin/orvibo-s20-control-karl-hack.pl
+
+###################################################################
+
+install-to-pi-pi.bash
+install-to-pi-khoskin.bash
+install-to-pi.bash
+install-to-pi-all.bash
+
+###################################################################
+
+./install/www/index.html
+
+./install/www-bin/graphs.pl
+
+###################################################################
+
+###################################################################
+
+###################################################################
+
+#khoskin@khoskin-P5K-E:~/github.com/khaospy$ g.grep PiHostPublishers
+install/bin/test-module-includes.pl:39:use Khaospy::PiHostPublishers;
+install/docs/todo.txt:16:        deprecate Khaospy::PiHostPublishers. move its stuff into Khaospy::Conf::PiHosts
+install/lib-perl/Khaospy/PiControllerDaemon.pm:60:use Khaospy::PiHostPublishers qw(
+install/lib-perl/Khaospy/PiControllerQueueDaemon.pm:57:use Khaospy::PiHostPublishers qw(
+install/lib-perl/Khaospy/PiHostPublishers.pm:1:package Khaospy::PiHostPublishers;
+
+
