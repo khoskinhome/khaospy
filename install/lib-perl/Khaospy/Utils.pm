@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use POSIX qw(strftime);
-use Carp qw/croak/;
+use Carp qw/croak confess/;
 use Data::Dumper;
 use Exporter qw/import/;
 use JSON;
@@ -74,12 +74,12 @@ sub get_one_wire_sender_hosts {
 sub get_hashval {
     my ($hash, $key, $allow_undef) = @_;
 
-    die "Not a hash" if ref $hash ne "HASH";
+    confess "Not a hash" if ref $hash ne "HASH";
 
-    die "key '$key' not in HASH\n"
+    confess "key '$key' not in HASH\n"
         if ! exists $hash->{$key};
 
-    die "key '$key' is not defined in HASH"
+    confess "key '$key' is not defined in HASH"
         if ! $allow_undef and ! defined $hash->{$key};
 
     return $hash->{$key};

@@ -14,6 +14,8 @@ use Khaospy::Constants qw(
     $PI_I2C_SET
     IN $IN OUT $OUT
     true false
+
+    $PI_CONTROL_MCP23017_PINS_TIMEOUT
 );
 
 use Khaospy::Log qw(
@@ -27,7 +29,6 @@ use Khaospy::Utils qw(
 
 our @EXPORT_OK = qw(
     init_mcp23017
-    poll_mcp23017
     init_gpio
     read_gpio
     write_gpio
@@ -38,35 +39,26 @@ our @EXPORT_OK = qw(
 #=cut
 
 #=pod
-# $mcp23017_pins_[config|state] = {
-#    <i2c_bus> => {
-#        <i2c_addr> => {
-#            <port_a|port_b> => [
+# $pins_[cfg|in_state|out_state] = {
+#    <i2c_bus> => {                 # key is 0 or 1 , maybe even 2
+#        <i2c_addr> => {            # key is "0x20" -> "0x27" (string)
+#            <port_a|port_b> => [   # key is "a" or "b"
 #                bit0,
 #                bit1,
 #                ....
 #                bit7
 #            ]
-#             <port_a_mask> ???
+#            <port_a_last_update|port_b_last_update> => time # key is "a_last_update" or "b_last_update"
 #        }
 #    },
 #
 # }
 #
-# mcp_OLAT | mcp_GPIO | mcp_IODIR = {
-#     <i2c_bus> => {
-#         <i2c_addr> => {
-#                 val =>  integer,
-#                 time => epoch_secs # since last updated. INs read, OUTs written.
-#             }
-#         }
-#     }
-#
 # gpio = { # something like :
-#    i2c_bus  => 0,
-#	 i2c_addr => '0x20',
-#	 portname =>'b',
-#	 portnum  => 1,
+#       i2c_bus  => 0,
+#	i2c_addr => '0x20',
+#	portname =>'b',
+#	portnum  => 1,
 # };
 
 
@@ -79,33 +71,29 @@ our @EXPORT_OK = qw(
 my $IODIR = { a => '0x00', b => '0x01' };
 
 # GPIO A/B are used to get the input on a gpio port
-my $GPIO  = { a => '0x12', b => '0x13' };
+my $MCP_GPIO  = { a => '0x12', b => '0x13' };
 
 # OLAT A/B are used to switch on and off the outputs on a gpio port.
 my $OLAT  = { a => '0x14', b => '0x15' };
 
-my $mcp_IODIR = {};
-my $mcp_GPIO  = {};
-my $mcp_OLAT  = {};
+my $pins_cfg = {}; # used by IODIR[A|B]
+my $pins_out = {}; # used by OLAT[A|B]
+my $pins_in  = {}; # used by GPIO[A|B]
 
-my $pins_cfg       = {}; # used by IODIR[A|B]
-my $pins_out_state = {}; # used by OLAT[A|B]
-my $pins_in_state  = {}; # used by GPIO[A|B]
-
-# needed for testing.
+# needed for unit testing :
 sub testing_get_pins_cfg       { $pins_cfg }
 sub testing_set_pins_cfg       { $pins_cfg = $_[0] }
-sub testing_get_pins_in_state  { $pins_in_state }
-sub testing_set_pins_in_state  { $pins_in_state = $_[0] }
-sub testing_get_pins_out_state { $pins_out_state }
-sub testing_set_pins_out_state { $pins_out_state = $_[0] }
+sub testing_get_pins_in_state  { $pins_in }
+sub testing_set_pins_in_state  { $pins_in = $_[0] }
+sub testing_get_pins_out_state { $pins_out }
+sub testing_set_pins_out_state { $pins_out = $_[0] }
 
 sub init_gpio {
     my ($class, $gpio, $IN_OUT ) = @_;
     # inits a single gpio pin
-    _init_pins( $gpio, $pins_cfg      , $IN_OUT, true );
-    _init_pins( $gpio, $pins_in_state ,undef   , true );
-    _init_pins( $gpio, $pins_out_state,undef   , false );
+    _init_pins( $gpio, $pins_cfg      , $IN_OUT, true  );
+    _init_pins( $gpio, $pins_in ,undef   , true  ) if $IN_OUT eq IN;
+    _init_pins( $gpio, $pins_out,undef   , false ) if $IN_OUT eq OUT;
 }
 
 sub _init_pins {
@@ -138,35 +126,39 @@ sub _init_pins {
 }
 
 sub init_mcp23017 {
+    # needs to be called once all the pins are init-ed by init_gpio()
+    for my $i2c_bus ( keys %$pins_cfg ){
+        my $bus_rh = get_hashval($pins_cfg,$i2c_bus);
+        for my $i2c_addr ( keys %$bus_rh ){
+            my $addr_rh = get_hashval($bus_rh, $i2c_addr);
+            for my $port ( qw/a b/ ){
+                next if ! exists $addr_rh->{$port};
 
-    print Dumper ( $pins_cfg );
-    # TODO actually push the pin config to the chip
-
-}
-
-sub poll_mcp23017 {
-    # TODO reads the INs , writes the OUTs
-
+                my $cmd = sprintf("%s -y %s %s %s 0x%02x",
+                    $PI_I2C_SET,
+                    $i2c_bus,
+                    $i2c_addr,
+                    $IODIR->{$port},
+                    _pin_array_to_num($addr_rh->{$port})
+                );
+                print $cmd."\n";
+            }
+        }
+    }
 }
 
 sub get_pins_i_name {
     my ( $pins_i ) = @_;
     return 'pins_cfg'       if $pins_i == $pins_cfg;
-    return 'pins_in_state'  if $pins_i == $pins_in_state;
-    return 'pins_out_state' if $pins_i == $pins_out_state;
+    return 'pins_in_state'  if $pins_i == $pins_in;
+    return 'pins_out_state' if $pins_i == $pins_out;
     return 'unknown-pins-datastructure';
 }
 
 sub get_pins_array {
     my ($gpio, $pins_i) = @_;
 
-    klogfatal get_pins_i_name($pins_i)." doesn't have i2c_bus set"
-        if ! exists $pins_i->{get_hashval($gpio, 'i2c_bus')};
-    my $i2c_bus_rh = $pins_i->{$gpio->{i2c_bus}};
-
-    klogfatal get_pins_i_name($pins_i)." doesn't have i2c_addr set"
-        if ! exists $i2c_bus_rh->{get_hashval($gpio, 'i2c_addr')};
-    my $i2c_addr_rh = $i2c_bus_rh->{$gpio->{i2c_addr}};
+    my $i2c_addr_rh = _get_pins_array_to_i2c_addr($gpio, $pins_i);
 
     $gpio->{portname} = lc(get_hashval($gpio, 'portname'));
     klogfatal get_pins_i_name($pins_i)." doesn't have portname set"
@@ -176,37 +168,108 @@ sub get_pins_array {
     return $array_ra;
 }
 
+sub set_last_update {
+    my ($gpio, $pins_i ) = @_;
+
+    my $i2c_addr_rh = _get_pins_array_to_i2c_addr($gpio, $pins_i);
+    $gpio->{portname} = lc(get_hashval($gpio, 'portname'));
+
+    my $last_key = $gpio->{portname}."_last_update";
+
+    $i2c_addr_rh->{$last_key} = time
+}
+
+sub last_update {
+    my ($gpio, $pins_i ) = @_;
+
+    my $i2c_addr_rh = _get_pins_array_to_i2c_addr($gpio, $pins_i);
+    $gpio->{portname} = lc(get_hashval($gpio, 'portname'));
+
+    my $last_key = $gpio->{portname}."_last_update";
+
+    $i2c_addr_rh->{$last_key} = 0
+        if ! exists $i2c_addr_rh->{$last_key};
+
+    return $i2c_addr_rh->{$last_key} ;
+}
+
+sub _get_pins_array_to_i2c_addr {
+    my ($gpio, $pins_i) = @_;
+
+    klogfatal get_pins_i_name($pins_i)." doesn't have i2c_bus set"
+        if ! exists $pins_i->{get_hashval($gpio, 'i2c_bus')};
+    my $i2c_bus_rh = $pins_i->{$gpio->{i2c_bus}};
+
+    klogfatal get_pins_i_name($pins_i)." doesn't have i2c_addr set"
+        if ! exists $i2c_bus_rh->{get_hashval($gpio, 'i2c_addr')};
+
+    return $i2c_bus_rh->{$gpio->{i2c_addr}};
+}
+
 sub set_pins_state_array {
     my ( $gpio, $pins_i, $new_state ) = @_;
 
-    klogfatal "new_state ($new_state) isn't 1 or 0"
-        if $new_state != true and $new_state != false;
+    klogfatal "new_state ($new_state) isn't 1 or 0 or an array"
+        if $new_state != true and $new_state != false and ref $new_state ne "ARRAY";
 
     # Should never need to set the pins_cfg after init.
     klogfatal get_pins_i_name($pins_i)." is not settable"
-        if $pins_i != $pins_in_state
-            and $pins_i != $pins_out_state;
+        if $pins_i != $pins_in
+            and $pins_i != $pins_out;
 
-    get_pins_array($gpio, $pins_i)->[ get_hashval($gpio,'portnum') ]
-        = $new_state;
+    if ( ref $new_state ne "ARRAY" ) {
+        get_pins_array($gpio, $pins_i)->[ get_hashval($gpio,'portnum') ]
+            = $new_state;
+    } else {
+        @{get_pins_array($gpio, $pins_i)} = @$new_state ;
+    }
 }
 
 sub read_gpio {
     my ( $class, $gpio ) = @_;
 
-    return get_pins_array( $gpio, $pins_in_state )
+    my $last_update = last_update($gpio, $pins_in);
+    if ( $last_update + $PI_CONTROL_MCP23017_PINS_TIMEOUT < time ){
+        my $cmd = sprintf("%s -y %s %s %s",
+            $PI_I2C_GET,
+            $gpio->{i2c_bus},
+            $gpio->{i2c_addr},
+            $MCP_GPIO->{$gpio->{portname}},
+        );
+
+        set_pins_state_array(
+            $gpio,
+            $pins_in,
+            _num_to_pin_array( hex( get_cmd( $cmd ) ) )
+        );
+
+        set_last_update($gpio, $pins_in)
+    }
+
+    return get_pins_array( $gpio, $pins_in )
         ->[ get_hashval($gpio, 'portnum') ];
 }
 
 sub write_gpio {
     my ( $class, $gpio, $new_state ) = @_;
-    set_pins_state_array($gpio, $pins_out_state, $new_state);
+    set_pins_state_array($gpio, $pins_out, $new_state);
+
+    my $cmd = sprintf("%s -y %s %s %s 0x%02x",
+        $PI_I2C_SET,
+        $gpio->{i2c_bus},
+        $gpio->{i2c_addr},
+        $OLAT->{$gpio->{portname}},
+        _pin_array_to_num(
+            get_pins_array($gpio, $pins_out)
+        )
+    );
+    get_cmd( $cmd );
 }
 
 sub _pin_array_to_num {
     my ( $array ) = @_;
 
-    klogfatal "Array doesn't have 8 bits for gpio, or a bit is not either 1 or 0",
+    klogfatal "Array either doesn't have 8 bits for gpio or a bit is not either 1 or 0",
         $array if @$array != 8 || grep { $_ != true and $_ != false } @$array;
 
     return oct("0b".join( "", reverse @$array));
@@ -214,7 +277,7 @@ sub _pin_array_to_num {
 
 sub _num_to_pin_array {
     my ( $num ) = @_;
-
+    # returns an array-ref where element 0 == bit-0
     klogfatal "number is not between 0 and 255"
         if $num < 0 || $num > 255;
 
@@ -222,5 +285,13 @@ sub _num_to_pin_array {
 
 }
 
+sub get_cmd {
+    my ($cmd) = @_;
+    print $cmd."\n";
+
+    #TODO run the command, error handling, and return the value.
+
+    return "0x00";
+}
 1;
 

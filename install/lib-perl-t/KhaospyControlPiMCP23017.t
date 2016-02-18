@@ -33,10 +33,20 @@ my $gpio = {
 # Test init
 init_gpio(undef,$gpio,OUT);
 
+my $gpio_in = {
+    i2c_bus  => 0,
+    i2c_addr => '0x20',
+    portname =>'a',
+    portnum  => 2,
+};
+
+init_gpio(undef,$gpio_in,IN);
+
 my $expect = {
     '0' => {
         '0x20' => {
-            'b' => [qw/1 1 1 1 1 0 1 1/ ]
+            'b' => [qw/1 1 1 1 1 0 1 1/ ],
+            'a' => [qw/1 1 1 1 1 1 1 1/ ]
         }
     }
 };
@@ -46,6 +56,10 @@ cmp_deeply(
     $expect,
     "pins cfg looks okay"
 );
+
+
+Khaospy::ControlPiMCP23017::init_mcp23017();
+
 
 # Test writing to a gpio
 $gpio->{portnum} = 0;
@@ -62,14 +76,14 @@ cmp_deeply(
 # they should all get init-ed to 1 (true)
 # so set one to 0 (false)
 my $test_bit = 5;
-$gpio->{portnum} = $test_bit;
+$gpio_in->{portnum} = $test_bit;
 my $pins_in = Khaospy::ControlPiMCP23017->testing_get_pins_in_state();
-Khaospy::ControlPiMCP23017::set_pins_state_array($gpio,$pins_in,false);
+Khaospy::ControlPiMCP23017::set_pins_state_array($gpio_in,$pins_in,false);
 
 for my $bit ( 0..7 ) {
-    $gpio->{portnum} = $bit;
+    $gpio_in->{portnum} = $bit;
     my $expect = $bit == $test_bit ? false : true;
-    my $result = Khaospy::ControlPiMCP23017->read_gpio($gpio, $pins_in);
+    my $result = Khaospy::ControlPiMCP23017->read_gpio($gpio_in, $pins_in);
     ok( $result == $expect, "read bit $bit == $expect" );
 }
 

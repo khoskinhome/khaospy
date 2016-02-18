@@ -46,7 +46,7 @@ our @EXPORT_OK = qw(
 
 sub init_pi_controls {
     get_controls_conf();
-    init_gpio_controls();
+    init_controls();
     init_mcp23017();
 }
 
@@ -99,7 +99,7 @@ my $pi_controls_state = {};
 
 my $controls_for_host;
 
-sub init_gpio_controls {
+sub init_controls {
     kloginfo "Initialise PiGPIO controls";
     $controls_for_host = get_controls_conf_for_host();
     _dispatch($init_dispatch, "Initialise");
