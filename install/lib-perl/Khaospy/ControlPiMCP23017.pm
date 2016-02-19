@@ -94,6 +94,11 @@ sub init_gpio {
     _init_pins( $gpio, $pins_cfg      , $IN_OUT, true  );
     _init_pins( $gpio, $pins_in ,undef   , true  ) if $IN_OUT eq IN;
     _init_pins( $gpio, $pins_out,undef   , false ) if $IN_OUT eq OUT;
+
+    # a bit of a hack , since this will affect a higher level datastructure.
+    # ( breaking encapsulation )
+    # this is done so that the correct $pins_in or $pins_out can be selected in read_gpio()
+    $gpio->{iodir} = $IN_OUT;
 }
 
 sub _init_pins {
@@ -141,7 +146,7 @@ sub init_mcp23017 {
                     $IODIR->{$port},
                     _pin_array_to_num($addr_rh->{$port})
                 );
-                print $cmd."\n";
+                get_cmd( $cmd );
             }
         }
     }
@@ -196,11 +201,11 @@ sub last_update {
 sub _get_pins_array_to_i2c_addr {
     my ($gpio, $pins_i) = @_;
 
-    klogfatal get_pins_i_name($pins_i)." doesn't have i2c_bus set"
+    klogfatal get_pins_i_name($pins_i)." doesn't have i2c_bus set", $pins_i
         if ! exists $pins_i->{get_hashval($gpio, 'i2c_bus')};
     my $i2c_bus_rh = $pins_i->{$gpio->{i2c_bus}};
 
-    klogfatal get_pins_i_name($pins_i)." doesn't have i2c_addr set"
+    klogfatal get_pins_i_name($pins_i)." doesn't have i2c_addr set", $pins_i
         if ! exists $i2c_bus_rh->{get_hashval($gpio, 'i2c_addr')};
 
     return $i2c_bus_rh->{$gpio->{i2c_addr}};
@@ -228,6 +233,10 @@ sub set_pins_state_array {
 sub read_gpio {
     my ( $class, $gpio ) = @_;
 
+    if ( get_hashval($gpio, 'iodir') eq OUT ){
+        return get_pins_array($gpio, $pins_out)->[ get_hashval($gpio,'portnum') ]
+    };
+
     my $last_update = last_update($gpio, $pins_in);
     if ( $last_update + $PI_CONTROL_MCP23017_PINS_TIMEOUT < time ){
         my $cmd = sprintf("%s -y %s %s %s",
@@ -252,6 +261,11 @@ sub read_gpio {
 
 sub write_gpio {
     my ( $class, $gpio, $new_state ) = @_;
+
+    if ( get_hashval($gpio, 'iodir') eq IN ){
+        klogfatal "trying to write to a gpio pin that has been configured as input";
+    };
+
     set_pins_state_array($gpio, $pins_out, $new_state);
 
     my $cmd = sprintf("%s -y %s %s %s 0x%02x",
@@ -287,11 +301,14 @@ sub _num_to_pin_array {
 
 sub get_cmd {
     my ($cmd) = @_;
-    print $cmd."\n";
+    klogdebug "command to mcp23017 : $cmd";
 
-    #TODO run the command, error handling, and return the value.
+    my $ret = qx($cmd);
+    $ret =~ s/\s+$//g;
 
-    return "0x00";
+    #TODO error handling
+
+    return $ret;
 }
 1;
 
