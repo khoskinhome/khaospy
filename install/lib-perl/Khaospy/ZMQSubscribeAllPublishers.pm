@@ -100,6 +100,8 @@ sub output_msg {
             my ($frac_str) = $fraction
                 =~ /^0\.(\d{4})/;
 
+            $frac_str = 0 if ! defined $frac_str;
+
             $r_val = sprintf("%s.%s GMT",
                 strftime("%F %T", gmtime($value)),
                 $frac_str
