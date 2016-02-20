@@ -87,7 +87,13 @@ sub output_msg {
     my ( $zmq_sock, $msg, $port ) = @_;
     kloginfo "msg on port $port";
 
-    my $dec = $JSON->decode($msg);
+    my $dec;
+    eval { $dec = $JSON->decode($msg); };
+
+    if ($@) {
+        print "$msg\n";
+        return;
+    }
 
     my $convert_times = sub {
         my ( $key, $value ) = @_;
