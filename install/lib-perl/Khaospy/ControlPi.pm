@@ -462,7 +462,7 @@ sub operate_relay_manual {
                 $pi_c_state->{last_manual_gpio_detect_change_time} = time;
             }
             # Either way this needs updating :
-            $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
+            $pi_c_state->{last_manual_gpio_detect_change} = $gpio_detect_value;
         }
 
         kloginfo "Control $control_name has been automatically operated";
@@ -475,18 +475,42 @@ sub operate_relay_manual {
 }
 
 sub init_gpio{
-    my ($pin_class) = shift @_;
-    return $pin_class->init_gpio(@_);
+    my ($pin_class, $gpio, $iodir) = @_;
+    try {
+        return $pin_class->init_gpio($gpio, $iodir);
+    } catch {
+        log_gpio_err( $pin_class, $gpio, $_ );
+    }
 }
 
 sub read_gpio{
-    my ($pin_class) = shift @_;
-    return $pin_class->read_gpio(@_);
+    my ($pin_class, $gpio) = @_;
+    try {
+        return $pin_class->read_gpio($gpio);
+    } catch {
+        log_gpio_err( $pin_class, $gpio, $_ );
+    }
 }
 
 sub write_gpio{
-    my ($pin_class) = shift @_;
-    return $pin_class->write_gpio(@_);
+    my ($pin_class, $gpio, $new_state ) = @_;
+    try {
+        return $pin_class->write_gpio( $gpio, $new_state );
+    } catch {
+        log_gpio_err( $pin_class, $gpio, $_ );
+    }
+}
+
+sub log_gpio_err {
+    my ( $pin_class, $gpio, $err ) = @_;
+    my ( $first_line, $rest ) = $err =~ /\A(.*?)\n(.*)/ms;
+
+    klogerror sprintf ("%s : %s : %s : gpio = { %s }",
+        $pin_class, ref ($_), $first_line,
+        join (",", map { "$_ => $gpio->{$_}" } sort keys %$gpio )
+    );
+
+    klogdebug "ABOVE error. $rest";
 }
 
 sub trans_true_to_ON { # and false to OFF
@@ -505,8 +529,10 @@ sub trans_ON_to_true { # and OFF to false
 }
 
 sub invert_state {
-    # if a control has "invert_state" option set then this
-    # inverts both ON/OFF and true/false
+    # looks at a control's "invert_state" key, and inverts the value supplied
+    # to this sub if invert_state == true.
+    #
+    # inverts both ON/OFF and true/false $val's
     my ( $control, $val ) = @_;
 
     return $val

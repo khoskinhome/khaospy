@@ -859,60 +859,77 @@ sub test_controls_conf {
             mac   => 'AC-CF-23-8D-3B-96',
         },
 
+## pi gpio
+        pigpio_relay => {
+            alias => 'pi gpio relay',
+            type  => "pi-gpio-relay",
+            host  => 'pitest',
+            invert_state => true,
+            gpio_relay   => 1,
+        },
 
-#        broken_frontroomrad    => {
-#            alias => 'Front Room Radiator',
-#            type  => "orviboS20",
-#            host  => 'frontroomrad',
-#            mac   => 'ACCF-23-8D-3B-96',
-#            extra => "bah",
-#
-#        },
-
-#        a_pi_gpio_relay2 => {
-#            alias => 'pi gpio relay 2',
-#            type  => "pi-gpio-relay",
-#            host  => 'pitest', # FIX THIS it will be piboiler when running.
-#            invert_state => true,
-#            gpio_relay   => 2, # NOT the BCM CPIO number.
-#        },
-#
-#        a_pi_gpio_switch => {
+#        pigpio_switch => {
 #            type => "pi-gpio-switch",
 #            host => "pitest",
 #            invert_state => false,
-#            gpio_switch => 7, # ERROR !
-#        },
-#
-## pi gpio
-#        boiler => {
-#            type => "pi-gpio-relay-manual",
-#            host => "pitest",
-#            ex_or_for_state => false,
-#            invert_state => false,
-#            manual_auto_timeout => 20,
-#            gpio_relay  => 4,
-#            gpio_detect => 0,
+#            gpio_switch => 7,
 #        },
 
-        #        a_pi_gpio_relay => {
-        #            type => "pi-gpio-relay",
-        #            host => "pitestNOT", # TODO non existant hostname.
-        #            invert_state => false,
-        #            gpio_relay  => 0,
-        #        },
-        #
-        #        duplicate_gpio_a_pi_gpio_relay => {
-        #            type => "pi-gpio-relay",
-        #            host => "pitestNOT", # TODO non existant hostname.
-        #            invert_state => false,
-        #            gpio_relay  => 0,
-        #        },
-        #
+        pigpio_relay_manual => {
+            type => "pi-gpio-relay-manual",
+            host => "pitest",
+            ex_or_for_state => false,
+            invert_state => false,
+            manual_auto_timeout => 20,
+            gpio_relay  => 4,
+            gpio_detect => 0,
+        },
 
 # pi mcp23017
+        mcp_relay_man_0 => {
+            type => "pi-mcp23017-relay-manual",
+            host => "pitest",
+            ex_or_for_state => true,
+            invert_state => false,
+            gpio_relay => {
+                i2c_bus  => 0,
+		i2c_addr => '0x27',
+		portname =>'b',
+		portnum  => 3,
+            },
+            gpio_detect => {
+                i2c_bus  => 0,
+		i2c_addr => '0x27',
+		portname =>'b',
+		portnum  => 0,
+            },
+        },
 
-        mcp_relay_man => {
+        mcp_relay_0 => {
+            type => "pi-mcp23017-relay",
+            host => "pitest",
+            invert_state => false,
+            gpio_relay => {
+                i2c_bus  => 0,
+		i2c_addr => '0x27',
+		portname =>'b',
+		portnum  => 1,
+            },
+        },
+
+        mcp_switch_0 => {
+            type => "pi-mcp23017-switch",
+            host => "pitest",
+            invert_state => false,
+            gpio_switch => {
+                i2c_bus  => 0,
+		i2c_addr => '0x27',
+		portname =>'b',
+		portnum  => 2,
+            },
+        },
+
+        mcp_relay_man_1 => {
             type => "pi-mcp23017-relay-manual",
             host => "pitest",
             ex_or_for_state => true,
@@ -931,7 +948,7 @@ sub test_controls_conf {
             },
         },
 
-        mcp_relay => {
+        mcp_relay_1 => {
             type => "pi-mcp23017-relay",
             host => "pitest",
             invert_state => false,
@@ -943,7 +960,7 @@ sub test_controls_conf {
             },
         },
 
-        mcp_switch => {
+        mcp_switch_1 => {
             type => "pi-mcp23017-switch",
             host => "pitest",
             invert_state => false,
@@ -972,7 +989,7 @@ sub live_boilers_conf {
     return {
         # frontroomrad is being using as the boiler control. This needs fixing.
         karlrad => {
-            on_delay_secs => 120, # TODO this should really be 120
+            on_delay_secs => 120,
             controls => [qw/
                 alisonrad
                 frontroomrad
@@ -990,10 +1007,8 @@ sub test_boilers_conf {
         karlrad => {
             on_delay_secs => 120, # TODO this should really be 120
             controls => [qw/
-                alisonrad
-                frontroomrad
-                ameliarad
-                dinningroomrad
+                mcp_relay_man
+                mcp_relay
             /],
 
         },
@@ -1105,9 +1120,9 @@ sub live_pi_host_conf {
 sub test_pi_host_conf {
     return {
         pitest => {
-            log_level         => 'debug',
+            log_level         => 'info',
             valid_gpios       => [ 0..7 ],
-            valid_i2c_buses   => [ 1 ],
+            valid_i2c_buses   => [ 0, 1 ], # could do an i2cdetect too.
             daemons => [
                 {
                     script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT,

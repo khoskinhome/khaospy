@@ -23,6 +23,14 @@ raspi-config :
         dtoverlay=w1-gpio
 
 
+i2c stuff :
+    http://www.raspberrypi-spy.co.uk/2014/11/enabling-the-i2c-interface-on-the-raspberry-pi/
+    https://www.raspberrypi.org/forums/viewtopic.php?f=44&t=91762&start=25
+
+    getting i2c-0 working on Pi2 :
+        add the kernel parm "bcm2708.vc_i2c_override=1" to /boot/cmdline.txt
+        and "dtparam=i2c_vc=on" to /boot/config.txt
+
 
 
 still to do :

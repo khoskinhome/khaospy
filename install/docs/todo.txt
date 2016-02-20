@@ -1,7 +1,39 @@
 High Prio
 ---------
-write the code in Khaospy::PiControlMCP23017
 
+error handling of mcp23017 read and write errors.
+
+get OneWireHeatingDaemon
+    able to use the ControlPi stuff..
+    listen to the PiControllers for updates.
+        (then I can use the window switches,before I get the full-blown-rules-daemon working )
+
+
+get BoilerDaemon.pm able to use the ControlPi stuff.
+
+get piboiler able to run the PC-queue-d.
+    try reinstall of dependencies.
+
+In my loft.
+    thermometers in my room , kitchen and my loft.
+    i2c-controller.
+        Can I use the secondary i2c-bus on PiB+ ?
+        Make a test lead.
+
+    get the outside one working properly.
+
+    maybe get ali's window switch wired in to alarm board.
+
+
+
+
+
+
+
+
+jumper pins from PHouse. leave some in the alarm-panel.
+
+write more tests for the the code in Khaospy::PiControlMCP23017
 
 raise proper named exceptions and don't just die.
 
@@ -49,12 +81,17 @@ Why are there a lot of tmpfs using up lots of ram on jessie version of raspibian
 Medium Prio
 -----------
 
+does the pi-host.conf need to have valid_i2c_buses ? This can be worked out with an i2c-detect ? maybe I need both. When khaospy actually runs on the host then it can do  an i2c-detect too.
+
 
 control config. an option for db-logging of state changes. ( already have the rrd_graph option )
 
+
 Implement for the OrviboS20 : remember the last state, and if its been manually operated by something other than khaospy. just like the PiGPIO relay-manual controls. Useful for "rules". Useful if I use them for light-switches.
 
+
 pi dns and dhcp server.
+
 
 pibastion that I can open to the net and just get stats.
 

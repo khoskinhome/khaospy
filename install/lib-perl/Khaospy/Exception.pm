@@ -27,6 +27,8 @@ use Exception::Class (
 
     'KhaospyExcept::PiHostsNoHostsRunningDaemon',
 
+    'KhaospyExcept::ShellCommand',
+
 );
 
 

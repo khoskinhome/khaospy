@@ -266,8 +266,6 @@ sub get_control_config {
     return $controls_conf->{$control_name};
 }
 
-
-
 my $pi_mcp23017_unique;
 my $pi_gpio_unique;
 
@@ -480,8 +478,8 @@ sub check_pi_mcp23017 {
     my $uniq = "host=".$control->{host}
           ."|i2c_bus=".$control->{$chk}{i2c_bus}
           ."|i2c_addr=".$control->{$chk}{i2c_addr}
-          ."|portname".lc($control->{$chk}{portname})
-          ."|portnum".$control->{$chk}{portnum};
+          ."|portname=".lc($control->{$chk}{portname})
+          ."|portnum=".$control->{$chk}{portnum};
 
     KhaospyExcept::ControlsConfigDuplicateMCP23017GPIO->throw(
         error => "Control '$control_name' is using the same "

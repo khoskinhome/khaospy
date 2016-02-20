@@ -25,6 +25,7 @@ use Khaospy::Log qw(
 
 use Khaospy::Utils qw(
     get_hashval
+    get_cmd
 );
 
 our @EXPORT_OK = qw(
@@ -34,11 +35,8 @@ our @EXPORT_OK = qw(
     write_gpio
 );
 
-#=pod
-#        my $switch_state = qx{i2cget -y $i2c_bus_y 0x20 0x12};
-#=cut
+# datastructures used is this module :
 
-#=pod
 # $pins_[cfg|in_state|out_state] = {
 #    <i2c_bus> => {                 # key is 0 or 1 , maybe even 2
 #        <i2c_addr> => {            # key is "0x20" -> "0x27" (string)
@@ -54,6 +52,7 @@ our @EXPORT_OK = qw(
 #
 # }
 #
+# This datastructure comes from the controls config :
 # gpio = { # something like :
 #       i2c_bus  => 0,
 #	i2c_addr => '0x20',
@@ -62,18 +61,16 @@ our @EXPORT_OK = qw(
 # };
 
 
-#=cut
-
 # IODIR, GPIO and OLAT are terms used on the Microchip's MCP23017 data-sheet
 
 # IODIR A/B are used to set the direction of the gpio pin
 # 0 for output, 1 for input. ( i.e. 0xFF is all input )
 my $IODIR = { a => '0x00', b => '0x01' };
 
-# GPIO A/B are used to get the input on a gpio port
+# GPIO A/B are used to get the input on a mcp23017 port
 my $MCP_GPIO  = { a => '0x12', b => '0x13' };
 
-# OLAT A/B are used to switch on and off the outputs on a gpio port.
+# OLAT A/B are used to switch on and off the outputs on a mcp23017 port.
 my $OLAT  = { a => '0x14', b => '0x15' };
 
 my $pins_cfg = {}; # used by IODIR[A|B]
@@ -95,9 +92,11 @@ sub init_gpio {
     _init_pins( $gpio, $pins_in ,undef   , true  ) if $IN_OUT eq IN;
     _init_pins( $gpio, $pins_out,undef   , false ) if $IN_OUT eq OUT;
 
-    # a bit of a hack , since this will affect a higher level datastructure.
+    # TODO. Could I do this better ?
+    # A bit of a hack , since this will affect a higher level datastructure.
     # ( breaking encapsulation )
-    # this is done so that the correct $pins_in or $pins_out can be selected in read_gpio()
+    # This is done so that the correct $pins_in or $pins_out
+    # array can be selected in read_gpio()
     $gpio->{iodir} = $IN_OUT;
 }
 
@@ -116,8 +115,8 @@ sub _init_pins {
     my $i2c_addr_rh = $i2c_bus_rh->{$gpio->{i2c_addr}};
 
     $gpio->{portname} = lc(get_hashval($gpio, 'portname'));
-    # Default of 11111111 0xff , so the IODIR defaults to input.
-    # this is electronically safer for the MCP23017
+    # Default of 0b11111111 / 0xff, so the IODIR defaults to input.
+    # This is electronically safer for the MCP23017
     $i2c_addr_rh->{lc($gpio->{portname})} = [ map { $default_bit } 0..7 ]
         if ! exists $i2c_addr_rh->{$gpio->{portname}};
 
@@ -146,7 +145,21 @@ sub init_mcp23017 {
                     $IODIR->{$port},
                     _pin_array_to_num($addr_rh->{$port})
                 );
-                get_cmd( $cmd );
+
+                try {
+                    my $ret = get_cmd( $cmd );
+                    klogdebug "Shell command '$cmd' returned '$ret'";
+                } catch {
+                    klogerror
+                        sprintf ("i2c_bus = %s : i2c_addr = %s : port = %s \n%s" ,
+                            $i2c_bus,
+                            $i2c_addr,
+                            $port,
+                            ref ( $_ ) ,
+                        );
+                    klogdebug $_;
+                }
+
             }
         }
     }
@@ -246,10 +259,12 @@ sub read_gpio {
             $MCP_GPIO->{$gpio->{portname}},
         );
 
+        my $ret = get_cmd( $cmd );
+        klogdebug "Shell command '$cmd' returned '$ret'";
         set_pins_state_array(
             $gpio,
             $pins_in,
-            _num_to_pin_array( hex( get_cmd( $cmd ) ) )
+            _num_to_pin_array( hex( $ret ) ),
         );
 
         set_last_update($gpio, $pins_in)
@@ -277,7 +292,8 @@ sub write_gpio {
             get_pins_array($gpio, $pins_out)
         )
     );
-    get_cmd( $cmd );
+    my $ret = get_cmd( $cmd );
+    klogdebug "Shell command '$cmd' returned '$ret'";
 }
 
 sub _pin_array_to_num {
@@ -299,16 +315,5 @@ sub _num_to_pin_array {
 
 }
 
-sub get_cmd {
-    my ($cmd) = @_;
-    klogdebug "command to mcp23017 : $cmd";
-
-    my $ret = qx($cmd);
-    $ret =~ s/\s+$//g;
-
-    #TODO error handling
-
-    return $ret;
-}
 1;
 

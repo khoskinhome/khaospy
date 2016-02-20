@@ -20,12 +20,17 @@ use Khaospy::Constants qw(
     $MESSAGES_OVER_SECS_INVALID
 );
 
+use Khaospy::Exception qw(
+    KhaospyExcept::ShellCommand
+);
+
 our @EXPORT_OK = qw(
     timestamp
     slurp
     burp
     get_one_wire_sender_hosts
     get_hashval
+    get_cmd
 );
 
 sub timestamp { return strftime("%F %T", gmtime( $_[0] || time) ); }
@@ -85,5 +90,20 @@ sub get_hashval {
     return $hash->{$key};
 }
 
+sub get_cmd {
+    my ($cmd) = @_;
+
+    my $ret = qx( $cmd 2>&1 );
+
+    if( $? ) {
+        KhaospyExcept::ShellCommand->throw(
+            error => "Shell command '$cmd' returned : shell-status $? : $ret"
+        );
+    }
+
+    $ret =~ s/\s+$//g;
+
+    return $ret;
+}
 
 1;

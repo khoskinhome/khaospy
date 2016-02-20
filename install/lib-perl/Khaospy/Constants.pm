@@ -54,6 +54,10 @@ our $KHAOSPY_ALL_DIRS = [
     our $KHAOSPY_WWW_BIN_DIR   = "$KHAOSPY_ROOT_DIR/www-bin",
 ];
 
+# To be much use $PI_CONTROL_MCP23017_PINS_TIMEOUT really needs to be
+# greater than the value of $PI_CONTROLLER_DAEMON_TIMER.
+# This is because $PI_CONTROLLER_DAEMON_TIMER runs the code that polls
+# MCP23017 controls, and therefore making  $PI_CONTROL_MCP23017_PINS_TIMEOUT just a bit bigger means there should be just one poll of MCP23017 port registers.
 our $PI_CONTROL_MCP23017_PINS_TIMEOUT = 0.2;
 
 #################
@@ -64,9 +68,9 @@ our $ONE_WIRE_SENDER            = 'khaospy-one-wired-sender.py';
 our $ONE_WIRE_RECEIVER          = 'khaospy-one-wired-receiver.py';
 #our $ONE_WIRE_RECEIVER_TIMER    =
 our $PI_CONTROLLER_DAEMON       = 'khaospy-controller-daemon.pl';
-our $PI_CONTROLLER_DAEMON_TIMER = .5; # TODO in Prod this can be 0.2 secs
+our $PI_CONTROLLER_DAEMON_TIMER = .1; # TODO in Prod this can be 0.2 secs
 our $PI_CONTROLLER_QUEUE_DAEMON = 'khaospy-controller-queue-d.pl';
-our $PI_CONTROLLER_QUEUE_DAEMON_TIMER = .5;# TODO in Prod this can be 0.2 secs
+our $PI_CONTROLLER_QUEUE_DAEMON_TIMER = .1;# TODO in Prod this can be 0.2 secs
 
 #our $STATUS_DAEMON_PUBLISH_EVERY_SECS               = 2;
 #our $RULES_DAEMON_RUN_EVERY_SECS                    = 0.5;
