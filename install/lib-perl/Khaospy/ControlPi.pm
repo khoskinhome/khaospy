@@ -38,20 +38,20 @@ use Khaospy::Log qw(
     klogwarn  kloginfo  klogdebug
 );
 
-our @EXPORT_OK = qw(
-    poll_pi_controls
-    init_pi_controls
-    operate_control
-);
+#our @EXPORT_OK = qw(
+#    poll_controls
+#    init_controls
+#    operate_control
+#);
 
-sub init_pi_controls {
+sub init_controls {
     get_controls_conf();
-    init_controls();
+    init_all_controls();
     init_mcp23017();
 }
 
-sub poll_pi_controls {
-    my ($callback) = @_;
+sub poll_controls {
+    my ($class, $callback) = @_;
     poll_pi_gpio_controls($callback);
 }
 
@@ -83,7 +83,7 @@ my $poll_dispatch = {
 };
 
 sub operate_control {
-    my ($control_name, $control, $action) = @_;
+    my ($class, $control_name, $control, $action) = @_;
 
     my $type = $control->{type};
 
@@ -99,7 +99,7 @@ my $pi_controls_state = {};
 
 my $controls_for_host;
 
-sub init_controls {
+sub init_all_controls {
     kloginfo "Initialise PiGPIO controls";
     $controls_for_host = get_controls_conf_for_host();
     _dispatch($init_dispatch, "Initialise");

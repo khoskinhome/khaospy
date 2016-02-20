@@ -1,23 +1,15 @@
-package Khaospy::PiControllerDaemon;
+package Khaospy::ControlsDaemon;
 use strict;
 use warnings;
 
 =pod
-
-A daemon that runs commands on a PiController and :
-
-    subscribes to all hosts tcp://all-hosts:5061 for commands.
-    $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT = 5061
-
-    publishes to tcp://*:5062 what the command did.
-    $PI_CONTROLLER_DAEMON_SEND_PORT = 5062
-
+generalised Controls Daemon class.
 =cut
 
 use Time::HiRes qw/usleep time/;
 use Exporter qw/import/;
 use Data::Dumper;
-use Carp qw/croak/;
+use Carp qw/croak confess/;
 use Sys::Hostname;
 
 use AnyEvent;
@@ -47,11 +39,9 @@ use Khaospy::Constants qw(
     $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
 
-    $PI_CONTROLLER_DAEMON
-    $PI_CONTROLLER_DAEMON_TIMER
-    $PI_CONTROLLER_DAEMON_SEND_PORT
 );
 
+use Khaospy::ControlOther;
 use Khaospy::ControlPi;
 
 use Khaospy::Log qw(
@@ -62,29 +52,43 @@ use Khaospy::Log qw(
 use Khaospy::Message qw(
     validate_control_msg_fields
 );
-
-use Khaospy::Utils qw( timestamp );
+use Khaospy::Utils qw(
+    get_hashval
+);
 
 use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
 use zhelpers;
 
-our @EXPORT_OK = qw( run_daemon );
+our @EXPORT_OK = qw(
+    run_daemon
+);
 
 # TODO use this to log messages received and only action them once.
 # my $msg_received = {};
 
 my $zmq_publisher;
 
+my $DAEMON_NAME;
+my $DAEMON_TIMER;
+my $DAEMON_SEND_PORT;
+my $CONTROLLER_CLASS;
+
 sub run_daemon {
-    my ( $opts ) = @_;
-    $opts = {} if ! $opts;
+    my ($setup) = @_;
 
-    klogstart "Controller Daemon START";
+    $DAEMON_NAME        = get_hashval($setup, "daemon_name");
+    $DAEMON_TIMER       = get_hashval($setup, "daemon_timer");
+    $DAEMON_SEND_PORT   = get_hashval($setup, "daemon_send_port");
+    $CONTROLLER_CLASS   = get_hashval($setup, "controller_class");
+#    my $opts = @_;
+#    $opts = {} if ! $opts;
 
-    Khaospy::ControlPi->init_controls();
+    klogstart "$DAEMON_NAME START";
+
+    $CONTROLLER_CLASS->init_controls();
 
     $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
-    my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_SEND_PORT";
+    my $pub_to_port = "tcp://*:$DAEMON_SEND_PORT";
     zmq_bind( $zmq_publisher, $pub_to_port );
 
     my @w;
@@ -105,7 +109,7 @@ sub run_daemon {
 
     push @w, AnyEvent->timer(
         after    => 0.1, # TODO. MAGIC NUMBER . should be in Constants.pm or a json-config. dunno. but not here.
-        interval => $PI_CONTROLLER_DAEMON_TIMER,
+        interval => $DAEMON_TIMER,
         cb       => \&timer_cb
     );
 
@@ -118,7 +122,7 @@ sub timer_cb {
 
     # TODO clean up $msg_received with messages over timeout.
 
-    Khaospy::ControlPi->poll_controls(\&poll_callback);
+    $CONTROLLER_CLASS->poll_controls(\&poll_callback);
 
 }
 
@@ -128,7 +132,7 @@ sub poll_callback {
     $poll_state->{request_epoch_time} = time;
     $poll_state->{action}             = STATUS;
     $poll_state->{poll_epoch_time}    = time;
-    $poll_state->{message_from}       = $PI_CONTROLLER_DAEMON;
+    $poll_state->{message_from}       = $DAEMON_NAME;
     my $json_msg = $JSON->encode($poll_state);
     zhelpers::s_send( $zmq_publisher, "$json_msg" );
 }
@@ -163,7 +167,7 @@ sub controller_message {
 # TODO check in msg_received has already been actioned. Is this necessary?
 
     my $status
-        = Khaospy::ControlPi->operate_control($control_name, $control, $action);
+        = $CONTROLLER_CLASS->operate_control($control_name, $control, $action);
 
     my $return_msg = {
       request_epoch_time => $request_epoch_time,
@@ -172,7 +176,7 @@ sub controller_message {
       action             => $action,
       request_host       => $request_host,
       action_epoch_time  => time,
-      message_from       => $PI_CONTROLLER_DAEMON,
+      message_from       => $DAEMON_NAME,
       %$status,
     };
 
@@ -184,7 +188,6 @@ sub controller_message {
     my $json_msg = $JSON->encode($return_msg);
 
     zhelpers::s_send( $zmq_publisher, "$json_msg" );
-
 }
 
 1;

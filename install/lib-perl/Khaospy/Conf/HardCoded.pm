@@ -929,48 +929,48 @@ sub test_controls_conf {
             },
         },
 
-        mcp_relay_man_1 => {
-            type => "pi-mcp23017-relay-manual",
-            host => "pitest",
-            ex_or_for_state => true,
-            invert_state => false,
-            gpio_relay => {
-                i2c_bus  => 1,
-		i2c_addr => '0x27',
-		portname =>'b',
-		portnum  => 3,
-            },
-            gpio_detect => {
-                i2c_bus  => 1,
-		i2c_addr => '0x27',
-		portname =>'b',
-		portnum  => 0,
-            },
-        },
-
-        mcp_relay_1 => {
-            type => "pi-mcp23017-relay",
-            host => "pitest",
-            invert_state => false,
-            gpio_relay => {
-                i2c_bus  => 1,
-		i2c_addr => '0x27',
-		portname =>'b',
-		portnum  => 1,
-            },
-        },
-
-        mcp_switch_1 => {
-            type => "pi-mcp23017-switch",
-            host => "pitest",
-            invert_state => false,
-            gpio_switch => {
-                i2c_bus  => 1,
-		i2c_addr => '0x27',
-		portname =>'b',
-		portnum  => 2,
-            },
-        },
+#        mcp_relay_man_1 => {
+#            type => "pi-mcp23017-relay-manual",
+#            host => "pitest",
+#            ex_or_for_state => true,
+#            invert_state => false,
+#            gpio_relay => {
+#                i2c_bus  => 1,
+#		i2c_addr => '0x27',
+#		portname =>'b',
+#		portnum  => 3,
+#            },
+#            gpio_detect => {
+#                i2c_bus  => 1,
+#		i2c_addr => '0x27',
+#		portname =>'b',
+#		portnum  => 0,
+#            },
+#        },
+#
+#        mcp_relay_1 => {
+#            type => "pi-mcp23017-relay",
+#            host => "pitest",
+#            invert_state => false,
+#            gpio_relay => {
+#                i2c_bus  => 1,
+#		i2c_addr => '0x27',
+#		portname =>'b',
+#		portnum  => 1,
+#            },
+#        },
+#
+#        mcp_switch_1 => {
+#            type => "pi-mcp23017-switch",
+#            host => "pitest",
+#            invert_state => false,
+#            gpio_switch => {
+#                i2c_bus  => 1,
+#		i2c_addr => '0x27',
+#		portname =>'b',
+#		portnum  => 2,
+#            },
+#        },
 
     };
 }

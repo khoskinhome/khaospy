@@ -1,16 +1,16 @@
-package Khaospy::PiControllerDaemon;
+package Khaospy::OtherControlsDaemon;
 use strict;
 use warnings;
 
 =pod
 
-A daemon that runs commands on a PiController and :
+A daemon that runs commands for controls that are not on a PiHost 
 
-    subscribes to all hosts tcp://all-hosts:5061 for commands.
-    $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT = 5061
+subscribes to hosts running Command-Queue-daemons on port 5061 for commands.
+$PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT = 5061
 
-    publishes to tcp://*:5062 what the command did.
-    $PI_CONTROLLER_DAEMON_SEND_PORT = 5062
+publishes to tcp://*:5065 what the command did.
+$OTHER_CONTROLS_DAEMON_SEND_PORT = 5065
 
 =cut
 
@@ -47,12 +47,16 @@ use Khaospy::Constants qw(
     $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
 
-    $PI_CONTROLLER_DAEMON
-    $PI_CONTROLLER_DAEMON_TIMER
-    $PI_CONTROLLER_DAEMON_SEND_PORT
+    $OTHER_CONTROLS_DAEMON
+    $OTHER_CONTROLS_DAEMON_TIMER
+    $OTHER_CONTROLS_DAEMON_SEND_PORT
 );
 
-use Khaospy::ControlPi;
+use Khaospy::ControlOther qw(
+    init_controls
+    poll_controls
+    operate_control
+);
 
 use Khaospy::Log qw(
     klogstart klogfatal klogerror
@@ -62,8 +66,6 @@ use Khaospy::Log qw(
 use Khaospy::Message qw(
     validate_control_msg_fields
 );
-
-use Khaospy::Utils qw( timestamp );
 
 use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
 use zhelpers;
@@ -79,12 +81,12 @@ sub run_daemon {
     my ( $opts ) = @_;
     $opts = {} if ! $opts;
 
-    klogstart "Controller Daemon START";
+    klogstart "Other Controls Daemon START";
 
-    Khaospy::ControlPi->init_controls();
+    init_controls();
 
     $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
-    my $pub_to_port = "tcp://*:$PI_CONTROLLER_DAEMON_SEND_PORT";
+    my $pub_to_port = "tcp://*:$OTHER_CONTROLS_DAEMON_SEND_PORT";
     zmq_bind( $zmq_publisher, $pub_to_port );
 
     my @w;
@@ -105,7 +107,7 @@ sub run_daemon {
 
     push @w, AnyEvent->timer(
         after    => 0.1, # TODO. MAGIC NUMBER . should be in Constants.pm or a json-config. dunno. but not here.
-        interval => $PI_CONTROLLER_DAEMON_TIMER,
+        interval => $OTHER_CONTROLS_DAEMON_TIMER,
         cb       => \&timer_cb
     );
 
@@ -118,7 +120,7 @@ sub timer_cb {
 
     # TODO clean up $msg_received with messages over timeout.
 
-    Khaospy::ControlPi->poll_controls(\&poll_callback);
+    poll_controls(undef, \&poll_callback);
 
 }
 
@@ -128,7 +130,7 @@ sub poll_callback {
     $poll_state->{request_epoch_time} = time;
     $poll_state->{action}             = STATUS;
     $poll_state->{poll_epoch_time}    = time;
-    $poll_state->{message_from}       = $PI_CONTROLLER_DAEMON;
+    $poll_state->{message_from}       = $OTHER_CONTROLS_DAEMON;
     my $json_msg = $JSON->encode($poll_state);
     zhelpers::s_send( $zmq_publisher, "$json_msg" );
 }
@@ -163,7 +165,7 @@ sub controller_message {
 # TODO check in msg_received has already been actioned. Is this necessary?
 
     my $status
-        = Khaospy::ControlPi->operate_control($control_name, $control, $action);
+        = operate_control($control_name, $control, $action);
 
     my $return_msg = {
       request_epoch_time => $request_epoch_time,
@@ -172,7 +174,7 @@ sub controller_message {
       action             => $action,
       request_host       => $request_host,
       action_epoch_time  => time,
-      message_from       => $PI_CONTROLLER_DAEMON,
+      message_from       => $OTHER_CONTROLS_DAEMON,
       %$status,
     };
 

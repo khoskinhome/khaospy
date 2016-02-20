@@ -12,6 +12,7 @@ use JSON;
 use POSIX qw(strftime);
 
 use Khaospy::Constants qw(
+    $JSON
     $ZMQ_CONTEXT
     true false
     ON OFF STATUS
@@ -22,12 +23,13 @@ use Khaospy::Constants qw(
 use Khaospy::OperateControls qw( signal_control );
 
 use Khaospy::Conf qw( get_boiler_conf );
+use Khaospy::Conf::PiHosts qw(
+    get_pi_hosts_running_daemon
+);
 
 use Khaospy::Utils qw( timestamp );
 
 our @EXPORT_OK = qw( run_boiler_daemon );
-
-my $JSON = JSON->new->allow_nonref;
 
 our $VERBOSE;
 

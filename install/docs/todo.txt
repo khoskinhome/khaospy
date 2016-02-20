@@ -1,15 +1,35 @@
 High Prio
 ---------
 
-error handling of mcp23017 read and write errors.
+write Other Controls Daemon ( initially for OrviboS20s )
+    Only 1 will run. So need to enforce this in pi-hosts conf.
+    Will behave like a PiControllerDaemon and listen for commands from PiControllerQueue.
+    Main reason for it is so that it can be treated as a relay-manual type of control.
+        ( don't need the invert-state and ex-or stuff, or gpio pins )
+    Also this will mean it can message to the Status-D
 
-get OneWireHeatingDaemon
-    able to use the ControlPi stuff..
-    listen to the PiControllers for updates.
-        (then I can use the window switches,before I get the full-blown-rules-daemon working )
+
 
 
 get BoilerDaemon.pm able to use the ControlPi stuff.
+
+
+
+make a lead to run thermometers and both i2cs for piserver.
+
+
+get OneWireHeatingDaemon
+    able to use the ControlPi stuff..
+
+    make the pi-hosts config die if there is more than one-heating-control-daemon configured.
+
+
+
+    get some window switches actaully working then :
+        listen to the PiControllers for updates.
+            (then I can use the window switches,before I get the full-blown-rules-daemon working )
+
+
 
 get piboiler able to run the PC-queue-d.
     try reinstall of dependencies.
@@ -17,16 +37,10 @@ get piboiler able to run the PC-queue-d.
 In my loft.
     thermometers in my room , kitchen and my loft.
     i2c-controller.
-        Can I use the secondary i2c-bus on PiB+ ?
-        Make a test lead.
 
-    get the outside one working properly.
+    get the outside thermometer working properly.
 
     maybe get ali's window switch wired in to alarm board.
-
-
-
-
 
 
 
@@ -80,6 +94,10 @@ Why are there a lot of tmpfs using up lots of ram on jessie version of raspibian
 
 Medium Prio
 -----------
+
+Multiway lighting, am I going to program up something in khaospy for Amelia's controller ? Am I going to build a new controller using SSRs ?
+
+
 
 does the pi-host.conf need to have valid_i2c_buses ? This can be worked out with an i2c-detect ? maybe I need both. When khaospy actually runs on the host then it can do  an i2c-detect too.
 
