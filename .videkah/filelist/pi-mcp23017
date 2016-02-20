@@ -27,7 +27,7 @@ install/www-bin/lightba.pl
 ./install/lib-perl/Khaospy/Conf/HardCoded.pm
 
 ./install/lib-perl-t/crap.t
-
+crap
 ./install/bin/khaospy-test-conf-generate.pl
 ./install/bin/khaospy-live-conf-generate.pl
 
