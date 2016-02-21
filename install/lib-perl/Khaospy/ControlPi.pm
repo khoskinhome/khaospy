@@ -44,6 +44,8 @@ use Khaospy::Log qw(
 #    operate_control
 #);
 
+sub check_host { true }
+
 sub init_controls {
     get_controls_conf();
     init_all_controls();

@@ -58,6 +58,10 @@ use Khaospy::Constants qw(
     $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
     $LOCALHOST
     $MESSAGE_TIMEOUT
+
+    $OTHER_CONTROLS_DAEMON
+    $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT
+    $OTHER_CONTROLS_DAEMON_SEND_PORT
 );
 
 use Khaospy::Conf::Controls qw(
@@ -75,7 +79,7 @@ use Khaospy::ZMQAnyEvent qw(
 
 use Khaospy::Log qw(
     klog START FATAL ERROR WARN INFO DEBUG
-    kloginfo
+    kloginfo klogfatal klogdebug
 );
 
 our @EXPORT_OK = qw( run_controller_queue_daemon );
@@ -116,7 +120,7 @@ sub run_controller_queue_daemon {
     klog(INFO, "Publishing to $pub_to_port");
 
 
-    # Listen for the Controllers return messages.
+    # Listen for the Pi Control Daemons return messages.
     for my $sub_host (
         @{get_pi_hosts_running_daemon(
             $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
@@ -132,16 +136,32 @@ sub run_controller_queue_daemon {
         });
     }
 
+    # Listen for the other controls daemon, should only be one of these.
+    my @sub_host = @{get_pi_hosts_running_daemon(
+            $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT
+        )};
+
+    klogfatal "Can only subscribe to one $OTHER_CONTROLS_DAEMON" if @sub_host > 1;
+
+    push @w, zmq_anyevent({
+        zmq_type          => ZMQ_SUB,
+        host              => $sub_host[0],
+        port              => $OTHER_CONTROLS_DAEMON_SEND_PORT,
+        msg_handler       => \&message_from_controller,
+        msg_handler_param => "",
+        klog              => true,
+    });
+
+    # Register the timer :
     push @w, AnyEvent->timer(
         after    => 0.1,
         interval => $PI_CONTROLLER_QUEUE_DAEMON_TIMER,
         cb       => \&timer_cb
     );
 
-    # run the AnyEvent loop
+    # Run the AnyEvent loop
     my $quit_program = AnyEvent->condvar;
     $quit_program->recv;
-
 }
 
 sub timer_cb {
@@ -173,7 +193,7 @@ sub message_from_controller {
         kloginfo "Deleting message $mkey";
         delete $msg_queue->{$mkey};
     } else {
-        kloginfo "Don't have message $mkey in queue";
+        klogdebug "Don't have message $mkey in queue";
     }
 }
 
@@ -208,8 +228,6 @@ sub queue_message {
     zmq_sendmsg( $zmq_publisher, $msg_queue->{$mkey}{json_from} );
 
 }
-
-
 
 1;
 

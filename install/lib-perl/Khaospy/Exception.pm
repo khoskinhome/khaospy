@@ -29,6 +29,8 @@ use Exception::Class (
 
     'KhaospyExcept::ShellCommand',
 
+    'KhaospyExcept::UnhandledControl',
+
 );
 
 

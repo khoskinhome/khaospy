@@ -3,9 +3,13 @@ use strict;
 use warnings;
 
 =pod
-generalised Controls Daemon class.
+Generalised Controls Daemon class.
+
+Used by Pi-Controls-D and Other-Controls-D
+
 =cut
 
+use Try::Tiny;
 use Time::HiRes qw/usleep time/;
 use Exporter qw/import/;
 use Data::Dumper;
@@ -39,6 +43,7 @@ use Khaospy::Constants qw(
     $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
 
+    $MESSAGE_TIMEOUT
 );
 
 use Khaospy::ControlOther;
@@ -51,6 +56,7 @@ use Khaospy::Log qw(
 
 use Khaospy::Message qw(
     validate_control_msg_fields
+    validate_control_msg_json
 );
 use Khaospy::Utils qw(
     get_hashval
@@ -63,8 +69,7 @@ our @EXPORT_OK = qw(
     run_daemon
 );
 
-# TODO use this to log messages received and only action them once.
-# my $msg_received = {};
+my $msg_actioned = {};
 
 my $zmq_publisher;
 
@@ -120,10 +125,13 @@ sub run_daemon {
 sub timer_cb {
     klogdebug "in timer ";
 
-    # TODO clean up $msg_received with messages over timeout.
-
     $CONTROLLER_CLASS->poll_controls(\&poll_callback);
 
+    for my $mkey ( keys %$msg_actioned ){
+        my $msg_rh = $msg_actioned->{$mkey}{hashref};
+        delete $msg_actioned->{$mkey}
+            if ( $msg_rh->{request_epoch_time} < time - $MESSAGE_TIMEOUT );
+    }
 }
 
 sub poll_callback {
@@ -140,54 +148,58 @@ sub poll_callback {
 sub controller_message {
     my ($zmq_sock, $msg, $param ) = @_;
 
-    my $msg_decoded;
-    eval{$msg_decoded = $JSON->decode( $msg );};
-
-    if ($@) {
-        klogerror "ERROR. JSON decode of message failed. $@";
+    my $msg_p;
+    eval { $msg_p = validate_control_msg_json($msg); };
+    if ( $@ || ! $msg_p ) {
+        klogerror $_;
         return;
     }
 
-    my $request_epoch_time = $msg_decoded->{request_epoch_time};
-    my $control_name       = $msg_decoded->{control_name};
-    my $control_host       = $msg_decoded->{control_host};
-    my $action             = $msg_decoded->{action};
-    my $request_host       = $msg_decoded->{request_host};
+    my $msg_rh       = get_hashval($msg_p,  'hashref');
+    my $mkey         = get_hashval($msg_p,  'mkey');
 
-    kloginfo  "Message received. '$control_name' '$action'";
-    klogdebug "Message Dump", ($msg_decoded);
+    my $control_name = get_hashval($msg_rh, 'control_name');
+    my $action       = get_hashval($msg_rh, 'action');
 
     my $control = get_control_config($control_name);
 
-    if ( $control->{host} ne hostname ) {
-        kloginfo "control $control_name is not controlled by this host";
+    if ( $CONTROLLER_CLASS->check_host && $control->{host} ne hostname ){
+        klogdebug "control $control_name is not controlled by this host";
         return;
     }
 
-# TODO check in msg_received has already been actioned. Is this necessary?
+    if ( exists $msg_actioned->{$mkey} ){
+        klogdebug "message $mkey already actioned";
+        return;
+    }
 
-    my $status
-        = $CONTROLLER_CLASS->operate_control($control_name, $control, $action);
+    kloginfo  "Message received. '$control_name' '$action'";
+    klogdebug "Message Dump", ($msg_rh);
 
-    my $return_msg = {
-      request_epoch_time => $request_epoch_time,
-      control_name       => $control_name,
-      control_host       => $control_host,
-      action             => $action,
-      request_host       => $request_host,
-      action_epoch_time  => time,
-      message_from       => $DAEMON_NAME,
-      %$status,
-    };
+    try {
+        my $status
+            = $CONTROLLER_CLASS->operate_control($control_name, $control, $action);
 
-# TODO log msg just actioned in :
-#    $msg_received = {};
+        my $return_msg = {
+          %$msg_rh, %$status,
+          action_epoch_time  => time,
+          message_from       => $DAEMON_NAME,
+        };
 
-    validate_control_msg_fields($return_msg);
+        my $json_msg = $JSON->encode($return_msg);
+        zhelpers::s_send( $zmq_publisher, "$json_msg" );
 
-    my $json_msg = $JSON->encode($return_msg);
+        $msg_actioned->{$mkey} = $msg_p;
 
-    zhelpers::s_send( $zmq_publisher, "$json_msg" );
+
+    } catch {
+        if (ref $_ eq 'KhaospyExcept::UnhandledControl'){
+            klogdebug $_;
+        } else {
+            $_->throw if ( ref $_ and $_->can("throw"));
+            klogfatal $_;
+        }
+    }
 }
 
 1;

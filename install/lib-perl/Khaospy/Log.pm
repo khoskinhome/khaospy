@@ -6,7 +6,6 @@ use Exporter qw/import/;
 use Carp qw/confess/;
 use Sys::Hostname;
 use Data::Dumper;
-use Try::Tiny;
 
 use Khaospy::Conf::PiHosts qw/get_this_pi_host_config/;
 use Khaospy::Utils qw/timestamp/;
@@ -58,11 +57,8 @@ sub klog {
     $type = lc ($type);
 
     my $pi_host_log_level ;
-    try {
-        $pi_host_log_level = get_this_pi_host_config()->{log_level};
-    } catch {
-        $pi_host_log_level = "debug";
-    };
+    eval { $pi_host_log_level = get_this_pi_host_config()->{log_level}; };
+    $pi_host_log_level = "debug" if $@;
 
     my $log_level = $OVERRIDE_CONF_LOGLEVEL || $pi_host_log_level;
 

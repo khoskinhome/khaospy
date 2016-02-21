@@ -14,6 +14,7 @@ use Exporter qw/import/;
 
 use Khaospy::Conf::Controls qw(
     get_controls_conf
+    get_control_config
     get_controls_conf_for_host
 );
 
@@ -31,6 +32,7 @@ use Khaospy::ControlPiMCP23017 qw (
 
 use Khaospy::Exception qw(
     KhaospyExcept::ControlsConfigInvalidType
+    KhaospyExcept::UnhandledControl
 );
 
 use Khaospy::Log qw(
@@ -38,16 +40,18 @@ use Khaospy::Log qw(
     klogwarn  kloginfo  klogdebug
 );
 
+use Khaospy::OrviboS20;
+
 our @EXPORT_OK = qw(
     poll_controls
     init_controls
     operate_control
 );
 
+sub check_host { false }
+
 sub init_controls {
-#    get_controls_conf();
-#    init_controls();
-#    init_mcp23017();
+    get_controls_conf();
 }
 
 sub poll_controls {
@@ -56,9 +60,35 @@ sub poll_controls {
 }
 
 sub operate_control {
+    my ( $class, $control_name, $control, $action ) = @_;
 
+    if ($control->{type} eq 'orviboS20'){
+        return _orvibo_command( $control_name, $control, $action);
+    }
 
+    KhaospyExcept::UnhandledControl->throw(
+        error => "Control $control_name is not handled by this module"
+    );
+}
 
+sub _orvibo_command {
+    my ( $control_name, $control, $action ) = @_;
+
+    kloginfo "run orviboS20 command '$control_name $action'";
+
+    my $current_state;
+
+    eval { $current_state = Khaospy::OrviboS20::signal_control(
+            $control->{host}, $control->{mac}, $action
+        );
+    };
+
+    if ( $@ || ! $current_state ) {
+        klogerror $_;
+        return {};
+    }
+
+    return { current_state => $current_state, };
 }
 
 

@@ -66,24 +66,24 @@ sub signal_control {
 
     my $control = get_control_config($control_name);
 
-    if ($control->{type} eq 'orviboS20'){
-        return _orvibo_command( $control_name, $action);
-    }
+#    if ($control->{type} eq 'orviboS20'){
+#        return _orvibo_command( $control_name, $action);
+#    }
     return _picontroller_command( $control_name, $action);
 }
 
-sub _orvibo_command {
-    my ( $control_name, $action ) = @_;
-
-    kloginfo "Khaospy::OperateControls run orviboS20 command '$control_name $action'";
-
-    my $control = get_control_config($control_name);
-
-    return Khaospy::OrviboS20::signal_control(
-        $control->{host} , $control->{mac}, $action
-    );
-}
-
+#sub _orvibo_command {
+#    my ( $control_name, $action ) = @_;
+#
+#    kloginfo "Khaospy::OperateControls run orviboS20 command '$control_name $action'";
+#
+#    my $control = get_control_config($control_name);
+#
+#    return Khaospy::OrviboS20::signal_control(
+#        $control->{host} , $control->{mac}, $action
+#    );
+#}
+#
 sub _picontroller_command {
     my ( $control_name, $action ) = @_;
 

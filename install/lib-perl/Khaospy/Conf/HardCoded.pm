@@ -29,6 +29,7 @@ use Khaospy::Constants qw(
     $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
     $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
 
+    $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT
 );
 
 use Khaospy::Utils qw/burp/;
@@ -1131,6 +1132,14 @@ sub test_pi_host_conf {
 ##                      '--log_level' => "debug", # over-ride per host setting.
                     },
                 },
+                {
+                    script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT,
+                    options => {
+## TODO implement --log_level cli-opt on daemon-scripts.
+##                      '--log_level' => "debug", # over-ride per host setting.
+                    },
+                },
+
                 {
                     script  => $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT,
                     options => {

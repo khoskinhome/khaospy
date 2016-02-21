@@ -34,8 +34,7 @@ use Khaospy::Message;
 use Khaospy::OneWireHeatingDaemon;
 use Khaospy::OrviboS20;
 
-use Khaospy::OtherControlsDaemon;
-use Khaospy::PiControllerDaemon;
+use Khaospy::ControlsDaemon;
 use Khaospy::PiControllerQueueDaemon;
 
 use Khaospy::Utils;

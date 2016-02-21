@@ -1,17 +1,29 @@
 High Prio
 ---------
 
-write Other Controls Daemon ( initially for OrviboS20s )
+Other-Controls-Daemon ( initially for OrviboS20s )
+    write the keep-state stuff.
+    write the polling stuff.
+
     Only 1 will run. So need to enforce this in pi-hosts conf.
-    Will behave like a PiControllerDaemon and listen for commands from PiControllerQueue.
+r   Will behave like a PiControllerDaemon and listen for commands from PiControllerQueue.
     Main reason for it is so that it can be treated as a relay-manual type of control.
-        ( don't need the invert-state and ex-or stuff, or gpio pins )
-    Also this will mean it can message to the Status-D
 
-
+pi-hosts. config checking. make sure there is only :
+    one other-controls-daemon
+    one heating-control-daemon
+    one boiler-daemon
+    one rules-daemon
 
 
 get BoilerDaemon.pm able to use the ControlPi stuff.
+    BoilerDaemon needs to listen to the outputs of :
+        PiControlD
+        OtherControlD
+    for the state of controls.
+
+    The refresh status can be dropped.
+        ( once I've got other Controls polling )
 
 
 

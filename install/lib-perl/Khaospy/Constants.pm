@@ -71,7 +71,7 @@ our $PI_CONTROLLER_DAEMON       = 'khaospy-pi-controls-d.pl';
 our $PI_CONTROLLER_DAEMON_TIMER = .1;
 
 our $OTHER_CONTROLS_DAEMON       = 'khaospy-other-controls-d.pl';
-our $OTHER_CONTROLS_DAEMON_TIMER = 1;
+our $OTHER_CONTROLS_DAEMON_TIMER = .1;
 
 our $PI_CONTROLLER_QUEUE_DAEMON = 'khaospy-command-queue-d.pl';
 our $PI_CONTROLLER_QUEUE_DAEMON_TIMER = .1;
