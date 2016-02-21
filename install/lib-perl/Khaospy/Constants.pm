@@ -70,8 +70,12 @@ our $ONE_WIRE_RECEIVER          = 'khaospy-one-wired-receiver.py';
 our $PI_CONTROLLER_DAEMON       = 'khaospy-pi-controls-d.pl';
 our $PI_CONTROLLER_DAEMON_TIMER = .1;
 
+# Polling Orvibo S20s is SLOW.
+# If the other-controls-daemon polls with its TIMER too often then
+# it seems messages are dropped by zmq, and all the daemon does is poll.
+# There is a setting poll_timeout for orvibo S20s that allow the timer-poll to run more # frequently.
 our $OTHER_CONTROLS_DAEMON       = 'khaospy-other-controls-d.pl';
-our $OTHER_CONTROLS_DAEMON_TIMER = .1;
+our $OTHER_CONTROLS_DAEMON_TIMER = 1;
 
 our $PI_CONTROLLER_QUEUE_DAEMON = 'khaospy-command-queue-d.pl';
 our $PI_CONTROLLER_QUEUE_DAEMON_TIMER = .1;

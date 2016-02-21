@@ -2,12 +2,16 @@ High Prio
 ---------
 
 Other-Controls-Daemon ( initially for OrviboS20s )
-    write the keep-state stuff.
-    write the polling stuff.
+    write manual_auto_timeout ( like relay-manual code )
 
     Only 1 will run. So need to enforce this in pi-hosts conf.
 r   Will behave like a PiControllerDaemon and listen for commands from PiControllerQueue.
     Main reason for it is so that it can be treated as a relay-manual type of control.
+
+Pi-Control-Daemon
+    use the ControlDispatch.pm. tricky.
+
+
 
 pi-hosts. config checking. make sure there is only :
     one other-controls-daemon

@@ -22,6 +22,7 @@ use Khaospy::BoilerMessage;
 
 use Khaospy::ControlOrviboS20;
 
+use Khaospy::ControlDispatch;
 use Khaospy::ControlOther;
 use Khaospy::ControlPi;
 use Khaospy::ControlPiGPIO;

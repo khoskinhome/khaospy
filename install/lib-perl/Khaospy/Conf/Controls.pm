@@ -141,11 +141,12 @@ my $check_optional_integer
 
 my $check_types = {
     "orvibos20" => {
-        alias     => \&check_optional,
-        rrd_graph => $check_optional_boolean,
-        db_log    => $check_optional_boolean,
-        host      => \&check_host,
-        mac       => $check_mac,
+        alias        => \&check_optional,
+        rrd_graph    => $check_optional_boolean,
+        db_log       => $check_optional_boolean,
+        poll_timeout => $check_optional_integer,
+        host         => \&check_host,
+        mac          => $check_mac,
         manual_auto_timeout => $check_optional_integer,
     },
     "onewire-thermometer" => {

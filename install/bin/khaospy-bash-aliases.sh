@@ -27,6 +27,7 @@ alias cdkhaospypid='cd /opt/khaospy/pid/'
 alias cdkhaospylog='cd /opt/khaospy/log/'
 
 alias bashrc='. ~/.bashrc'
+alias r='reset;unalias -a;. ~/.bashrc'
 
 alias la='ls --color=auto -la'
 alias lart='ls --color=auto -lart'
@@ -34,10 +35,10 @@ alias l1='ls --color=auto -1'
 
 alias s.reboot='sudo reboot'
 alias s.shutdown='sudo shutdown'
-alias s.khaospy_zmq_subscribe='sudo /opt/khaospy/bin/khaospy-zmq-subscribe.pl'
-alias s.khaospy_pi_controls_d='sudo /opt/khaospy/bin/khaospy-pi-controls-d.pl'
-alias s.khaospy_other_controls_d='sudo /opt/khaospy/bin/khaospy-other-controls-d.pl'
-alias s.khaospy_command_queue_d='sudo /opt/khaospy/bin/khaospy-command-queue-d.pl'
-alias s.khaospy_operate_control='sudo /opt/khaospy/bin/khaospy-operate-control.pl'
+alias s.zmq_subscribe='sudo /opt/khaospy/bin/khaospy-zmq-subscribe.pl'
+alias s.d_pi_controls_d='sudo /opt/khaospy/bin/khaospy-pi-controls-d.pl'
+alias s.d_other_controls='sudo /opt/khaospy/bin/khaospy-other-controls-d.pl'
+alias s.d_command_queue='sudo /opt/khaospy/bin/khaospy-command-queue-d.pl'
+alias s.operate_control='sudo /opt/khaospy/bin/khaospy-operate-control.pl'
 
 cd /opt/khaospy/bin
