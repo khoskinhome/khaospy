@@ -25,16 +25,11 @@ use Exception::Class (
 
     'KhaospyExcept::ControlsConfigHostUnresovlable',
 
-    'KhaospyExcept::PiHostsNoHostsRunningDaemon',
-
     'KhaospyExcept::ShellCommand',
 
     'KhaospyExcept::UnhandledControl',
 
 );
-
-
-
 
 
 1;

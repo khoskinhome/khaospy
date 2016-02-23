@@ -18,11 +18,12 @@ If not the message will timeout, and get removed from the queue.
 
 =cut
 
-use Exporter qw/import/;
+use Exporter qw(import);
 use Data::Dumper;
 use JSON;
 use Sys::Hostname;
-use Clone qw/clone/;
+use Clone qw(clone);
+use Carp qw(croak);
 
 use AnyEvent;
 use ZMQ::LibZMQ3;
@@ -54,7 +55,6 @@ use Khaospy::Constants qw(
     $PI_CONTROL_SEND_PORT
     $PI_CONTROLLER_DAEMON_SEND_PORT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
-    $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
     $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
     $LOCALHOST
     $MESSAGE_TIMEOUT
@@ -120,12 +120,14 @@ sub run_controller_queue_daemon {
     klog(INFO, "Publishing to $pub_to_port");
 
 
+    my $count_zmq_subs = 0;
     # Listen for the Pi Control Daemons return messages.
     for my $sub_host (
         @{get_pi_hosts_running_daemon(
             $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
         )}
     ){
+        $count_zmq_subs++;
         push @w, zmq_anyevent({
             zmq_type          => ZMQ_SUB,
             host              => $sub_host,
@@ -136,21 +138,23 @@ sub run_controller_queue_daemon {
         });
     }
 
-    # Listen for the other controls daemon, should only be one of these.
-    my @sub_host = @{get_pi_hosts_running_daemon(
-            $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT
-        )};
+    # Listen for the other controls daemon.
+    for my $sub_host (
+        @{get_pi_hosts_running_daemon( $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT)}
+    ){
+        $count_zmq_subs++;
+        push @w, zmq_anyevent({
+            zmq_type          => ZMQ_SUB,
+            host              => $sub_host,
+            port              => $OTHER_CONTROLS_DAEMON_SEND_PORT,
+            msg_handler       => \&message_from_controller,
+            msg_handler_param => "",
+            klog              => true,
+        });
+    }
 
-    klogfatal "Can only subscribe to one $OTHER_CONTROLS_DAEMON" if @sub_host > 1;
-
-    push @w, zmq_anyevent({
-        zmq_type          => ZMQ_SUB,
-        host              => $sub_host[0],
-        port              => $OTHER_CONTROLS_DAEMON_SEND_PORT,
-        msg_handler       => \&message_from_controller,
-        msg_handler_param => "",
-        klog              => true,
-    });
+    croak "No Control Daemons configured. Command-Queue-D Can't subscribe to anything."
+        if ! $count_zmq_subs;
 
     # Register the timer :
     push @w, AnyEvent->timer(

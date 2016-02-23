@@ -2,6 +2,8 @@ package Khaospy::Message;
 use strict;
 use warnings;
 
+
+use Try::Tiny;
 use Carp qw/confess/;
 use Data::Dumper;
 use Exporter qw/import/;
@@ -58,7 +60,12 @@ sub validate_control_msg_fields {
     my $action             = $msg_rh->{action};
     my $request_host       = $msg_rh->{request_host};
 
-    my $control = get_control_config($control_name);
+#    try {
+#        my $control = get_control_config($control_name);
+#    } catch {
+#
+#
+#    }
 
     if ( ! $request_epoch_time ){
         confess "ERROR message has invalid request_epoch_time";

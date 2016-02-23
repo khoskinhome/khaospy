@@ -1,6 +1,7 @@
 package Khaospy::ZMQSubscribeAllPublishers;
 use strict;
 use warnings;
+use Time::HiRes;
 
 # used by CLI khaospy-zmq-subscribe.pl to listen to all publishers on a host.
 
@@ -31,8 +32,11 @@ use Khaospy::Constants qw(
     $PI_CONTROLLER_DAEMON_SEND_PORT
     $OTHER_CONTROLS_DAEMON_SEND_PORT
     $PI_STATUS_DAEMON_SEND_PORT
-    $MAC_SWITCH_DAEMON_PORT
-    $PING_SWITCH_DAEMON_PORT
+    $MAC_SWITCH_DAEMON_SEND_PORT
+    $PING_SWITCH_DAEMON_SEND_PORT
+
+
+    $KHAOSPY_RRD_IMAGE_DIR
 );
 
 use Khaospy::Conf qw(
@@ -46,7 +50,7 @@ use Khaospy::Log qw(
 
 use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
 
-use Khaospy::Utils qw( timestamp );
+use Khaospy::Utils qw( timestamp burp );
 
 our @EXPORT_OK = qw( run_subscribe_all );
 
@@ -92,7 +96,7 @@ sub output_msg {
     eval { $dec = $JSON->decode($msg); };
 
     if ($@) {
-        print "$msg\n";
+        output ("$msg\n" );
         return;
     }
 
@@ -122,7 +126,49 @@ sub output_msg {
     };
 
     my @out = map { $convert_times->($_, $dec->{$_}) } keys %$dec;
-    print join( "\n" , sort @out )."\n";
+    output ( join( "\n" , sort @out )."\n" );
+
+}
+
+
+sub output {
+    my ($out) = @_;
+    print $out;
+
+=pod
+TODO rm this lot , or properly dev something . this is a hack for alarm testing .
+
+
+=cut
+
+    my $dump_dir = "$KHAOSPY_RRD_IMAGE_DIR/alarm-test/";
+
+    burp ( "$dump_dir/debug-msg-".time.".txt", $out );
+
+    chdir $dump_dir ;
+    for my $filename ( <*> ) {
+
+        my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
+             $atime,$mtime,$ctime,$blksize,$blocks)
+               = stat($filename);
+
+        if ( $filename =~ /^debug-msg/ && $mtime + 15 < time ) {
+            print "going to rm $filename\n";
+            unlink $filename;
+        }
+
+    }
+
+ 
+
+
+
+
+
+
+
+
+
 
 }
 
@@ -145,10 +191,10 @@ sub get_ports {
     push @ports, $PI_STATUS_DAEMON_SEND_PORT
         if $opts->{"status"};
 
-    push @ports, $MAC_SWITCH_DAEMON_PORT
+    push @ports, $MAC_SWITCH_DAEMON_SEND_PORT
         if $opts->{"mac"};
 
-    push @ports, $PING_SWITCH_DAEMON_PORT
+    push @ports, $PING_SWITCH_DAEMON_SEND_PORT
         if $opts->{"ping"};
 
     @ports = (
@@ -157,8 +203,8 @@ sub get_ports {
         $PI_CONTROLLER_DAEMON_SEND_PORT,
         $OTHER_CONTROLS_DAEMON_SEND_PORT,
         $PI_STATUS_DAEMON_SEND_PORT,
-        $MAC_SWITCH_DAEMON_PORT,
-        $PING_SWITCH_DAEMON_PORT,
+        $MAC_SWITCH_DAEMON_SEND_PORT,
+        $PING_SWITCH_DAEMON_SEND_PORT,
     ) if ! @ports;
 
     return @ports;

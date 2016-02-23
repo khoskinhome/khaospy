@@ -200,229 +200,11 @@ sub live_heating_thermometer_config {
 }
 sub test_heating_thermometer_config {
     return {
-        '28-0000066ebc74' => {
-            name               => 'Alison',
-            rrd_group          => 'upstairs',
-            upper_temp         => 18.5,
-            lower_temp         => 18.0,
-            control            => 'alisonrad',
-        },
-        '28-000006e04e8b' => {
-            name               => 'Playhouse-tv',
-            rrd_group          => 'sheds',
-        },
-        '28-0000066fe99e' => {
-            name               => 'Playhouse-9e-door',
-            rrd_group          => 'sheds',
-        },
-        '28-00000670596d' => {
-            name               => 'Bathroom',
-            rrd_group          => 'upstairs',
-        },
-        '28-021463277cff' => {
-            name               => 'Loft',
-            rrd_group          => 'upstairs',
-        },
-        '28-0214632d16ff' => {
-            name               => 'Amelia',
-            rrd_group          => 'upstairs',
-            upper_temp         => 20.0,
-            lower_temp         => 19.5,
-            control            => 'ameliarad',
-        },
-        '28-021463423bff' => {
-            name               => 'Upstairs-Landing',
-            rrd_group          => 'upstairs',
-        },
-        '28-000006e04d3c' => {
-            name               => 'Outside-front-drive',
-            rrd_group          => 'outside',
-        },
-        '28-000006e00a67' => {
-            name               => 'boiler-ch-in-cold',
-            rrd_group          => 'boiler',
-        },
-        '28-0114632f89ff' => {
-            name               => 'boiler-ch-out-hot',
-            rrd_group          => 'boiler',
-        },
-        '28-0414688dbfff' => {
-            name               => 'boiler-wh-in-cold',
-            rrd_group          => 'boiler',
-        },
-        '28-011465cb13ff' => {
-            name               => 'boiler-wh-out-hot',
-            rrd_group          => 'boiler',
-        },
-        '28-031463502eff' => {
-            name               => 'boiler-room',
-            rrd_group          => 'boiler',
-        },
-        '28-0214630558ff' => {
-            name               => 'front-room',
-            rrd_group          => 'downstairs',
-            upper_temp         => 19.0,
-            lower_temp         => 18.5,
-            control            => 'frontroomrad',
-        },
-        '28-000006cafb0d' => {
-            name               => 'front-porch',
-            rrd_group          => 'downstairs',
-        },
-        '28-0000066ff2ac' => {
-            name               => 'dinning-room',
-            rrd_group          => 'downstairs',
-            upper_temp         => 19.0,
-            lower_temp         => 18.5,
-            control            => 'dinningroomrad',
-        },
+        %{live_heating_thermometer_config()},
 
     };
 }
 
-
-#################################
-# controls, relays, switches, sensors conf.
-#####
-# Every control has a unique control-name.
-# Controls can be turned "on" and "off" or have their "status" queried.
-#
-#   <type>  can be :
-#               orviboS20 ( orvibos20 will also work )
-#               pi-gpio-xxx     pi-mcp23017-xxx
-#   <host>  is either an hostname or ip-address
-#
-#   <mac>   is currently only need for Orvibo S20 controls.
-#           This might be fixed in the Khaospy::OrviboS20 module, so it just needs the hostname.
-#           Configuring orviboS20s is a whole "how-to" in itself, since they will only DHCP,
-#           and to get static ips, and hostname via say /etc/hosts takes a bit of configuring of
-#           the DHCP server, using nmap to find the orviboS20s etc..
-#           The long term plan is to try and drop <mac> for Orvibo S20s.
-
-# above is wrong.
-
-# In the gpio on both pi and i2c-connected-mcp23017 config :
-#   a "switch" is an "input" for the gpio
-#   a "detect" is an "input" for the gpio. detecting the voltage in part of the circuit.
-#   a "relay"  is an "output" for the gpio, controlling usually a relay, but it could control a transistor.
-# Hence the config never needs to know the direction the GPIO needs to be set in.
-# The direction is implied by the above.
-
-# a "relay" is a control from the automation perspective.
-
-# A "relay" can be wired in 2-way type arangement with a manual-override-switch.
-# This is known as a relay-manual.
-# So to know if the load is ON the system therefore needs to have a "detect" gpio input.
-# In some circuits the detect input is wired in such a way to detect the voltage on the electrical load.
-# i.e it measures the result of the 2 inputs to the circuit, the relay and the manual-switch.
-# So the GPIO "detect" is the circuit state. This is easy !
-#
-# In one arangement to simplify wiring and keep costs down, the detect signal is measuring the manual-switch state.
-# In this case to get the state of the circuit, the manual-switch-state reported by "detect" needs to be ex-or-ed
-# with the gpio-output that is driving the relay.
-#
-# So for this circuit there is a config option "ex_or_for_state". Which means "ex-or the gpio_relay and gpio_detect" to get the state of the circuit.
-
-# diagrams will make this clearer.
-
-
-####
-# a "switch" only ever has a GPIO input.
-
-# Yes in reality a relay is a switch. To keep things simple here it is being kept that a # relay is something that is under the control of this home-auto system, and a switch is something feeding a logic state into the home-auto system.
-
-####
-# invert_state.
-#
-# The invert_state is necessary because some relays-modules, logic states, switches and wiring-arrangements
-# actaully invert what you think the state should be.
-# There are relay modules that when you push a 5v signal to them actually switch off.
-# There are also different ways of wiring the relay and manual-switch that can invert the logic.
-# Wiring a circuit using the normally-open as compared with the normally-closed relay-contacts will also invert state.
-# So invert_state deals with this issue.
-# If you find a relay, relay-manual or switch is giving you the opposite to what you want just change the invert_state flag.
-
-# pi gpio
-# please note the pi-gpio numbers here are the WiringPi GPIO numbers and NOT the BCM CPIO number.
-# There are lots of resources on the web that detail what Pi GPIO pins are usable and which ones are double up for use on other things. The gpio pins can change depending on the pi-revision.
-
-# pi i2c mcp23017
-# a gpio on one of these needs the following params :
-#    i2c_bus  => 0,      # 1 or 0 depending on pi revision.
-#    i2c_addr => '0x20', # i2c address of the mcp23017, set by jumper next to the IC on the PCB.
-#    portname =>'b',     # a or b ONLY
-#    portnum  => 0,      # 0 -> 7
-# again the IODIR ( as MCP23017 doc calls it ) is implied by if it is being used to drive a "relay" (out) or being used to read a "switch" (in)
-
-#example configs :
-#
-#        boiler => {
-#            type => "pi-gpio-relay-manual",
-#            host => "pitest",
-#            ex_or_for_state => false,
-#            invert_state => false,
-#            gpio_relay  => 4,
-#            gpio_detect => 0,
-#        },
-#
-#        a_pi_gpio_relay => {
-#            type => "pi-gpio-relay",
-#            host => "pitest",
-#            invert_state => false,
-#            gpio_relay  => 1,
-#        },
-#
-#        a_pi_gpio_switch => {
-#            type => "pi-gpio-switch",
-#            host => "pitest",
-#            invert_state => false,
-#            gpio_switch => 7,
-#        },
-#
-# pi mcp23017
-#        a_pi_mcp23017_relay_with_manual => {
-#            type => "pi-mcp23017-relay-manual",
-#            host => "pitest",
-#            ex_or_for_state => false,
-#            invert_state => false,
-#            gpio_relay => {
-#               i2c_bus  => 0,
-#		i2c_addr => '0x20',
-#		portname =>'b',
-#		portnum  => 0,
-#            },
-#            gpio_detect => {
-#               i2c_bus  => 0,
-#		i2c_addr => '0x20',
-#		portname =>'b',
-#		portnum  => 1,
-#            },
-#
-#        },
-#
-#        a_pi_mcp23017_relay => {
-#            type => "pi-mcp23017-relay",
-#            host => "pitest",
-#            invert_state => false,
-#            gpio_relay => {
-#               i2c_bus  => 0,
-#		i2c_addr => '0x20',
-#		portname =>'b',
-#		portnum  => 0,
-#            },
-#        },
-#
-#        a_pi_mcp23017_switch => {
-#            type => "pi-mcp23017-switch",
-#            host => "pitest",
-#            invert_state => false,
-#            gpio_switch => {
-#               i2c_bus  => 0,
-#		i2c_addr => '0x20',
-#		portname =>'b',
-#		portnum  => 1,
-#            },
-#
 sub live_controls_conf {
     ## TODO find a way of using the host name from /etc/hosts to get the ip and mac.
     return {
@@ -553,98 +335,114 @@ sub live_controls_conf {
             gpio_detect => 0,
         },
 
-        alarm_01 => { # alarm_01
+        amelia_pir => { # alarm_01
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 01",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 0,
             },
         },
-        alarm_02 => { # alarm 02
+        amelia_window => { # alarm 02
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 02",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 1,
             },
         },
-        alarm_03 => { # alarm 03
+        alison_pir => { # alarm 03
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 03",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 2,
             },
         },
-        alarm_04 => { # alarm 04
+        alison_window => { # alarm 04
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 04",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 3,
             },
         },
-        alarm_05 => { # alarm 05
+        dining_room_pir => { # alarm 05
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 05",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 4,
             },
         },
-        alarm_06 => { # alarm 06
+        dining_room_window => { # alarm 06
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 06",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 5,
             },
         },
-        alarm_07 => { # alarm 07
+        front_room_pir => { # alarm 07
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 07",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 6,
             },
         },
-        alarm_08 => { # alarm 08
+        front_room_window => { # alarm 08
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 08",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 7,
             },
         },
-        alarm_09 => { # alarm_09
+        front_outside_door => { # alarm_09
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 09",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 7,
             },
         },
         alarm_10 => { # alarm 10
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 10",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 6,
             },
         },
         alarm_11 => { # alarm 11
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 11",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 5,
             },
         },
         alarm_12 => { # alarm 12
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 12",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 4,
             },
         },
         alarm_13 => { # alarm 13
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 13",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 3,
             },
         },
         alarm_14 => { # alarm 14
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 14",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 2,
             },
         },
         alarm_15 => { # alarm 15
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 15",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 1,
             },
         },
         alarm_16 => { # alarm 16
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 16",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 0,
             },
@@ -652,96 +450,112 @@ sub live_controls_conf {
 
         alarm_17 => { # alarm_17
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 17",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 0,
             },
         },
         alarm_18 => { # alarm 18
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 18",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 1,
             },
         },
         alarm_19 => { # alarm 19
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 19",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 2,
             },
         },
         alarm_20 => { # alarm 20
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 20",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 3,
             },
         },
         alarm_21 => { # alarm 21
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 21",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 4,
             },
         },
         alarm_22 => { # alarm 22
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 22",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 5,
             },
         },
         alarm_23 => { # alarm 23
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 23",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 6,
             },
         },
         alarm_24 => { # alarm 24
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 24",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 7,
             },
         },
         alarm_25 => { # alarm_25
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 25",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 7,
             },
         },
         alarm_26 => { # alarm 26
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 26",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 6,
             },
         },
         alarm_27 => { # alarm 27
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 27",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 5,
             },
         },
         alarm_28 => { # alarm 28
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm 28",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 4,
             },
         },
         alarm_tamp_1 => { # alarm tamp-1
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm tamper 1",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 3,
             },
         },
         alarm_tamp_2 => { # alarm tamp-2
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm tamper 2",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 2,
             },
         },
         alarm_tamp_3 => { # alarm tamp-3
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm tamper 3",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 1,
             },
         },
         alarm_tamp_4 => { # alarm tamp-4
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
+            alias => "alarm tamper 4",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 0,
             },
@@ -752,123 +566,7 @@ sub live_controls_conf {
 sub test_controls_conf {
     ## TODO find a way of using the host name from /etc/hosts to get the ip and mac.
     return {
-
-        'therm-alison-door' => {
-            type          => "onewire-thermometer",
-            alias         => 'Alison',
-            onewire_addr  => '28-0000066ebc74'  ,
-        },
-        'therm-playhouse' => {
-            type          => "onewire-thermometer",
-            alias         => 'Playhouse-tv',
-            onewire_addr  => '28-000006e04e8b' ,
-        },
-        'therm-playhouse-door' => {
-            type          => "onewire-thermometer",
-            alias         => 'Playhouse-9e-door',
-            onewire_addr  => '28-0000066fe99e' ,
-        },
-        'therm-bathroom' => {
-            type          => "onewire-thermometer",
-            alias         => 'Bathroom',
-            onewire_addr  => '28-00000670596d'  ,
-        },
-        'therm-loft' => {
-            type          => "onewire-thermometer",
-            alias         => 'Loft',
-            onewire_addr  => '28-021463277cff'  ,
-        },
-        'therm-amelia-door' => {
-            type          => "onewire-thermometer",
-            alias         => 'Amelia',
-            onewire_addr  => '28-0214632d16ff',
-        },
-        'therm-upstairs-landing' => {
-            type          => "onewire-thermometer",
-            alias         => 'Upstairs-Landing',
-            onewire_addr  => '28-021463423bff',
-        },
-        'therm-outside-front-drive' => {
-            type          => "onewire-thermometer",
-            alias         => 'Outside-front-drive',
-            onewire_addr  => '28-000006e04d3c',
-        },
-        'therm-boiler-ch-in-cold' => {
-            type          => "onewire-thermometer",
-            alias         => 'boiler-ch-in-cold',
-            onewire_addr  => '28-000006e00a67',
-        },
-        'therm-boiler-ch-out-hot' => {
-            type          => "onewire-thermometer",
-            alias         => 'boiler-ch-out-hot',
-            onewire_addr  => '28-0114632f89ff',
-        },
-        'therm-boiler-wh-in-cold' => {
-            type          => "onewire-thermometer",
-            alias         => 'boiler-wh-in-cold',
-            onewire_addr  => '28-0414688dbfff',
-        },
-        'therm-boiler-wh-out-hot' => {
-            type          => "onewire-thermometer",
-            alias         => 'boiler-wh-out-hot',
-            onewire_addr  => '28-011465cb13ff',
-        },
-        'therm-boiler-room' => {
-            type          => "onewire-thermometer",
-            alias         => 'boiler-room',
-            onewire_addr  => '28-031463502eff',
-        },
-        'therm-front-room' => {
-            type          => "onewire-thermometer",
-            alias         => 'front-room',
-            onewire_addr  => '28-0214630558ff',
-        },
-        'therm-front-porch' => {
-            type          => "onewire-thermometer",
-            alias         => 'front-porch',
-            onewire_addr  => '28-000006cafb0d',
-        },
-        'therm-dining-room-near-boiler' => {
-            type          => "onewire-thermometer",
-            alias         => 'dining-room',
-            onewire_addr  => '28-0000066ff2ac',
-        },
-
-        alisonrad       => {
-            alias => 'Alison Radiator',
-            type  => "orviboS20",
-            host  => 'alisonrad',
-            poll_timeout => 5,
-            mac   => 'AC:CF:23:72:D1:FE',
-        },
-        ameliarad       => {
-            alias => 'Amelia Radiator',
-            type  => "orviboS20",
-            host  => 'ameliarad',
-            poll_timeout => 5,
-            mac   => 'AC-CF-23-72-F3-D4',
-        },
-        karlrad         => {
-            alias => 'Karl Radiator',
-            type  => "orviboS20",
-            host  => 'karlrad',
-            poll_timeout => 5,
-            mac   => 'AC-CF-23-8D-7E-D2',
-        },
-        dinningroomrad  => {
-            alias => 'Dining Room Radiator',
-            type  => "orviboS20",
-            host  => 'dinningroomrad',
-            poll_timeout => 5,
-            mac   => 'AC-CF-23-8D-A4-8E',
-        },
-        frontroomrad    => {
-            alias => 'Front Room Radiator',
-            type  => "orviboS20",
-            host  => 'frontroomrad',
-            poll_timeout => 5,
-            mac   => 'AC-CF-23-8D-3B-96',
-        },
+        %{live_controls_conf()},
 
 ## pi gpio
         pigpio_relay => {
@@ -897,91 +595,91 @@ sub test_controls_conf {
         },
 
 # pi mcp23017
-        mcp_relay_man_0 => {
-            type => "pi-mcp23017-relay-manual",
-            host => "pitest",
-            ex_or_for_state => true,
-            invert_state => false,
-            gpio_relay => {
-                i2c_bus  => 0,
-		i2c_addr => '0x27',
-		portname =>'b',
-		portnum  => 3,
-            },
-            gpio_detect => {
-                i2c_bus  => 0,
-		i2c_addr => '0x27',
-		portname =>'b',
-		portnum  => 0,
-            },
-        },
-
-        mcp_relay_0 => {
-            type => "pi-mcp23017-relay",
-            host => "pitest",
-            invert_state => false,
-            gpio_relay => {
-                i2c_bus  => 0,
-		i2c_addr => '0x27',
-		portname =>'b',
-		portnum  => 1,
-            },
-        },
-
-        mcp_switch_0 => {
-            type => "pi-mcp23017-switch",
-            host => "pitest",
-            invert_state => false,
-            gpio_switch => {
-                i2c_bus  => 0,
-		i2c_addr => '0x27',
-		portname =>'b',
-		portnum  => 2,
-            },
-        },
-
-#        mcp_relay_man_1 => {
+#        mcp_relay_man_0 => {
 #            type => "pi-mcp23017-relay-manual",
 #            host => "pitest",
 #            ex_or_for_state => true,
 #            invert_state => false,
 #            gpio_relay => {
-#                i2c_bus  => 1,
+#                i2c_bus  => 0,
 #		i2c_addr => '0x27',
 #		portname =>'b',
 #		portnum  => 3,
 #            },
 #            gpio_detect => {
-#                i2c_bus  => 1,
+#                i2c_bus  => 0,
 #		i2c_addr => '0x27',
 #		portname =>'b',
 #		portnum  => 0,
 #            },
 #        },
 #
-#        mcp_relay_1 => {
+#        mcp_relay_0 => {
 #            type => "pi-mcp23017-relay",
 #            host => "pitest",
 #            invert_state => false,
 #            gpio_relay => {
-#                i2c_bus  => 1,
+#                i2c_bus  => 0,
 #		i2c_addr => '0x27',
 #		portname =>'b',
 #		portnum  => 1,
 #            },
 #        },
 #
-#        mcp_switch_1 => {
+#        mcp_switch_0 => {
 #            type => "pi-mcp23017-switch",
 #            host => "pitest",
 #            invert_state => false,
 #            gpio_switch => {
-#                i2c_bus  => 1,
+#                i2c_bus  => 0,
 #		i2c_addr => '0x27',
 #		portname =>'b',
 #		portnum  => 2,
 #            },
 #        },
+
+        mcp_relay_man_1 => {
+            type => "pi-mcp23017-relay-manual",
+            host => "pitest",
+            ex_or_for_state => true,
+            invert_state => false,
+            gpio_relay => {
+                i2c_bus  => 1,
+		i2c_addr => '0x27',
+		portname =>'b',
+		portnum  => 3,
+            },
+            gpio_detect => {
+                i2c_bus  => 1,
+		i2c_addr => '0x27',
+		portname =>'b',
+		portnum  => 0,
+            },
+        },
+
+        mcp_relay_1 => {
+            type => "pi-mcp23017-relay",
+            host => "pitest",
+            invert_state => false,
+            gpio_relay => {
+                i2c_bus  => 1,
+		i2c_addr => '0x27',
+		portname =>'b',
+		portnum  => 1,
+            },
+        },
+
+        mcp_switch_1 => {
+            type => "pi-mcp23017-switch",
+            host => "pitest",
+            invert_state => false,
+            gpio_switch => {
+                i2c_bus  => 1,
+		i2c_addr => '0x27',
+		portname =>'b',
+		portnum  => 2,
+            },
+        },
 
     };
 }
@@ -1050,17 +748,6 @@ sub test_global_conf {
 
 sub live_pi_host_conf {
     return {
-        pitest => {
-            log_level         => 'info',
-            valid_gpios       => [ 0..7 ],
-            valid_i2c_buses   => [ 1 ],
-            daemons => [
-                {
-                    script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT,
-                    options => { },
-                },
-            ],
-        },
         piserver => {
             log_level         => 'info',
             valid_gpios       => [ 0..7 ],
@@ -1130,6 +817,7 @@ sub live_pi_host_conf {
 
 sub test_pi_host_conf {
     return {
+        %{live_pi_host_conf()},
         pitest => {
             log_level         => 'info',
             valid_gpios       => [ 0..7 ],

@@ -4,17 +4,47 @@ High Prio
 Other-Controls-Daemon ( initially for OrviboS20s )
     write manual_auto_timeout ( like relay-manual code )
 
-    Only 1 will run. So need to enforce this in pi-hosts conf.
-r   Will behave like a PiControllerDaemon and listen for commands from PiControllerQueue.
+    more than one can run.
+        need to modify the CommandQueueDaemon to allow this.
+        new setting for ( currently only Orvibo S20s) called "poll_host" ( optional )
+        This will be name of the host where a running Other-Controls-D will poll the control.
+        If an orvibo-s20-control doesn't have this setting it will NOT get polled.
+
+    remove the rand() in the time checking of the last-poll part.
+
+    Will behave like a PiControllerDaemon and listen for commands from PiControllerQueue.
     Main reason for it is so that it can be treated as a relay-manual type of control.
+
 
 Pi-Control-Daemon
     use the ControlDispatch.pm. tricky.
 
 
+The messages to support new fields
+    "action_by"  This will currently be :
+        Manual ( a plain old wall switch operated it. or something outside khaospy)
+        Manual-WebUI ( someone click in the webui )
+        Auto-Rules
+    So an action knows the classification of what called it.
+    last_change_state_by
+
+    Rules will then be able to be subtle.
+    i.e. if a light is operated by a manual wall switch then the rules-d can be more subtle.
+    The manual_auto_timeout could be deprecated if the rules-D can be made aware of the action_by information.
+
+    ( action_by_user to indicate user-name. do we need this ? )
+
+
+CommandQueueDaemon
+    get it to subscribe to as many Pi-Controls-D or Other-Controls-D as there are.
+    There needs to be at least 1 subscription. But that is all.
+
+
+a way of distributing the confs to all hosts.
+    scp / tar . whatever. something quick and easy.
+
 
 pi-hosts. config checking. make sure there is only :
-    one other-controls-daemon
     one heating-control-daemon
     one boiler-daemon
     one rules-daemon
@@ -34,17 +64,16 @@ get BoilerDaemon.pm able to use the ControlPi stuff.
 make a lead to run thermometers and both i2cs for piserver.
 
 
+write a cli tool that will summarise the confs nicely .
+    pi-hosts
+    controls
+    one-wire-heating-daemon
+    boiler
+
 get OneWireHeatingDaemon
     able to use the ControlPi stuff..
 
     make the pi-hosts config die if there is more than one-heating-control-daemon configured.
-
-
-
-    get some window switches actaully working then :
-        listen to the PiControllers for updates.
-            (then I can use the window switches,before I get the full-blown-rules-daemon working )
-
 
 
 get piboiler able to run the PC-queue-d.

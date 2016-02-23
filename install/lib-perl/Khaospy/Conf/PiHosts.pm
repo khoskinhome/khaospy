@@ -14,7 +14,6 @@ use List::Compare;
 
 use Khaospy::Exception qw(
     KhaospyExcept::InvalidDaemonScriptName
-    KhaospyExcept::PiHostsNoHostsRunningDaemon
 );
 
 use Khaospy::Constants qw(
@@ -94,10 +93,6 @@ sub get_pi_hosts_running_daemon {
                 if $script eq $daemon_script_full_path;
         }
     }
-
-    KhaospyExcept::PiHostsNoHostsRunningDaemon->throw(
-        error => "No Hosts are running the script $daemon_script_full_path",
-    ) if ! @$pi_hosts_run_d;
 
     return $pi_hosts_run_d;
 }
