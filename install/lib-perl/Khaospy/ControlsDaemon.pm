@@ -163,7 +163,14 @@ sub controller_message {
 
     my $control = get_control_config($control_name);
 
-    if ( $CONTROLLER_CLASS->check_host && $control->{host} ne hostname ){
+    if ( ! exists $control->{$CONTROLLER_CLASS->check_host_field} ){
+        klogdebug "control $control_name is not of a type controlled by this daemon";
+        return;
+    }
+
+    my $daemon_host = $control->{$CONTROLLER_CLASS->check_host_field};
+
+    if ( $daemon_host ne hostname ){
         klogdebug "control $control_name is not controlled by this host";
         return;
     }

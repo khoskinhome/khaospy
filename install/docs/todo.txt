@@ -1,19 +1,21 @@
 High Prio
 ---------
 
+control_type in the zmq message. maybe.
+
+./bin dir and a ./daemons dir. split up what's in bin-dir
+
+make sure logs go to usb stick on the pis.
+
+daemon locking . only one command-queue, pi-controls, other-controls per host.
+
+need to timeout the REQ of putting a command on the queue in OperateControl.pm
+
 Other-Controls-Daemon ( initially for OrviboS20s )
+
     write manual_auto_timeout ( like relay-manual code )
 
-    more than one can run.
-        need to modify the CommandQueueDaemon to allow this.
-        new setting for ( currently only Orvibo S20s) called "poll_host" ( optional )
-        This will be name of the host where a running Other-Controls-D will poll the control.
-        If an orvibo-s20-control doesn't have this setting it will NOT get polled.
-
     remove the rand() in the time checking of the last-poll part.
-
-    Will behave like a PiControllerDaemon and listen for commands from PiControllerQueue.
-    Main reason for it is so that it can be treated as a relay-manual type of control.
 
 
 Pi-Control-Daemon
@@ -38,6 +40,7 @@ The messages to support new fields
 CommandQueueDaemon
     get it to subscribe to as many Pi-Controls-D or Other-Controls-D as there are.
     There needs to be at least 1 subscription. But that is all.
+
 
 
 a way of distributing the confs to all hosts.
@@ -72,8 +75,12 @@ write a cli tool that will summarise the confs nicely .
 
 get OneWireHeatingDaemon
     able to use the ControlPi stuff..
-
     make the pi-hosts config die if there is more than one-heating-control-daemon configured.
+
+status-d
+    listens to all things.
+    has http rest api
+    use AnyEvent.
 
 
 get piboiler able to run the PC-queue-d.

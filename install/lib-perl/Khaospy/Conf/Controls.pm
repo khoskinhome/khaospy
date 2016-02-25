@@ -22,6 +22,7 @@ use Khaospy::Exception qw(
     KhaospyExcept::ControlsConfigKeysInvalidValue
 
     KhaospyExcept::PiHostsNoValidGPIO
+    KhaospyExcept::PiHostsDaemonNotOnHost
     KhaospyExcept::ControlsConfigInvalidGPIO
     KhaospyExcept::ControlsConfigDuplicateGPIO
 
@@ -42,6 +43,7 @@ use Khaospy::Constants qw(
     $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT
     $MAC_SWITCH_DAEMON_SCRIPT
     $PING_SWITCH_DAEMON_SCRIPT
+
 );
 
 use Khaospy::Conf qw(
@@ -50,9 +52,12 @@ use Khaospy::Conf qw(
 
 use Khaospy::Conf::PiHosts qw(
     get_pi_host_config
+    get_pi_hosts_running_daemon
 );
 
-use Khaospy::Utils;
+use Khaospy::Utils qw(
+    get_hashval
+);
 
 our @EXPORT_OK = qw(
     get_control_config
@@ -76,7 +81,8 @@ my $check_types = {
         rrd_graph    => $check_optional_boolean,
         db_log       => $check_optional_boolean,
         poll_timeout => $check_optional_integer,
-#TODO        poll_host    => check_optional_host_runs($KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT),
+        poll_host    =>
+            check_host_runs($KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT),
         host         => \&check_host,
         mac          => $check_mac,
         manual_auto_timeout => $check_optional_integer,
@@ -93,7 +99,8 @@ my $check_types = {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
-        host            => \&check_host_runs_pi_controls,
+        host            =>
+            check_host_runs($KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT),
         ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
         manual_auto_timeout => $check_optional_integer,
@@ -104,7 +111,8 @@ my $check_types = {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
-        host            => \&check_host_runs_pi_controls,
+        host            =>
+            check_host_runs($KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
         gpio_relay      => \&check_pi_gpio,
     },
@@ -112,7 +120,8 @@ my $check_types = {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
-        host            => \&check_host_runs_pi_controls,
+        host            =>
+            check_host_runs($KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
         gpio_switch     => \&check_pi_gpio,
     },
@@ -120,7 +129,8 @@ my $check_types = {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
-        host            => \&check_host_runs_pi_controls,
+        host            =>
+            check_host_runs($KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT),
         ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
         manual_auto_timeout => $check_optional_integer,
@@ -131,7 +141,8 @@ my $check_types = {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
-        host            => \&check_host_runs_pi_controls,
+        host            =>
+            check_host_runs($KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
         gpio_relay      => \&check_pi_mcp23017,
     },
@@ -139,7 +150,8 @@ my $check_types = {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
-        host            => \&check_host_runs_pi_controls,
+        host            =>
+            check_host_runs($KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
         gpio_switch     => \&check_pi_mcp23017,
     },
@@ -148,14 +160,14 @@ my $check_types = {
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         mac             => $check_mac,
-#TODO        poll_host       => check_host_runs($MAC_SWITCH_DAEMON_SCRIPT),
+        poll_host       => check_host_runs($MAC_SWITCH_DAEMON_SCRIPT),
     },
     "ping-switch" => {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            => \&check_host,
-#TODO        poll_host       => check_host_runs($PING_SWITCH_DAEMON_SCRIPT),
+        poll_host       => check_host_runs($PING_SWITCH_DAEMON_SCRIPT),
     }
 };
 
@@ -181,18 +193,20 @@ sub get_controls_conf {
 }
 
 sub get_controls_conf_for_host {
-    my ($host) = @_;
+    my ($host, $host_key) = @_;
     $host = $host || hostname;
+    $host_key = $host_key || "host";
+
     get_controls_conf();
     my $ret_controls = {};
 
     for my $control_name ( keys %$controls_conf ){
         my $control = $controls_conf->{$control_name};
 
-        next if ! exists $control->{host};
+        next if ! exists $control->{$host_key};
 
         $ret_controls->{$control_name} = $control
-            if $host eq $control->{host};
+            if $host eq get_hashval($control, $host_key);
     }
 
     return $ret_controls;
@@ -234,7 +248,6 @@ sub _validate_controls_conf {
             ."$collate_errors\n"
     )
         if $collate_errors;
-
 }
 
 sub check_config {
@@ -270,7 +283,6 @@ sub check_config {
     )
         if ! $lc->is_LequivalentR && ! $lc->is_RsubsetL ;
 
-    # TODO think about the Exception collation here.
     # No extra keys in $control. Good.
     delete $chk_type->{type}; # only needed for List::Compare.
     for my $chk ( keys %$chk_type ){
@@ -332,40 +344,19 @@ sub check_host {
     _is_host_resolvable($val);
 }
 
-sub check_host_runs_pi_controls {
-    my ($control_name, $control, $chk) = @_;
-    check_host(@_);
-    my $val = $control->{$chk};
-    # TODO check the pi-host-conf for all the known hosts.
-    # that run pi-controls-daemons.
-}
-
-sub check_optional_host_runs {
-    my ($daemon_script_name) = @_;
-    return sub {
-        # TODO write this.
-    };
-}
-
 sub check_host_runs {
     my ($daemon_script_name) = @_;
     return sub {
-        # TODO write this
+        my ($control_name, $control, $chk) = @_;
+        check_host(@_);
+        my $val = $control->{$chk};
+
+        KhaospyExcept::PiHostsDaemonNotOnHost->throw(
+            error => "Control $control_name has a $chk of $val. $val is not running $daemon_script_name",
+        ) if ! grep { $_ eq $val }
+            @{get_pi_hosts_running_daemon($daemon_script_name)};
     };
 }
-
-#sub check_optional_host_runs_other_controls {
-#    my ($control_name, $control, $chk) = @_;
-#
-#    return if ! exists $control->{$chk}
-#        || ! defined $control->{$chk};
-#
-#    check_host(@_);
-#    my $val = $control->{$chk};
-#    # TODO check the pi-host-conf for all the known hosts.
-#    # that run other-controls-daemons.
-#
-#}
 
 sub check_pi_gpio {
     my ($control_name, $control, $chk) = @_;
@@ -414,8 +405,7 @@ sub check_pi_mcp23017 {
     )
         if ( ref $val ne 'HASH' );
 
-    # need to check the sub keys.
-
+    # check the sub keys.
     # first check i2c_bus sub-key against valid ones in pi-host config.
     my $host = $control->{host};
 
@@ -438,7 +428,7 @@ sub check_pi_mcp23017 {
         if ! grep { $_ == $i2c_bus } @$valid_i2c_buses;
 
 
-    # check the reset of the sub-keys :
+    # check the rest of the sub-keys :
     check_regex(qr/^0x2[0-7]$/)->( $control_name , $val, "i2c_addr", "(on $chk)");
     check_regex(qr/^[abAB]$/)->(   $control_name , $val, "portname", "(on $chk)");
     check_regex(qr/^[0-7]$/)->(    $control_name , $val, "portnum",  "(on $chk)");

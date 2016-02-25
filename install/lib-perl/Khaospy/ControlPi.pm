@@ -44,7 +44,7 @@ use Khaospy::Log qw(
 #    operate_control
 #);
 
-sub check_host { true }
+sub check_host_field { "host" }
 
 sub init_controls {
     get_controls_conf();

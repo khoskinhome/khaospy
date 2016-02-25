@@ -12,9 +12,11 @@ use Carp qw/confess croak/;
 use Data::Dumper;
 use Exporter qw/import/;
 use Time::HiRes;
+use Sys::Hostname;
 
 use Khaospy::Conf::Controls qw(
     get_controls_conf
+    get_controls_conf_for_host
 );
 
 use Khaospy::Constants qw(
@@ -47,7 +49,7 @@ our @EXPORT_OK = qw(
     operate_control
 );
 
-sub check_host { false }
+sub check_host_field { "poll_host" }
 
 my $controls_state = {};
 
@@ -76,7 +78,7 @@ sub init_controls {
             },
         },
         \&unhandled_type_cb,
-        get_controls_conf(),
+        get_controls_conf_for_host(undef,check_host_field()),
     );
 }
 
@@ -153,6 +155,7 @@ sub poll_orvibo_s20 {
     $poll_callback->({
         control_name  => $control_name,
         control_host  => $control->{host},
+        poll_host     => hostname,
         %$c_state,
     }) if $ret->{last_change_state} ne $l_state and defined $poll_callback;
 

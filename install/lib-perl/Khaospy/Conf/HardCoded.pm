@@ -295,6 +295,7 @@ sub live_controls_conf {
             type  => "orviboS20",
             host  => 'alisonrad',
             poll_timeout => 5,
+            poll_host => 'piboiler',
             mac   => 'AC:CF:23:72:D1:FE',
         },
         ameliarad       => {
@@ -302,6 +303,7 @@ sub live_controls_conf {
             type  => "orviboS20",
             host  => 'ameliarad',
             poll_timeout => 5,
+            poll_host => 'piboiler',
             mac   => 'AC-CF-23-72-F3-D4',
         },
         karlrad         => {
@@ -309,6 +311,7 @@ sub live_controls_conf {
             type  => "orviboS20",
             host  => 'karlrad',
             poll_timeout => 5,
+            poll_host => 'pitest',
             mac   => 'AC-CF-23-8D-7E-D2',
         },
         dinningroomrad  => {
@@ -316,6 +319,7 @@ sub live_controls_conf {
             type  => "orviboS20",
             host  => 'dinningroomrad',
             poll_timeout => 5,
+            poll_host => 'piboiler',
             mac   => 'AC-CF-23-8D-A4-8E',
         },
         frontroomrad    => {
@@ -323,6 +327,7 @@ sub live_controls_conf {
             type  => "orviboS20",
             host  => 'frontroomrad',
             poll_timeout => 5,
+            poll_host => 'piboiler',
             mac   => 'AC-CF-23-8D-3B-96',
         },
 
@@ -810,6 +815,8 @@ sub live_pi_host_conf {
 #                    script  => "$KHAOSPY_BOILER_DAEMON_SCRIPT",
 #                    options => { },
 #                },
+                { script  => $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
             ],
         },
     };

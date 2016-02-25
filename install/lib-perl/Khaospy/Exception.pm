@@ -16,6 +16,7 @@ use Exception::Class (
     'KhaospyExcept::ControlsConfigKeysInvalidValue',
 
     'KhaospyExcept::PiHostsNoValidGPIO',
+    'KhaospyExcept::PiHostsDaemonNotOnHost',
     'KhaospyExcept::ControlsConfigInvalidGPIO',
     'KhaospyExcept::ControlsConfigDuplicateGPIO',
 

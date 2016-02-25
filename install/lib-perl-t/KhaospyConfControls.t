@@ -6,7 +6,7 @@ FindBin::again();
 use lib "$FindBin::Bin/../lib-perl/";
 # by Karl Kount-Khaos Hoskin. 2015-2016
 
-use Test::More tests => 63;
+use Test::More tests => 67;
 use Test::Exception;
 use Test::Deep;
 
@@ -42,6 +42,13 @@ use Khaospy::Exception qw(
     KhaospyExcept::ControlsConfigHostUnresovlable
 );
 
+use Khaospy::Constants qw(
+    $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
+    $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT
+    $PING_SWITCH_DAEMON_SCRIPT
+    $MAC_SWITCH_DAEMON_SCRIPT
+);
+
 # TODO test the loading of a JSON file, for the pi-hosts and controls.
 
 # stop the host resolution from dying.
@@ -56,7 +63,12 @@ my $pi_hosts_return = {
         log_level         => 'info',
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
-        daemons => [],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
     },
 };
 my $override_get_pi_hosts_conf
@@ -189,6 +201,7 @@ $controls_return = {
             alias => 'Alison Radiator',
             type  => "orviboS20",
             host  => 'alisonrad',
+            poll_host  => 'pitest',
             mac   => 'AC:CF:23:72:D1:FE',
         },
 };
@@ -200,6 +213,7 @@ $controls_return = {
         alisonrad       => {
             type  => "orviboS20",
             host  => 'alisonrad',
+            poll_host  => 'pitest',
             mac   => 'AC:CF:23:72:D1:FE',
         },
 };
@@ -211,6 +225,7 @@ $controls_return = {
         alisonrad       => {
             type  => "orviboS20",
             host  => 'alisonrad',
+            poll_host  => 'pitest',
         },
 };
 throws_ok { get_control_config('alisonrad') }
@@ -224,6 +239,7 @@ $controls_return = {
         alisonrad       => {
             type  => "orviboS20",
             host  => 'alisonrad',
+            poll_host  => 'pitest',
             mac   => 'AC:CF:D1:FE',
         },
 };
@@ -235,6 +251,63 @@ throws_ok { get_control_config('alisonrad') }
     "dies on an invalid 'mac' in OrviboS20 type";
 
 
+
+$controls_return = {
+        alisonrad       => {
+            type  => "orviboS20",
+            host  => 'alisonrad',
+            poll_host  => 'alisonrad', # not a valid host running the daemon
+            mac   => 'AC:CF:23:72:D1:FE',
+        },
+};
+throws_ok { get_control_config('alisonrad') }
+    qr/Control.*?is not running/,
+    "dies on an invalid poll_host (not running the daemon) in OrviboS20 type";
+throws_ok { get_control_config('alisonrad') }
+    qr/KhaospyExcept::PiHostsDaemonNotOnHost/,
+    "dies on an invalid poll_host (not running the daemon) in OrviboS20 type";
+
+# remove the daemon configs
+$pi_hosts_return = {
+    pitest => {
+        log_level         => 'info',
+        valid_gpios       => [ 0..7 ],
+        valid_i2c_buses   => [ 0 ],
+        daemons => [
+        ],
+    },
+};
+
+$controls_return = {
+        alisonrad       => {
+            type  => "orviboS20",
+            host  => 'alisonrad',
+            poll_host  => 'pitest',
+            mac   => 'AC:CF:23:72:D1:FE',
+        },
+};
+throws_ok { get_control_config('alisonrad') }
+    qr/Control.*?is not running/,
+    "dies on an invalid poll_host (not running the daemon) in OrviboS20 type ( no daemon in pi-hosts)";
+throws_ok { get_control_config('alisonrad') }
+    qr/KhaospyExcept::PiHostsDaemonNotOnHost/,
+    "dies on an invalid poll_host (not running the daemon) in OrviboS20 type ( no daemon in pi-hosts)";
+
+##########################
+# reset the pi_hosts for the next tests :
+$pi_hosts_return = {
+    pitest => {
+        log_level         => 'info',
+        valid_gpios       => [ 0..7 ],
+        valid_i2c_buses   => [ 0 ],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
+    },
+};
 ##########################
 # pi-gpio-relay
 
@@ -257,7 +330,12 @@ $pi_hosts_return = {
         log_level         => 'info',
         valid_gpios       => [ 1 ],
         valid_i2c_buses   => [ 0 ],
-        daemons => [],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
     },
 };
 throws_ok { get_control_config('boiler') }
@@ -274,7 +352,12 @@ $pi_hosts_return = {
         log_level         => 'info',
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
-        daemons => [],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
     },
 };
 
@@ -309,13 +392,23 @@ $pi_hosts_return = {
         log_level         => 'info',
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
-        daemons => [],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
     },
     pitest2 => {
         log_level         => 'info',
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
-        daemons => [],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
     },
 };
 $controls_return = {
@@ -425,7 +518,12 @@ $pi_hosts_return = {
         log_level         => 'info',
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
-        daemons => [],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
     },
 };
 
@@ -492,7 +590,12 @@ $pi_hosts_return = {
         log_level         => 'info',
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 2 ],
-        daemons => [],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
     },
 };
 
@@ -522,7 +625,12 @@ $pi_hosts_return = {
         log_level         => 'info',
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
-        daemons => [],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
     },
 };
 $controls_return = {
@@ -649,13 +757,23 @@ $pi_hosts_return = {
         log_level         => 'info',
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
-        daemons => [],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
     },
     pitest2 => {
         log_level         => 'info',
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
-        daemons => [],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
     },
 };
 
@@ -712,13 +830,24 @@ $pi_hosts_return = {
         log_level         => 'info',
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
-        daemons => [],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
     },
     pianother => {
         log_level         => 'info',
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
-        daemons => [],
+        daemons => [
+                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
+                { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
+        ],
+
     },
 
 };
@@ -738,6 +867,17 @@ $controls_return = {
     },
 };
 
-ok ( exists get_controls_conf_for_host("pitest")->{pitest_pi_gpio_switch} );
-ok ( ! exists get_controls_conf_for_host("pitest")->{pianother_pi_gpio_switch} );
-ok ( exists get_controls_conf_for_host("pianother")->{pianother_pi_gpio_switch} );
+ok ( exists get_controls_conf_for_host("pitest")->{pitest_pi_gpio_switch},
+    "pitest has a pitest_pi_gpio_switch running on it"
+);
+
+ok ( ! exists get_controls_conf_for_host("pitest")->{pianother_pi_gpio_switch},
+    "pitest doesn't have a pianother_pi_gpio_switch running on it"
+);
+
+ok ( exists get_controls_conf_for_host("pianother")->{pianother_pi_gpio_switch},
+    "pianother has a pianother_pi_gpio_switch running on it"
+);
+
+
+# TODO write the mac-switch and ping-switch conf tests.
