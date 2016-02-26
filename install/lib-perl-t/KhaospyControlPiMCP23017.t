@@ -19,6 +19,9 @@ sub false { 0 };
 sub IN  {"in"};
 sub OUT {"out"};
 
+# tests broken.
+# TODO needs to override the get_cmd command and fake the return stuff.
+
 use_ok  ( "Khaospy::ControlPiMCP23017",
             "init_gpio"
         );

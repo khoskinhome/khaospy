@@ -10,7 +10,7 @@ zmq-PUBlish ( not REQuest ) to port
 
 
 
-
+fix the KhaospyControlPiMCP23017.t tests.
 
 
 ./bin dir and a ./daemons dir. split up what's in bin-dir
@@ -19,7 +19,6 @@ make sure logs go to usb stick on the pis.
 
 daemon locking . only one command-queue, pi-controls, other-controls per host.
 
-need to timeout the REQ of putting a command on the queue in QueueCommand.pm
 
 Other-Controls-Daemon ( initially for OrviboS20s )
 
