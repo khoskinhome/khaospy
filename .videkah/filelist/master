@@ -367,10 +367,10 @@ to-be-deleted/bin/khaospy-one-wire-heating-daemon-old.pl:110:    my $thermometer
 khoskin@khoskin-P5K-E:~/github.com/khaospy$ grep -r send_command ./ | grep Khaospy
 ./install/lib-perl/Khaospy/Controls.pm:    send_command
 ./install/lib-perl/Khaospy/Controls.pm:sub send_command {
-./install/lib-perl/Khaospy/BoilerDaemon.pm:use Khaospy::OperateControls qw( send_command );
+./install/lib-perl/Khaospy/BoilerDaemon.pm:use Khaospy::QueueCommand qw( send_command );
 ./install/lib-perl/Khaospy/BoilerDaemon.pm:    eval { $ret = send_command( $control, $action ); };
 Binary file ./install/lib-perl/Khaospy/.Controls.pm.swp matches
-./install/lib-perl/Khaospy/PiControllerDaemon.pm:use Khaospy::OperateControls qw( send_command );
+./install/lib-perl/Khaospy/PiControllerDaemon.pm:use Khaospy::QueueCommand qw( send_command );
 ./install/lib-perl/Khaospy/PiControllerDaemon.pm:#    eval { $ret = send_command( $control, $action ); };
 ./install/lib-perl/Khaospy/OneWireHeatingDaemon.pm:    send_command
 ./install/lib-perl/Khaospy/OneWireHeatingDaemon.pm:            eval { $retval = send_command($control_name, $action); };

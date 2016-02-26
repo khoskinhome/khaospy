@@ -27,18 +27,23 @@ install/www-bin/lightba.pl
 ./install/lib-perl/Khaospy/Conf/HardCoded.pm
 
 ./install/lib-perl-t/crap.t
-crap
 ./install/bin/khaospy-test-conf-generate.pl
 ./install/bin/khaospy-live-conf-generate.pl
 
 ./install/lib-perl/Khaospy/Constants.pm
+
+./install/lib-perl/Khaospy/ControlDispatch.pm
+
+./install/lib-perl/Khaospy/ControlOther.pm
 
 ./install/lib-perl/Khaospy/ControlPi.pm
 ./install/lib-perl/Khaospy/ControlPiGPIO.pm
 ./install/lib-perl/Khaospy/ControlPiMCP23017.pm
 ./install/lib-perl-t/KhaospyControlPiMCP23017.t
 
-install/lib-perl/Khaospy/PiControllerDaemon.pm
+./install/lib-perl/Khaospy/ControlsDaemon.pm
+./install/bin/khaospy-pi-controls-d.pl
+./install/bin/khaospy-other-controls-d.pl
 
 ./install/lib-perl/Khaospy/ControlOrviboS20.pm
 
@@ -54,14 +59,12 @@ install/lib-perl/Khaospy/PiControllerDaemon.pm
 ./install/lib-perl/Khaospy/OrviboS20.pm
 ./install/lib-perl/t-scripts/test-khaospy-orvibos20.pl
 
-./install/lib-perl/Khaospy/OperateControls.pm
+./install/lib-perl/Khaospy/QueueCommand.pm
 ./install/bin/khaospy-operate-control.pl
 
-./install/lib-perl/Khaospy/PiControllerDaemon.pm
-./install/bin/khaospy-controller-daemon.pl
 
-./install/lib-perl/Khaospy/PiControllerQueueDaemon.pm
-./install/bin/khaospy-controller-queue-d.pl
+./install/lib-perl/Khaospy/CommandQueueDaemon.pm
+./install/bin/khaospy-command-queue-d.pl
 
 ./install/lib-perl/Khaospy/Utils.pm
 
@@ -190,6 +193,8 @@ mapping-i2c-alarm-board.py
 ./install/docs/heating-control.txt
 ./install/docs/lighting-control.txt
 ./install/docs/khaospy-why.txt
+./install/docs/controls-relays-switches-sensors-conf.txt
+./install/docs/controls-config-settings.txt
 
 ./install/docs/apache2-sites-enabled-orig-pi.txt
 
@@ -218,16 +223,4 @@ install-to-pi-all.bash
 ./install/www-bin/graphs.pl
 
 ###################################################################
-
-###################################################################
-
-###################################################################
-
-#khoskin@khoskin-P5K-E:~/github.com/khaospy$ g.grep PiHostPublishers
-install/bin/test-module-includes.pl:39:use Khaospy::PiHostPublishers;
-install/docs/todo.txt:16:        deprecate Khaospy::PiHostPublishers. move its stuff into Khaospy::Conf::PiHosts
-install/lib-perl/Khaospy/PiControllerDaemon.pm:60:use Khaospy::PiHostPublishers qw(
-install/lib-perl/Khaospy/PiControllerQueueDaemon.pm:57:use Khaospy::PiHostPublishers qw(
-install/lib-perl/Khaospy/PiHostPublishers.pm:1:package Khaospy::PiHostPublishers;
-
 

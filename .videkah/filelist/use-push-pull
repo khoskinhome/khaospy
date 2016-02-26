@@ -56,7 +56,7 @@ install/lib-perl/Khaospy/PiControllerDaemon.pm
 ./install/lib-perl/Khaospy/OrviboS20.pm
 ./install/lib-perl/t-scripts/test-khaospy-orvibos20.pl
 
-./install/lib-perl/Khaospy/OperateControls.pm
+./install/lib-perl/Khaospy/QueueCommand.pm
 ./install/bin/khaospy-operate-control.pl
 
 ./install/lib-perl/Khaospy/PiControllerDaemon.pm
