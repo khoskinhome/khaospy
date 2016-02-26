@@ -12,7 +12,7 @@ use lib "$FindBin::Bin/../lib-perl";
 A daemon that runs commands for controls that are not on a PiHost
 
 subscribes to hosts running Command-Queue-daemons on port 5061 for commands.
-$PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT = 5061
+$COMMAND_QUEUE_DAEMON_SEND_PORT = 5061
 
 publishes to tcp://*:5065 what the command did.
 $PI_CONTROLLER_DAEMON_SEND_PORT = 5062

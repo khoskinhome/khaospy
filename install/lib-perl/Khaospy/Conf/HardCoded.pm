@@ -27,7 +27,7 @@ use Khaospy::Constants qw(
     $ONE_WIRE_HEATING_DAEMON
     $BOILER_DAEMON_SCRIPT
     $PI_CONTROLLER_DAEMON_SCRIPT
-    $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
+    $COMMAND_QUEUE_DAEMON_SCRIPT
 
     $OTHER_CONTROLS_DAEMON_SCRIPT
 );
@@ -771,7 +771,7 @@ sub live_pi_host_conf {
                     options => { '--host' => "piboiler" },
                 },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT      , options => { }, },
-                { script  => $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT, options => { }, },
+                { script  => $COMMAND_QUEUE_DAEMON_SCRIPT, options => { }, },
 
             ],
         },
@@ -815,7 +815,7 @@ sub live_pi_host_conf {
 #                    script  => "$BOILER_DAEMON_SCRIPT",
 #                    options => { },
 #                },
-                { script  => $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT, options => { }, },
+                { script  => $COMMAND_QUEUE_DAEMON_SCRIPT, options => { }, },
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
             ],
         },
@@ -846,7 +846,7 @@ sub test_pi_host_conf {
                 },
 
                 {
-                    script  => $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT,
+                    script  => $COMMAND_QUEUE_DAEMON_SCRIPT,
                     options => {
 ## TODO implement --log_level cli-opt on daemon-scripts.
 ##                      '--log_level' => "debug", # over-ride per host setting.

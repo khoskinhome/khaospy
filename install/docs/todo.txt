@@ -3,10 +3,6 @@ High Prio
 
 CommandQueueDaemon
 
-
-    rename CommandQueueDaemon.pm to CommandQueueDaemon.pm
-
-
     get the QueueCommand.pm to 
         subscribe to 
 

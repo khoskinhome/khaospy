@@ -22,7 +22,7 @@ use Khaospy::Constants qw(
     $ONE_WIRE_HEATING_DAEMON
     $BOILER_DAEMON_SCRIPT
     $PI_CONTROLLER_DAEMON_SCRIPT
-    $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
+    $COMMAND_QUEUE_DAEMON_SCRIPT
 
 );
 
@@ -81,7 +81,7 @@ $pi_hosts_return = {
                 options =>{},
             },
             {
-                script=>$PI_CONTROLLER_QUEUE_DAEMON_SCRIPT,
+                script=>$COMMAND_QUEUE_DAEMON_SCRIPT,
                 options =>{},
             },
         ],
@@ -110,8 +110,8 @@ ok ( $return = get_pi_hosts_running_daemon( $PI_CONTROLLER_DAEMON_SCRIPT) ,
 cmp_deeply( $return, bag(qw/pitest pitestanother/) , "Got the hosts expected" );
 
 
-ok ( $return = get_pi_hosts_running_daemon( $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT) ,
-     "Getting hosts that run $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT"
+ok ( $return = get_pi_hosts_running_daemon( $COMMAND_QUEUE_DAEMON_SCRIPT) ,
+     "Getting hosts that run $COMMAND_QUEUE_DAEMON_SCRIPT"
 );
 cmp_deeply( $return, bag(qw/pitest/) , "Got the hosts expected" );
 

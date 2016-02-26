@@ -28,7 +28,7 @@ use Khaospy::Constants qw(
     $LOCALHOST
 
     $ONE_WIRE_DAEMON_PORT
-    $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
+    $COMMAND_QUEUE_DAEMON_SEND_PORT
     $PI_CONTROLLER_DAEMON_SEND_PORT
     $OTHER_CONTROLS_DAEMON_SEND_PORT
     $PI_STATUS_DAEMON_SEND_PORT
@@ -179,7 +179,7 @@ sub get_ports {
     push @ports, $ONE_WIRE_DAEMON_PORT
         if $opts->{"one-wire"};
 
-    push @ports, $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
+    push @ports, $COMMAND_QUEUE_DAEMON_SEND_PORT
         if $opts->{"command-queue"};
 
     push @ports, $PI_CONTROLLER_DAEMON_SEND_PORT
@@ -199,7 +199,7 @@ sub get_ports {
 
     @ports = (
         $ONE_WIRE_DAEMON_PORT,
-        $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT,
+        $COMMAND_QUEUE_DAEMON_SEND_PORT,
         $PI_CONTROLLER_DAEMON_SEND_PORT,
         $OTHER_CONTROLS_DAEMON_SEND_PORT,
         $PI_STATUS_DAEMON_SEND_PORT,

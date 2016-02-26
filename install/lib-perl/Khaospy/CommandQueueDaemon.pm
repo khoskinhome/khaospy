@@ -49,12 +49,12 @@ use Khaospy::Constants qw(
     true false
     ON OFF STATUS
 
-    $PI_CONTROLLER_QUEUE_DAEMON
-    $PI_CONTROLLER_QUEUE_DAEMON_TIMER
+    $COMMAND_QUEUE_DAEMON
+    $COMMAND_QUEUE_DAEMON_TIMER
 
     $QUEUE_COMMAND_PORT
     $PI_CONTROLLER_DAEMON_SEND_PORT
-    $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
+    $COMMAND_QUEUE_DAEMON_SEND_PORT
     $PI_CONTROLLER_DAEMON_SCRIPT
     $LOCALHOST
     $MESSAGE_TIMEOUT
@@ -115,7 +115,7 @@ sub run_command_queue_daemon {
 
     # Publisher to push the queue out to controllers.
     $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
-    my $pub_to_port = "tcp://*:$PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT";
+    my $pub_to_port = "tcp://*:$COMMAND_QUEUE_DAEMON_SEND_PORT";
     zmq_bind( $zmq_publisher, $pub_to_port );
     klog(INFO, "Publishing to $pub_to_port");
 
@@ -159,7 +159,7 @@ sub run_command_queue_daemon {
     # Register the timer :
     push @w, AnyEvent->timer(
         after    => 0.1,
-        interval => $PI_CONTROLLER_QUEUE_DAEMON_TIMER,
+        interval => $COMMAND_QUEUE_DAEMON_TIMER,
         cb       => \&timer_cb
     );
 
@@ -218,7 +218,7 @@ sub queue_message {
     my $mkey = $msg_p->{mkey};
 
     my $new_msg = clone($msg_p->{hashref});
-    $new_msg->{message_from} = $PI_CONTROLLER_QUEUE_DAEMON;
+    $new_msg->{message_from} = $COMMAND_QUEUE_DAEMON;
     $msg_p->{json_from} = $JSON->encode($new_msg);
 
     $msg_queue->{$mkey} = $msg_p;

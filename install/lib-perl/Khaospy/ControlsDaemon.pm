@@ -40,8 +40,8 @@ use Khaospy::Constants qw(
     true false
     STATUS
 
-    $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
-    $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
+    $COMMAND_QUEUE_DAEMON_SCRIPT
+    $COMMAND_QUEUE_DAEMON_SEND_PORT
 
     $MESSAGE_TIMEOUT
 );
@@ -100,13 +100,13 @@ sub run_daemon {
 
     for my $sub_host (
         @{get_pi_hosts_running_daemon(
-            $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
+            $COMMAND_QUEUE_DAEMON_SCRIPT
         )}
     ){
         push @w, zmq_anyevent({
             zmq_type    => ZMQ_SUB,
             host        => $sub_host,
-            port        => $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT,
+            port        => $COMMAND_QUEUE_DAEMON_SEND_PORT,
             msg_handler => \&controller_message,
             klog        => true,
         });
