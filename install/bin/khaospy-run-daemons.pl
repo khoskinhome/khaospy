@@ -23,8 +23,8 @@ die "Not root user" if $>;
 
 use Khaospy::Constants qw(
     $JSON
-    $KHAOSPY_LOG_DIR
-    $KHAOSPY_PID_DIR
+    $LOG_DIR
+    $PID_DIR
 );
 
 use Khaospy::Conf::PiHosts qw(
@@ -55,7 +55,7 @@ for my $daemon_cfg ( @{$conf->{daemons}} ){
 
     print "Checking $command\n";
 
-    my $log_file = "$KHAOSPY_LOG_DIR/$pid_log_name";
+    my $log_file = "$LOG_DIR/$pid_log_name";
     my $pid_file = "$pid_log_name.pid";
 
     # currently the directory /opt/khaospy/bin is "unsafe"
@@ -65,7 +65,7 @@ for my $daemon_cfg ( @{$conf->{daemons}} ){
         sudo /usr/bin/daemon
             -U
             --name=$pid_file
-            --pidfiles=$KHAOSPY_PID_DIR
+            --pidfiles=$PID_DIR
             --stdout=$log_file.stdout
             --stderr=$log_file.stderr
             --errlog=$log_file.errlog

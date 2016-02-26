@@ -16,7 +16,6 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
-    $KHAOSPY_CONTROLS_CONF_FULLPATH
 );
 
 use Khaospy::Utils qw/timestamp/;

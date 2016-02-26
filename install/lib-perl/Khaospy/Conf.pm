@@ -19,11 +19,11 @@ use Khaospy::Constants qw(
     ON OFF STATUS
     true false
 
-    $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
-    $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_RELOAD_SECS
+    $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
+    $ONE_WIRE_HEATING_DAEMON_CONF_RELOAD_SECS
 
-    $KHAOSPY_BOILERS_CONF_FULLPATH
-    $KHAOSPY_GLOBAL_CONF_FULLPATH
+    $BOILERS_CONF_FULLPATH
+    $GLOBAL_CONF_FULLPATH
 
 );
 
@@ -66,24 +66,24 @@ sub get_one_wire_heating_control_conf {
     my ($force_reload) = @_;
     get_conf(
         \$heating_conf,
-        $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH,
+        $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH,
         $force_reload,
         undef,
         \$$heating_conf_last_loaded,
-        $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_RELOAD_SECS
+        $ONE_WIRE_HEATING_DAEMON_CONF_RELOAD_SECS
     )
 }
 
 my $boiler_conf;
 sub get_boiler_conf {
     my ($force_reload) = @_;
-    get_conf(\$boiler_conf, $KHAOSPY_BOILERS_CONF_FULLPATH, $force_reload);
+    get_conf(\$boiler_conf, $BOILERS_CONF_FULLPATH, $force_reload);
 }
 
 my $global_conf;
 sub get_global_conf {
     my ($force_reload) = @_;
-    get_conf( \$global_conf, $KHAOSPY_GLOBAL_CONF_FULLPATH, $force_reload);
+    get_conf( \$global_conf, $GLOBAL_CONF_FULLPATH, $force_reload);
 }
 
 1;

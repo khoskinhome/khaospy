@@ -43,8 +43,8 @@ use Khaospy::Exception qw(
 );
 
 use Khaospy::Constants qw(
-    $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
-    $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT
+    $PI_CONTROLLER_DAEMON_SCRIPT
+    $OTHER_CONTROLS_DAEMON_SCRIPT
     $PING_SWITCH_DAEMON_SCRIPT
     $MAC_SWITCH_DAEMON_SCRIPT
 );
@@ -64,8 +64,8 @@ my $pi_hosts_return = {
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
@@ -301,8 +301,8 @@ $pi_hosts_return = {
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
@@ -331,8 +331,8 @@ $pi_hosts_return = {
         valid_gpios       => [ 1 ],
         valid_i2c_buses   => [ 0 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
@@ -353,8 +353,8 @@ $pi_hosts_return = {
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
@@ -393,8 +393,8 @@ $pi_hosts_return = {
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
@@ -404,8 +404,8 @@ $pi_hosts_return = {
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
@@ -519,8 +519,8 @@ $pi_hosts_return = {
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
@@ -591,8 +591,8 @@ $pi_hosts_return = {
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 2 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
@@ -626,8 +626,8 @@ $pi_hosts_return = {
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
@@ -758,8 +758,8 @@ $pi_hosts_return = {
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
@@ -769,8 +769,8 @@ $pi_hosts_return = {
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
@@ -831,8 +831,8 @@ $pi_hosts_return = {
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
@@ -842,8 +842,8 @@ $pi_hosts_return = {
         valid_gpios       => [ 0..7 ],
         valid_i2c_buses   => [ 0 ],
         daemons => [
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],

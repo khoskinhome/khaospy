@@ -23,7 +23,6 @@ use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     true false
     ON OFF STATUS
-    $KHAOSPY_CONTROLS_CONF_FULLPATH
 
     $QUEUE_COMMAND_PORT
 

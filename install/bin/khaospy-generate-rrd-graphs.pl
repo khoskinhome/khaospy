@@ -11,15 +11,15 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Utils qw/slurp/;
 use Khaospy::Constants qw(
-    $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
-    $KHAOSPY_RRD_DIR
-    $KHAOSPY_RRD_IMAGE_DIR
+    $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
+    $RRD_DIR
+    $RRD_IMAGE_DIR
 );
 
 my $json = JSON->new->allow_nonref;
 
 my $thermometer_conf = $json->decode(
-    slurp ( $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH )
+    slurp ( $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH )
 );
 
 my $COLOURS = [
@@ -38,7 +38,7 @@ my $TRENDCOLOUR="#FFFF00",
 
 my $rrd_groups = { all => [] };
 
-chdir $KHAOSPY_RRD_DIR;
+chdir $RRD_DIR;
 
 while ( <*> ){
     my $address   = $_;
@@ -47,13 +47,13 @@ while ( <*> ){
 
     print "$address name => $address : rrd_group => $rrd_group \n";
 
-    my $imgpath="$KHAOSPY_RRD_IMAGE_DIR/$address-$name";
+    my $imgpath="$RRD_IMAGE_DIR/$address-$name";
     mkdir $imgpath if ( ! -d $imgpath );
 
     $rrd_groups->{$rrd_group} = [] if ! exists $rrd_groups->{$rrd_group};
 
     my $this_g = {
-            rrdpath_n_file => "$KHAOSPY_RRD_DIR/$address",
+            rrdpath_n_file => "$RRD_DIR/$address",
             location_name => $name,
         };
 
@@ -69,7 +69,7 @@ print "\n";
 for my $tgrp ( keys %$rrd_groups ){
     print "rrd_group $tgrp\n";
 
-    my $imgpath="$KHAOSPY_RRD_IMAGE_DIR/$tgrp";
+    my $imgpath="$RRD_IMAGE_DIR/$tgrp";
     mkdir $imgpath if ! -d $imgpath ;
 
     # multi_graph_day( $imgpath, "day", "1d", $rrd_groups->{$tgrp} );

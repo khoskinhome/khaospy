@@ -17,16 +17,16 @@ use Khaospy::Exception qw(
 );
 
 use Khaospy::Constants qw(
-    $KHAOSPY_PI_HOSTS_CONF_FULLPATH
+    $PI_HOSTS_CONF_FULLPATH
 
-    $KHAOSPY_ALL_SCRIPTS
+    $ALL_SCRIPTS
 
-    $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
-    $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
-    $KHAOSPY_ONE_WIRE_HEATING_DAEMON
-    $KHAOSPY_BOILER_DAEMON_SCRIPT
-    $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
-    $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
+    $ONE_WIRED_SENDER_SCRIPT
+    $ONE_WIRED_RECEIVER_SCRIPT
+    $ONE_WIRE_HEATING_DAEMON
+    $BOILER_DAEMON_SCRIPT
+    $PI_CONTROLLER_DAEMON_SCRIPT
+    $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
 
 );
 
@@ -54,7 +54,7 @@ sub get_pi_hosts_conf {
     my ($force_reload) = @_;
     get_conf(
         \$pi_hosts_conf,
-        $KHAOSPY_PI_HOSTS_CONF_FULLPATH,
+        $PI_HOSTS_CONF_FULLPATH,
         $force_reload,
         \&_validate_pi_hosts_conf
     );
@@ -63,7 +63,7 @@ sub get_pi_host_config {
     my ($host, $force_reload) = @_;
     get_pi_hosts_conf($force_reload);
 
-    die "Host '$host' doesn't exist in $KHAOSPY_PI_HOSTS_CONF_FULLPATH\n"
+    die "Host '$host' doesn't exist in $PI_HOSTS_CONF_FULLPATH\n"
         if ! exists $pi_hosts_conf->{$host};
 
     return $pi_hosts_conf->{$host};
@@ -80,7 +80,7 @@ sub get_pi_hosts_running_daemon {
     KhaospyExcept::InvalidDaemonScriptName->throw(
         error => "Invalid script name '$daemon_script_full_path'"
     )
-        if ! grep { $_ eq $daemon_script_full_path } @$KHAOSPY_ALL_SCRIPTS;
+        if ! grep { $_ eq $daemon_script_full_path } @$ALL_SCRIPTS;
 
     get_pi_hosts_conf();
 

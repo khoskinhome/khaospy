@@ -17,7 +17,7 @@ use Khaospy::Constants qw(
     true false
     ON OFF STATUS
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT
-    $KHAOSPY_BOILERS_CONF_FULLPATH
+    $BOILERS_CONF_FULLPATH
 );
 
 use Khaospy::QueueCommand qw( queue_command );
@@ -217,7 +217,7 @@ sub get_boiler_name_for_control {
 
     croak "More than one boiler is configured to use control '$control'\n"
             .Dumper(\@boiler_list)
-            ."please fix $KHAOSPY_BOILERS_CONF_FULLPATH\n"
+            ."please fix $BOILERS_CONF_FULLPATH\n"
         if  @boiler_list > 1;
 
     return $boiler_list[0] if $boiler_list[0];

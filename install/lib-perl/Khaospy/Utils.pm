@@ -13,10 +13,10 @@ my $json = JSON->new->allow_nonref;
 use Khaospy::Constants qw(
     true false
     ON OFF STATUS
-    $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
+    $ONE_WIRED_SENDER_SCRIPT
 
-    $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
-    $KHAOSPY_CONTROLS_CONF_FULLPATH
+    $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
+    $CONTROLS_CONF_FULLPATH
     $MESSAGES_OVER_SECS_INVALID
 );
 
@@ -60,14 +60,14 @@ sub get_one_wire_sender_hosts {
 
 
 #    my $daemon_runner_conf = $json->decode(
-#        slurp ( $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH )
+#        slurp ( $DAEMON_RUNNER_CONF_FULLPATH )
 #    );
 #
 #    my $one_wire_sender_host = [];
 #    for my $host ( keys %$daemon_runner_conf ){
 #        push @$one_wire_sender_host, $host
 #            if (
-#                grep { $_ =~ /^$KHAOSPY_ONE_WIRED_SENDER_SCRIPT/ }
+#                grep { $_ =~ /^$ONE_WIRED_SENDER_SCRIPT/ }
 #                @{$daemon_runner_conf->{$host}}
 #            );
 #    }

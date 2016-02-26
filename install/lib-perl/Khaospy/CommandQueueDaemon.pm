@@ -55,12 +55,12 @@ use Khaospy::Constants qw(
     $QUEUE_COMMAND_PORT
     $PI_CONTROLLER_DAEMON_SEND_PORT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
-    $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
+    $PI_CONTROLLER_DAEMON_SCRIPT
     $LOCALHOST
     $MESSAGE_TIMEOUT
 
     $OTHER_CONTROLS_DAEMON
-    $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT
+    $OTHER_CONTROLS_DAEMON_SCRIPT
     $OTHER_CONTROLS_DAEMON_SEND_PORT
 );
 
@@ -124,7 +124,7 @@ sub run_command_queue_daemon {
     # Listen for the Pi Control Daemons return messages.
     for my $sub_host (
         @{get_pi_hosts_running_daemon(
-            $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
+            $PI_CONTROLLER_DAEMON_SCRIPT
         )}
     ){
         $count_zmq_subs++;
@@ -140,7 +140,7 @@ sub run_command_queue_daemon {
 
     # Listen for the other controls daemon.
     for my $sub_host (
-        @{get_pi_hosts_running_daemon( $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT)}
+        @{get_pi_hosts_running_daemon( $OTHER_CONTROLS_DAEMON_SCRIPT)}
     ){
         $count_zmq_subs++;
         push @w, zmq_anyevent({

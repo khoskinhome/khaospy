@@ -11,7 +11,7 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Utils qw/slurp/;
 use Khaospy::Constants qw(
-    $KHAOSPY_CONTROLS_CONF_FULLPATH
+    $CONTROLS_CONF_FULLPATH
 );
 
 use Khaospy::OrviboS20 qw/signal_control/;
@@ -26,7 +26,7 @@ my $json = JSON->new->allow_nonref;
   ## install/lib-perl/Khaospy/Constants.pm:113:        '28-0000066ebc74' => { # TODO rm this line
 
 my $controls = $json->decode(
-    slurp ( $KHAOSPY_CONTROLS_CONF_FULLPATH )
+    slurp ( $CONTROLS_CONF_FULLPATH )
 );
 
 

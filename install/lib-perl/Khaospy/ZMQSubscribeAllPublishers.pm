@@ -36,7 +36,7 @@ use Khaospy::Constants qw(
     $PING_SWITCH_DAEMON_SEND_PORT
 
 
-    $KHAOSPY_RRD_IMAGE_DIR
+    $RRD_IMAGE_DIR
 );
 
 use Khaospy::Conf qw(
@@ -141,7 +141,7 @@ TODO rm this lot , or properly dev something . this is a hack for alarm testing 
 
 =cut
 
-    my $dump_dir = "$KHAOSPY_RRD_IMAGE_DIR/alarm-test/";
+    my $dump_dir = "$RRD_IMAGE_DIR/alarm-test/";
 
     burp ( "$dump_dir/debug-msg-".time.".txt", $out );
 

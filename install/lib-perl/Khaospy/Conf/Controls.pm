@@ -36,11 +36,11 @@ use Khaospy::Exception qw(
 use Khaospy::Constants qw(
     $JSON
     ON OFF STATUS
-    $KHAOSPY_CONTROLS_CONF_FULLPATH
-    $KHAOSPY_PI_HOSTS_CONF_FULLPATH
+    $CONTROLS_CONF_FULLPATH
+    $PI_HOSTS_CONF_FULLPATH
 
-    $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
-    $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT
+    $PI_CONTROLLER_DAEMON_SCRIPT
+    $OTHER_CONTROLS_DAEMON_SCRIPT
     $MAC_SWITCH_DAEMON_SCRIPT
     $PING_SWITCH_DAEMON_SCRIPT
 
@@ -82,7 +82,7 @@ my $check_types = {
         db_log       => $check_optional_boolean,
         poll_timeout => $check_optional_integer,
         poll_host    =>
-            check_host_runs($KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT),
+            check_host_runs($OTHER_CONTROLS_DAEMON_SCRIPT),
         host         => \&check_host,
         mac          => $check_mac,
         manual_auto_timeout => $check_optional_integer,
@@ -100,7 +100,7 @@ my $check_types = {
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            =>
-            check_host_runs($KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT),
+            check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
         ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
         manual_auto_timeout => $check_optional_integer,
@@ -112,7 +112,7 @@ my $check_types = {
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            =>
-            check_host_runs($KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT),
+            check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
         gpio_relay      => \&check_pi_gpio,
     },
@@ -121,7 +121,7 @@ my $check_types = {
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            =>
-            check_host_runs($KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT),
+            check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
         gpio_switch     => \&check_pi_gpio,
     },
@@ -130,7 +130,7 @@ my $check_types = {
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            =>
-            check_host_runs($KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT),
+            check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
         ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
         manual_auto_timeout => $check_optional_integer,
@@ -142,7 +142,7 @@ my $check_types = {
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            =>
-            check_host_runs($KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT),
+            check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
         gpio_relay      => \&check_pi_mcp23017,
     },
@@ -151,7 +151,7 @@ my $check_types = {
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            =>
-            check_host_runs($KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT),
+            check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
         gpio_switch     => \&check_pi_mcp23017,
     },
@@ -186,7 +186,7 @@ sub get_controls_conf {
     my ($force_reload) = @_;
     get_conf(
         \$controls_conf,
-        $KHAOSPY_CONTROLS_CONF_FULLPATH,
+        $CONTROLS_CONF_FULLPATH,
         $force_reload,
         \&_validate_controls_conf,
     );
@@ -219,7 +219,7 @@ sub get_control_config {
 
     KhaospyExcept::ControlDoesnotExist->throw(
         error => "Control '$control_name' doesn't exist in "
-            ."$KHAOSPY_CONTROLS_CONF_FULLPATH\n"
+            ."$CONTROLS_CONF_FULLPATH\n"
     )
         if ! exists $controls_conf->{$control_name};
 
@@ -244,7 +244,7 @@ sub _validate_controls_conf {
 
     KhaospyExcept::ControlsConfig->throw(
         error => "Errors checking the controls config"
-            ." $KHAOSPY_CONTROLS_CONF_FULLPATH\n\n"
+            ." $CONTROLS_CONF_FULLPATH\n\n"
             ."$collate_errors\n"
     )
         if $collate_errors;
@@ -369,7 +369,7 @@ sub check_pi_gpio {
 
     KhaospyExcept::PiHostsNoValidGPIO->throw(
         error => "Pi-host '$host' doesn't have 'valid_gpios' configured.\n"
-            ."The valid_gpios are defined in the pi-host config $KHAOSPY_PI_HOSTS_CONF_FULLPATH.\n"
+            ."The valid_gpios are defined in the pi-host config $PI_HOSTS_CONF_FULLPATH.\n"
             ."Control '$control_name' cannot be checked for the validity of '$chk'"
     )
         if ! defined $valid_gpios;
@@ -377,7 +377,7 @@ sub check_pi_gpio {
     KhaospyExcept::ControlsConfigInvalidGPIO->throw(
         error => "Control '$control_name' has an invalid gpio for '$chk' of '$val'\n"
             ."The valid_gpios defined for the pi-host '$host'"
-            ." in $KHAOSPY_PI_HOSTS_CONF_FULLPATH are (".join(',', @$valid_gpios).")"
+            ." in $PI_HOSTS_CONF_FULLPATH are (".join(',', @$valid_gpios).")"
     )
         if ! grep { $_ == $val } @$valid_gpios;
 
@@ -415,7 +415,7 @@ sub check_pi_mcp23017 {
 
     KhaospyExcept::PiHostsNoValidI2CBus->throw(
         error => "Pi-host '$host' doesn't have 'valid_i2c_buses' configured.\n"
-            ."The valid_i2c_buses are defined in the pi-host config $KHAOSPY_PI_HOSTS_CONF_FULLPATH.\n"
+            ."The valid_i2c_buses are defined in the pi-host config $PI_HOSTS_CONF_FULLPATH.\n"
             ."Control '$control_name' cannot be checked for the validity of '$chk' (i2c_bus)"
     )
         if ! defined $valid_i2c_buses;
@@ -423,7 +423,7 @@ sub check_pi_mcp23017 {
     KhaospyExcept::ControlsConfigInvalidI2CBus->throw(
         error => "Control '$control_name' has an invalid i2c_bus for '$chk' of '$val'\n"
             ."The valid_i2c_buses defined for the pi-host '$host'"
-            ." in $KHAOSPY_PI_HOSTS_CONF_FULLPATH are (".join(',', @$valid_i2c_buses).")"
+            ." in $PI_HOSTS_CONF_FULLPATH are (".join(',', @$valid_i2c_buses).")"
     )
         if ! grep { $_ == $i2c_bus } @$valid_i2c_buses;
 

@@ -17,12 +17,12 @@ sub true  { 1 };
 sub false { 0 };
 
 use Khaospy::Constants qw(
-    $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
-    $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
-    $KHAOSPY_ONE_WIRE_HEATING_DAEMON
-    $KHAOSPY_BOILER_DAEMON_SCRIPT
-    $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
-    $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
+    $ONE_WIRED_SENDER_SCRIPT
+    $ONE_WIRED_RECEIVER_SCRIPT
+    $ONE_WIRE_HEATING_DAEMON
+    $BOILER_DAEMON_SCRIPT
+    $PI_CONTROLLER_DAEMON_SCRIPT
+    $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
 
 );
 
@@ -67,7 +67,7 @@ throws_ok { get_pi_hosts_running_daemon('bad-daemon-name') }
     KhaospyExcept::InvalidDaemonScriptName->new,
     "dies with bad script name";
 
-lives_ok { get_pi_hosts_running_daemon( $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT ) }
+lives_ok { get_pi_hosts_running_daemon( $PI_CONTROLLER_DAEMON_SCRIPT ) }
     "lives with good script name";
 
 $pi_hosts_return = {
@@ -77,11 +77,11 @@ $pi_hosts_return = {
         valid_i2c_buses   => [ 0 ],
         daemons => [
             {
-                script=>$KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT,
+                script=>$PI_CONTROLLER_DAEMON_SCRIPT,
                 options =>{},
             },
             {
-                script=>$KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT,
+                script=>$PI_CONTROLLER_QUEUE_DAEMON_SCRIPT,
                 options =>{},
             },
         ],
@@ -92,11 +92,11 @@ $pi_hosts_return = {
         valid_i2c_buses   => [ 0 ],
         daemons => [
             {
-                script=>$KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT,
+                script=>$PI_CONTROLLER_DAEMON_SCRIPT,
                 options =>{},
             },
             {
-                script=>$KHAOSPY_ONE_WIRED_SENDER_SCRIPT,
+                script=>$ONE_WIRED_SENDER_SCRIPT,
                 options =>{},
             },
         ],
@@ -104,20 +104,20 @@ $pi_hosts_return = {
 
 };
 
-ok ( $return = get_pi_hosts_running_daemon( $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT) ,
-     "Getting hosts that run $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT"
+ok ( $return = get_pi_hosts_running_daemon( $PI_CONTROLLER_DAEMON_SCRIPT) ,
+     "Getting hosts that run $PI_CONTROLLER_DAEMON_SCRIPT"
 );
 cmp_deeply( $return, bag(qw/pitest pitestanother/) , "Got the hosts expected" );
 
 
-ok ( $return = get_pi_hosts_running_daemon( $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT) ,
-     "Getting hosts that run $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT"
+ok ( $return = get_pi_hosts_running_daemon( $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT) ,
+     "Getting hosts that run $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT"
 );
 cmp_deeply( $return, bag(qw/pitest/) , "Got the hosts expected" );
 
 
-ok ( $return = get_pi_hosts_running_daemon( $KHAOSPY_ONE_WIRED_SENDER_SCRIPT) ,
-     "Getting hosts that run $KHAOSPY_ONE_WIRED_SENDER_SCRIPT"
+ok ( $return = get_pi_hosts_running_daemon( $ONE_WIRED_SENDER_SCRIPT) ,
+     "Getting hosts that run $ONE_WIRED_SENDER_SCRIPT"
 );
 cmp_deeply( $return, bag(qw/pitestanother/) , "Got the hosts expected" );
 

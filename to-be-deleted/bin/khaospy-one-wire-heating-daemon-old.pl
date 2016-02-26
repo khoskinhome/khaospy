@@ -23,7 +23,7 @@ use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     true false
     ON OFF STATUS
-    $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
+    $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
     $ONE_WIRE_DAEMON_PORT
 );
 
@@ -110,12 +110,12 @@ sub process_thermometer_msg {
     my $tc   = $thermometer_conf->{$owaddr};
 
     print "One-wire address $owaddr isn't in "
-        ."$KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH config file\n"
+        ."$ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH config file\n"
             if ! defined $tc ;
 ;
     my $name = $tc->{name} || '';
     print "'name' isn't defined for one-wire address $owaddr in "
-       ."$KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH "
+       ."$ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH "
             if ! $name ;
 
     my $control_name = $tc->{control} || '';
@@ -136,17 +136,17 @@ sub process_thermometer_msg {
         print "    Both the 'upper_temp' and 'control' need to be defined\n";
         print "        upper_temp = $upper_temp\n";
         print "        control    = $control_name\n";
-        print "    Please fix the config file $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
+        print "    Please fix the config file $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
         print "    Cannot operate this control.\n";
         print "#####\n";
         return;
     }
 
     if ( $upper_temp <= $lower_temp ){
-        print "\n    Broken temperature range in $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH config.\n";
+        print "\n    Broken temperature range in $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH config.\n";
         print "        (Upper) $upper_temp <= (Lower) $lower_temp\n";
         print "    Upper temperature must be greater than the lower temperature\n";
-        print "    Please fix the config file $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
+        print "    Please fix the config file $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
         print "    Cannot operate this control.\n";
         print "#####\n";
         return;

@@ -14,22 +14,22 @@ use Khaospy::Constants qw(
 
     true false
 
-    $KHAOSPY_CONF_DIR
+    $CONF_DIR
 
-    $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF
-    $KHAOSPY_CONTROLS_CONF
-    $KHAOSPY_BOILERS_CONF
-    $KHAOSPY_GLOBAL_CONF
-    $KHAOSPY_PI_HOSTS_CONF
+    $ONE_WIRE_HEATING_DAEMON_CONF
+    $CONTROLS_CONF
+    $BOILERS_CONF
+    $GLOBAL_CONF
+    $PI_HOSTS_CONF
 
-    $KHAOSPY_ONE_WIRED_SENDER_SCRIPT
-    $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT
-    $KHAOSPY_ONE_WIRE_HEATING_DAEMON
-    $KHAOSPY_BOILER_DAEMON_SCRIPT
-    $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
-    $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
+    $ONE_WIRED_SENDER_SCRIPT
+    $ONE_WIRED_RECEIVER_SCRIPT
+    $ONE_WIRE_HEATING_DAEMON
+    $BOILER_DAEMON_SCRIPT
+    $PI_CONTROLLER_DAEMON_SCRIPT
+    $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT
 
-    $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT
+    $OTHER_CONTROLS_DAEMON_SCRIPT
 );
 
 use Khaospy::Utils qw/burp/;
@@ -46,29 +46,29 @@ our @EXPORT_OK = qw(
 
 my $live_confs = {
 
-    $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF
+    $ONE_WIRE_HEATING_DAEMON_CONF
         => live_heating_thermometer_config(),
-    $KHAOSPY_CONTROLS_CONF
+    $CONTROLS_CONF
         => live_controls_conf(),
-    $KHAOSPY_BOILERS_CONF
+    $BOILERS_CONF
         => live_boilers_conf(),
-    $KHAOSPY_GLOBAL_CONF
+    $GLOBAL_CONF
         => live_global_conf(),
-    $KHAOSPY_PI_HOSTS_CONF
+    $PI_HOSTS_CONF
         => live_pi_host_conf(),
 
 };
 
 my $test_confs = {
-    $KHAOSPY_ONE_WIRE_HEATING_DAEMON_CONF
+    $ONE_WIRE_HEATING_DAEMON_CONF
         => test_heating_thermometer_config(),
-    $KHAOSPY_CONTROLS_CONF
+    $CONTROLS_CONF
         => test_controls_conf(),
-    $KHAOSPY_BOILERS_CONF
+    $BOILERS_CONF
         => test_boilers_conf(),
-    $KHAOSPY_GLOBAL_CONF
+    $GLOBAL_CONF
         => test_global_conf(),
-    $KHAOSPY_PI_HOSTS_CONF
+    $PI_HOSTS_CONF
         => test_pi_host_conf(),
 };
 
@@ -89,9 +89,9 @@ sub write_out_conf {
 
     for my $conf_file ( keys %$use_conf ) {
 
-        print "Generating $KHAOSPY_CONF_DIR/$conf_file\n";
+        print "Generating $CONF_DIR/$conf_file\n";
 
-        burp ( "$KHAOSPY_CONF_DIR/$conf_file",
+        burp ( "$CONF_DIR/$conf_file",
                 $JSON->pretty->encode( $use_conf->{$conf_file} )
         );
     }
@@ -759,19 +759,19 @@ sub live_pi_host_conf {
             valid_i2c_buses   => [ 1 ],
             daemons => [
                 {
-                    script  => $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT,
+                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
                     options => { '--host' => "pioldwifi" },
                 },
                 {
-                    script  => $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT,
+                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
                     options => { '--host' => "piloft" },
                 },
                 {
-                    script  => $KHAOSPY_ONE_WIRED_RECEIVER_SCRIPT,
+                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
                     options => { '--host' => "piboiler" },
                 },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT      , options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT      , options => { }, },
+                { script  => $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT, options => { }, },
 
             ],
         },
@@ -781,7 +781,7 @@ sub live_pi_host_conf {
             valid_i2c_buses   => [ 1 ],
             daemons => [
                 {
-                    script  =>$KHAOSPY_ONE_WIRED_SENDER_SCRIPT,
+                    script  =>$ONE_WIRED_SENDER_SCRIPT,
                     options => { '--stdout_freq' => '890' },
                 },
                 {
@@ -796,7 +796,7 @@ sub live_pi_host_conf {
             valid_i2c_buses   => [ 0 ],
             daemons => [
                 {
-                    script  =>$KHAOSPY_ONE_WIRED_SENDER_SCRIPT,
+                    script  =>$ONE_WIRED_SENDER_SCRIPT,
                     options => { '--stdout_freq' => '890' },
                 },
             ],
@@ -806,17 +806,17 @@ sub live_pi_host_conf {
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 1 ],
             daemons => [
-                { script  =>$KHAOSPY_ONE_WIRED_SENDER_SCRIPT,
+                { script  =>$ONE_WIRED_SENDER_SCRIPT,
                   options => { '--stdout_freq' => '890' },
                 },
-                { script  => $KHAOSPY_ONE_WIRE_HEATING_DAEMON, options => { }, },
-                { script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT, options => { }, },
+                { script  => $ONE_WIRE_HEATING_DAEMON, options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT, options => { }, },
 #                {
-#                    script  => "$KHAOSPY_BOILER_DAEMON_SCRIPT",
+#                    script  => "$BOILER_DAEMON_SCRIPT",
 #                    options => { },
 #                },
-                { script  => $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT, options => { }, },
-                { script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT, options => { }, },
+                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
             ],
         },
     };
@@ -831,14 +831,14 @@ sub test_pi_host_conf {
             valid_i2c_buses   => [ 0, 1 ], # could do an i2cdetect too.
             daemons => [
                 {
-                    script  => $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT,
+                    script  => $PI_CONTROLLER_DAEMON_SCRIPT,
                     options => {
 ## TODO implement --log_level cli-opt on daemon-scripts.
 ##                      '--log_level' => "debug", # over-ride per host setting.
                     },
                 },
                 {
-                    script  => $KHAOSPY_OTHER_CONTROLS_DAEMON_SCRIPT,
+                    script  => $OTHER_CONTROLS_DAEMON_SCRIPT,
                     options => {
 ## TODO implement --log_level cli-opt on daemon-scripts.
 ##                      '--log_level' => "debug", # over-ride per host setting.
@@ -846,7 +846,7 @@ sub test_pi_host_conf {
                 },
 
                 {
-                    script  => $KHAOSPY_PI_CONTROLLER_QUEUE_DAEMON_SCRIPT,
+                    script  => $PI_CONTROLLER_QUEUE_DAEMON_SCRIPT,
                     options => {
 ## TODO implement --log_level cli-opt on daemon-scripts.
 ##                      '--log_level' => "debug", # over-ride per host setting.

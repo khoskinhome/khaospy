@@ -11,7 +11,7 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Utils qw/slurp/;
 use Khaospy::Constants qw(
-    $KHAOSPY_CONTROLS_CONF_FULLPATH
+    $CONTROLS_CONF_FULLPATH
     STATUS
 );
 
@@ -20,7 +20,7 @@ use Khaospy::QueueCommand qw/ queue_command /;
 my $json = JSON->new->allow_nonref;
 
 my $controls = $json->decode(
-    slurp ( $KHAOSPY_CONTROLS_CONF_FULLPATH )
+    slurp ( $CONTROLS_CONF_FULLPATH )
 );
 
 use Getopt::Long;

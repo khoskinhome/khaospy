@@ -17,20 +17,20 @@ use Data::Dumper;
 use Khaospy::Utils qw/slurp/;
 use Khaospy::Constants qw(
     $JSON
-    $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH
-    $KHAOSPY_LOG_DIR
-    $KHAOSPY_PID_DIR
+    $DAEMON_RUNNER_CONF_FULLPATH
+    $LOG_DIR
+    $PID_DIR
 );
 
 use Sys::Hostname qw/hostname/;
 my $thishost = hostname;
 print "This host is $thishost\n";
 
-my $conf = $JSON->decode( slurp ($KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH) );
+my $conf = $JSON->decode( slurp ($DAEMON_RUNNER_CONF_FULLPATH) );
 
 if ( ! exists $conf->{$thishost} ) {
     print "This hostname $thishost not found in the config file"
-        ." $KHAOSPY_DAEMON_RUNNER_CONF_FULLPATH . Dumper of conf = \n";
+        ." $DAEMON_RUNNER_CONF_FULLPATH . Dumper of conf = \n";
     die Dumper ($conf);
 }
 
@@ -42,7 +42,7 @@ for my $cfg_entry ( @{$conf->{$thishost}} ){
     my $command = "$cfg_entry";
     print "Checking $command\n";
 
-    my $log_file = "$KHAOSPY_LOG_DIR/${scriptname_short}";
+    my $log_file = "$LOG_DIR/${scriptname_short}";
     my $pid_file = "${scriptname_short}.pid";
 
     # currently the directory /opt/khaospy/bin is unsafe . so "/usr/bin/daemon" needs
@@ -51,7 +51,7 @@ for my $cfg_entry ( @{$conf->{$thishost}} ){
         sudo /usr/bin/daemon
             -U
             --name=$pid_file
-            --pidfiles=$KHAOSPY_PID_DIR
+            --pidfiles=$PID_DIR
             --stdout=$log_file.stdout
             --stderr=$log_file.stderr
             --errlog=$log_file.errlog
