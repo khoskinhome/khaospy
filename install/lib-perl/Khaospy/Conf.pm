@@ -19,8 +19,8 @@ use Khaospy::Constants qw(
     ON OFF STATUS
     true false
 
-    $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
-    $ONE_WIRE_HEATING_DAEMON_CONF_RELOAD_SECS
+    $HEATING_DAEMON_CONF_FULLPATH
+    $HEATING_DAEMON_CONF_RELOAD_SECS
 
     $BOILERS_CONF_FULLPATH
     $GLOBAL_CONF_FULLPATH
@@ -66,11 +66,11 @@ sub get_one_wire_heating_control_conf {
     my ($force_reload) = @_;
     get_conf(
         \$heating_conf,
-        $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH,
+        $HEATING_DAEMON_CONF_FULLPATH,
         $force_reload,
         undef,
         \$$heating_conf_last_loaded,
-        $ONE_WIRE_HEATING_DAEMON_CONF_RELOAD_SECS
+        $HEATING_DAEMON_CONF_RELOAD_SECS
     )
 }
 

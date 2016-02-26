@@ -1,4 +1,4 @@
-package Khaospy::OneWireHeatingDaemon;
+package Khaospy::HeatingDaemon;
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     true false
     ON OFF STATUS
-    $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
+    $HEATING_DAEMON_CONF_FULLPATH
     $ONE_WIRE_DAEMON_PORT
 );
 
@@ -43,7 +43,7 @@ use Khaospy::BoilerMessage qw(
 );
 
 our @EXPORT_OK = qw(
-    run_one_wire_heating_daemon
+    run_heating_daemon
 );
 
 my $json = JSON->new->allow_nonref;
@@ -56,7 +56,7 @@ use POSIX qw(strftime);
 # getting the temperatures.
 # http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
 
-sub run_one_wire_heating_daemon {
+sub run_heating_daemon {
 
     my ( $opts ) = @_;
 
@@ -112,7 +112,7 @@ sub anyevent_io {
     eval { $thermometer_conf = get_one_wire_heating_control_conf();};
     if ($@) {
         print "ERROR. Reading in the conf.\n$@\n";
-        croak "ERROR. Please check the conf file $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
+        croak "ERROR. Please check the conf file $HEATING_DAEMON_CONF_FULLPATH\n";
     }
 
     sub process_thermometer_msg {
@@ -128,7 +128,7 @@ sub anyevent_io {
         eval { $new_thermometer_conf = get_one_wire_heating_control_conf();};
         if ($@ ) {
             print "\n\nERROR. getting the conf.\n";
-            print "ERROR. Probably a broken conf $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
+            print "ERROR. Probably a broken conf $HEATING_DAEMON_CONF_FULLPATH\n";
             print "ERROR. $@";
             print "ERROR. Using the old conf\n\n";
         }
@@ -137,12 +137,12 @@ sub anyevent_io {
         my $tc   = $thermometer_conf->{$owaddr};
 
         print "ERROR. One-wire address $owaddr isn't in "
-            ."$ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH config file\n"
+            ."$HEATING_DAEMON_CONF_FULLPATH config file\n"
                 if ! defined $tc ;
 
         my $name = $tc->{name} || '';
         print "ERROR. 'name' isn't defined for one-wire address $owaddr in "
-           ."$ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH "
+           ."$HEATING_DAEMON_CONF_FULLPATH "
                 if ! $name ;
 
         my $control_name = $tc->{control} || '';
@@ -163,16 +163,16 @@ sub anyevent_io {
             print "ERROR. Both the 'upper_temp' and 'control' need to be defined\n";
             print "ERROR. upper_temp = $upper_temp C\n";
             print "ERROR. control    = '$control_name' \n";
-            print "ERROR. Please fix the config file $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
+            print "ERROR. Please fix the config file $HEATING_DAEMON_CONF_FULLPATH\n";
             print "ERROR. Cannot operate this control.\n";
             return;
         }
 
         if ( $upper_temp <= $lower_temp ){
-            print "\nERROR. Broken temperature range in $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH config.\n";
+            print "\nERROR. Broken temperature range in $HEATING_DAEMON_CONF_FULLPATH config.\n";
             print "ERROR. (Upper) $upper_temp C <= $lower_temp C (Lower)\n";
             print "ERROR. Upper temperature must be greater than the lower temperature\n";
-            print "ERROR. Please fix the config file $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH\n";
+            print "ERROR. Please fix the config file $HEATING_DAEMON_CONF_FULLPATH\n";
             print "ERROR. Cannot operate this control.\n";
             return;
         }

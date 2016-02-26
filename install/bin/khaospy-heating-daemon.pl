@@ -10,8 +10,8 @@ use Khaospy::Constants qw(
     true false
 );
 
-use Khaospy::OneWireHeatingDaemon qw(
-    run_one_wire_heating_daemon
+use Khaospy::HeatingDaemon qw(
+    run_heating_daemon
 );
 
 use Getopt::Long;
@@ -19,4 +19,4 @@ my $verbose = false;
 
 GetOptions ( "verbose" => \$verbose );
 
-run_one_wire_heating_daemon({ verbose => $verbose });
+run_heating_daemon({ verbose => $verbose });

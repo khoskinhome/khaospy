@@ -28,11 +28,12 @@ use Khaospy::ControlPi;
 use Khaospy::ControlPiGPIO;
 use Khaospy::ControlPiMCP23017;
 
+use Khaospy::HeatingDaemon;
+
 use Khaospy::Log;
 
 use Khaospy::Message;
 
-use Khaospy::OneWireHeatingDaemon;
 use Khaospy::OrviboS20;
 
 use Khaospy::ControlsDaemon;

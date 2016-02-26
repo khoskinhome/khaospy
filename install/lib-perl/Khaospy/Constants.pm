@@ -104,8 +104,8 @@ our $ALL_SCRIPTS = [
     our $ONE_WIRED_RECEIVER_SCRIPT
         = "$BIN_DIR/$ONE_WIRE_RECEIVER",
 
-    our $ONE_WIRE_HEATING_DAEMON
-        = "$BIN_DIR/khaospy-one-wire-heating-daemon.pl",
+    our $HEATING_DAEMON
+        = "$BIN_DIR/khaospy-heating-daemon.pl",
 
     our $BOILER_DAEMON_SCRIPT
         = "$BIN_DIR/khaospy-boiler-daemon.pl",
@@ -133,7 +133,7 @@ our $ALL_SCRIPTS = [
 #############
 # json confs
 
-our $ONE_WIRE_HEATING_DAEMON_CONF   = "heating_thermometer.json";
+our $HEATING_DAEMON_CONF   = "heating_thermometer.json";
 our $CONTROLS_CONF                  = "controls.json";
 our $BOILERS_CONF                   = "boilers.json";
 
@@ -141,10 +141,10 @@ our $BOILERS_CONF                   = "boilers.json";
 our $GLOBAL_CONF                    = "global.json";
 our $PI_HOSTS_CONF                  = "pi-host.json";
 
-our $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
-    = "$CONF_DIR/$ONE_WIRE_HEATING_DAEMON_CONF";
+our $HEATING_DAEMON_CONF_FULLPATH
+    = "$CONF_DIR/$HEATING_DAEMON_CONF";
 
-our $ONE_WIRE_HEATING_DAEMON_CONF_RELOAD_SECS = 300;
+our $HEATING_DAEMON_CONF_RELOAD_SECS = 300;
 
 our $CONTROLS_CONF_FULLPATH
     = "$CONF_DIR/$CONTROLS_CONF";
@@ -215,9 +215,9 @@ our @EXPORT_OK = qw(
     $WWW_DIR
     $WWW_BIN_DIR
 
-    $ONE_WIRE_HEATING_DAEMON_CONF
-    $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
-    $ONE_WIRE_HEATING_DAEMON_CONF_RELOAD_SECS
+    $HEATING_DAEMON_CONF
+    $HEATING_DAEMON_CONF_FULLPATH
+    $HEATING_DAEMON_CONF_RELOAD_SECS
 
     $CONTROLS_CONF
     $CONTROLS_CONF_FULLPATH
@@ -240,7 +240,7 @@ our @EXPORT_OK = qw(
     $ONE_WIRED_SENDER_SCRIPT
     $ONE_WIRE_DAEMON_PORT
 
-    $ONE_WIRE_HEATING_DAEMON
+    $HEATING_DAEMON
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT
 
     $BOILER_DAEMON_SCRIPT

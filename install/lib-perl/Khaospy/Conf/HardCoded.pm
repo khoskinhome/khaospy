@@ -16,7 +16,7 @@ use Khaospy::Constants qw(
 
     $CONF_DIR
 
-    $ONE_WIRE_HEATING_DAEMON_CONF
+    $HEATING_DAEMON_CONF
     $CONTROLS_CONF
     $BOILERS_CONF
     $GLOBAL_CONF
@@ -24,7 +24,7 @@ use Khaospy::Constants qw(
 
     $ONE_WIRED_SENDER_SCRIPT
     $ONE_WIRED_RECEIVER_SCRIPT
-    $ONE_WIRE_HEATING_DAEMON
+    $HEATING_DAEMON
     $BOILER_DAEMON_SCRIPT
     $PI_CONTROLLER_DAEMON_SCRIPT
     $COMMAND_QUEUE_DAEMON_SCRIPT
@@ -46,7 +46,7 @@ our @EXPORT_OK = qw(
 
 my $live_confs = {
 
-    $ONE_WIRE_HEATING_DAEMON_CONF
+    $HEATING_DAEMON_CONF
         => live_heating_thermometer_config(),
     $CONTROLS_CONF
         => live_controls_conf(),
@@ -60,7 +60,7 @@ my $live_confs = {
 };
 
 my $test_confs = {
-    $ONE_WIRE_HEATING_DAEMON_CONF
+    $HEATING_DAEMON_CONF
         => test_heating_thermometer_config(),
     $CONTROLS_CONF
         => test_controls_conf(),
@@ -809,7 +809,7 @@ sub live_pi_host_conf {
                 { script  =>$ONE_WIRED_SENDER_SCRIPT,
                   options => { '--stdout_freq' => '890' },
                 },
-                { script  => $ONE_WIRE_HEATING_DAEMON, options => { }, },
+                { script  => $HEATING_DAEMON, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT, options => { }, },
 #                {
 #                    script  => "$BOILER_DAEMON_SCRIPT",

@@ -11,7 +11,7 @@ use lib "$FindBin::Bin/../lib-perl";
 
 use Khaospy::Utils qw/slurp/;
 use Khaospy::Constants qw(
-    $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH
+    $HEATING_DAEMON_CONF_FULLPATH
     $RRD_DIR
     $RRD_IMAGE_DIR
 );
@@ -19,7 +19,7 @@ use Khaospy::Constants qw(
 my $json = JSON->new->allow_nonref;
 
 my $thermometer_conf = $json->decode(
-    slurp ( $ONE_WIRE_HEATING_DAEMON_CONF_FULLPATH )
+    slurp ( $HEATING_DAEMON_CONF_FULLPATH )
 );
 
 my $COLOURS = [
