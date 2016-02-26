@@ -15,7 +15,7 @@ use Khaospy::Constants qw(
     STATUS
 );
 
-use Khaospy::OperateControls qw/signal_control/;
+use Khaospy::QueueCommand qw/ queue_command /;
 
 my $json = JSON->new->allow_nonref;
 
@@ -42,7 +42,7 @@ if ( ! $control_name || ! $action ) {
 $action = lc $action;
 
 my $return;
-eval { $return = signal_control( $control_name, $action ) };
+eval { $return = queue_command( $control_name, $action ) };
 
 if ( $@ ) {
     print "FAILED to operate control '$control_name' with '$action'. DIED with return = $return ; $@\n";

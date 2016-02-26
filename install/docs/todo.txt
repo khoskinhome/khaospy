@@ -1,6 +1,12 @@
 High Prio
 ---------
 
+rename QueueCommands to QueueCommand.pm
+    rename its only sub to queue_command()
+
+
+
+
 control_type in the zmq message. maybe.
 
 ./bin dir and a ./daemons dir. split up what's in bin-dir
@@ -9,7 +15,7 @@ make sure logs go to usb stick on the pis.
 
 daemon locking . only one command-queue, pi-controls, other-controls per host.
 
-need to timeout the REQ of putting a command on the queue in OperateControl.pm
+need to timeout the REQ of putting a command on the queue in QueueCommand.pm
 
 Other-Controls-Daemon ( initially for OrviboS20s )
 

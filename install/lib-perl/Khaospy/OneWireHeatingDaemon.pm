@@ -30,8 +30,8 @@ use Khaospy::Constants qw(
     $ONE_WIRE_DAEMON_PORT
 );
 
-use Khaospy::OperateControls qw(
-    signal_control
+use Khaospy::QueueCommand qw(
+    queue_command
 );
 
 use Khaospy::Conf qw(
@@ -184,7 +184,7 @@ sub anyevent_io {
             my ( $action ) = @_;
             my $retval;
             print timestamp."Send command to '$control_name' '$action' \n";
-            eval { $retval = signal_control($control_name, $action); };
+            eval { $retval = queue_command($control_name, $action); };
             if ( $@ ) {
                 print "$@\n";
                 return

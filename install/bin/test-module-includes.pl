@@ -15,7 +15,7 @@ use Khaospy::Conf::PiHosts;
 use Khaospy::Exception;
 
 use Khaospy::Constants;
-use Khaospy::OperateControls;
+use Khaospy::QueueCommand;
 
 use Khaospy::BoilerDaemon;
 use Khaospy::BoilerMessage;

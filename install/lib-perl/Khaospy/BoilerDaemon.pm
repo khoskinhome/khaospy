@@ -20,7 +20,7 @@ use Khaospy::Constants qw(
     $KHAOSPY_BOILERS_CONF_FULLPATH
 );
 
-use Khaospy::OperateControls qw( signal_control );
+use Khaospy::QueueCommand qw( queue_command );
 
 use Khaospy::Conf qw( get_boiler_conf );
 use Khaospy::Conf::PiHosts qw(
@@ -284,7 +284,7 @@ sub _sig_a_control {
     my ( $control, $action, $update_scalar_ref ) = @_;
 
     my $ret;
-    eval { $ret = signal_control( $control, $action ); };
+    eval { $ret = queue_command( $control, $action ); };
 
     if ( $@ ) {
         print timestamp."Error signalling control '$control' with '$action'. $@\n";
