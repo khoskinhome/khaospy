@@ -1,4 +1,4 @@
-package Khaospy::PiControllerQueueDaemon;
+package Khaospy::CommandQueueDaemon;
 use strict;
 use warnings;
 
@@ -6,7 +6,7 @@ use warnings;
 # http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
 # http://funcptr.net/2012/09/10/zeromq---edge-triggered-notification/
 
-=pod PiControllerQueueDaemon
+=pod CommandQueueDaemon
 
 Receive's messages from Khaospy::QueueCommand for Pi-run-controls
 
@@ -52,7 +52,7 @@ use Khaospy::Constants qw(
     $PI_CONTROLLER_QUEUE_DAEMON
     $PI_CONTROLLER_QUEUE_DAEMON_TIMER
 
-    $PI_CONTROL_SEND_PORT
+    $QUEUE_COMMAND_PORT
     $PI_CONTROLLER_DAEMON_SEND_PORT
     $PI_CONTROLLER_QUEUE_DAEMON_SEND_PORT
     $KHAOSPY_PI_CONTROLLER_DAEMON_SCRIPT
@@ -82,14 +82,14 @@ use Khaospy::Log qw(
     kloginfo klogfatal klogdebug
 );
 
-our @EXPORT_OK = qw( run_controller_queue_daemon );
+our @EXPORT_OK = qw( run_command_queue_daemon );
 
 my $msg_queue = {};
 my $zmq_publisher;
 
 our $VERBOSE;
 
-sub run_controller_queue_daemon {
+sub run_command_queue_daemon {
     my ( $opts ) = @_;
     $opts = {} if ! $opts;
     $VERBOSE = $opts->{verbose} || false;
@@ -108,7 +108,7 @@ sub run_controller_queue_daemon {
     push @w, zmq_anyevent({
         zmq_type          => ZMQ_REP,
         host              => $LOCALHOST,
-        port              => $PI_CONTROL_SEND_PORT,
+        port              => $QUEUE_COMMAND_PORT,
         msg_handler       => \&queue_message,
         klog              => true,
     });

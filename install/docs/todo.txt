@@ -1,13 +1,21 @@
 High Prio
 ---------
 
-rename QueueCommands to QueueCommand.pm
-    rename its only sub to queue_command()
+CommandQueueDaemon
+
+
+    rename CommandQueueDaemon.pm to CommandQueueDaemon.pm
+
+
+    get the QueueCommand.pm to 
+        subscribe to 
+
+zmq-PUBlish ( not REQuest ) to port
 
 
 
 
-control_type in the zmq message. maybe.
+
 
 ./bin dir and a ./daemons dir. split up what's in bin-dir
 
@@ -26,6 +34,8 @@ Other-Controls-Daemon ( initially for OrviboS20s )
 
 Pi-Control-Daemon
     use the ControlDispatch.pm. tricky.
+    if the gpio or i2c commands fail during initialisation the daemon should die. The ports will not be in the correct state.
+
 
 
 The messages to support new fields
@@ -41,11 +51,6 @@ The messages to support new fields
     The manual_auto_timeout could be deprecated if the rules-D can be made aware of the action_by information.
 
     ( action_by_user to indicate user-name. do we need this ? )
-
-
-CommandQueueDaemon
-    get it to subscribe to as many Pi-Controls-D or Other-Controls-D as there are.
-    There needs to be at least 1 subscription. But that is all.
 
 
 
@@ -131,7 +136,7 @@ write the :
 
 Conf::PiHosts.
 
-    Go over the PiControllerDaemon and PiControllerQueueDaemon and tidy up. proper exception handling. Try::Tiny. and raise proper exeptions. not dies. give them a name.
+    Go over the PiControllerDaemon and CommandQueueDaemon and tidy up. proper exception handling. Try::Tiny. and raise proper exeptions. not dies. give them a name.
 
 Starting writing the PiMCP23017 module . need this  for th alarm switch panel.  with tests. lots of work. ( finish of the PiGPIO first, some of the logic could be shared. )
 

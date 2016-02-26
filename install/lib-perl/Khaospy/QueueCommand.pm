@@ -25,7 +25,7 @@ use Khaospy::Constants qw(
     ON OFF STATUS
     $KHAOSPY_CONTROLS_CONF_FULLPATH
 
-    $PI_CONTROL_SEND_PORT
+    $QUEUE_COMMAND_PORT
 
     $ZMQ_REQUEST_TIMEOUT
 );
@@ -55,7 +55,7 @@ our @EXPORT_OK = qw(
 
 my $zmq_context   = $ZMQ_CONTEXT;
 my $zmq_req_sock = zmq_socket($zmq_context,ZMQ_REQ);
-my $req_to_port = "tcp://*:$PI_CONTROL_SEND_PORT";
+my $req_to_port = "tcp://*:$QUEUE_COMMAND_PORT";
 zmq_bind( $zmq_req_sock, $req_to_port );
 
 sub queue_command {

@@ -7,8 +7,8 @@ FindBin::again();
 
 use lib "$FindBin::Bin/../lib-perl";
 
-use Khaospy::PiControllerQueueDaemon qw(
-    run_controller_queue_daemon
+use Khaospy::CommandQueueDaemon qw(
+    run_command_queue_daemon
 );
 
 use Khaospy::Constants qw(
@@ -21,6 +21,6 @@ my $VERBOSE = false;
 
 GetOptions ( "verbose" => \$VERBOSE );
 
-run_controller_queue_daemon( { verbose => $VERBOSE } );
+run_command_queue_daemon( { verbose => $VERBOSE } );
 
 exit 0;
