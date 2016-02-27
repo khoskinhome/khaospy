@@ -37,6 +37,8 @@ our @EXPORT_OK = qw( zmq_anyevent );
 
         subscribe => 'channel'. defaults to ''
 
+        bind => true/false. OPTIONAL. defaults to false if not supplied.
+
         msg_handler => \&sub_name or code-ref. COMPULSORY.
         msg_handler_param => scalar. Gets passed to msg_handler subroutine. OPTIONAL.
 
@@ -45,7 +47,7 @@ our @EXPORT_OK = qw( zmq_anyevent );
 
     creates a zmq_socket of specified type.
 
-    connects to zmq_socket.
+    connects ( or binds ) to zmq_socket.
 
     returns the AnyEvent->io() that needs to be held in a @worker / $worker variable.
 
@@ -75,7 +77,7 @@ sub zmq_anyevent{
         = $p->{port}
             or klogfatal "Need to supply a 'port'";
 
-    # do i need to have tcp protocol parameterised ?
+    # Do i need to have (tcp) protocol parameterised ?
     my $connect_str = "tcp://$host:$port";
 
     my $msg_handler = $p->{msg_handler};
@@ -88,9 +90,17 @@ sub zmq_anyevent{
 
     my $zmq_sock = zmq_socket($ZMQ_CONTEXT, $zmq_type);
 
-    if ( my $zmq_state = zmq_connect($zmq_sock, $connect_str )){
-        klogfatal "zmq can't connect to $connect_str. status = $zmq_state . $!\n";
-    };
+    if ( exists $p->{bind} && $p->{bind} ){ # defaults to zmq_connect.
+        if ( my $zmq_state = zmq_bind($zmq_sock, $connect_str )){
+            # zmq_connect returns zero on success.
+            klogfatal "zmq can't bind to $connect_str. status = $zmq_state . $!\n";
+        };
+    } else {
+        if ( my $zmq_state = zmq_connect($zmq_sock, $connect_str )){
+            # zmq_connect returns zero on success.
+            klogfatal "zmq can't connect to $connect_str. status = $zmq_state . $!\n";
+        };
+    }
 
     kloginfo "Listening to $connect_str";
 

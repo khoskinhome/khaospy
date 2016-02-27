@@ -59,6 +59,8 @@ use Khaospy::Constants qw(
     $LOCALHOST
     $MESSAGE_TIMEOUT
 
+    MYTPE_COMMAND_QUEUE_BROADCAST
+
     $OTHER_CONTROLS_DAEMON
     $OTHER_CONTROLS_DAEMON_SCRIPT
     $OTHER_CONTROLS_DAEMON_SEND_PORT
@@ -78,8 +80,8 @@ use Khaospy::ZMQAnyEvent qw(
 );
 
 use Khaospy::Log qw(
-    klog START FATAL ERROR WARN INFO DEBUG
-    klogstart kloginfo klogfatal klogdebug
+    klog ERROR WARN INFO DEBUG
+    klogerror klogstart kloginfo klogfatal klogdebug
 );
 
 our @EXPORT_OK = qw( run_command_queue_daemon );
@@ -106,6 +108,7 @@ sub run_command_queue_daemon {
     # Listen for messages to go onto the queue.
     push @w, zmq_anyevent({
         zmq_type          => ZMQ_REP,
+        bind              => true,
         host              => $LOCALHOST,
         port              => $QUEUE_COMMAND_PORT,
         msg_handler       => \&queue_message,
@@ -116,7 +119,7 @@ sub run_command_queue_daemon {
     $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
     my $pub_to_port = "tcp://*:$COMMAND_QUEUE_DAEMON_SEND_PORT";
     zmq_bind( $zmq_publisher, $pub_to_port );
-    klog(INFO, "Publishing to $pub_to_port");
+    kloginfo "Publishing to $pub_to_port";
 
 
     my $count_zmq_subs = 0;
@@ -168,18 +171,18 @@ sub run_command_queue_daemon {
 }
 
 sub timer_cb {
-    klog(DEBUG,"in timer");
+    klogdebug "in timer";
 
     # iterate over queued messages , and publish them
     # for control-daemons to pick up. hopefully.
     for my $mkey ( keys %$msg_queue ){
         my $msg_rh = $msg_queue->{$mkey}{hashref};
 
-        klog(INFO, "Publish message $msg_queue->{$mkey}{json_from}");
+        kloginfo "Publish message $msg_queue->{$mkey}{json_from}";
         zmq_sendmsg( $zmq_publisher, $msg_queue->{$mkey}{json_from} );
 
         if ( $msg_rh->{request_epoch_time} < time - $MESSAGE_TIMEOUT ){
-            klog(ERROR, "Msg timed out. $mkey");
+            klogerror "Msg timed out. $mkey";
             delete $msg_queue->{$mkey};
         }
     }
@@ -203,13 +206,13 @@ sub message_from_controller {
 sub queue_message {
     my ($zmq_sock, $msg, $param ) = @_;
 
-    klog(INFO, "Queuing message $msg");
+    kloginfo "Queuing message $msg";
     #my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
 
     my $msg_p;
     eval{$msg_p = validate_control_msg_json($msg)};
     if ($@){
-        klog(ERROR,"Problem with message format. $@");
+        klogerror "Problem with message format. $@";
         zmq_sendmsg( $zmq_sock, "ERROR. Not queued" );
         return;
     }
@@ -218,16 +221,17 @@ sub queue_message {
 
     my $new_msg = clone($msg_p->{hashref});
     $new_msg->{message_from} = $COMMAND_QUEUE_DAEMON;
+    $new_msg->{message_type} = MYTPE_COMMAND_QUEUE_BROADCAST;
     $msg_p->{json_from} = $JSON->encode($new_msg);
 
     $msg_queue->{$mkey} = $msg_p;
 
     # have to reply to the requestor :
-    klog(DEBUG, "Reply to requestor $msg");
+    klogdebug "Reply to requestor $msg";
     zmq_sendmsg( $zmq_sock, "queued $msg_p->{mkey}" );
 
     # publish this message for control-daemons to grab :
-    klog(DEBUG, "Publish (first) message $msg");
+    klogdebug "Publish (first) message $msg";
     zmq_sendmsg( $zmq_publisher, $msg_queue->{$mkey}{json_from} );
 
 }

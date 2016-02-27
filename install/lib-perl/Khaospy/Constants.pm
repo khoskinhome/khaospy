@@ -37,8 +37,10 @@ sub MANUAL {"manual"};
 
 our $CODE_VERSION="0.01.001";
 
-
-
+sub MTYPE_QUEUE_COMMAND           {"queue-command"};
+sub MTYPE_POLL_UPDATE             {"poll-update"};
+sub MYTPE_COMMAND_QUEUE_BROADCAST {"command-queue-broadcast"};
+sub MTYPE_OPERATION_STATUS        {"operation-status"};
 #######
 # dirs
 
@@ -162,6 +164,7 @@ our $PI_HOSTS_CONF_FULLPATH
     = "$CONF_DIR/$PI_HOSTS_CONF";
 
 #############
+# TODO . almost certainly don't need this , post the boiler daemon rewrite.
 our $HEATING_CONTROL_DAEMON_PUBLISH_PORT  = 5021;
 
 our $ONE_WIRE_DAEMON_PORT                 = 5001;
@@ -283,6 +286,10 @@ our @EXPORT_OK = qw(
 
     $QUEUE_COMMAND_PORT
 
+    MTYPE_QUEUE_COMMAND
+    MTYPE_POLL_UPDATE
+    MYTPE_COMMAND_QUEUE_BROADCAST
+    MTYPE_OPERATION_STATUS
 
     $MESSAGES_OVER_SECS_INVALID
     $MESSAGE_TIMEOUT

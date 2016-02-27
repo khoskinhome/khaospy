@@ -40,6 +40,44 @@ our $BOILER_STATUS_REFRESH_EVERY_SECS = 60;
 
 #######
 # subs
+=pod
+
+plan
+
+
+Needs to subscribe to all pi-controllers and other-controllers, like the CommandQueueDaemon does.
+
+DO THIS LATER : Well in fact it only needs to subscribe to those that are running the controls its interested in .
+    "get_control_daemon_hosts_for_controls( [ array-of-control-names ] )
+    This would be the name of the host
+
+
+The pi-and-other-controllers will send out the status of a control.
+
+if that is one of the boiler daemon's controls then it will keep its state.
+
+When all of the boiler-dameon's controls are off a signal will be sent to the boiler to turn off.
+
+When ANY of the boiler-d's controls are on a signal will be sent to the boiler to turn on.
+
+
+
+What if the boiler or any of the rad controls are manually operated ?
+
+This can rely on the manual_auto_timeout that the control-daemons already have.
+
+The boiler-daemon just listens to the controls its interested in and switches on or off the boiler ( or boilers ) accordingly.
+
+
+The boiler daemon has a setting on_delay_secs that will pause the sending of the command to the boiler control for this amount of seconds, when going from the "off" to the "on" state.
+
+1) get the boiler config .
+1) subscribe to all  pi-controllers and other-controllers, like the CommandQueueDaemon does.
+
+
+Need to fix the QueueCommand to zmq-pub first of all , otherwise I will not be able to have to processes pushing to one CommandQueue on a single-pi.
+
+=cut
 
 sub run_boiler_daemon {
 

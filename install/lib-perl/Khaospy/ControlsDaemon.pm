@@ -43,6 +43,9 @@ use Khaospy::Constants qw(
     $COMMAND_QUEUE_DAEMON_SCRIPT
     $COMMAND_QUEUE_DAEMON_SEND_PORT
 
+    MTYPE_POLL_UPDATE
+    MTYPE_OPERATION_STATUS
+
     $MESSAGE_TIMEOUT
 );
 
@@ -137,6 +140,9 @@ sub timer_cb {
 sub poll_callback {
     my ( $poll_state ) = @_;
 
+
+    $poll_state->{message_type} =
+        MTYPE_POLL_UPDATE;
     $poll_state->{request_epoch_time} = time;
     $poll_state->{action}             = STATUS;
     $poll_state->{poll_epoch_time}    = time;
@@ -191,6 +197,7 @@ sub controller_message {
           %$msg_rh, %$status,
           action_epoch_time  => time,
           message_from       => $DAEMON_NAME,
+          message_type       => MTYPE_OPERATION_STATUS,
         };
 
         my $json_msg = $JSON->encode($return_msg);

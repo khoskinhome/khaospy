@@ -21,7 +21,7 @@ chdir ($LIB_PERL_T) or die "Can't cd to $LIB_PERL_T";
 for my $t_file (<*.t>){
     next if $t_file eq $alltests_filename;
 
-    say;
+    say '';
     say $t_file;
 
     my $result ;

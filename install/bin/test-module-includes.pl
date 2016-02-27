@@ -46,7 +46,7 @@ use Khaospy::ZMQAnyEvent;
 
 use zhelpers;
 
-say ;
+say '';
 say "$0 all modules got used okay";
 
 #./install/lib-perl/t/KhaospyTest/PiGPIO.pm

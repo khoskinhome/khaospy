@@ -1,21 +1,42 @@
 High Prio
 ---------
 
-CommandQueueDaemon
+get BoilerDaemon.pm able to use the QueueCommand.pm.
+    BoilerDaemon needs to listen to the outputs of :
+        PiControlD
+        OtherControlD
+    for the state of controls.
+    HeatingD doesn't need to tell the boiler ( like it did )
 
-    get the QueueCommand.pm to  publish to $QUEUE_COMMAND_PORT
-    get the CommandQueueDaemon to subscribe to $QUEUE_COMMAND_PORT
+    The refresh status can be dropped.
+        ( once I've got other Controls polling )
 
 
+QueueCommand.pm
+    time out on the zmq-REQ, raise exception.
 
-fix the KhaospyControlPiMCP23017.t tests.
+
+CommandQueueDaemon.pm :
 
 
-./bin dir and a ./daemons dir. split up what's in bin-dir
+General :
 
-make sure logs go to usb stick on the pis.
+    a quick CH Webpage, logins ( httpauth )
+        ali, able to control her room.
+        amelia able to control her room.
+        melissa able to control the front-room.
 
-daemon locking . only one command-queue, pi-controls, other-controls per host.
+    make the install script clean up the lib-dirs before scp .
+    get to the bottom of if I really want to use the zhelpers subs like zhelpers::s_send.
+
+    daemon locking . only one command-queue, pi-controls, other-controls per host.
+
+    raise proper named exceptions and don't just die.
+
+    make sure logs go to usb stick on the pis.
+
+    ./bin dir and a ./daemons dir. split up what's in bin-dir
+    fix the KhaospyControlPiMCP23017.t tests.
 
 
 Other-Controls-Daemon ( initially for OrviboS20s )
@@ -48,21 +69,16 @@ The messages to support new fields
 a way of distributing the confs to all hosts.
     scp / tar . whatever. something quick and easy.
 
+Logging option. Be able to expand , and sort ( like the khaospy-zmq-subscribe.pl ) received JSON messages.
+    pi-host level option
+    daemon-script level option.
+
 
 pi-hosts. config checking. make sure there is only :
-    one heating-control-daemon
+    one heating-daemon
     one boiler-daemon
     one rules-daemon
 
-get BoilerDaemon.pm able to use the QueueCommand.pm.
-    BoilerDaemon needs to listen to the outputs of :
-        PiControlD
-        OtherControlD
-    for the state of controls.
-    HeatingD doesn't need to tell the boiler ( like it did )
-
-    The refresh status can be dropped.
-        ( once I've got other Controls polling )
 
 make a lead to run thermometers and both i2cs for piserver.
 
@@ -73,14 +89,14 @@ write a cli tool that will summarise the confs nicely .
     boiler
 
 get HeatingDaemon
-    able to use the ControlPi stuff..
+    able to use the ControlPi ControlOther stuff..
     make the pi-hosts config die if there is more than one-heating-control-daemon configured.
+    although the heating-daemon is now so simple, it will be replaced by the rules-d
 
 status-d
     listens to all things.
     has http rest api
     use AnyEvent.
-
 
 get piboiler able to run the PC-queue-d.
     try reinstall of dependencies.
@@ -91,18 +107,10 @@ In my loft.
 
     get the outside thermometer working properly.
 
-    maybe get ali's window switch wired in to alarm board.
 
-
-
-
-jumper pins from PHouse. leave some in the alarm-panel.
 
 write more tests for the the code in Khaospy::PiControlMCP23017
 
-raise proper named exceptions and don't just die.
-
-Test that PiControllerDaemon.pm subscribes to the correct hosts.
 
 Test that the following stuff works
     pi-gpio-relay
@@ -112,14 +120,6 @@ Test that the following stuff works
 Get the electronic/physical PiMCP23017 interface working
 
 
-run it on PiServer for the Alarm Interface board.
-
-wire up some alarm-sensors.
-
-write the :
-    stuff to get boiler control actaully running on a pi-gpio-relay-manual.
-
-    a quick CH Webpage.
 
 
 Conf::PiHosts.

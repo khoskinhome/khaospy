@@ -7,6 +7,7 @@ use warnings;
 use Sys::Hostname;
 use Exporter qw/import/;
 use Data::Dumper;
+use Carp qw(croak confess);
 
 use Time::HiRes qw/usleep time/;
 
@@ -22,8 +23,10 @@ use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     true false
     ON OFF STATUS
-
+    $LOCALHOST
     $QUEUE_COMMAND_PORT
+
+    MTYPE_QUEUE_COMMAND
 
     $ZMQ_REQUEST_TIMEOUT
 );
@@ -38,7 +41,7 @@ use Khaospy::Message qw(
 );
 
 use Khaospy::Log qw(
-    kloginfo
+    klogdebug
 );
 
 use Khaospy::Utils qw(
@@ -53,8 +56,12 @@ our @EXPORT_OK = qw(
 
 my $zmq_context   = $ZMQ_CONTEXT;
 my $zmq_req_sock = zmq_socket($zmq_context,ZMQ_REQ);
-my $req_to_port = "tcp://*:$QUEUE_COMMAND_PORT";
-zmq_bind( $zmq_req_sock, $req_to_port );
+my $connect_str = "tcp://$LOCALHOST:$QUEUE_COMMAND_PORT";
+
+if ( my $zmq_state = zmq_connect($zmq_req_sock, $connect_str )){
+    # zmq_connect returns zero on success.
+    confess "zmq can't connect to $connect_str. status = $zmq_state . $!\n";
+};
 
 sub queue_command {
     my ( $control_name, $action ) = @_;
@@ -66,6 +73,7 @@ sub queue_command {
         control_name        => $control_name,
         control_host        => $control->{host},
         action              => $action,
+        message_type        => MTYPE_QUEUE_COMMAND,
         request_host        => hostname,
         control_type        => get_hashval($control, "type"),
     };
@@ -77,7 +85,7 @@ sub queue_command {
     # TODO a $ZMQ_REQUEST_TIMEOUT on the following
     # and if it times out then log an error message.
 
-    print "sending to $req_to_port \n";
+    klogdebug "sending to $connect_str \n";
     zhelpers::s_send( $zmq_req_sock, "$json_msg" );
     return zhelpers::s_recv($zmq_req_sock);
 }
