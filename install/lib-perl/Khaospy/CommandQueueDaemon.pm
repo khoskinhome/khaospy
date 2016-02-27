@@ -79,7 +79,7 @@ use Khaospy::ZMQAnyEvent qw(
 
 use Khaospy::Log qw(
     klog START FATAL ERROR WARN INFO DEBUG
-    kloginfo klogfatal klogdebug
+    klogstart kloginfo klogfatal klogdebug
 );
 
 our @EXPORT_OK = qw( run_command_queue_daemon );
@@ -94,11 +94,10 @@ sub run_command_queue_daemon {
     $opts = {} if ! $opts;
     $VERBOSE = $opts->{verbose} || false;
 
-    klog(START,"Controller Queue Daemon START");
-    klog(START,"VERBOSE = ".( $VERBOSE ? "TRUE" : "FALSE" ));
+    klogstart "Controller Queue Daemon START";
+    klogstart "VERBOSE = ".( $VERBOSE ? "TRUE" : "FALSE" );
 
-    # TODO only running these to validate the confs.
-    # could possibly do with a "validate_all_confs" or sumin' like that.
+    # running these to validate the confs :
     get_controls_conf();
     get_pi_hosts_conf();
 

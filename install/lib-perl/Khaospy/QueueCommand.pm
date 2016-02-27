@@ -4,7 +4,6 @@ use warnings;
 
 # Used for sending a messages for a control to the CommandQueueDaemon.
 
-
 use Sys::Hostname;
 use Exporter qw/import/;
 use Data::Dumper;
@@ -59,8 +58,6 @@ zmq_bind( $zmq_req_sock, $req_to_port );
 
 sub queue_command {
     my ( $control_name, $action ) = @_;
-
-    print "Khaospy::QueueCommand Run PiController COMMAND '$control_name $action'\n";
 
     my $control = get_control_config($control_name);
 

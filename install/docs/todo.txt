@@ -3,10 +3,8 @@ High Prio
 
 CommandQueueDaemon
 
-    get the QueueCommand.pm to 
-        subscribe to 
-
-zmq-PUBlish ( not REQuest ) to port
+    get the QueueCommand.pm to  publish to $QUEUE_COMMAND_PORT
+    get the CommandQueueDaemon to subscribe to $QUEUE_COMMAND_PORT
 
 
 
@@ -32,7 +30,6 @@ Pi-Control-Daemon
     if the gpio or i2c commands fail during initialisation the daemon should die. The ports will not be in the correct state.
 
 
-
 The messages to support new fields
     "action_by"  This will currently be :
         Manual ( a plain old wall switch operated it. or something outside khaospy)
@@ -48,7 +45,6 @@ The messages to support new fields
     ( action_by_user to indicate user-name. do we need this ? )
 
 
-
 a way of distributing the confs to all hosts.
     scp / tar . whatever. something quick and easy.
 
@@ -58,20 +54,17 @@ pi-hosts. config checking. make sure there is only :
     one boiler-daemon
     one rules-daemon
 
-
-get BoilerDaemon.pm able to use the ControlPi stuff.
+get BoilerDaemon.pm able to use the QueueCommand.pm.
     BoilerDaemon needs to listen to the outputs of :
         PiControlD
         OtherControlD
     for the state of controls.
+    HeatingD doesn't need to tell the boiler ( like it did )
 
     The refresh status can be dropped.
         ( once I've got other Controls polling )
 
-
-
 make a lead to run thermometers and both i2cs for piserver.
-
 
 write a cli tool that will summarise the confs nicely .
     pi-hosts
