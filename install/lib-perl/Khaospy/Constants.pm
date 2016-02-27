@@ -46,6 +46,8 @@ our $ALL_DIRS = [
     our $ROOT_DIR      = "/opt/khaospy",
     our $BIN_DIR       = "$ROOT_DIR/bin",
     our $CONF_DIR      = "$ROOT_DIR/conf",
+    our $LIB_PERL      = "$ROOT_DIR/lib-perl",
+    our $LIB_PERL_T    = "$ROOT_DIR/lib-perl-t",
     our $LOG_DIR       = "$ROOT_DIR/log",
     our $PID_DIR       = "$ROOT_DIR/pid",
     our $RRD_DIR       = "$ROOT_DIR/rrd",
@@ -208,12 +210,15 @@ our @EXPORT_OK = qw(
     $ROOT_DIR
     $BIN_DIR
     $CONF_DIR
+    $LIB_PERL
+    $LIB_PERL_T
     $LOG_DIR
     $PID_DIR
     $RRD_DIR
     $RRD_IMAGE_DIR
     $WWW_DIR
     $WWW_BIN_DIR
+
 
     $HEATING_DAEMON_CONF
     $HEATING_DAEMON_CONF_FULLPATH

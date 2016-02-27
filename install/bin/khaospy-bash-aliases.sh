@@ -25,6 +25,7 @@ alias cdkhaospywww='cd /opt/khaospy/www/'
 alias cdkhaospywwwbin='cd /opt/khaospy/www-bin/'
 alias cdkhaospypid='cd /opt/khaospy/pid/'
 alias cdkhaospylog='cd /opt/khaospy/log/'
+alias cdkhaospylibperlt='cd /opt/khaospy/lib-perl-t/'
 
 alias bashrc='. ~/.bashrc'
 alias r='reset;unalias -a;. ~/.bashrc'
@@ -35,10 +36,15 @@ alias l1='ls --color=auto -1'
 
 alias s.reboot='sudo reboot'
 alias s.shutdown='sudo shutdown'
-alias s.zmq_subscribe='sudo /opt/khaospy/bin/khaospy-zmq-subscribe.pl'
-alias s.d_pi_controls_d='sudo /opt/khaospy/bin/khaospy-pi-controls-d.pl'
-alias s.d_other_controls='sudo /opt/khaospy/bin/khaospy-other-controls-d.pl'
-alias s.d_command_queue='sudo /opt/khaospy/bin/khaospy-command-queue-d.pl'
-alias s.operate_control='sudo /opt/khaospy/bin/khaospy-operate-control.pl'
+alias kzmq_subscribe='sudo /opt/khaospy/bin/khaospy-zmq-subscribe.pl'
+alias kdpi_controls_d='sudo /opt/khaospy/bin/khaospy-pi-controls-d.pl'
+alias kdother_controls='sudo /opt/khaospy/bin/khaospy-other-controls-d.pl'
+alias kdcommand_queue='sudo /opt/khaospy/bin/khaospy-command-queue-d.pl'
+alias koperate_control='sudo /opt/khaospy/bin/khaospy-operate-control.pl'
+alias kclive_conf_generate='sudo /opt/khaospy/bin/khaospy-live-conf-generate.pl'
+alias kctest_conf_generate='sudo /opt/khaospy/bin/khaospy-test-conf-generate.pl'
+
+alias ktests='/opt/khaospy/lib-perl-t/alltests.t; /opt/khaospy/bin/test-module-includes.pl'
+
 
 cd /opt/khaospy/bin
