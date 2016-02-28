@@ -36,15 +36,20 @@ alias l1='ls --color=auto -1'
 
 alias s.reboot='sudo reboot'
 alias s.shutdown='sudo shutdown'
+alias s.crontab='sudo crontab'
 alias kzmq_subscribe='sudo /opt/khaospy/bin/khaospy-zmq-subscribe.pl'
+
+alias kdboiler_d='sudo /opt/khaospy/bin/khaospy-boiler-daemon.pl'
 alias kdpi_controls_d='sudo /opt/khaospy/bin/khaospy-pi-controls-d.pl'
-alias kdother_controls='sudo /opt/khaospy/bin/khaospy-other-controls-d.pl'
-alias kdcommand_queue='sudo /opt/khaospy/bin/khaospy-command-queue-d.pl'
+alias kdother_controls_d='sudo /opt/khaospy/bin/khaospy-other-controls-d.pl'
+alias kdcommand_queue_d='sudo /opt/khaospy/bin/khaospy-command-queue-d.pl'
+alias kdone_wired_sender_d='sudo /opt/khaospy/bin/khaospy-one-wired-sender.py'
+alias kdheating_d='sudo /opt/khaospy/bin/khaospy-heating-daemon.pl'
+
 alias koperate_control='sudo /opt/khaospy/bin/khaospy-operate-control.pl'
 alias kclive_conf_generate='sudo /opt/khaospy/bin/khaospy-live-conf-generate.pl'
 alias kctest_conf_generate='sudo /opt/khaospy/bin/khaospy-test-conf-generate.pl'
 
 alias ktests='/opt/khaospy/lib-perl-t/alltests.t; /opt/khaospy/bin/test-module-includes.pl'
-
 
 cd /opt/khaospy/bin

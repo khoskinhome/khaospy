@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
-use Time::HiRes qw/usleep gettimeofday/;
+use Time::HiRes qw/usleep gettimeofday time/;
 
 
 use Test::More;

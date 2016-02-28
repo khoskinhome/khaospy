@@ -311,7 +311,7 @@ sub live_controls_conf {
             type  => "orviboS20",
             host  => 'karlrad',
             poll_timeout => 5,
-            poll_host => 'pitest',
+            poll_host => 'piboiler',
             mac   => 'AC-CF-23-8D-7E-D2',
         },
         dinningroomrad  => {
@@ -702,13 +702,14 @@ sub test_controls_conf {
 sub live_boilers_conf {
     return {
         # frontroomrad is being using as the boiler control. This needs fixing.
-        karlrad => {
+        boiler => {
             on_delay_secs => 120,
             controls => [qw/
                 alisonrad
                 frontroomrad
                 ameliarad
                 dinningroomrad
+                karlrad
             /],
 
         },
@@ -716,17 +717,18 @@ sub live_boilers_conf {
 }
 
 sub test_boilers_conf {
-    return {
-        # frontroomrad is being using as the boiler control. This needs fixing.
-        karlrad => {
-            on_delay_secs => 120, # TODO this should really be 120
-            controls => [qw/
-                mcp_relay_man
-                mcp_relay
-            /],
-
-        },
-    };
+    return live_boilers_conf();
+#    return {
+#        # frontroomrad is being using as the boiler control. This needs fixing.
+#        karlrad => {
+#            on_delay_secs => 120, # TODO this should really be 120
+#            controls => [qw/
+#                mcp_relay_man
+#                mcp_relay
+#            /],
+#
+#        },
+#    };
 }
 
 # TODO to be deprecated.
@@ -809,13 +811,10 @@ sub live_pi_host_conf {
                 { script  =>$ONE_WIRED_SENDER_SCRIPT,
                   options => { '--stdout_freq' => '890' },
                 },
-                { script  => $HEATING_DAEMON, options => { }, },
-                { script  => $PI_CONTROLLER_DAEMON_SCRIPT, options => { }, },
-#                {
-#                    script  => "$BOILER_DAEMON_SCRIPT",
-#                    options => { },
-#                },
-                { script  => $COMMAND_QUEUE_DAEMON_SCRIPT, options => { }, },
+                { script  => $HEATING_DAEMON,               options => { }, },
+                { script  => $BOILER_DAEMON_SCRIPT,         options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT,  options => { }, },
+                { script  => $COMMAND_QUEUE_DAEMON_SCRIPT,  options => { }, },
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
             ],
         },

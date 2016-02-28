@@ -11,16 +11,6 @@ use Khaospy::BoilerDaemon qw(
     run_boiler_daemon
 );
 
-use Khaospy::Constants qw(
-    true false
-);
-
-use Getopt::Long;
-
-my $VERBOSE = false;
-
-GetOptions ( "verbose" => \$VERBOSE );
-
-run_boiler_daemon( { verbose => $VERBOSE } );
+run_boiler_daemon();
 
 exit 0;

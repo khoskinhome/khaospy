@@ -1,6 +1,11 @@
 High Prio
 ---------
 
+
+fix the Constants.pm $HEATING_DAEMON
+
+one-liner to restart all daemons on a pi.
+
 get BoilerDaemon.pm able to use the QueueCommand.pm.
     BoilerDaemon needs to listen to the outputs of :
         PiControlD

@@ -12,7 +12,7 @@ use IO::Socket;
 use IO::Select;
 use Data::Dumper;
 use Net::Ping;
-use Time::HiRes qw/usleep/;
+use Time::HiRes qw/usleep time/;
 
 
 

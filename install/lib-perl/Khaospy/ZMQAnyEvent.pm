@@ -16,9 +16,18 @@ use ZMQ::Constants qw(
     ZMQ_REP
 );
 
+use Khaospy::Conf::PiHosts qw/
+    get_pi_hosts_running_daemon
+/;
+
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     true false
+
+    $PI_CONTROLLER_DAEMON_SCRIPT
+    $PI_CONTROLLER_DAEMON_SEND_PORT
+    $OTHER_CONTROLS_DAEMON_SCRIPT
+    $OTHER_CONTROLS_DAEMON_SEND_PORT
 );
 
 use Khaospy::Log qw(
@@ -26,7 +35,14 @@ use Khaospy::Log qw(
     kloginfo  klogdebug
 );
 
-our @EXPORT_OK = qw( zmq_anyevent );
+use Khaospy::Utils qw(
+    get_hashval
+);
+
+our @EXPORT_OK = qw(
+    subscribe_to_controller_daemons
+    zmq_anyevent
+);
 
 =head2
 
@@ -69,13 +85,11 @@ sub zmq_anyevent{
              )
         );
 
-    my $host
-        = $p->{host}
-            or klogfatal "Need to supply a 'host'";
+    my $host = $p->{host}
+        or klogfatal "Need to supply a 'host'";
 
-    my $port
-        = $p->{port}
-            or klogfatal "Need to supply a 'port'";
+    my $port = $p->{port}
+        or klogfatal "Need to supply a 'port'";
 
     # Do i need to have (tcp) protocol parameterised ?
     my $connect_str = "tcp://$host:$port";
@@ -118,6 +132,50 @@ sub zmq_anyevent{
             }
         },
     );
+}
+
+sub subscribe_to_controller_daemons {
+    my ( $w, $p ) = @_;
+
+    my $klog = exists $p->{klog} && defined $p->{klog} ? $p->{klog} : true;
+
+    my $count_zmq_subs = 0;
+
+    # Listen for the Pi Control Daemons return messages.
+    for my $sub_host (
+        @{get_pi_hosts_running_daemon(
+            $PI_CONTROLLER_DAEMON_SCRIPT
+        )}
+    ){
+        $count_zmq_subs++;
+        push @$w, zmq_anyevent({
+            zmq_type          => ZMQ_SUB,
+            host              => $sub_host,
+            port              => $PI_CONTROLLER_DAEMON_SEND_PORT,
+            msg_handler       => get_hashval($p, 'msg_handler'),
+            msg_handler_param => $p->{msg_handler_param} || "",
+            klog              => $klog,
+        });
+    }
+
+    # Listen for the other controls daemon.
+    for my $sub_host (
+        @{get_pi_hosts_running_daemon( $OTHER_CONTROLS_DAEMON_SCRIPT)}
+    ){
+        $count_zmq_subs++;
+        push @$w, zmq_anyevent({
+            zmq_type          => ZMQ_SUB,
+            host              => $sub_host,
+            port              => $OTHER_CONTROLS_DAEMON_SEND_PORT,
+            msg_handler       => get_hashval($p, 'msg_handler'),
+            msg_handler_param => $p->{msg_handler_param} || "",
+            klog              => $klog,
+        });
+    }
+
+    klogfatal "No Control Daemons configured. Can't subscribe to anything."
+        if ! $count_zmq_subs;
+
 }
 
 1;

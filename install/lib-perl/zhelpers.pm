@@ -12,7 +12,7 @@ Author: Klaas Nijkes
 
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(:all);
-use Time::HiRes qw(usleep);
+use Time::HiRes qw(usleep time);
 
 my $MAX_MSGLEN = 511;
 

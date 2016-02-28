@@ -24,24 +24,21 @@ use JSON;
 use Sys::Hostname;
 use Clone qw(clone);
 use Carp qw(croak);
+use Time::HiRes qw(time);
 
 use AnyEvent;
 use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(
-    ZMQ_RCVMORE
-    ZMQ_SUBSCRIBE
-    ZMQ_FD
     ZMQ_PUB
-    ZMQ_SUB
     ZMQ_REP
 );
 
 use zhelpers;
 
-use Khaospy::Message qw/
+use Khaospy::Message qw(
     validate_control_msg_json
     validate_control_msg_fields
-/;
+);
 
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
@@ -51,32 +48,28 @@ use Khaospy::Constants qw(
 
     $COMMAND_QUEUE_DAEMON
     $COMMAND_QUEUE_DAEMON_TIMER
+    $COMMAND_QUEUE_DAEMON_BROADCAST_TIMER
 
     $QUEUE_COMMAND_PORT
-    $PI_CONTROLLER_DAEMON_SEND_PORT
     $COMMAND_QUEUE_DAEMON_SEND_PORT
-    $PI_CONTROLLER_DAEMON_SCRIPT
     $LOCALHOST
     $MESSAGE_TIMEOUT
 
     MYTPE_COMMAND_QUEUE_BROADCAST
 
-    $OTHER_CONTROLS_DAEMON
-    $OTHER_CONTROLS_DAEMON_SCRIPT
-    $OTHER_CONTROLS_DAEMON_SEND_PORT
 );
 
 use Khaospy::Conf::Controls qw(
     get_controls_conf
 );
 
-use Khaospy::Conf::PiHosts qw/
-    get_pi_hosts_running_daemon
+use Khaospy::Conf::PiHosts qw(
     get_pi_hosts_conf
-/;
+);
 
 use Khaospy::ZMQAnyEvent qw(
     zmq_anyevent
+    subscribe_to_controller_daemons
 );
 
 use Khaospy::Log qw(
@@ -121,42 +114,14 @@ sub run_command_queue_daemon {
     zmq_bind( $zmq_publisher, $pub_to_port );
     kloginfo "Publishing to $pub_to_port";
 
-
-    my $count_zmq_subs = 0;
-    # Listen for the Pi Control Daemons return messages.
-    for my $sub_host (
-        @{get_pi_hosts_running_daemon(
-            $PI_CONTROLLER_DAEMON_SCRIPT
-        )}
-    ){
-        $count_zmq_subs++;
-        push @w, zmq_anyevent({
-            zmq_type          => ZMQ_SUB,
-            host              => $sub_host,
-            port              => $PI_CONTROLLER_DAEMON_SEND_PORT,
+    subscribe_to_controller_daemons(
+        \@w,
+        {
             msg_handler       => \&message_from_controller,
             msg_handler_param => "",
             klog              => true,
-        });
-    }
-
-    # Listen for the other controls daemon.
-    for my $sub_host (
-        @{get_pi_hosts_running_daemon( $OTHER_CONTROLS_DAEMON_SCRIPT)}
-    ){
-        $count_zmq_subs++;
-        push @w, zmq_anyevent({
-            zmq_type          => ZMQ_SUB,
-            host              => $sub_host,
-            port              => $OTHER_CONTROLS_DAEMON_SEND_PORT,
-            msg_handler       => \&message_from_controller,
-            msg_handler_param => "",
-            klog              => true,
-        });
-    }
-
-    croak "No Control Daemons configured. Command-Queue-D Can't subscribe to anything."
-        if ! $count_zmq_subs;
+        }
+    );
 
     # Register the timer :
     push @w, AnyEvent->timer(
@@ -178,8 +143,13 @@ sub timer_cb {
     for my $mkey ( keys %$msg_queue ){
         my $msg_rh = $msg_queue->{$mkey}{hashref};
 
+        next if $msg_rh->{last_broadcast_time}
+            + $COMMAND_QUEUE_DAEMON_BROADCAST_TIMER
+                > time;
+
         kloginfo "Publish message $msg_queue->{$mkey}{json_from}";
         zmq_sendmsg( $zmq_publisher, $msg_queue->{$mkey}{json_from} );
+        $msg_rh->{last_broadcast_time} = time;
 
         if ( $msg_rh->{request_epoch_time} < time - $MESSAGE_TIMEOUT ){
             klogerror "Msg timed out. $mkey";
@@ -191,7 +161,7 @@ sub timer_cb {
 sub message_from_controller {
     my ($zmq_sock, $msg, $param ) = @_;
 
-    kloginfo "$param FROM CONTROLLER : $msg";
+    klogdebug "$param FROM CONTROLLER : $msg";
 
     my $mkey = validate_control_msg_json($msg)->{mkey};
 
@@ -219,10 +189,11 @@ sub queue_message {
 
     my $mkey = $msg_p->{mkey};
 
-    my $new_msg = clone($msg_p->{hashref});
-    $new_msg->{message_from} = $COMMAND_QUEUE_DAEMON;
-    $new_msg->{message_type} = MYTPE_COMMAND_QUEUE_BROADCAST;
-    $msg_p->{json_from} = $JSON->encode($new_msg);
+    my $msg_p_rh = $msg_p->{hashref};
+    $msg_p_rh->{message_from} = $COMMAND_QUEUE_DAEMON;
+    $msg_p_rh->{message_type} = MYTPE_COMMAND_QUEUE_BROADCAST;
+    $msg_p_rh->{last_broadcast_time} = time;
+    $msg_p->{json_from} = $JSON->encode($msg_p_rh);
 
     $msg_queue->{$mkey} = $msg_p;
 

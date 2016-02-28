@@ -56,6 +56,11 @@ our @EXPORT_OK = qw(
 
 my $zmq_context   = $ZMQ_CONTEXT;
 my $zmq_req_sock = zmq_socket($zmq_context,ZMQ_REQ);
+
+# TODO , could connect to a command-queue on a different host.
+# would need to work out what hosts are running command queues.
+#
+# Currently if this is left as LOCALHOST it should fatal , if there isn't a command-queue-d running on the LOCALHOST.
 my $connect_str = "tcp://$LOCALHOST:$QUEUE_COMMAND_PORT";
 
 if ( my $zmq_state = zmq_connect($zmq_req_sock, $connect_str )){

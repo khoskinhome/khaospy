@@ -1,0 +1,94 @@
+
+The Boiler daemon has a conf of all the heating controls that are associated with the boilers.
+
+$conf = {
+            'boiler-central-heating' => {
+                'on_delay_secs' => 120,
+                'controls' => [
+                    'alisonrad',
+                    'karlrad',
+                    'ameliarad',
+                    'dinningroomrad'
+                ]
+            },
+            'another-boiler-in-a-big-house' => {
+                on_delay_secs => 120,
+                'controls' => [
+                    'huge-mansion-room-rad',
+                ]
+            }
+        };
+
+
+Thermometer-monitor-daemons
+###########################
+
+The the various thermometer monitor daemons publish to a zero-mq-port the current state of any thermometer that has an associated control to the boiler daemon.
+
+The boiler-daemon listens to the zero-mq-ports of the various thermometer-monitor-daemons for json messages structured like :
+    {
+      EpochTime'     => '1451416995.77076',
+      HomeAutoClass' => 'boilerControl',
+      Control'       => 'a-control-name',
+      Action         => 'on'
+    };
+
+The boiler-daemon, with its config, has the knowledge of which if any of controls published by the thermometer-monitor deamons are radiator-controls for which the boiler-daemon has to switch on the boilers it is configured to control.
+
+The boiler-daemon ignores any messages for controls that it doesn't know about.
+
+boiler ON or OFF.
+################
+
+When all of the rad-controls for a specific boiler are off then the boiler is immediately be switched off.
+
+If the boiler is in the off state, and one or more of the controls switches on, then due to the radiator-actuators taking a couple of minutes to operate, the boiler-daemon will wait for on_delay_secs before it switches on.
+
+You need to time the operation of a radiator-actuator-valve to get this time. The ones I have take about 2 minutes to fully open. You do not want the boiler pumping hot-water with all the valves off. ( Usually there is always at least one radiator that is fully open to stop the boiler pump trying to push water around a fully closed system )
+
+If all the rads go into the off state , the boiler will be switched off immediately. ( pump-over-run might be in operation on the boiler )
+
+Only 1 boiler-daemon will run . This is enforced by daemon-runner ( not yet implemented ).
+
+The boiler daemon will work out the hosts of the thermometer-monitor-daemons it has to subscribe to from the daemon-runner conf. This is not yet implemented, and the boiler-daemon currently has to run on the same host as the thermometer-monitor-daemons.
+
+#############################################################
+# Zero-mq with AnyEvent code examples got from :
+# http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
+
+=pod
+
+plan
+
+
+Needs to subscribe to all pi-controllers and other-controllers, like the CommandQueueDaemon does.
+
+DO THIS LATER : Well in fact it only needs to subscribe to those that are running the controls its interested in .
+    "get_control_daemon_hosts_for_controls( [ array-of-control-names ] )
+    This would be the name of the host
+
+
+The pi-and-other-controllers will send out the status of a control.
+
+if that is one of the boiler daemon's controls then it will keep its state.
+
+When all of the boiler-dameon's controls are off a signal will be sent to the boiler to turn off.
+
+When ANY of the boiler-d's controls are on a signal will be sent to the boiler to turn on.
+
+What if the boiler or any of the rad controls are manually operated ?
+
+This can rely on the manual_auto_timeout that the control-daemons already have.
+
+The boiler-daemon just listens to the controls its interested in and switches on or off the boiler ( or boilers ) accordingly.
+
+
+The boiler daemon has a setting on_delay_secs that will pause the sending of the command to the boiler control for this amount of seconds, when going from the "off" to the "on" state.
+
+1) get the boiler config .
+1) subscribe to all  pi-controllers and other-controllers, like the CommandQueueDaemon does.
+
+
+=cut
+
+

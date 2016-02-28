@@ -1,7 +1,7 @@
 package Khaospy::ZMQSubscribeAllPublishers;
 use strict;
 use warnings;
-use Time::HiRes;
+use Time::HiRes qw/time/;
 
 # used by CLI khaospy-zmq-subscribe.pl to listen to all publishers on a host.
 

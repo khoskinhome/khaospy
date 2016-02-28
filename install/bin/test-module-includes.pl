@@ -18,7 +18,6 @@ use Khaospy::Constants;
 use Khaospy::QueueCommand;
 
 use Khaospy::BoilerDaemon;
-use Khaospy::BoilerMessage;
 
 use Khaospy::ControlOrviboS20;
 

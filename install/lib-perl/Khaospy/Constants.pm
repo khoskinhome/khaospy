@@ -62,7 +62,7 @@ our $ALL_DIRS = [
 # greater than the value of $PI_CONTROLLER_DAEMON_TIMER.
 # This is because $PI_CONTROLLER_DAEMON_TIMER runs the code that polls
 # MCP23017 controls, and therefore making  $PI_CONTROL_MCP23017_PINS_TIMEOUT just a bit bigger means there should be just one poll of MCP23017 port registers.
-our $PI_CONTROL_MCP23017_PINS_TIMEOUT = 0.2;
+our $PI_CONTROL_MCP23017_PINS_TIMEOUT = 0.3;
 
 #################
 # daemon scripts
@@ -72,7 +72,7 @@ our $ONE_WIRE_SENDER            = 'khaospy-one-wired-sender.py';
 our $ONE_WIRE_RECEIVER          = 'khaospy-one-wired-receiver.py';
 #our $ONE_WIRE_RECEIVER_TIMER    =
 our $PI_CONTROLLER_DAEMON       = 'khaospy-pi-controls-d.pl';
-our $PI_CONTROLLER_DAEMON_TIMER = .1;
+our $PI_CONTROLLER_DAEMON_TIMER = .2;
 
 # Polling Orvibo S20s is SLOW.
 # If the other-controls-daemon polls with its TIMER too often then
@@ -82,7 +82,8 @@ our $OTHER_CONTROLS_DAEMON       = 'khaospy-other-controls-d.pl';
 our $OTHER_CONTROLS_DAEMON_TIMER = 1;
 
 our $COMMAND_QUEUE_DAEMON = 'khaospy-command-queue-d.pl';
-our $COMMAND_QUEUE_DAEMON_TIMER = .1;
+our $COMMAND_QUEUE_DAEMON_TIMER = 0.2;
+our $COMMAND_QUEUE_DAEMON_BROADCAST_TIMER = 0.6;
 
 #our $STATUS_DAEMON_PUBLISH_EVERY_SECS               = 2;
 #our $RULES_DAEMON_RUN_EVERY_SECS                    = 0.5;
@@ -93,13 +94,10 @@ our $PI_STATUS_DAEMON           = 'khaospy-status-d.pl';
 # its primary mission is for the webui to be able to get the status of controls.
 our $PI_STATUS_DAEMON_TIMER     = 5;
 
-
 our $MAC_SWITCH_DAEMON          = 'khaospy-mac-switch-d.pl';
 our $MAC_SWITCH_DAEMON_TIMER    = 5;
 our $PING_SWITCH_DAEMON         = 'khaospy-ping-switch-d.pl';
 our $PING_SWITCH_DAEMON_TIMER   = 5;
-
-
 
 our $ALL_SCRIPTS = [
     our $ONE_WIRED_SENDER_SCRIPT
@@ -187,6 +185,11 @@ our $ZMQ_REQUEST_TIMEOUT        = 10; # seconds.
 
 our $LOCALHOST = '127.0.0.1';
 
+our $BOILER_DAEMON_TIMER = 5;
+our $BOILER_STATUS_REFRESH_EVERY_SECS = 120;
+our $BOILER_DAEMON_DELAY_START = 20;
+
+
 
 ######################
 our @EXPORT_OK = qw(
@@ -252,12 +255,16 @@ our @EXPORT_OK = qw(
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT
 
     $BOILER_DAEMON_SCRIPT
+    $BOILER_DAEMON_TIMER
+    $BOILER_STATUS_REFRESH_EVERY_SECS
+    $BOILER_DAEMON_DELAY_START
+
 
     $COMMAND_QUEUE_DAEMON
     $COMMAND_QUEUE_DAEMON_SCRIPT
     $COMMAND_QUEUE_DAEMON_SEND_PORT
     $COMMAND_QUEUE_DAEMON_TIMER
-
+    $COMMAND_QUEUE_DAEMON_BROADCAST_TIMER
 
     $MAC_SWITCH_DAEMON
     $MAC_SWITCH_DAEMON_SEND_PORT

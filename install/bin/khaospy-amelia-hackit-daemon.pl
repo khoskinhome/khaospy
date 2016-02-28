@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
-use Time::HiRes qw/usleep gettimeofday/;
+use Time::HiRes qw/usleep gettimeofday time/;
 
 use Term::ReadKey;
 my $use_readkey = 0;

@@ -48,15 +48,23 @@ sub burp {
 }
 
 sub get_hashval {
-    my ($hash, $key, $allow_undef) = @_;
+    my ($hash, $key, $allow_undef, $default_on_undef, $default_on_not_exists) = @_;
 
-    confess "Not a hash" if ref $hash ne "HASH";
+    confess "Not a hash\n" if ref $hash ne "HASH";
+
+    return $default_on_not_exists
+        if defined $default_on_not_exists and ! exists $hash->{$key};
 
     confess "key '$key' not in HASH\n"
         if ! exists $hash->{$key};
 
+    $allow_undef = true if defined $default_on_undef;
+
     confess "key '$key' is not defined in HASH"
         if ! $allow_undef and ! defined $hash->{$key};
+
+    return $default_on_undef
+        if defined $default_on_undef and ! defined $hash->{$key};
 
     return $hash->{$key};
 }

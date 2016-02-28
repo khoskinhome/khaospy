@@ -11,7 +11,7 @@ use Try::Tiny;
 use Carp qw/confess croak/;
 use Data::Dumper;
 use Exporter qw/import/;
-use Time::HiRes;
+use Time::HiRes qw/time/;
 use Sys::Hostname;
 
 use Khaospy::Conf::Controls qw(

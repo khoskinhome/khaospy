@@ -78,6 +78,9 @@ my $boiler_conf;
 sub get_boiler_conf {
     my ($force_reload) = @_;
     get_conf(\$boiler_conf, $BOILERS_CONF_FULLPATH, $force_reload);
+
+    # TODO validate that a rad-control can only be used by one boiler-control
+ 
 }
 
 my $global_conf;
