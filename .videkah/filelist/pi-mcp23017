@@ -12,7 +12,6 @@ install/www-bin/lightba.pl
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
 
-./install/lib-perl/Khaospy/BoilerMessage.pm
 
 ./install/lib-perl/Khaospy/Conf.pm
 ./install/lib-perl/Khaospy/Conf/Controls.pm
@@ -53,7 +52,7 @@ install/www-bin/lightba.pl
 
 ./install/lib-perl/Khaospy/Message.pm
 
-./install/lib-perl/Khaospy/OneWireHeatingDaemon.pm
+./install/lib-perl/Khaospy/HeatingDaemon.pm
 ./install/bin/khaospy-one-wire-heating-daemon.pl
 
 ./install/lib-perl/Khaospy/OrviboS20.pm
@@ -61,7 +60,6 @@ install/www-bin/lightba.pl
 
 ./install/lib-perl/Khaospy/QueueCommand.pm
 ./install/bin/khaospy-operate-control.pl
-
 
 ./install/lib-perl/Khaospy/CommandQueueDaemon.pm
 ./install/bin/khaospy-command-queue-d.pl
@@ -80,6 +78,7 @@ install/www-bin/lightba.pl
 ./install/lib-perl/t/test-picontrollerdaemon-send-msg.pl
 ./install/lib-perl/t/test-picontrollerdaemon-listen.pl
 
+./install/lib-perl-t/alltests.t
 ######################################################
 #
 #######################################################
@@ -189,6 +188,8 @@ mapping-i2c-alarm-board.py
 ./install/docs/anyevent-zmq-links.txt
 ./install/docs/proj_khaospy-home-auto-software.txt
 ./install/docs/proj_khaospy-home-auto-software2.txt
+
+./install/docs/boiler-daemon.txt
 ./install/docs/lighting-wiring-circuits.txt
 ./install/docs/heating-control.txt
 ./install/docs/lighting-control.txt
@@ -223,4 +224,5 @@ install-to-pi-all.bash
 ./install/www-bin/graphs.pl
 
 ###################################################################
+
 
