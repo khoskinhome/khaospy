@@ -195,6 +195,22 @@ sub live_heating_thermometer_config {
             lower_temp         => 18.5,
             control            => 'dinningroomrad',
         },
+        '28-041591f5e5ff' => {
+            name               => 'Karl',
+            rrd_group          => 'downstairs',
+            upper_temp         => 18.0,
+            lower_temp         => 17.0,
+            control            => 'karlrad',
+        },
+        '28-000006e01389' => {
+            name               => 'loft-over-kitchen',
+            rrd_group          => 'downstairs',
+        },
+       '28-011465167eff' => {
+            name          => 'Kitchen',
+            rrd_group     => 'downstairs',
+        },
+
 
     };
 }
@@ -208,85 +224,99 @@ sub test_heating_thermometer_config {
 sub live_controls_conf {
     ## TODO find a way of using the host name from /etc/hosts to get the ip and mac.
     return {
-
+        'therm-karl' => {
+            type          => "onewire-thermometer",
+            alias         => 'Karl thermometer',
+            onewire_addr  => '28-041591f5e5ff',
+        },
+        'therm-loft-over-kitchen' => {
+            type          => "onewire-thermometer",
+            alias         => 'Loft over kitchen',
+            onewire_addr  => '28-000006e01389',
+        },
+        'therm-kitchen' => {
+            type          => "onewire-thermometer",
+            alias         => 'Kitchen thermometer',
+            onewire_addr  => '28-011465167eff'  ,
+        },
         'therm-alison-door' => {
             type          => "onewire-thermometer",
-            alias         => 'Alison',
+            alias         => 'Alison thermometer',
             onewire_addr  => '28-0000066ebc74'  ,
         },
         'therm-playhouse' => {
             type          => "onewire-thermometer",
-            alias         => 'Playhouse-tv',
+            alias         => 'Playhouse-tv thermometer.',
             onewire_addr  => '28-000006e04e8b' ,
         },
         'therm-playhouse-door' => {
             type          => "onewire-thermometer",
-            alias         => 'Playhouse-9e-door',
+            alias         => 'Playhouse-9e-door thermometer',
             onewire_addr  => '28-0000066fe99e' ,
         },
         'therm-bathroom' => {
             type          => "onewire-thermometer",
-            alias         => 'Bathroom',
+            alias         => 'Bathroom thermometer',
             onewire_addr  => '28-00000670596d'  ,
         },
         'therm-loft' => {
             type          => "onewire-thermometer",
-            alias         => 'Loft',
+            alias         => 'Loft thermometer',
             onewire_addr  => '28-021463277cff'  ,
         },
         'therm-amelia-door' => {
             type          => "onewire-thermometer",
-            alias         => 'Amelia',
+            alias         => 'Amelia thermometer',
             onewire_addr  => '28-0214632d16ff',
         },
         'therm-upstairs-landing' => {
             type          => "onewire-thermometer",
-            alias         => 'Upstairs-Landing',
+            alias         => 'Upstairs-Landing thermometer',
             onewire_addr  => '28-021463423bff',
         },
         'therm-outside-front-drive' => {
             type          => "onewire-thermometer",
-            alias         => 'Outside-front-drive',
+            alias         => 'Outside-front-drive thermometer',
             onewire_addr  => '28-000006e04d3c',
         },
         'therm-boiler-ch-in-cold' => {
             type          => "onewire-thermometer",
-            alias         => 'boiler-ch-in-cold',
+            alias         => 'boiler-ch-in-cold thermometer',
             onewire_addr  => '28-000006e00a67',
         },
         'therm-boiler-ch-out-hot' => {
             type          => "onewire-thermometer",
-            alias         => 'boiler-ch-out-hot',
+            alias         => 'boiler-ch-out-hot thermometer',
             onewire_addr  => '28-0114632f89ff',
         },
         'therm-boiler-wh-in-cold' => {
             type          => "onewire-thermometer",
-            alias         => 'boiler-wh-in-cold',
+            alias         => 'boiler-wh-in-cold thermometer',
             onewire_addr  => '28-0414688dbfff',
         },
         'therm-boiler-wh-out-hot' => {
             type          => "onewire-thermometer",
-            alias         => 'boiler-wh-out-hot',
+            alias         => 'boiler-wh-out-hot thermometer',
             onewire_addr  => '28-011465cb13ff',
         },
         'therm-boiler-room' => {
             type          => "onewire-thermometer",
-            alias         => 'boiler-room',
+            alias         => 'boiler-room thermometer',
             onewire_addr  => '28-031463502eff',
         },
         'therm-front-room' => {
             type          => "onewire-thermometer",
-            alias         => 'front-room',
+            alias         => 'front-room thermometer',
             onewire_addr  => '28-0214630558ff',
         },
         'therm-front-porch' => {
             type          => "onewire-thermometer",
-            alias         => 'front-porch',
+            alias         => 'front-porch thermometer',
             onewire_addr  => '28-000006cafb0d',
         },
         'therm-dining-room-near-boiler' => {
             type          => "onewire-thermometer",
-            alias         => 'dining-room',
+            alias         => 'dining-room thermometer',
             onewire_addr  => '28-0000066ff2ac',
         },
 
@@ -758,11 +788,18 @@ sub live_pi_host_conf {
         piserver => {
             log_level         => 'info',
             valid_gpios       => [ 0..7 ],
-            valid_i2c_buses   => [ 1 ],
+            valid_i2c_buses   => [ 0, 1 ],
             daemons => [
+                { script  =>$ONE_WIRED_SENDER_SCRIPT,
+                  options => { '--stdout_freq' => '890' },
+                },
                 {
                     script  => $ONE_WIRED_RECEIVER_SCRIPT,
                     options => { '--host' => "pioldwifi" },
+                },
+                {
+                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
+                    options => { '--host' => "piserver" },
                 },
                 {
                     script  => $ONE_WIRED_RECEIVER_SCRIPT,
@@ -772,9 +809,8 @@ sub live_pi_host_conf {
                     script  => $ONE_WIRED_RECEIVER_SCRIPT,
                     options => { '--host' => "piboiler" },
                 },
-                { script  => $PI_CONTROLLER_DAEMON_SCRIPT      , options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT, options => { }, },
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT, options => { }, },
-
             ],
         },
         piloft => {

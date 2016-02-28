@@ -1,27 +1,24 @@
 High Prio
 ---------
 
+khaospy-operate-control.pl
+    to subscribe to all controllers and listen for the update.
+    output like the zmq-subscriber
+
+zmq-subscribe-tool to translate the temperatures into their control names and temp.
 
 fix the Constants.pm $HEATING_DAEMON
 
 one-liner to restart all daemons on a pi.
 
-get BoilerDaemon.pm able to use the QueueCommand.pm.
-    BoilerDaemon needs to listen to the outputs of :
-        PiControlD
-        OtherControlD
-    for the state of controls.
-    HeatingD doesn't need to tell the boiler ( like it did )
-
-    The refresh status can be dropped.
-        ( once I've got other Controls polling )
-
+BoilerDaemon.pm
+    nothing todo at present.
 
 QueueCommand.pm
     time out on the zmq-REQ, raise exception.
 
-
 CommandQueueDaemon.pm :
+    nothing todo at present.
 
 
 General :
