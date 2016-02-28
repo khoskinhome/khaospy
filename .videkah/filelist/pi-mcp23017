@@ -86,6 +86,11 @@ install/www-bin/lightba.pl
 
 ./install/bin/khaospy-run-daemons.pl
 
+./install/bin/khaospy-stop-daemons.pl
+./install/bin/khaospy-restart-daemons.pl
+
+./install/bin/khaospy-ps.pl
+
 #######################################################
 # one wire thermometer stuff :
 
@@ -206,16 +211,33 @@ mapping-i2c-alarm-board.py
 
 ./install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl
 
-
 ./install/bin/orvibo-s20-control.pl
 ./install/bin/orvibo-s20-control-karl-hack.pl
 
 ###################################################################
 
 install-to-pi-pi.bash
-install-to-pi-khoskin.bash
-install-to-pi.bash
+#install-to-pi-khoskin.bash
+#install-to-pi.bash
 install-to-pi-all.bash
+
+run-test-conf-update-on-pi.bash
+run-test-conf-update-on-pi-all.bash
+
+run-live-conf-update-on-pi.bash
+run-live-conf-update-on-pi-all.bash
+
+run-kill-all-daemons-on-pi.bash
+run-kill-all-daemons-on-pi-all.bash
+
+run-kill-and-restart-daemons-on-pi.bash
+run-kill-and-restart-daemons-on-pi-all.bash
+
+install-run-test-conf-kill-and-restart-daemons.bash
+install-run-test-conf-kill-and-restart-daemons-all.bash
+
+install-run-live-conf-kill-and-restart-daemons.bash
+install-run-live-conf-kill-and-restart-daemons-all.bash
 
 ###################################################################
 

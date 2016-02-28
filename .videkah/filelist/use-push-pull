@@ -50,8 +50,8 @@ install/lib-perl/Khaospy/PiControllerDaemon.pm
 
 ./install/lib-perl/Khaospy/Message.pm
 
-./install/lib-perl/Khaospy/OneWireHeatingDaemon.pm
-./install/bin/khaospy-one-wire-heating-daemon.pl
+./install/lib-perl/Khaospy/HeatingDaemon.pm
+./install/bin/khaospy-heating-daemon.pl
 
 ./install/lib-perl/Khaospy/OrviboS20.pm
 ./install/lib-perl/t-scripts/test-khaospy-orvibos20.pl
