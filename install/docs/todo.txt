@@ -1,11 +1,41 @@
 High Prio
 ---------
+need an orvibo to test with. The manual_auto_timeout. I could
+    1) buy one.
+        how many do I really need ? ( once I've hardwired the rads )
+        1 for a light in amelia's room.
+        2 for lights in Ali's room
+        1 for a light in my room
+        1 to control the heater in the playhouse (maybe)
+    2) wire up Ali's rad controller , and have her orvibo.
+    3) borrow melissa's light controller.
+    4) use my orvibo.
+    5) use the dinning room orvibo.
+
+
+Pi-Control-D
+    use the ControlDispatch.pm. tricky.
+    if the gpio or i2c commands fail during initialisation the daemon should die. The ports will not be in the correct state.
+    rewrite the relay_manual ex_or and manual-change stuff. Its really hard to follow.
+
+
+Other-Controls-D ( initially for OrviboS20s )
+
+    write manual_auto_timeout ( like relay-manual code )
+
+    remove the rand() in the time checking of the last-poll part.
+
+
 
 khaospy-operate-control.pl
     to subscribe to all controllers and listen for the update.
     output like the zmq-subscriber
 
-zmq-subscribe-tool to translate the temperatures into their control names and temp.
+zmq-subscribe-tool
+    to translate the temperatures into their control names and temp.
+    be able to filter on a specific control name.
+    be able to subscribe to multiple hosts.
+        i.e. --host-n-port=pihost:one-wire
 
 fix the Constants.pm $HEATING_DAEMON
 
@@ -41,16 +71,6 @@ General :
     fix the KhaospyControlPiMCP23017.t tests.
 
 
-Other-Controls-Daemon ( initially for OrviboS20s )
-
-    write manual_auto_timeout ( like relay-manual code )
-
-    remove the rand() in the time checking of the last-poll part.
-
-
-Pi-Control-Daemon
-    use the ControlDispatch.pm. tricky.
-    if the gpio or i2c commands fail during initialisation the daemon should die. The ports will not be in the correct state.
 
 
 The messages to support new fields

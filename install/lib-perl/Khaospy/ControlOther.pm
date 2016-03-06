@@ -32,6 +32,8 @@ use Khaospy::ControlDispatch qw(
     dispatch_operate
 );
 
+use Khaospy::ControlUtils qw ( set_manual_auto_timeout );
+
 use Khaospy::Exception qw(
     KhaospyExcept::UnhandledControl
 );
@@ -103,19 +105,37 @@ sub operate_orvibo_s20 {
 
     my $current_state;
 
+    $controls_state->{$control_name} = {}
+        if ! exists $controls_state->{$control_name};
+    my $c_state = $controls_state->{$control_name};
+
+    # so set_manual_auto_timeout here
+    my $timeout_left = set_manual_auto_timeout($control, $c_state,
+        'last_manual_change_time'
+    );
+    if ( $timeout_left > 0 && $action ne STATUS ){
+        # a poll will always be STATUS.
+        # So polls will always skip this.
+        kloginfo sprintf(
+            "Control %s cannot be automatically operated for "
+            ."another %.2f seconds ( manual_auto_timeout )",
+            $control_name,
+            $timeout_left
+        );
+        return $c_state;
+    }
+
     eval { $current_state = Khaospy::OrviboS20::signal_control(
             $control->{host}, $control->{mac}, $action
         );
     };
 
+    $c_state->{current_state} = $current_state;
+
     if ( $@ || ! $current_state ){
         klogerror $_;
         return {};
     }
-
-    $controls_state->{$control_name} = {}
-        if ! exists $controls_state->{$control_name};
-    my $c_state = $controls_state->{$control_name};
 
     if ( ! exists $c_state->{last_change_state}
         || $c_state->{last_change_state} ne $current_state
@@ -124,9 +144,21 @@ sub operate_orvibo_s20 {
         $c_state->{last_change_state}      = $current_state || "error";
         $c_state->{last_change_state_time} = time;
         $c_state->{last_change_state_by}   = $state_change_by;
+
+        if ( $state_change_by eq MANUAL ) {
+            if ( ! exists $c_state->{last_manual_change_time} ){
+                # "init" special case. set it to jan 1970 :
+                $c_state->{last_manual_change_time} = 0;
+            } else {
+                $c_state->{last_manual_change_time} = time;
+                set_manual_auto_timeout($control, $c_state,
+                    'last_manual_change_time'
+                );
+            }
+        }
     }
 
-    return { %$c_state, current_state => $current_state, };
+    return $c_state;
 }
 
 sub poll_orvibo_s20 {

@@ -198,8 +198,8 @@ sub live_heating_thermometer_config {
         '28-041591f5e5ff' => {
             name               => 'Karl',
             rrd_group          => 'downstairs',
-            upper_temp         => 18.0,
-            lower_temp         => 17.0,
+            upper_temp         => 16.0,
+            lower_temp         => 15.0,
             control            => 'karlrad',
         },
         '28-000006e01389' => {
@@ -678,6 +678,7 @@ sub test_controls_conf {
             host => "pitest",
             ex_or_for_state => true,
             invert_state => false,
+            manual_auto_timeout => 20,
             gpio_relay => {
                 i2c_bus  => 1,
 		i2c_addr => '0x27',
@@ -716,6 +717,15 @@ sub test_controls_conf {
             },
         },
 
+        melissalight  => {
+            alias        => 'Melissa Light',
+            manual_auto_timeout => 20,
+            type         => "orviboS20",
+            host         => 'melissalight',
+            poll_timeout => 5,
+            poll_host    => 'pitest',
+            mac          => 'AC-CF-23-72-28-30',
+        },
     };
 }
 

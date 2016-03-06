@@ -10,7 +10,7 @@ use warnings;
 use Try::Tiny;
 use Carp qw/confess croak/;
 use Data::Dumper;
-use Exporter qw/import/;
+use Time::HiRes qw(time);
 
 use Khaospy::Conf::Controls qw(
     get_controls_conf
@@ -29,6 +29,8 @@ use Khaospy::ControlPiMCP23017 qw (
     init_mcp23017
 );
 
+use Khaospy::ControlUtils qw ( set_manual_auto_timeout );
+
 use Khaospy::Exception qw(
     KhaospyExcept::ControlsConfigInvalidType
 );
@@ -38,11 +40,7 @@ use Khaospy::Log qw(
     klogwarn  kloginfo  klogdebug
 );
 
-#our @EXPORT_OK = qw(
-#    poll_controls
-#    init_controls
-#    operate_control
-#);
+use Khaospy::Utils qw ( get_hashval );
 
 sub check_host_field { "host" }
 
@@ -145,7 +143,7 @@ sub _dispatch {
 # }
 
 sub _get_and_set_switch_or_relay_state {
-    # NOT for relay-manual .only "relay" or "switch" controls.
+    # NOT for relay-manual. Only "relay" or "switch" controls.
     # ( where invert_state is simpler, and no "ex_or_for_state". )
     my ($pin_class,$control_name,$control, $gpio_num) = @_;
 
@@ -164,6 +162,9 @@ sub _get_and_set_switch_or_relay_state {
         $pi_c_state->{last_change_state} = $current_state;
         $pi_c_state->{last_change_state_time} = time;
     }
+
+    # TODO the last_change_state and current_state are the same thing.
+    # this seems stupid. Need to think about this.
 
     return {
         current_state => $current_state,
@@ -357,6 +358,9 @@ sub poll_relay_manual {
             $pi_c_state->{last_change_state_by}   = MANUAL;
             $pi_c_state->{last_manual_gpio_detect_change_time} = time;
             $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
+            set_manual_auto_timeout( $control, $pi_c_state,
+                'last_manual_gpio_detect_change_time'
+            );
 
             $callback->({
                 control_name  => $control_name,
@@ -389,41 +393,27 @@ sub operate_relay_manual {
 
         poll_relay_manual($pin_class)->($control_name,$control);
 
-        if ( $action eq STATUS
-            ||  ( exists $control->{manual_auto_timeout}
-                    && $pi_c_state->{last_manual_gpio_detect_change_time}
-                         + $control->{manual_auto_timeout} > time
-                )
-        ){
+        $pi_c_state->{current_state} = $current_state;
 
-            my %extra_msg = ();
-            if ( $action ne STATUS ){
-                my $timeout_left = (
-                    $pi_c_state->{last_manual_gpio_detect_change_time}
-                        + $control->{manual_auto_timeout} - time
-                );
+        my $timeout_left = set_manual_auto_timeout( $control, $pi_c_state,
+            'last_manual_gpio_detect_change_time'
+        );
 
-                kloginfo sprintf(
-                    "Control %s cannot be automatically operated for "
-                    ."another %.2f seconds ( manual_auto_timeout )",
-                    $control_name,
-                    $timeout_left
-                );
-                $extra_msg{manual_auto_timeout_left} = $timeout_left;
-            }
+        return $pi_c_state if ( $action eq STATUS ) ;
 
-            return {
-                %extra_msg,
-                current_state => $current_state,
-                %{$pi_c_state},
-            };
-        } elsif ( $current_state eq $action ){
+        if ( $timeout_left > 0 ){
+            kloginfo sprintf(
+                "Control %s cannot be automatically operated for "
+                ."another %.2f seconds ( manual_auto_timeout )",
+                $control_name,
+                $timeout_left
+            );
+            return $pi_c_state;
+        }
+
+        if ( $current_state eq $action ){
             kloginfo "Control $control_name doesn't need to be changed";
-
-            return {
-                current_state => $current_state,
-                %{$pi_c_state},
-            };
+            return $pi_c_state;
         }
 
         # The "auto" gpio_relay needs its state inverting/toggling
@@ -439,6 +429,8 @@ sub operate_relay_manual {
         $current_state = _calc_current_relay_manual_circuit_state(
             $pin_class, $control_name, $control
         );
+
+        $pi_c_state->{current_state} = $current_state;
 
         $pi_c_state->{last_change_state_time} = time;
         $pi_c_state->{last_change_state_by}   = AUTO;
@@ -469,10 +461,7 @@ sub operate_relay_manual {
 
         kloginfo "Control $control_name has been automatically operated";
 
-        return {
-            current_state => $current_state,
-            %{$pi_c_state},
-        };
+        return $pi_c_state;
     }
 }
 
