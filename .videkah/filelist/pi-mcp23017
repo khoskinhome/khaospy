@@ -36,9 +36,13 @@ install/www-bin/lightba.pl
 ./install/lib-perl/Khaospy/ControlOther.pm
 
 ./install/lib-perl/Khaospy/ControlPi.pm
+./crap-rewrite.pl
 ./install/lib-perl/Khaospy/ControlPiGPIO.pm
 ./install/lib-perl/Khaospy/ControlPiMCP23017.pm
 ./install/lib-perl-t/KhaospyControlPiMCP23017.t
+
+./install/lib-perl/Khaospy/ControlUtils.pm
+
 
 ./install/lib-perl/Khaospy/ControlsDaemon.pm
 ./install/bin/khaospy-pi-controls-d.pl
