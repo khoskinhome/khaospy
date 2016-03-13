@@ -1,16 +1,6 @@
 High Prio
 ---------
-need an orvibo to test with. The manual_auto_timeout. I could
-    1) buy one.
-        how many do I really need ? ( once I've hardwired the rads )
-        1 for a light in amelia's room.
-        2 for lights in Ali's room
-        1 for a light in my room
-        1 to control the heater in the playhouse (maybe)
-    2) wire up Ali's rad controller , and have her orvibo.
-    3) borrow melissa's light controller.
-    4) use my orvibo.
-    5) use the dinning room orvibo.
+Just borrow melissa's orvibo, until I get some spare from the rad controllers.
 
 
 Pi-Control-D
@@ -20,8 +10,6 @@ Pi-Control-D
 
 
 Other-Controls-D ( initially for OrviboS20s )
-
-    write manual_auto_timeout ( like relay-manual code )
 
     remove the rand() in the time checking of the last-poll part.
 

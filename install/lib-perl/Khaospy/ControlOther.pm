@@ -172,7 +172,7 @@ sub poll_orvibo_s20 {
     $c_state->{last_poll_time} = 0 if ! defined $c_state->{last_poll_time};
 
     return if exists $control->{poll_timeout}
-        && time + rand() < $c_state->{last_poll_time} + $control->{poll_timeout};
+        && time < $c_state->{last_poll_time} + $control->{poll_timeout};
 
     $c_state->{last_poll_time} = time ;
 

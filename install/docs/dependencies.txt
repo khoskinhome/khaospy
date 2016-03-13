@@ -65,3 +65,4 @@ sudo cpanm Exception::Class
 
 sudo cpanm Clone JSON AnyEvent ZMQ::LibZMQ3 List::Compare Sub::Override Test::More Test::Exception Test::Deep Exception::Class
 
+sudo cpanm DateTime
