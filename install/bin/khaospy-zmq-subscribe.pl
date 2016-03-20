@@ -30,18 +30,27 @@ CLI switches say "just listen to the port for this" :
 
 =cut
 
-GetOptions (
+my %opts = (
     "host=s"        => \my $host,
     "log-level=s"   => \my $log_level,
-    "one-wire"      => \my $one_wire,
-    "command-queue" => \my $command_queue,
-    "pi-control"    => \my $pi_control,
-    "other-control" => \my $other_control,
-    "status"        => \my $status,
-    "mac"           => \my $mac,
-    "ping"          => \my $ping,
-
+    "w|ow|one-wire"      => \my $one_wire,
+    "c|command-queue" => \my $command_queue,
+    "p|pi-control"    => \my $pi_control,
+    "o|other-control" => \my $other_control,
+    "s|status"        => \my $status,
+    "m|mac"           => \my $mac,
+    "g|ping"          => \my $ping,
+    "f|filter-control=s"=> \my $filter_control,
+    "h|help"        => \my $help,
 );
+
+GetOptions (%opts);
+
+if ( $help ) {
+    print "CLI params :\n";
+    print join "\n", keys %opts;
+    exit 0 ;
+}
 
 run_subscribe_all( {
     'host'          => $host,
@@ -53,6 +62,7 @@ run_subscribe_all( {
     "status"        => $status,
     "mac"           => $mac,
     "ping"          => $ping,
+    "filter-control"=> $filter_control,
 } );
 
 exit 0;

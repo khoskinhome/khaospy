@@ -1,6 +1,22 @@
 High Prio
 ---------
-Just borrow melissa's orvibo, until I get some spare from the rad controllers.
+
+
+
+
+
+email-home-auto.
+    pgp encryption.
+    send a message to it.
+    get a response.
+
+manual-auto-timeout only populates if the manual-auto-timeout is set.
+
+
+PiGPIO and PiMCP. try and keep state between daemon restarts. reboots would be really hard. restarts maybe possible.
+ZMQ messages .encrypt.
+
+DHCP / DNS server.
 
 
 Pi-Control-D

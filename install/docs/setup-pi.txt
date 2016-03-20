@@ -43,4 +43,36 @@ once fully setup "dd" the micro-sd card and get an image
 
 
 
+setup bind9 DNS on piloft
+
+    sudo apt-get install dnsutils bind9-doc bind9
+
+    http://mixeduperic.com/ubuntu/seven-easy-steps-to-setting-up-an-interal-dns-server-on-ubuntu.html
+
+    https://help.ubuntu.com/lts/serverguide/dns-installation.html
+
+      sudo apt-get install bind9
+      sudo apt-get update
+      sudo apt-get install bind9
+      sudo apt-get install dnsutils bind9-doc bind9
+      sudo vim /etc/bind/named.conf.options
+      sudo vim /etc/bind/named.conf.local
+      sudo cp /etc/bind/db.local /etc/bind/db.khaos
+      sudo vim /etc/bind/named.conf.local
+      sudo vim /etc/bind/db.khaos
+      sudo cp /etc/bind/db.127 /etc/bind/db.192
+      sudo vim /etc/bind/db.192
+      history
+      sudo vim /etc/bind/db.192
+      sudo /etc/init.d/bind9 start
+      sudo vim /etc/resolv.conf
+      dig distrowatch.com
+      dig karlrad.khaos
+      ping karlrad.khaos
+      dig distrowatch.com
+      ping karlrad.khaos
+      dig karlrad.khaos
+      ping karlrad
+      history
+
 

@@ -124,8 +124,8 @@ sub live_heating_thermometer_config {
         '28-0000066ebc74' => {
             name               => 'Alison',
             rrd_group          => 'upstairs',
-            upper_temp         => 18.5,
-            lower_temp         => 18.0,
+            upper_temp         => 19.5,
+            lower_temp         => 18.5,
             control            => 'alisonrad',
         },
         '28-000006e04e8b' => {
@@ -200,8 +200,8 @@ sub live_heating_thermometer_config {
         '28-041591f5e5ff' => {
             name               => 'Karl',
             rrd_group          => 'downstairs',
-            upper_temp         => 16.0,
-            lower_temp         => 15.0,
+            upper_temp         => 17.0,
+            lower_temp         => 16.0,
             control            => 'karlrad',
         },
         '28-000006e01389' => {
@@ -325,42 +325,62 @@ sub live_controls_conf {
         alisonrad       => {
             alias => 'Alison Radiator',
             type  => "orviboS20",
-            host  => 'alisonrad',
-            poll_timeout => 5,
+            host  => 'alisonrad.khaos',
+            poll_timeout => 10,
             poll_host => 'piboiler',
             mac   => 'AC:CF:23:72:D1:FE',
         },
         ameliarad       => {
             alias => 'Amelia Radiator',
             type  => "orviboS20",
-            host  => 'ameliarad',
-            poll_timeout => 5,
+            host  => 'ameliarad.khaos',
+            poll_timeout => 10,
             poll_host => 'piboiler',
             mac   => 'AC-CF-23-72-F3-D4',
         },
         karlrad         => {
             alias => 'Karl Radiator',
             type  => "orviboS20",
-            host  => 'karlrad',
-            poll_timeout => 5,
+            host  => 'karlrad.khaos',
+            poll_timeout => 10,
             poll_host => 'piboiler',
             mac   => 'AC-CF-23-8D-7E-D2',
         },
         dinningroomrad  => {
             alias => 'Dining Room Radiator',
             type  => "orviboS20",
-            host  => 'dinningroomrad',
-            poll_timeout => 5,
+            host  => 'diningroomrad.khaos',
+            poll_timeout => 10,
             poll_host => 'piboiler',
             mac   => 'AC-CF-23-8D-A4-8E',
         },
         frontroomrad    => {
             alias => 'Front Room Radiator',
             type  => "orviboS20",
-            host  => 'frontroomrad',
-            poll_timeout => 5,
+            host  => 'frontroomrad.khaos',
+            poll_timeout => 10,
             poll_host => 'piboiler',
             mac   => 'AC-CF-23-8D-3B-96',
+        },
+
+        testsocket      => {
+            alias => 'Test Socket',
+            type  => "orviboS20",
+            manual_auto_timeout => 10,
+            host  => 'testsocket.khaos',
+            poll_timeout => 10,
+            poll_host => 'piboiler',
+            mac   => 'AC-CF-23-8D-BE-24',
+        },
+
+        melissalight  => {
+            alias        => 'Melissa Light',
+            manual_auto_timeout => 20,
+            type         => "orviboS20",
+            host         => 'melissalight.khaos',
+            poll_timeout => 10,
+            poll_host    => 'piboiler',
+            mac          => 'AC-CF-23-72-28-30',
         },
 
 # pi gpio
@@ -719,15 +739,6 @@ sub test_controls_conf {
             },
         },
 
-        melissalight  => {
-            alias        => 'Melissa Light',
-            manual_auto_timeout => 20,
-            type         => "orviboS20",
-            host         => 'melissalight',
-            poll_timeout => 5,
-            poll_host    => 'pitest',
-            mac          => 'AC-CF-23-72-28-30',
-        },
     };
 }
 

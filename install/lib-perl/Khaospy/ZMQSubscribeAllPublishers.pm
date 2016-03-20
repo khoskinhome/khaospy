@@ -56,9 +56,12 @@ our @EXPORT_OK = qw( run_subscribe_all );
 
 our $LOGLEVEL;
 
+our $OPTS;
+
 sub run_subscribe_all {
     my ( $opts ) = @_;
     $opts = {} if ! $opts;
+    $OPTS = $opts;
     $Khaospy::Log::OVERRIDE_CONF_LOGLEVEL = $opts->{"log-level"} || DEBUG;
 
     my $sub_host = $opts->{"host"} || $LOCALHOST;
@@ -90,15 +93,19 @@ sub run_subscribe_all {
 
 sub output_msg {
     my ( $zmq_sock, $msg, $port ) = @_;
-    kloginfo "msg on port $port";
 
     my $dec;
     eval { $dec = $JSON->decode($msg); };
-
     if ($@) {
+        kloginfo "msg on port $port";
         output ("$msg\n" );
         return;
     }
+
+    if ( exists $dec->{control_name} and exists $OPTS->{'filter-control'} ){
+        return if $dec->{control_name} !~ m/$OPTS->{'filter-control'}/;
+    }
+    kloginfo "msg on port $port";
 
     my $convert_times = sub {
         my ( $key, $value ) = @_;
@@ -141,7 +148,9 @@ TODO rm this lot , or properly dev something . this is a hack for alarm testing 
 
 =cut
 
+
     my $dump_dir = "$RRD_IMAGE_DIR/alarm-test/";
+    return if ! -d $dump_dir;
 
     burp ( "$dump_dir/debug-msg-".time.".txt", $out );
 
@@ -158,16 +167,6 @@ TODO rm this lot , or properly dev something . this is a hack for alarm testing 
         }
 
     }
-
- 
-
-
-
-
-
-
-
-
 
 
 }
