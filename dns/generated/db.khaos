@@ -1,0 +1,160 @@
+;
+; BIND data file for local loopback interface
+;
+$TTL	604800
+@	IN	SOA	piserver.khaos. root.localhost. (
+			      2		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+@	IN	NS	piserver.khaos.
+@	IN	A	127.0.0.1
+@	IN	AAAA	::1
+
+; Below are A Record Addresses
+
+; piold piold-wifi pioldwifi
+; 74-DA-38-05-2E-C4 pioldwifi wireless eth
+piold		IN	A	192.168.1.5
+
+; B8-27-EB-A6-13-6F piold wired-eth
+piold-eth	IN	A	192.168.1.6
+
+; B8-27-EB-1A-32-6D pitest
+pitest		IN	A	192.168.1.7
+
+; B8-27-EB-98-BC-C3 piloft.
+piloft		IN	A	192.168.1.8
+
+; B8-27-EB-95-75-4E piboiler
+piboiler	IN	A	192.168.1.9
+
+; needs reserving for the cheapo ip-cams that by default use that IP.
+ipcam10		IN	A	192.168.1.10
+ipcam15		IN	A	192.168.1.15
+
+
+; B8-27-EB-96-88-FC piserver
+piserver	IN	A	192.168.1.14
+
+
+; samsung printer :
+printer-samsung-ml2251n	IN	A	192.168.1.16
+prts		IN	CNAME	printer-samsung-ml2251n.khaos.
+
+
+; D8-50-E6-DC-FE-41  melissa
+melissapc	IN	A	192.168.1.17
+
+
+; 00-10-18-33-41-E1  00:10:18:33:41:E1   nas
+nas		IN	A	192.168.1.19
+
+
+; 00-C0-EE-43-C4-CE  00:C0:EE:43:C4:CE kyocera printer :
+printer-kyocera-fsc5100dn	IN	A	192.168.1.24
+prtk		IN	CNAME	printer-kyocera-fsc5100dn.khaos.
+
+
+; AC-CF-23-72-28-30 melissalight
+melissalight	IN	A	192.168.1.159
+
+; AC-CF-23-72-F3-D4 ameliaradiator
+ameliarad	IN	A	192.168.1.160
+
+; AC-CF-23-72-D1-FE alisonradiator
+alisonrad	IN	A	192.168.1.161
+
+; AC-CF-23-8D-A4-8E diningroomrad
+diningroomrad	IN	A	192.168.1.162
+dinningroomrad	IN	CNAME	diningroomrad.khaos.
+
+; AC-CF-23-8D-7E-D2 karlradiator
+karlrad		IN	A	192.168.1.163
+
+; AC-CF-23-8D-3B-96 frontroomrad
+frontroomrad 	IN	A	192.168.1.164
+
+; AC-CF-23-8D-BE-24 testsocket
+testsocket	IN	A	192.168.1.165
+
+
+; 00-12-15-2E-2E-9C  00:12:15:2E:2E:9C ipcam01
+ipcam01		IN	A	192.168.1.241
+
+;
+ipcam02		IN	A	192.168.1.242
+
+;
+ipcam03		IN	A	192.168.1.243
+
+;
+;ipcam04		IN	A	192.168.1.244
+
+;
+;ipcam05		IN	A	192.168.1.245
+
+
+
+
+; ##############################################
+; # routers, and wifi access points .
+; # all have a khaos prefix since the wifi SSIDs are prefixed with that.
+; ##############################################
+
+; # On patch panel : A n M 2
+; # MAC address. C4-6E-1F-47-80-23
+khaosamelia	IN	A	192.168.1.249
+r-amelia	IN	CNAME	khaosamelia.khaos.
+ramelia		IN	CNAME	khaosamelia.khaos.
+
+
+; # Nmap scan report for khaosloft (192.168.1.250)
+; # MAC Address: 10:FE:ED:C1:94:88 (Tp-link Technologies CO.)
+; # On patch panel :
+khaosloft	IN	A	192.168.1.250
+r-loft		IN	CNAME	khaosloft.khaos.
+rloft		IN	CNAME	khaosloft.khaos.
+
+
+; # Nmap scan report for khaosplayhouse (192.168.1.251)
+; # MAC Address: A0:F3:C1:BF:A8:8E (Tp-link Technologies CO.)
+; # On patch panel :
+khaosplayhouse	IN	A	192.168.1.251
+r-playhouse	IN	CNAME	khaosplayhouse.khaos.
+rplayhouse	IN	CNAME	khaosplayhouse.khaos.
+r-ph		IN	CNAME	khaosplayhouse.khaos.
+rph		IN	CNAME	khaosplayhouse.khaos.
+
+
+; # Nmap scan report for khaoskitchen (192.168.1.252)
+; # MAC Address: C4:6E:1F:47:77:71 (Tp-link Technologies Co.)
+; # On patch panel :
+khaoskitchen 	IN	A	192.168.1.252
+r-kitchen	IN	CNAME	khaoskitchen.khaos.
+r-kit		IN	CNAME	khaoskitchen.khaos.
+rkitchen	IN	CNAME	khaoskitchen.khaos.
+rkit		IN	CNAME	khaoskitchen.khaos.
+
+
+; # Nmap scan report for khaoskarl (192.168.1.253)
+; # MAC Address: C4:6E:1F:EC:F7:15 (Tp-link Technologies Co.)
+; # On patch panel :
+khaoskarl	IN	A	192.168.1.253
+r-karl		IN	CNAME	khaoskarl.khaos.
+rkarl		IN	CNAME	khaoskarl.khaos.
+
+
+; # Nmap scan report for khaosbt (192.168.1.254)
+; # MAC Address: 18:62:2C:32:67:4A (Sagemcom SAS)
+; # On patch panel : A n M 1
+khaosbt 	IN	A	192.168.1.254
+khaosbthub	IN	CNAME	khaosbt.khaos.
+r-bt		IN	CNAME	khaosbt.khaos.
+rbt		IN	CNAME	khaosbt.khaos.
+r-bthub		IN	CNAME	khaosbt.khaos.
+rbthub		IN	CNAME	khaosbt.khaos.
+
+

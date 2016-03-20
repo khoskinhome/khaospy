@@ -1,0 +1,54 @@
+;
+; BIND reverse data file for local loopback interface
+;
+$TTL	604800
+@	IN	SOA	piserver.khaos. root.localhost. (
+			      1		; Serial
+			 604800		; Refresh
+			  86400		; Retry
+			2419200		; Expire
+			 604800 )	; Negative Cache TTL
+;
+@	IN	NS	piserver.khaos.
+
+
+5	IN	PTR	piold.khaos.
+6	IN	PTR	piold-eth.khaos.
+7	IN	PTR	pitest.khaos.
+8	IN	PTR	piloft.khaos.
+9	IN	PTR	piboiler.khaos.
+
+10	IN	PTR	ipcam.khaos.
+
+14	IN	PTR	piserver.khaos.
+
+16	IN	PTR	printer-samsung-ml2251n.khaos.
+17	IN	PTR	melissapc.khaos.
+
+19	IN	PTR	nas.khaos.
+
+24	IN	PTR	printer-kyocera-fsc5100dn.khaos.
+
+159	IN	PTR	melissalight.khaos.
+160	IN	PTR	ameliarad.khaos.
+161	IN	PTR	alisonrad.khaos.
+162	IN	PTR	diningroomrad.khaos.
+163	IN	PTR	karlrad.khaos.
+164	IN	PTR	frontroomrad.khaos.
+165	IN	PTR	testsocket.khaos.
+
+241	IN	PTR	ipcam01.khaos.
+242	IN	PTR	ipcam02.khaos.
+243	IN	PTR	ipcam03.khaos.
+;244	IN	PTR	ipcam04.khaos.
+;245	IN	PTR	ipcam05.khaos.
+
+249	IN	PTR	khaosamelia.khaos.
+250	IN	PTR	khaosloft.khaos.
+251	IN	PTR	khaosplayhouse.khaos.
+252	IN	PTR	khaoskitchen.khaos.
+253	IN	PTR	khaoskarl.khaos.
+254	IN	PTR	khaosbt.khaos.
+
+
+
