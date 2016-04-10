@@ -102,7 +102,7 @@ sub output_msg {
         return;
     }
 
-    if ( exists $dec->{control_name} and exists $OPTS->{'filter-control'} ){
+    if ( exists $dec->{control_name} and $OPTS->{'filter-control'} ){
         return if $dec->{control_name} !~ m/$OPTS->{'filter-control'}/;
     }
     kloginfo "msg on port $port";

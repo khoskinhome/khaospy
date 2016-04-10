@@ -455,21 +455,21 @@ sub live_controls_conf {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 7,
             },
         },
-        alarm_10 => { # alarm 10
+        front_porch_pir => { # alarm 10
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
             alias => "alarm 10",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 6,
             },
         },
-        alarm_11 => { # alarm 11
+        inner_front_door => { # alarm 11
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
             alias => "alarm 11",
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 5,
             },
         },
-        alarm_12 => { # alarm 12
+        inner_front_door_deadlock => { # alarm 12
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
             alias => "alarm 12",
             gpio_switch => {

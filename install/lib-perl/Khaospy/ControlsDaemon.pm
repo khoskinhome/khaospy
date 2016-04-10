@@ -176,6 +176,8 @@ sub controller_message {
 
     my $daemon_host = $control->{$CONTROLLER_CLASS->check_host_field};
 
+    # TODO if daemon_host doesn't have a '.' then only check up to the first '.' in the hostname
+    # otherwise check the entire hostname
     if ( $daemon_host ne hostname ){
         klogdebug "control $control_name is not controlled by this host";
         return;

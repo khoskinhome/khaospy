@@ -46,7 +46,7 @@ my $rules = [
     },
 
     {
-        start_time  => '0100',
+        start_time  => '0000',
         end_time    => '0600',
         day_of_week => qr/^[67]$/,
         action      => OFF,
@@ -54,7 +54,15 @@ my $rules = [
     },
 
     {
-        start_time  => '2200',
+        start_time  => '2300',
+        end_time    => '2359',
+        day_of_week => qr/^[67]$/,
+        action      => OFF,
+        channel     => 1,
+    },
+
+    {
+        start_time  => '2100', #2100
         end_time    => '2359',
         day_of_week => qr/^[71234]$/,
         action      => OFF,
@@ -62,6 +70,18 @@ my $rules = [
     },
 ];
 
+#my $rules = [
+#
+#    {
+#        start_time  => '0100',
+#        end_time    => '0600',
+#        day_of_week => qr/^[1234567]$/,
+#        action      => OFF,
+#        channel     => 1,
+#    },
+#
+#];
+#
 
 sub init {
     for my $chan ( keys %$remote_channel ) {

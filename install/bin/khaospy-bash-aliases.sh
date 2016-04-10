@@ -64,4 +64,8 @@ alias kclive_conf_generate='sudo /opt/khaospy/bin/khaospy-live-conf-generate.pl'
 alias kctest_conf_generate='sudo /opt/khaospy/bin/khaospy-test-conf-generate.pl'
 alias ktests='/opt/khaospy/lib-perl-t/alltests.t; /opt/khaospy/bin/test-module-includes.pl'
 
+
+#TODO RM this before release :
+alias mountnas='sudo mount -t cifs //nas.khaos/movies_n_tv  /media/khoskin/nas_movies_n_tv -o username=khoskin,noexec'
+
 cd /opt/khaospy/bin
