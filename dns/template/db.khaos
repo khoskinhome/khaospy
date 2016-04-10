@@ -32,8 +32,8 @@ piloft		IN	A	192.168.1.8
 piboiler	IN	A	192.168.1.9
 
 ; needs reserving for the cheapo ip-cams that by default use that IP.
-ipcam10		IN	A	192.168.1.10
-ipcam15		IN	A	192.168.1.15
+ipcam-new-10		IN	A	192.168.1.10
+ipcam-new-15		IN	A	192.168.1.15
 
 
 ; B8-27-EB-96-88-FC piserver
@@ -80,24 +80,36 @@ frontroomrad 	IN	A	192.168.1.164
 ; AC-CF-23-8D-BE-24 testsocket
 testsocket	IN	A	192.168.1.165
 
+; 18-FE-34-D6-78-6D espdev
+espdev          IN	A	192.168.1.166
+
+swannpvr	IN	A	192.168.1.230
+swann           IN	CNAME	swannpvr.khaos.
 
 ; 00-12-15-2E-2E-9C  00:12:15:2E:2E:9C ipcam01
-ipcam01		IN	A	192.168.1.241
+ipcam01		IN	A	192.168.1.231
+
+; 00-B9-6A-0D-1A-C5
+ipcam02		IN	A	192.168.1.232
+
+; 00-12-15-37-05-35  points from dining room to shed.
+ipcam03		IN	A	192.168.1.233
+
+; 00:18:A9:76:7D:D3  HD sinocam with IR
+ipcam04		IN	A	192.168.1.234
 
 ;
-ipcam02		IN	A	192.168.1.242
-
-;
-ipcam03		IN	A	192.168.1.243
-
-;
-;ipcam04		IN	A	192.168.1.244
-
-;
-;ipcam05		IN	A	192.168.1.245
-
-
-
+ipcam05		IN	A	192.168.1.235
+ipcam06		IN	A	192.168.1.236
+ipcam07		IN	A	192.168.1.237
+ipcam08		IN	A	192.168.1.238
+ipcam09		IN	A	192.168.1.239
+ipcam10		IN	A	192.168.1.240
+ipcam11		IN	A	192.168.1.241
+ipcam12		IN	A	192.168.1.242
+ipcam13		IN	A	192.168.1.243
+ipcam14		IN	A	192.168.1.244
+ipcam15		IN	A	192.168.1.245
 
 ; ##############################################
 ; # routers, and wifi access points .

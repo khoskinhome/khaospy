@@ -18,7 +18,8 @@ $TTL	604800
 8	IN	PTR	piloft.khaos.
 9	IN	PTR	piboiler.khaos.
 
-10	IN	PTR	ipcam.khaos.
+10	IN	PTR	ipcam-new-10.khaos.
+15	IN	PTR	ipcam-new-15.khaos.
 
 14	IN	PTR	piserver.khaos.
 
@@ -36,12 +37,24 @@ $TTL	604800
 163	IN	PTR	karlrad.khaos.
 164	IN	PTR	frontroomrad.khaos.
 165	IN	PTR	testsocket.khaos.
+166	IN	PTR	espdev.khaos.
 
-241	IN	PTR	ipcam01.khaos.
-242	IN	PTR	ipcam02.khaos.
-243	IN	PTR	ipcam03.khaos.
-;244	IN	PTR	ipcam04.khaos.
-;245	IN	PTR	ipcam05.khaos.
+230     IN      PTR     swannpvr.khaos.
+231	IN	PTR	ipcam01.khaos.
+232	IN	PTR	ipcam02.khaos.
+233	IN	PTR	ipcam03.khaos.
+234	IN	PTR	ipcam04.khaos.
+235	IN	PTR	ipcam05.khaos.
+236	IN	PTR	ipcam06.khaos.
+237	IN	PTR	ipcam07.khaos.
+238	IN	PTR	ipcam08.khaos.
+239	IN	PTR	ipcam09.khaos.
+240	IN	PTR	ipcam10.khaos.
+241	IN	PTR	ipcam11.khaos.
+242	IN	PTR	ipcam12.khaos.
+243	IN	PTR	ipcam13.khaos.
+244	IN	PTR	ipcam14.khaos.
+245	IN	PTR	ipcam15.khaos.
 
 249	IN	PTR	khaosamelia.khaos.
 250	IN	PTR	khaosloft.khaos.
