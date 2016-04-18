@@ -17,6 +17,9 @@ sudo apt-get install -y  libsodium-dev libzmq3-dev
 
 sudo apt-get install -y python-dev
 
+sudo apt-get install postgresql postgresql-contrib libpq-dev
+
+
 
 sudo apt-get install -y \
 apache2 \
@@ -33,8 +36,9 @@ screen \
 vim \
 git
 
-sudo apt-get install -y apache2 daemon i2c-tools perl-doc perl-modules python-pip python-rrdtool python-smbus python-yaml python-zmq screen vim git
+sudo apt-get install -y apache2-utils apache2 daemon i2c-tools perl-doc perl-modules python-pip python-rrdtool python-smbus python-yaml python-zmq screen vim git
 
+sudo apt-get install libapache2-mod-perl2 libapache2-mod-perl2-dev  libapache2-request-perl libdatetime-perl -y
 
 # libzmq-dev \
 
@@ -66,3 +70,5 @@ sudo cpanm Exception::Class
 sudo cpanm Clone JSON AnyEvent ZMQ::LibZMQ3 List::Compare Sub::Override Test::More Test::Exception Test::Deep Exception::Class
 
 sudo cpanm DateTime
+
+sudo cpanm Dancer2

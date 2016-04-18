@@ -1,17 +1,6 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-
-#print "Content-type: text/html\r\n\r\n";
-#
-#print "Hello there!<br />\nJust testing .<br />\n";
-#
-#for (my $i=0; $i<10; $i++) {
-#    print $i."<br />";
-#}
-#
-#
-
 my $html = "Content-Type: text/html
 
 <HTML>

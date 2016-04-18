@@ -76,3 +76,71 @@ setup bind9 DNS on piloft
       history
 
 
+
+the webserver
+##############
+    https://www.digitalocean.com/community/tutorials/how-to-create-a-ssl-certificate-on-apache-for-debian-8
+
+
+    in /etc/apache2/mods-available/ssl.conf change :
+        SSLProtocol all -SSLv3
+            to :
+        SSLProtocol all -TLSv1.2
+
+    At the command line :
+        cd /etc/apache2/mods-enabled
+        sudo ln -s ../mods-available/ssl.conf
+        sudo ln -s ../mods-available/ssl.load
+
+
+
+    https://piserver.khaos/phpldapadmin/cmd.php
+    https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-14-04
+    https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-a-basic-ldap-server-on-an-ubuntu-12-04-vps
+
+    symlinks from /var/www/
+
+
+postgres db.
+############
+
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-14-04
+
+
+    https://www.digitalocean.com/community/tutorials/how-to-add-and-delete-users-on-an-ubuntu-14-04-vps
+    create unix user names :
+
+    pgread
+    pgwrite
+
+        postgres@piserver:~$ createuser --interactive
+        Enter name of role to add: khaospy_read
+        Shall the new role be a superuser? (y/n) n
+        Shall the new role be allowed to create databases? (y/n) n
+        Shall the new role be allowed to create more new roles? (y/n) n
+
+        postgres@piserver:~$ createuser --interactive
+        Enter name of role to add: khaospy_write
+        Shall the new role be a superuser? (y/n) n
+        Shall the new role be allowed to create databases? (y/n) n
+        Shall the new role be allowed to create more new roles? (y/n) n
+
+
+    stopped postgres server with
+
+        sudo service postgres stop
+
+    mkdir /media/120GB_ssd/postgres   ( on a usb attached SSD and not on pi main sd card )
+
+
+    cd /media/120GB_ssd ;  chown postgres.postgres postgres
+
+    cd /var/lib
+
+    mv ./postgres/* /media/120GB_ssd/postgres
+
+    in /etc/postgres/postgresql.conf changed the line to be :
+        data_directory = '/media/120GB_ssd/postgresql/9.4/main'         # use data in another directory
+
+ 
+

@@ -33,6 +33,12 @@ alias l1='ls --color=auto -1'
 
 alias hg='history | grep -i'
 
+
+alias psql.khaospy_read='psql -U khaospy_read -d khaospy -h localhost'
+alias psql.khaospy_write='psql -U khaospy_write -d khaospy -h localhost'
+
+alias s.apache.reload='sudo service apache2 reload'
+alias s.postgresql.reload='sudo service postgresql reload'
 alias s.reboot='sudo reboot'
 alias sureboot='sudo reboot'
 alias s.shutdown='sudo shutdown'

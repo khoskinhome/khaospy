@@ -476,7 +476,7 @@ sub live_controls_conf {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 4,
             },
         },
-        alarm_13 => { # alarm 13
+        front_room_door => { # alarm 13
             type => "pi-mcp23017-switch"  , host => "piserver", invert_state => false,
             alias => "alarm 13",
             gpio_switch => {
