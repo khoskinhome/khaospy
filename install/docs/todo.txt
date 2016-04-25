@@ -31,8 +31,6 @@ Other-Controls-D ( initially for OrviboS20s )
 
     remove the rand() in the time checking of the last-poll part.
 
-
-
 khaospy-operate-control.pl
     to subscribe to all controllers and listen for the update.
     output like the zmq-subscriber
@@ -170,6 +168,19 @@ Starting writing the PiMCP23017 module . need this  for th alarm switch panel.  
     make boiler on/off with rad states page.
 
 Why are there a lot of tmpfs using up lots of ram on jessie version of raspibian ?
+
+
+
+WebUI
+-----
+    get a site that insists on login. using Dancer2.
+    use httpOnly cookies.
+    update/insert/delete actions will generate a randon ID that must be used when doing the action.
+
+    2fa. use mobile phone to send a 6 char passcode to when trying to login from an external source. ( i.e. not on the home-lan )
+
+
+
 
 Medium Prio
 -----------

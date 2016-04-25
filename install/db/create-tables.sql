@@ -19,7 +19,11 @@ create table users (
     name         text NOT NULL UNIQUE,
     email        text not null unique,
     passhash     text NOT NULL,
-    mobile_phone text not null unique
+    passhash_expire_timestamp timestamp with time zone,
+    is_api_user  boolean not null default false,
+    is_admin     boolean not null default false,
+    mobile_phone text not null unique,
+    can_remote   boolean not null default false
 
 );
 GRANT SELECT ON users TO khaospy_read;
@@ -65,7 +69,7 @@ COMMIT;
 ------+------+-------+----------+----------+--------------
 --(0 rows)
 --
---
+
 --
 --INSERT INTO users
 --(username, name, email,passhash, mobile_phone)

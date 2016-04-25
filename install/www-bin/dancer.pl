@@ -1,16 +1,32 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-
+use Data::Dumper;
 use Dancer2;
 
 get '/hello/:name' => sub {
     return "Why, hello there " . params->{name};
 };
 
-get '/' => sub {
-    return "dispatch root blah blah";
+get '/env' => sub {
+
+    my $out = "";
+    for my $k ( sort keys %ENV ) {
+        $out .= "$k => ".$ENV{$k}."\n";
+    }
+
+    $out .= config->{appdir}."\n";
+
+    return "<pre>$out</pre>";
 };
+
+get '/' => sub {
+    return template 'test.tt', {
+        test => "this is a test",
+
+    };
+};
+
 
 dance;
 

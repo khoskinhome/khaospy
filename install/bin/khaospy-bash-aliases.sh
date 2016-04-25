@@ -24,6 +24,9 @@ alias cdkhaospypid='cd /opt/khaospy/pid/'
 alias cdkhaospylog='cd /opt/khaospy/log/'
 alias cdkhaospylibperlt='cd /opt/khaospy/lib-perl-t/'
 
+alias tail.apache.error.log='sudo tail -f /var/log/apache2/error.log'
+alias tail.apache.access.log='sudo tail -f /var/log/apache2/access.log'
+
 alias bashrc='. ~/.bashrc'
 alias r='reset;unalias -a;. ~/.bashrc'
 
@@ -39,6 +42,8 @@ alias psql.khaospy_write='psql -U khaospy_write -d khaospy -h localhost'
 
 alias s.apache.reload='sudo service apache2 reload'
 alias s.postgresql.reload='sudo service postgresql reload'
+alias s.postgresql.stop='sudo service postgresql stop'
+alias s.postgresql.start='sudo service postgresql start'
 alias s.reboot='sudo reboot'
 alias sureboot='sudo reboot'
 alias s.shutdown='sudo shutdown'
