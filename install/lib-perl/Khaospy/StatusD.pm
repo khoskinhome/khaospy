@@ -138,7 +138,9 @@ sub output_msg {
 
     my $control_name = $dec->{control_name};
     my $current_state = trans_ON_to_value($dec->{current_state});
+        # current_state is either "on" or "off"
 
+#    $dec->{current_value},  # a floating point val.
 #    $dec->{last_change_state_time},
 #    $dec->{last_change_state_by},
 #    $dec->{manual_auto_timeout_left},

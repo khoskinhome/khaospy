@@ -33,6 +33,8 @@ use Khaospy::Log;
 
 use Khaospy::Message;
 
+use Khaospy::OneWireThermometer;
+
 use Khaospy::OrviboS20;
 
 use Khaospy::ControlsDaemon;

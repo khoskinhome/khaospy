@@ -29,6 +29,7 @@ use Exception::Class (
     'KhaospyExcept::ShellCommand',
 
     'KhaospyExcept::UnhandledControl',
+    'KhaospyExcept::GeneralError',
 
 );
 

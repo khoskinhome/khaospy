@@ -81,7 +81,7 @@ while True:
                 jsonbody['OneWireAddress']=thdir
                 jsonbody['HomeAutoClass']="oneWireThermometer"
                 jsonbody['EpochTime']=time.time()
-
+ 
                 if data[0].strip()[-3:] == "YES":
                     jsonbody['Celsius']=float(data[1].split("=")[1])/1000
                 else:

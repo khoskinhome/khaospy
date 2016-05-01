@@ -31,6 +31,8 @@ use Khaospy::Exception qw(
     KhaospyExcept::ControlsConfigDuplicateMCP23017GPIO
 
     KhaospyExcept::ControlsConfigHostUnresovlable
+
+    KhaospyExcept::GeneralError
 );
 
 use Khaospy::Constants qw(
@@ -63,6 +65,7 @@ our @EXPORT_OK = qw(
     get_control_config
     get_controls_conf
     get_controls_conf_for_host
+    get_control_name_for_one_wire
 );
 
 my $check_mac = check_regex(
@@ -74,6 +77,8 @@ my $check_optional_boolean
     = check_optional_regex(qr/^[01]$/);
 my $check_optional_integer
     = check_optional_regex(qr/^\d+$/);
+
+my $ONEWIRE_THERM_TYPE = "onewire-thermometer";
 
 my $check_types = {
     "orvibos20" => {
@@ -87,7 +92,7 @@ my $check_types = {
         mac          => $check_mac,
         manual_auto_timeout => $check_optional_integer,
     },
-    "onewire-thermometer" => {
+    $ONEWIRE_THERM_TYPE => {
         alias         => \&check_optional,
         rrd_graph     => $check_optional_boolean,
         db_log        => $check_optional_boolean,
@@ -224,6 +229,26 @@ sub get_control_config {
         if ! exists $controls_conf->{$control_name};
 
     return $controls_conf->{$control_name};
+}
+
+sub get_control_name_for_one_wire {
+    my ( $one_wire_addr ) = @_;
+    get_controls_conf();
+
+    my @controls_one_wire_conf =
+        grep { $controls_conf->{$_}{onewire_addr} eq $one_wire_addr }
+        grep { $controls_conf->{$_}{type} eq $ONEWIRE_THERM_TYPE }
+        keys %$controls_conf;
+
+
+    KhaospyExcept::GeneralError->throw(
+        error => "Got more than one control for one-wire-address $one_wire_addr : ".join( ",", @controls_one_wire_conf)."\n",
+    )
+        if scalar @controls_one_wire_conf > 1;
+
+    return $controls_one_wire_conf[0] if @controls_one_wire_conf;
+
+    return;
 }
 
 my $pi_mcp23017_unique;

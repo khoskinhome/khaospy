@@ -71,13 +71,20 @@ our $ONE_WIRE_SENDER            = 'khaospy-one-wired-sender.py';
 #our $ONE_WIRE_SENDER_TIMER      =
 our $ONE_WIRE_RECEIVER          = 'khaospy-one-wired-receiver.py';
 #our $ONE_WIRE_RECEIVER_TIMER    =
+
+our $ONE_WIRE_SENDER_PERL_DAEMON = 'khaospy-one-wire-daemon.pl';
+our $ONE_WIRE_SENDER_PERL_TIMER  = 30;
+our $ONE_WIRE_SENSOR_DIR         = '/sys/bus/w1/devices/';
+
 our $PI_CONTROLLER_DAEMON       = 'khaospy-pi-controls-d.pl';
 our $PI_CONTROLLER_DAEMON_TIMER = .2;
 
 # Polling Orvibo S20s is SLOW.
 # If the other-controls-daemon polls with its TIMER too often then
 # it seems messages are dropped by zmq, and all the daemon does is poll.
+# This seems to be due to network-traffic issues.
 # There is a setting poll_timeout for orvibo S20s that allow the timer-poll to run more # frequently.
+# It is recommend to set the poll_timeout on these to about 5 secs.
 our $OTHER_CONTROLS_DAEMON       = 'khaospy-other-controls-d.pl';
 our $OTHER_CONTROLS_DAEMON_TIMER = 1;
 
@@ -102,6 +109,9 @@ our $PING_SWITCH_DAEMON_TIMER   = 5;
 our $ALL_SCRIPTS = [
     our $ONE_WIRED_SENDER_SCRIPT
         = "$BIN_DIR/$ONE_WIRE_SENDER",
+
+    our $ONE_WIRE_SENDER_PERL_SCRIPT
+        = "$BIN_DIR/$ONE_WIRE_SENDER_PERL_DAEMON",
 
     our $ONE_WIRED_RECEIVER_SCRIPT
         = "$BIN_DIR/$ONE_WIRE_RECEIVER",
@@ -169,6 +179,7 @@ our $PI_HOSTS_CONF_FULLPATH
 our $HEATING_CONTROL_DAEMON_PUBLISH_PORT  = 5021;
 
 our $ONE_WIRE_DAEMON_PORT                 = 5001;
+our $ONE_WIRE_DAEMON_PERL_PORT            = 5002;
 
 # TOOD QUEUE_COMMAND_PORT needs renaming to PI_OPERATE_CONTROL_SEND_PORT
 # TODO rename $QUEUE_COMMAND_PORT to $QUEUE_COMMAND_PORT
@@ -253,6 +264,13 @@ our @EXPORT_OK = qw(
     $ONE_WIRE_SENDER
     $ONE_WIRED_SENDER_SCRIPT
     $ONE_WIRE_DAEMON_PORT
+
+    $ONE_WIRE_SENDER_PERL_DAEMON
+    $ONE_WIRE_SENDER_PERL_SCRIPT
+    $ONE_WIRE_DAEMON_PERL_PORT
+    $ONE_WIRE_SENDER_PERL_TIMER
+    $ONE_WIRE_SENSOR_DIR
+
 
     $HEATING_DAEMON
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT

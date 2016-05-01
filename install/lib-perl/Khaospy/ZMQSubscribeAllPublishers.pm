@@ -28,6 +28,7 @@ use Khaospy::Constants qw(
     $LOCALHOST
 
     $ONE_WIRE_DAEMON_PORT
+    $ONE_WIRE_DAEMON_PERL_PORT
     $COMMAND_QUEUE_DAEMON_SEND_PORT
     $PI_CONTROLLER_DAEMON_SEND_PORT
     $OTHER_CONTROLS_DAEMON_SEND_PORT
@@ -75,6 +76,8 @@ sub run_subscribe_all {
     kloginfo "Subscribing to ", \@subscribe_ports;
 
     my @w;
+
+    # TODO needs to be able to subscribe to multiple hosts.
 
     for my $port ( @subscribe_ports ){
         push @w, zmq_anyevent({
@@ -175,8 +178,10 @@ sub get_ports {
     my ($opts) = @_;
     my @ports;
 
-    push @ports, $ONE_WIRE_DAEMON_PORT
-        if $opts->{"one-wire"};
+    if ( $opts->{"one-wire"} ) {
+        push @ports, $ONE_WIRE_DAEMON_PORT;
+        push @ports, $ONE_WIRE_DAEMON_PERL_PORT;
+    }
 
     push @ports, $COMMAND_QUEUE_DAEMON_SEND_PORT
         if $opts->{"command-queue"};
@@ -197,6 +202,7 @@ sub get_ports {
         if $opts->{"ping"};
 
     @ports = (
+        $ONE_WIRE_DAEMON_PERL_PORT,
         $ONE_WIRE_DAEMON_PORT,
         $COMMAND_QUEUE_DAEMON_SEND_PORT,
         $PI_CONTROLLER_DAEMON_SEND_PORT,
