@@ -8,6 +8,7 @@ install/www-bin/lightba.pl
 ##./install/www/img/ where the images are
 
 #######################################################
+crap
 
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
@@ -41,6 +42,11 @@ install/www-bin/lightba.pl
 ./install/lib-perl/Khaospy/ControlPiMCP23017.pm
 ./install/lib-perl-t/KhaospyControlPiMCP23017.t
 
+./install/lib-perl/Khaospy/ControlPiBoilerHomeEasy.pm
+./install/bin/khaospy-piboiler-homeeasy.pl
+./install/bin/khaospy-piboiler-homeeasy-schedule-d.pl
+./install/lib-perl-t/KhaospyControlPiBoilerHomeEasy.t
+
 ./install/lib-perl/Khaospy/ControlUtils.pm
 
 
@@ -64,6 +70,7 @@ install/www-bin/lightba.pl
 
 ./install/lib-perl/Khaospy/QueueCommand.pm
 ./install/bin/khaospy-operate-control.pl
+./install/bin/khaospy-operate-orvibos20-direct.pl
 
 ./install/lib-perl/Khaospy/CommandQueueDaemon.pm
 ./install/bin/khaospy-command-queue-d.pl
@@ -72,6 +79,10 @@ install/www-bin/lightba.pl
 
 ./install/lib-perl/Khaospy/ZMQSubscribeAllPublishers.pm
 ./install/bin/khaospy-zmq-subscribe.pl
+
+./install/lib-perl/Khaospy/StatusD.pm
+./install/bin/khaospy-status-d.pl
+
 
 ./install/lib-perl/Khaospy/ZMQAnyEvent.pm
 
@@ -127,6 +138,17 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ./install/bin/helper/gpio-4-relay-on.sh
 ./install/bin/helper/gpio-4-relay-off.sh
 ./install/bin/helper/gpio-0-input-status.sh
+
+./install/bin/helper/piboiler-homeeasy-1-on.sh
+./install/bin/helper/piboiler-homeeasy-1-off.sh
+
+./install/bin/helper/piboiler-homeeasy-2-on.sh
+./install/bin/helper/piboiler-homeeasy-2-off.sh
+./install/bin/helper/piboiler-homeeasy-3-on.sh
+./install/bin/helper/piboiler-homeeasy-3-off.sh
+./install/bin/helper/piboiler-homeeasy-4-on.sh
+./install/bin/helper/piboiler-homeeasy-4-off.sh
+
 
 ./install/bin/helper/zmq-get-version.pl
 
@@ -206,10 +228,42 @@ mapping-i2c-alarm-board.py
 ./install/docs/controls-relays-switches-sensors-conf.txt
 ./install/docs/controls-config-settings.txt
 
+./install/docs/ipcams.txt
+
 ./install/docs/apache2-sites-enabled-orig-pi.txt
 
 ./install/docs/to-be-deleted-file-list
 
+##################################
+# DNS
+##################################
+## ./dns/piloft/etc/bind/bind.keys
+#./dns/piloft/etc/bind/db.192
+## ./dns/piloft/etc/bind/db.root
+## ./dns/piloft/etc/bind/db.empty
+## ./dns/piloft/etc/bind/db.local
+## ./dns/piloft/etc/bind/db.0
+## ./dns/piloft/etc/bind/zones.rfc1918
+## ./dns/piloft/etc/bind/db.127
+## ./dns/piloft/etc/bind/rndc.key
+#./dns/piloft/etc/bind/named.conf.options
+## ./dns/piloft/etc/bind/db.255
+#./dns/piloft/etc/bind/db.khaos
+#./dns/piloft/etc/bind/named.conf.local
+##./dns/piloft/etc/bind/named.conf
+##./dns/piloft/etc/bind/named.conf.default-zones
+
+./dns/template/db.192
+./dns/template/db.khaos
+./dns/template/named.conf.local
+./dns/template/named.conf.options
+
+# where the templates get written to :
+./dns/generated/
+
+./dns/generate-and-scp-to-hosts.pl
+
+./dns/scp-dns-to-hosts.bash
 
 ##############################################################################
 
@@ -244,11 +298,25 @@ install-run-live-conf-kill-and-restart-daemons.bash
 install-run-live-conf-kill-and-restart-daemons-all.bash
 
 ###################################################################
+./install/www-bin/test-cgi.pl
 
 ./install/www/index.html
 
 ./install/www-bin/graphs.pl
 
+./install/www-bin/dancer.pl
+./install/www-dancer-tt/test.tt
+./install/www-dancer-env/config.yml
+
+set views => '/opt/khaospy/www-dancer-tt/';
+
 ###################################################################
 
+./install/db/create-db.sql
+./install/db/grant-db.sql
+./install/db/create-tables.sql
 
+
+./install/apache/default-ssl.conf
+
+crap
