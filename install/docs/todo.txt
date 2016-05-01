@@ -1,10 +1,11 @@
 High Prio
 ---------
 
+pitest . ipcam recording. mount-nas . automate, daemonise.
+
 get pi-s running BST / GMT automatically. UTC is a pain with scheduling.
 
 install/lib-perl/Khaospy/ControlsDaemon.pm:180:    # otherwise check the entire hostname # TODO rm this line
-
 
 
 email-home-auto.

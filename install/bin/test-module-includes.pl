@@ -39,6 +39,7 @@ use Khaospy::ControlsDaemon;
 use Khaospy::CommandQueueDaemon;
 
 use Khaospy::Utils;
+use Khaospy::StatusD;
 
 use Khaospy::ZMQSubscribeAllPublishers;
 use Khaospy::ZMQAnyEvent;

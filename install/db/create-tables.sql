@@ -29,6 +29,25 @@ create table users (
 GRANT SELECT ON users TO khaospy_read;
 GRANT ALL ON users TO khaospy_write;
 
+
+CREATE SEQUENCE control_status_seq;
+GRANT SELECT ON control_status_seq TO khaospy_read;
+GRANT ALL ON control_status_seq TO khaospy_write;
+create table control_status (
+    id INTEGER PRIMARY KEY DEFAULT nextval('control_status_seq') NOT NULL,
+    control_name             text not null,
+    current_state            real not null,
+    last_change_state_time   timestamp with time zone not null,
+    last_change_state_by     text null,
+    manual_auto_timeout_left integer null,
+    request_time             timestamp with time zone not null,
+    db_update_time           timestamp with time zone not null
+);
+GRANT SELECT ON control_status TO khaospy_read;
+GRANT ALL    ON control_status TO khaospy_write;
+
+
+
 --INSERT INTO users (name, name ) VALUES( 'blah', 'uk-gpms');
 
 --UPDATE blahtable

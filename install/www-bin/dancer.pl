@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Dancer2;
+use Dancer2::Plugin::Database;
 
 get '/hello/:name' => sub {
     return "Why, hello there " . params->{name};
@@ -21,6 +22,10 @@ get '/env' => sub {
 };
 
 get '/' => sub {
+
+    my $sth = database->prepare("select * from users");
+
+
     return template 'test.tt', {
         test => "this is a test",
 
