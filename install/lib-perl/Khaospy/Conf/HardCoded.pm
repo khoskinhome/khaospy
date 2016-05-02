@@ -26,7 +26,7 @@ use Khaospy::Constants qw(
 
     $ONE_WIRED_SENDER_SCRIPT
     $ONE_WIRED_RECEIVER_SCRIPT
-    $HEATING_DAEMON
+    $HEATING_DAEMON_SCRIPT
     $BOILER_DAEMON_SCRIPT
     $PI_CONTROLLER_DAEMON_SCRIPT
     $COMMAND_QUEUE_DAEMON_SCRIPT
@@ -878,7 +878,7 @@ sub live_pi_host_conf {
                   options => { '--stdout_freq' => '890' },
                 },
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
-                { script  => $HEATING_DAEMON,               options => { }, },
+                { script  => $HEATING_DAEMON_SCRIPT,        options => { }, },
                 { script  => $BOILER_DAEMON_SCRIPT,         options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT,  options => { }, },
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT,  options => { }, },

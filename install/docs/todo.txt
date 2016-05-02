@@ -42,7 +42,7 @@ zmq-subscribe-tool
     be able to subscribe to multiple hosts.
         i.e. --host-n-port=pihost:one-wire
 
-fix the Constants.pm $HEATING_DAEMON
+fix the Constants.pm $HEATING_DAEMON_SCRIPT
 
 one-liner to restart all daemons on a pi.
 

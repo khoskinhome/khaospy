@@ -19,6 +19,7 @@ use JSON;
 
 use Khaospy::Utils qw(
     timestamp
+    get_hashval
 );
 
 use Khaospy::Constants qw(
@@ -27,8 +28,8 @@ use Khaospy::Constants qw(
     ON OFF STATUS
     $HEATING_DAEMON_CONF_FULLPATH
 
-    $ONE_WIRE_DAEMON_PORT
-    $ONE_WIRED_SENDER_SCRIPT
+    $ONE_WIRE_SENDER_PERL_SCRIPT
+    $ONE_WIRE_DAEMON_PERL_PORT
 );
 
 use Khaospy::QueueCommand qw(
@@ -74,13 +75,13 @@ sub run_heating_daemon {
     my $count_zmq_subs=0;
     # subscribe to all the hosts publishing one-wire thermometers.
     for my $sub_host (
-        @{get_pi_hosts_running_daemon($ONE_WIRED_SENDER_SCRIPT)}
+        @{get_pi_hosts_running_daemon($ONE_WIRE_SENDER_PERL_SCRIPT)}
     ){
         $count_zmq_subs++;
         push @w, zmq_anyevent({
             zmq_type          => ZMQ_SUB,
             host              => $sub_host,
-            port              => $ONE_WIRE_DAEMON_PORT,
+            port              => $ONE_WIRE_DAEMON_PERL_PORT,
             msg_handler       => \&process_thermometer_msg,
             msg_handler_param => "",
             klog              => true,
@@ -105,13 +106,17 @@ sub run_heating_daemon {
 
     sub process_thermometer_msg {
         my ($zmq_sock, $msg, $param) = @_;
-        my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
 
+        my $msg_rh = $json->decode( $msg );
 
-        my $msg_decoded = $json->decode( $msgdata );
-
-        my $owaddr    = $msg_decoded->{OneWireAddress};
-        my $curr_temp = $msg_decoded->{Celsius};
+        my $control_name
+            = get_hashval($msg_rh, 'control_name');
+        my $owaddr
+            = get_hashval($msg_rh, 'onewire_addr');
+        my $current_value_temp
+            = get_hashval($msg_rh, 'current_value');
+        my $request_epoch_time
+            = get_hashval($msg_rh, 'request_epoch_time');
 
         my $new_thermometer_conf ;
         eval { $new_thermometer_conf = get_one_wire_heating_control_conf();};
@@ -134,21 +139,21 @@ sub run_heating_daemon {
            ."$HEATING_DAEMON_CONF_FULLPATH "
                 if ! $name ;
 
-        my $control_name = $tc->{control} || '';
+        my $operate_control_name = $tc->{control} || '';
         my $upper_temp   = $tc->{upper_temp} || '';
 
-        if ( ! $control_name && ! $upper_temp ){
-            klogdebug "$name : $owaddr : $curr_temp C";
+        if ( ! $operate_control_name && ! $upper_temp ){
+            klogdebug "$name : $owaddr : $current_value_temp C";
             return ;
         }
 
         my $lower_temp = $tc->{lower_temp} || ( $upper_temp - 1 );
 
-        if ( ! $control_name || ! defined $upper_temp || ! defined $lower_temp ){
+        if ( ! $operate_control_name || ! defined $upper_temp || ! defined $lower_temp ){
             klogerror "Not all the parameters are configured for this thermometer";
             klogerror "Both the 'upper_temp' and 'control' need to be defined";
             klogerror "upper_temp = $upper_temp C";
-            klogerror "control    = '$control_name'";
+            klogerror "control    = '$operate_control_name'";
             klogerror "Please fix the config file $HEATING_DAEMON_CONF_FULLPATH";
             return;
         }
@@ -162,24 +167,24 @@ sub run_heating_daemon {
             return;
         }
 
-        kloginfo "$name : $owaddr : $curr_temp C : lower = $lower_temp C : upper = $upper_temp C";
-        klogdebug "msg", $msg_decoded;
+        kloginfo "$name : $owaddr : $current_value_temp C : lower = $lower_temp C : upper = $upper_temp C";
+        klogdebug "msg", $msg_rh;
 
         my $send_cmd = sub {
             my ( $action ) = @_;
             my $retval;
-            kloginfo "Send command to '$control_name' '$action'";
-            eval { $retval = queue_command($control_name, $action); };
+            kloginfo "Send command to '$operate_control_name' '$action'";
+            eval { $retval = queue_command($operate_control_name, $action); };
             if ( $@ ) {
                 klogerror "$@";
                 return
             }
         };
 
-        if ( $curr_temp > $upper_temp ){
+        if ( $current_value_temp > $upper_temp ){
             $send_cmd->(OFF);
         }
-        elsif ( $curr_temp < $lower_temp ){
+        elsif ( $current_value_temp < $lower_temp ){
             $send_cmd->(ON);
         } else {
             kloginfo "Current temperate is in correct range\n";
