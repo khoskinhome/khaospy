@@ -47,6 +47,18 @@ use Khaospy::Constants qw(
     $OTHER_CONTROLS_DAEMON_SCRIPT
     $PING_SWITCH_DAEMON_SCRIPT
     $MAC_SWITCH_DAEMON_SCRIPT
+
+    $ORVIBOS20_CONTROL_TYPE
+    $ONEWIRE_THERM_CONTROL_TYPE
+    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE
+    $PI_GPIO_RELAY_CONTROL_TYPE
+    $PI_GPIO_SWITCH_CONTROL_TYPE
+    $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE
+    $PI_MCP23017_RELAY_CONTROL_TYPE
+    $PI_MCP23017_SWITCH_CONTROL_TYPE
+    $MAC_SWITCH_CONTROL_TYPE
+    $PING_SWITCH_CONTROL_TYPE
+
 );
 
 # TODO test the loading of a JSON file, for the pi-hosts and controls.
@@ -127,7 +139,7 @@ throws_ok { get_control_config('blahdeblah') }
 
 $controls_return = {
     'therm-loft' => {
-        type          => "onewire-thermometer",
+        type          => $ONEWIRE_THERM_CONTROL_TYPE,
         rrd_graph     => true,
         alias         => 'Loft',
         onewire_addr  => '28-021463277cff'  ,
@@ -139,7 +151,7 @@ cmp_deeply( $cont_cfg, $controls_return->{'therm-loft'} , "Got the control data"
 
 $controls_return = {
     'therm-loft' => {
-        type          => "onewire-thermometer",
+        type          => $ONEWIRE_THERM_CONTROL_TYPE,
         rrd_graph     => 9, # not a boolean value !
         alias         => 'Loft',
         onewire_addr  => '28-021463277cff'  ,
@@ -155,7 +167,7 @@ throws_ok { get_control_config('therm-loft') }
 # remove the optional "alias" field :
 $controls_return = {
     'therm-loft' => {
-        type          => "onewire-thermometer",
+        type          => $ONEWIRE_THERM_CONTROL_TYPE,
         onewire_addr  => '28-021463277cff'  ,
     },
 };
@@ -168,7 +180,7 @@ throws_ok { get_control_config('not-a-control-in-conf') }
 ##
 $controls_return = {
     'therm-loft' => {
-        type          => "onewire-thermometer",
+        type          => $ONEWIRE_THERM_CONTROL_TYPE,
         alias         => 'Loft',
         onewire_addr  => '28-021463277cff',
         unknown_key   => "broken!",
@@ -181,7 +193,7 @@ throws_ok { get_control_config('therm-loft') }
 ##
 $controls_return = {
     'therm-loft' => {
-        type          => "onewire-thermometer",
+        type          => $ONEWIRE_THERM_CONTROL_TYPE,
         alias         => 'Loft',
         onewire_addr  => '28-0243277cff',
     },
@@ -199,7 +211,7 @@ throws_ok { get_control_config('therm-loft') }
 $controls_return = {
         alisonrad       => {
             alias => 'Alison Radiator',
-            type  => "orviboS20",
+            type  => $ORVIBOS20_CONTROL_TYPE,
             host  => 'alisonrad',
             poll_host  => 'pitest',
             mac   => 'AC:CF:23:72:D1:FE',
@@ -211,7 +223,7 @@ cmp_deeply( $cont_cfg, $controls_return->{'alisonrad'} , "Got the control data" 
 # remove optional "alias"
 $controls_return = {
         alisonrad       => {
-            type  => "orviboS20",
+            type  => $ORVIBOS20_CONTROL_TYPE,
             host  => 'alisonrad',
             poll_host  => 'pitest',
             mac   => 'AC:CF:23:72:D1:FE',
@@ -223,7 +235,7 @@ cmp_deeply( $cont_cfg, $controls_return->{'alisonrad'} , "Got the control data" 
 
 $controls_return = {
         alisonrad       => {
-            type  => "orviboS20",
+            type  => $ORVIBOS20_CONTROL_TYPE,
             host  => 'alisonrad',
             poll_host  => 'pitest',
         },
@@ -237,7 +249,7 @@ throws_ok { get_control_config('alisonrad') }
 
 $controls_return = {
         alisonrad       => {
-            type  => "orviboS20",
+            type  => $ORVIBOS20_CONTROL_TYPE,
             host  => 'alisonrad',
             poll_host  => 'pitest',
             mac   => 'AC:CF:D1:FE',
@@ -254,7 +266,7 @@ throws_ok { get_control_config('alisonrad') }
 
 $controls_return = {
         alisonrad       => {
-            type  => "orviboS20",
+            type  => $ORVIBOS20_CONTROL_TYPE,
             host  => 'alisonrad',
             poll_host  => 'alisonrad', # not a valid host running the daemon
             mac   => 'AC:CF:23:72:D1:FE',
@@ -280,7 +292,7 @@ $pi_hosts_return = {
 
 $controls_return = {
         alisonrad       => {
-            type  => "orviboS20",
+            type  => $ORVIBOS20_CONTROL_TYPE,
             host  => 'alisonrad',
             poll_host  => 'pitest',
             mac   => 'AC:CF:23:72:D1:FE',
@@ -314,7 +326,7 @@ $pi_hosts_return = {
 $controls_return = {
     boiler => {
         alias => 'Boiler Central Heating',
-        type  => "pi-gpio-relay",
+        type  => $PI_GPIO_RELAY_CONTROL_TYPE,
         host  => 'pitest', # FIX THIS it will be piboiler when running.
         gpio_relay   => 4, # NOT the BCM CPIO number.
         invert_state => true,
@@ -365,14 +377,14 @@ $pi_hosts_return = {
 $controls_return = {
     boiler => {
         alias => 'Boiler Central Heating',
-        type  => "pi-gpio-relay",
+        type  => $PI_GPIO_RELAY_CONTROL_TYPE,
         host  => 'pitest', # FIX THIS it will be piboiler when running.
         gpio_relay   => 4, # NOT the BCM CPIO number.
         invert_state => true,
     },
     boiler2 => {
         alias => 'Boiler Central Heating 2',
-        type  => "pi-gpio-relay",
+        type  => $PI_GPIO_RELAY_CONTROL_TYPE,
         host  => 'pitest', # FIX THIS it will be piboiler when running.
         gpio_relay   => 4, # NOT the BCM CPIO number.
         invert_state => true,
@@ -414,14 +426,14 @@ $pi_hosts_return = {
 $controls_return = {
     boiler => {
         alias => 'Boiler Central Heating',
-        type  => "pi-gpio-relay",
+        type  => $PI_GPIO_RELAY_CONTROL_TYPE,
         host  => 'pitest',
         gpio_relay   => 4,
         invert_state => true,
     },
     boiler2 => {
         alias => 'Boiler Central Heating 2',
-        type  => "pi-gpio-relay",
+        type  => $PI_GPIO_RELAY_CONTROL_TYPE,
         host  => 'pitest2',
         gpio_relay   => 4,
         invert_state => true,
@@ -433,7 +445,7 @@ cmp_deeply( $cont_cfg, $controls_return->{'boiler'} , "Got the control data" );
 # simple validity check on a pi-gpio-relay-manual
 $controls_return = {
     a_pi_gpio_relay_manual => {
-        type => "pi-gpio-relay-manual",
+        type => $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE,
         host => "pitest",
         ex_or_for_state => false,
         invert_state => false,
@@ -447,7 +459,7 @@ cmp_deeply( $cont_cfg, $controls_return->{'a_pi_gpio_relay_manual'} , "Got the c
 # check on a pi-gpio-relay-manual that invert_state must be boolean
 $controls_return = {
     a_pi_gpio_relay_manual => {
-        type => "pi-gpio-relay-manual",
+        type => $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE,
         host => "pitest",
         ex_or_for_state => false,
         invert_state => 9, # not a valid boolean. 1 or 0 only.
@@ -465,7 +477,7 @@ throws_ok { get_control_config('a_pi_gpio_relay_manual') }
 # check on a pi-gpio-relay-manual that invert_state must be boolean
 $controls_return = {
     a_pi_gpio_relay_manual => {
-        type => "pi-gpio-relay-manual",
+        type => $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE,
         host => "pitest",
         ex_or_for_state => 9, # not a valid boolean. 1 or 0 only
         invert_state => false,
@@ -483,7 +495,7 @@ throws_ok { get_control_config('a_pi_gpio_relay_manual') }
 # check on a pi-gpio-relay-manual can't have both the gpio_relay and gpio_detect set to the same gpio number.
 $controls_return = {
     a_pi_gpio_relay_manual => {
-        type => "pi-gpio-relay-manual",
+        type => $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE,
         host => "pitest",
         ex_or_for_state => true,
         invert_state => false,
@@ -501,7 +513,7 @@ throws_ok { get_control_config('a_pi_gpio_relay_manual') }
 # simple validity check on a pi-gpio-relay-manual
 $controls_return = {
     a_pi_gpio_switch => {
-        type => "pi-gpio-switch",
+        type => $PI_GPIO_SWITCH_CONTROL_TYPE,
         host => "pitest",
         invert_state => true,
         gpio_switch => 6,
@@ -529,7 +541,7 @@ $pi_hosts_return = {
 
 $controls_return = {
     a_pi_mcp23017_relay => {
-        type => "pi-mcp23017-relay",
+        type => $PI_MCP23017_RELAY_CONTROL_TYPE,
         host => "pitest",
         invert_state => false,
         gpio_relay => {
@@ -545,7 +557,7 @@ cmp_deeply( $cont_cfg, $controls_return->{'a_pi_mcp23017_relay'} , "Got the cont
 
 $controls_return = {
     a_pi_mcp23017_relay => {
-        type => "pi-mcp23017-relay",
+        type => $PI_MCP23017_RELAY_CONTROL_TYPE,
         host => "pitest",
         invert_state => 9, #  not a boolean 0 or 1
         gpio_relay => {
@@ -565,7 +577,7 @@ throws_ok { get_control_config('a_pi_mcp23017_relay') }
 
 $controls_return = {
     a_pi_mcp23017_relay => {
-        type => "pi-mcp23017-relay",
+        type => $PI_MCP23017_RELAY_CONTROL_TYPE,
         host => "pitest",
         invert_state => true,
         gpio_relay => {
@@ -601,7 +613,7 @@ $pi_hosts_return = {
 
 $controls_return = {
     a_pi_mcp23017_relay => {
-        type => "pi-mcp23017-relay",
+        type => $PI_MCP23017_RELAY_CONTROL_TYPE,
         host => "pitest",
         invert_state => true,
         gpio_relay => {
@@ -635,7 +647,7 @@ $pi_hosts_return = {
 };
 $controls_return = {
     a_pi_mcp23017_relay => {
-        type => "pi-mcp23017-relay",
+        type => $PI_MCP23017_RELAY_CONTROL_TYPE,
         host => "pitest",
         invert_state => true,
         gpio_relay => {
@@ -657,7 +669,7 @@ throws_ok { get_control_config('a_pi_mcp23017_relay') }
 
 $controls_return = {
     a_pi_mcp23017_relay => {
-        type => "pi-mcp23017-relay",
+        type => $PI_MCP23017_RELAY_CONTROL_TYPE,
         host => "pitest",
         invert_state => true,
         gpio_relay => {
@@ -679,7 +691,7 @@ throws_ok { get_control_config('a_pi_mcp23017_relay') }
 
 $controls_return = {
     a_pi_mcp23017_switch => {
-        type => "pi-mcp23017-switch",
+        type => $PI_MCP23017_SWITCH_CONTROL_TYPE,
         host => "pitest",
         invert_state => false,
         gpio_switch => {
@@ -697,7 +709,7 @@ cmp_deeply( $cont_cfg, $controls_return->{'a_pi_mcp23017_switch'} , "Got the con
 
 $controls_return = {
     a_pi_mcp23017_relay_with_manual => {
-        type => "pi-mcp23017-relay-manual",
+        type => $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE,
         host => "pitest",
         ex_or_for_state => false,
         invert_state => false,
@@ -723,7 +735,7 @@ cmp_deeply( $cont_cfg, $controls_return->{'a_pi_mcp23017_relay_with_manual'} , "
 ## check both gpios can't be the same.
 $controls_return = {
     a_pi_mcp23017_relay_with_manual => {
-        type => "pi-mcp23017-relay-manual",
+        type => $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE,
         host => "pitest",
         ex_or_for_state => false,
         invert_state => false,
@@ -779,7 +791,7 @@ $pi_hosts_return = {
 
 $controls_return = {
     a_pi_mcp23017_relay_with_manual => {
-        type => "pi-mcp23017-relay-manual",
+        type => $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE,
         host => "pitest",
         ex_or_for_state => false,
         invert_state => false,
@@ -799,7 +811,7 @@ $controls_return = {
     },
 
     a_pi_mcp23017_relay_with_manual2 => {
-        type => "pi-mcp23017-relay-manual",
+        type => $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE,
         host => "pitest2",
         ex_or_for_state => false,
         invert_state => false,
@@ -854,13 +866,13 @@ $pi_hosts_return = {
 
 $controls_return = {
     pitest_pi_gpio_switch => {
-        type => "pi-gpio-switch",
+        type => $PI_GPIO_SWITCH_CONTROL_TYPE,
         host => "pitest",
         invert_state => true,
         gpio_switch => 6,
     },
     pianother_pi_gpio_switch => {
-        type => "pi-gpio-switch",
+        type => $PI_GPIO_SWITCH_CONTROL_TYPE,
         host => "pianother",
         invert_state => true,
         gpio_switch => 7,

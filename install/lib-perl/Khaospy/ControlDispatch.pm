@@ -16,6 +16,7 @@ use Khaospy::Constants qw(
     ON OFF STATUS
     AUTO MANUAL
     IN $IN OUT $OUT
+
 );
 
 use Khaospy::Log qw(

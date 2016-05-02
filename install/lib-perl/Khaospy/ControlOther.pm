@@ -24,6 +24,7 @@ use Khaospy::Constants qw(
     ON OFF STATUS
     AUTO MANUAL
     IN $IN OUT $OUT
+    $ORVIBOS20_CONTROL_TYPE
 );
 
 use Khaospy::ControlDispatch qw(
@@ -70,13 +71,13 @@ sub init_controls {
     init_dispatch(
         {
             init    => {
-                orviboS20 => \&poll_orvibo_s20,
+                $ORVIBOS20_CONTROL_TYPE => \&poll_orvibo_s20,
             },
             poll    => {
-                orviboS20 => \&poll_orvibo_s20,
+                $ORVIBOS20_CONTROL_TYPE => \&poll_orvibo_s20,
             },
             operate => {
-                orviboS20 => \&operate_orvibo_s20,
+                $ORVIBOS20_CONTROL_TYPE => \&operate_orvibo_s20,
             },
         },
         \&unhandled_type_cb,

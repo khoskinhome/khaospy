@@ -207,7 +207,21 @@ our $BOILER_DAEMON_TIMER = 5;
 our $BOILER_STATUS_REFRESH_EVERY_SECS = 120;
 our $BOILER_DAEMON_DELAY_START = 20;
 
+#################
+# CONTROL_TYPES :
+our $ORVIBOS20_CONTROL_TYPE                 = "orvibos20";
+our $ONEWIRE_THERM_CONTROL_TYPE             = "onewire-thermometer";
 
+our $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE      = "pi-gpio-relay-manual";
+our $PI_GPIO_RELAY_CONTROL_TYPE             = "pi-gpio-relay";
+our $PI_GPIO_SWITCH_CONTROL_TYPE            = "pi-gpio-switch";
+
+our $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE  = "pi-mcp23017-relay-manual";
+our $PI_MCP23017_RELAY_CONTROL_TYPE         = "pi-mcp23017-relay";
+our $PI_MCP23017_SWITCH_CONTROL_TYPE        = "pi-mcp23017-switch";
+
+our $MAC_SWITCH_CONTROL_TYPE                = "mac-switch";
+our $PING_SWITCH_CONTROL_TYPE               = "ping-switch";
 
 ######################
 our @EXPORT_OK = qw(
@@ -333,6 +347,17 @@ our @EXPORT_OK = qw(
     $ZMQ_REQUEST_TIMEOUT
 
     $LOCALHOST
+
+    $ORVIBOS20_CONTROL_TYPE
+    $ONEWIRE_THERM_CONTROL_TYPE
+    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE
+    $PI_GPIO_RELAY_CONTROL_TYPE
+    $PI_GPIO_SWITCH_CONTROL_TYPE
+    $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE
+    $PI_MCP23017_RELAY_CONTROL_TYPE
+    $PI_MCP23017_SWITCH_CONTROL_TYPE
+    $MAC_SWITCH_CONTROL_TYPE
+    $PING_SWITCH_CONTROL_TYPE
 
 );
 

@@ -22,6 +22,14 @@ use Khaospy::Constants qw(
     ON OFF STATUS
     AUTO MANUAL
     IN $IN OUT $OUT
+
+    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE
+    $PI_GPIO_RELAY_CONTROL_TYPE
+    $PI_GPIO_SWITCH_CONTROL_TYPE
+    $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE
+    $PI_MCP23017_RELAY_CONTROL_TYPE
+    $PI_MCP23017_SWITCH_CONTROL_TYPE
+
 );
 
 use Khaospy::ControlPiGPIO;
@@ -56,30 +64,30 @@ sub poll_controls {
 }
 
 my $operate_dispatch = {
-    'pi-gpio-relay'             => operate_relay('Khaospy::ControlPiGPIO'),
-    'pi-gpio-switch'            => operate_switch('Khaospy::ControlPiGPIO'),
-    'pi-gpio-relay-manual'      => operate_relay_manual('Khaospy::ControlPiGPIO'),
-    'pi-mcp23017-relay'         => operate_relay('Khaospy::ControlPiMCP23017'),
-    'pi-mcp23017-switch'        => operate_switch('Khaospy::ControlPiMCP23017'),
-    'pi-mcp23017-relay-manual'  => operate_relay_manual('Khaospy::ControlPiMCP23017'),
+    $PI_GPIO_RELAY_CONTROL_TYPE             => operate_relay('Khaospy::ControlPiGPIO'),
+    $PI_GPIO_SWITCH_CONTROL_TYPE            => operate_switch('Khaospy::ControlPiGPIO'),
+    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE      => operate_relay_manual('Khaospy::ControlPiGPIO'),
+    $PI_MCP23017_RELAY_CONTROL_TYPE         => operate_relay('Khaospy::ControlPiMCP23017'),
+    $PI_MCP23017_SWITCH_CONTROL_TYPE        => operate_switch('Khaospy::ControlPiMCP23017'),
+    $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE  => operate_relay_manual('Khaospy::ControlPiMCP23017'),
 };
 
 my $init_dispatch = {
-    'pi-gpio-relay'             => init_relay('Khaospy::ControlPiGPIO'),
-    'pi-gpio-switch'            => init_switch('Khaospy::ControlPiGPIO'),
-    'pi-gpio-relay-manual'      => init_relay_manual('Khaospy::ControlPiGPIO'),
-    'pi-mcp23017-relay'         => init_relay('Khaospy::ControlPiMCP23017'),
-    'pi-mcp23017-switch'        => init_switch('Khaospy::ControlPiMCP23017'),
-    'pi-mcp23017-relay-manual'  => init_relay_manual('Khaospy::ControlPiMCP23017'),
+    $PI_GPIO_RELAY_CONTROL_TYPE             => init_relay('Khaospy::ControlPiGPIO'),
+    $PI_GPIO_SWITCH_CONTROL_TYPE            => init_switch('Khaospy::ControlPiGPIO'),
+    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE      => init_relay_manual('Khaospy::ControlPiGPIO'),
+    $PI_MCP23017_RELAY_CONTROL_TYPE         => init_relay('Khaospy::ControlPiMCP23017'),
+    $PI_MCP23017_SWITCH_CONTROL_TYPE        => init_switch('Khaospy::ControlPiMCP23017'),
+    $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE  => init_relay_manual('Khaospy::ControlPiMCP23017'),
 };
 
 my $poll_dispatch = {
-    'pi-gpio-relay'             => undef,
-    'pi-gpio-switch'            => poll_switch('Khaospy::ControlPiGPIO'),
-    'pi-gpio-relay-manual'      => poll_relay_manual('Khaospy::ControlPiGPIO'),
-    'pi-mcp23017-relay'         => undef,
-    'pi-mcp23017-switch'        => poll_switch('Khaospy::ControlPiMCP23017'),
-    'pi-mcp23017-relay-manual'  => poll_relay_manual('Khaospy::ControlPiMCP23017'),
+    $PI_GPIO_RELAY_CONTROL_TYPE             => undef,
+    $PI_GPIO_SWITCH_CONTROL_TYPE            => poll_switch('Khaospy::ControlPiGPIO'),
+    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE      => poll_relay_manual('Khaospy::ControlPiGPIO'),
+    $PI_MCP23017_RELAY_CONTROL_TYPE         => undef,
+    $PI_MCP23017_SWITCH_CONTROL_TYPE        => poll_switch('Khaospy::ControlPiMCP23017'),
+    $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE  => poll_relay_manual('Khaospy::ControlPiMCP23017'),
 };
 
 sub operate_control {

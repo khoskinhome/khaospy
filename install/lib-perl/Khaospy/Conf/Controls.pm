@@ -46,6 +46,17 @@ use Khaospy::Constants qw(
     $MAC_SWITCH_DAEMON_SCRIPT
     $PING_SWITCH_DAEMON_SCRIPT
 
+    $ORVIBOS20_CONTROL_TYPE
+    $ONEWIRE_THERM_CONTROL_TYPE
+    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE
+    $PI_GPIO_RELAY_CONTROL_TYPE
+    $PI_GPIO_SWITCH_CONTROL_TYPE
+    $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE
+    $PI_MCP23017_RELAY_CONTROL_TYPE
+    $PI_MCP23017_SWITCH_CONTROL_TYPE
+    $MAC_SWITCH_CONTROL_TYPE
+    $PING_SWITCH_CONTROL_TYPE
+
 );
 
 use Khaospy::Conf qw(
@@ -61,11 +72,13 @@ use Khaospy::Utils qw(
     get_hashval
 );
 
+
 our @EXPORT_OK = qw(
     get_control_config
     get_controls_conf
     get_controls_conf_for_host
     get_control_name_for_one_wire
+
 );
 
 my $check_mac = check_regex(
@@ -78,10 +91,9 @@ my $check_optional_boolean
 my $check_optional_integer
     = check_optional_regex(qr/^\d+$/);
 
-my $ONEWIRE_THERM_TYPE = "onewire-thermometer";
 
 my $check_types = {
-    "orvibos20" => {
+    $ORVIBOS20_CONTROL_TYPE => {
         alias        => \&check_optional,
         rrd_graph    => $check_optional_boolean,
         db_log       => $check_optional_boolean,
@@ -92,7 +104,7 @@ my $check_types = {
         mac          => $check_mac,
         manual_auto_timeout => $check_optional_integer,
     },
-    $ONEWIRE_THERM_TYPE => {
+    $ONEWIRE_THERM_CONTROL_TYPE => {
         alias         => \&check_optional,
         rrd_graph     => $check_optional_boolean,
         db_log        => $check_optional_boolean,
@@ -100,7 +112,7 @@ my $check_types = {
             qr/^[0-9A-Fa-f]{2}-[0-9A-Fa-f]{12}$/
         ),
     },
-    "pi-gpio-relay-manual" => {
+    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE => {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
@@ -112,7 +124,7 @@ my $check_types = {
         gpio_relay      => \&check_pi_gpio,
         gpio_detect     => \&check_pi_gpio,
     },
-    "pi-gpio-relay" => {
+    $PI_GPIO_RELAY_CONTROL_TYPE => {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
@@ -121,7 +133,7 @@ my $check_types = {
         invert_state    => $check_boolean,
         gpio_relay      => \&check_pi_gpio,
     },
-    "pi-gpio-switch" => {
+    $PI_GPIO_SWITCH_CONTROL_TYPE => {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
@@ -130,7 +142,7 @@ my $check_types = {
         invert_state    => $check_boolean,
         gpio_switch     => \&check_pi_gpio,
     },
-    "pi-mcp23017-relay-manual" => {
+    $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE => {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
@@ -142,7 +154,7 @@ my $check_types = {
         gpio_relay      => \&check_pi_mcp23017,
         gpio_detect     => \&check_pi_mcp23017,
     },
-    "pi-mcp23017-relay" => {
+    $PI_MCP23017_RELAY_CONTROL_TYPE => {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
@@ -151,7 +163,7 @@ my $check_types = {
         invert_state    => $check_boolean,
         gpio_relay      => \&check_pi_mcp23017,
     },
-    "pi-mcp23017-switch" => {
+    $PI_MCP23017_SWITCH_CONTROL_TYPE => {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
@@ -160,20 +172,53 @@ my $check_types = {
         invert_state    => $check_boolean,
         gpio_switch     => \&check_pi_mcp23017,
     },
-    "mac-switch" => {
+    $MAC_SWITCH_CONTROL_TYPE => {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         mac             => $check_mac,
         poll_host       => check_host_runs($MAC_SWITCH_DAEMON_SCRIPT),
     },
-    "ping-switch" => {
+    $PING_SWITCH_CONTROL_TYPE => {
         alias           => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            => \&check_host,
         poll_host       => check_host_runs($PING_SWITCH_DAEMON_SCRIPT),
     }
+};
+
+my $rrd_create_thermometer = [qw(
+    --start  now  --step 60
+    DS:a:GAUGE:120:-40:90
+    RRA:AVERAGE:0.5:1:1440
+    RRA:AVERAGE:0.5:4:1440
+    RRA:AVERAGE:0.5:8:1440
+    RRA:AVERAGE:0.5:32:1440
+    RRA:AVERAGE:0.5:60:17520
+)];
+
+my $rrd_create_switch = [qw(
+    --start  now  --step 60
+    DS:a:GAUGE:120:0:1
+    RRA:AVERAGE:0.5:1:1440
+    RRA:AVERAGE:0.5:4:1440
+    RRA:AVERAGE:0.5:8:1440
+    RRA:AVERAGE:0.5:32:1440
+    RRA:AVERAGE:0.5:60:17520
+)];
+
+my $rrd_create_params = {
+    $ORVIBOS20_CONTROL_TYPE                 => $rrd_create_switch,
+    $ONEWIRE_THERM_CONTROL_TYPE             => $rrd_create_thermometer,
+    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE      => $rrd_create_switch,
+    $PI_GPIO_RELAY_CONTROL_TYPE             => $rrd_create_switch,
+    $PI_GPIO_SWITCH_CONTROL_TYPE            => $rrd_create_switch,
+    $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE  => $rrd_create_switch,
+    $PI_MCP23017_RELAY_CONTROL_TYPE         => $rrd_create_switch,
+    $PI_MCP23017_SWITCH_CONTROL_TYPE        => $rrd_create_switch,
+    $MAC_SWITCH_CONTROL_TYPE                => $rrd_create_switch,
+    $PING_SWITCH_CONTROL_TYPE               => $rrd_create_switch,
 };
 
 # TODO need a better way of forcing the loading of the control config
@@ -237,7 +282,7 @@ sub get_control_name_for_one_wire {
 
     my @controls_one_wire_conf =
         grep { $controls_conf->{$_}{onewire_addr} eq $one_wire_addr }
-        grep { $controls_conf->{$_}{type} eq $ONEWIRE_THERM_TYPE }
+        grep { $controls_conf->{$_}{type} eq $ONEWIRE_THERM_CONTROL_TYPE }
         keys %$controls_conf;
 
 

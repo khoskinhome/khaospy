@@ -12,6 +12,7 @@ use lib "$FindBin::Bin/../lib-perl";
 use Khaospy::Utils qw/slurp/;
 use Khaospy::Constants qw(
     $CONTROLS_CONF_FULLPATH
+    $ORVIBOS20_CONTROL_TYPE
 );
 
 use Khaospy::OrviboS20 qw/signal_control/;
@@ -40,7 +41,7 @@ for my $control_key ( keys %$controls ) {
     print "Testing $control_key\n";
 
     my $control = $controls->{$control_key};
-    next if lc($control->{type}) ne 'orvibos20';
+    next if lc($control->{type}) ne $ORVIBOS20_CONTROL_TYPE;
 
     test_on_off_status($control->{host},$control->{mac});
 
