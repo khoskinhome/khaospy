@@ -7,6 +7,7 @@ use Carp qw/croak confess/;
 use Data::Dumper;
 use Exporter qw/import/;
 use JSON;
+use DateTime;
 
 my $json = JSON->new->allow_nonref;
 
@@ -30,6 +31,7 @@ our @EXPORT_OK = qw(
     burp
     get_hashval
     get_cmd
+    get_iso8601_utc_from_epoch
 );
 
 sub timestamp { return strftime("%F %T", gmtime( $_[0] || time) ); }
@@ -83,6 +85,20 @@ sub get_cmd {
     $ret =~ s/\s+$//g;
 
     return $ret;
+}
+
+sub get_iso8601_utc_from_epoch {
+    my ($epoch) = @_;
+
+    return if ! defined $epoch;
+
+    my $dt =
+        DateTime->from_epoch(
+            epoch => $epoch,
+            time_zone => 'UTC',
+        );
+
+    return $dt->strftime('%F %T.%6Nz');
 }
 
 1;

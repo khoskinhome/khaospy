@@ -178,7 +178,7 @@ sub get_ports {
     my ($opts) = @_;
     my @ports;
 
-    if ( $opts->{"one-wire"} ) {
+    if ( $opts->{"one-wire"} ){
         push @ports, $ONE_WIRE_DAEMON_PORT;
         push @ports, $ONE_WIRE_DAEMON_PERL_PORT;
     }
@@ -191,7 +191,7 @@ sub get_ports {
 
     push @ports, $OTHER_CONTROLS_DAEMON_SEND_PORT
         if $opts->{"other-control"};
-        
+
     push @ports, $PI_STATUS_DAEMON_SEND_PORT
         if $opts->{"status"};
 

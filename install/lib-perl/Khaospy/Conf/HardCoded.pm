@@ -22,6 +22,8 @@ use Khaospy::Constants qw(
     $GLOBAL_CONF
     $PI_HOSTS_CONF
 
+    $ONE_WIRE_SENDER_PERL_SCRIPT
+
     $ONE_WIRED_SENDER_SCRIPT
     $ONE_WIRED_RECEIVER_SCRIPT
     $HEATING_DAEMON
@@ -29,6 +31,7 @@ use Khaospy::Constants qw(
     $PI_CONTROLLER_DAEMON_SCRIPT
     $COMMAND_QUEUE_DAEMON_SCRIPT
 
+    $PI_STATUS_DAEMON_SCRIPT
     $PIBOILER_HOMEEASY_SCHEDULE_DAEMON_SCRIPT
 
     $OTHER_CONTROLS_DAEMON_SCRIPT
@@ -813,9 +816,11 @@ sub live_pi_host_conf {
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 0, 1 ],
             daemons => [
+                { script  => $PI_STATUS_DAEMON_SCRIPT,  options => { }, },
                 { script  =>$ONE_WIRED_SENDER_SCRIPT,
                   options => { '--stdout_freq' => '890' },
                 },
+                { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
                 {
                     script  => $ONE_WIRED_RECEIVER_SCRIPT,
                     options => { '--host' => "pioldwifi" },
@@ -845,6 +850,7 @@ sub live_pi_host_conf {
                     script  =>$ONE_WIRED_SENDER_SCRIPT,
                     options => { '--stdout_freq' => '890' },
                 },
+                { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
                 {
                     script  =>"/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
                     options => { },
@@ -860,6 +866,7 @@ sub live_pi_host_conf {
                     script  =>$ONE_WIRED_SENDER_SCRIPT,
                     options => { '--stdout_freq' => '890' },
                 },
+                { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
             ],
         },
         piboiler => {
@@ -870,6 +877,7 @@ sub live_pi_host_conf {
                 { script  =>$ONE_WIRED_SENDER_SCRIPT,
                   options => { '--stdout_freq' => '890' },
                 },
+                { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
                 { script  => $HEATING_DAEMON,               options => { }, },
                 { script  => $BOILER_DAEMON_SCRIPT,         options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT,  options => { }, },

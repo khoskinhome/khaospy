@@ -24,7 +24,7 @@ use Khaospy::Constants qw(
 
     $BOILERS_CONF_FULLPATH
     $GLOBAL_CONF_FULLPATH
-
+    $DATABASE_CONF_FULLPATH
 );
 
 use Khaospy::Utils;
@@ -33,6 +33,7 @@ our @EXPORT_OK = qw(
     get_one_wire_heating_control_conf
     get_boiler_conf
     get_global_conf
+    get_database_conf
     get_conf
 );
 
@@ -89,4 +90,9 @@ sub get_global_conf {
     get_conf( \$global_conf, $GLOBAL_CONF_FULLPATH, $force_reload);
 }
 
+my $database_conf;
+sub get_database_conf {
+    my ($force_reload) = @_;
+    get_conf( \$database_conf, $DATABASE_CONF_FULLPATH, $force_reload);
+}
 1;

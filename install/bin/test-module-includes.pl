@@ -27,6 +27,8 @@ use Khaospy::ControlPi;
 use Khaospy::ControlPiGPIO;
 use Khaospy::ControlPiMCP23017;
 
+use Khaospy::DBH;
+
 use Khaospy::HeatingDaemon;
 
 use Khaospy::Log;
