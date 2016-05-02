@@ -10,6 +10,8 @@ install/www-bin/lightba.pl
 #######################################################
 crap
 
+crap.migrate.rrd.sh
+
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
 
@@ -29,6 +31,8 @@ crap
 ./install/lib-perl-t/crap.t
 ./install/bin/khaospy-test-conf-generate.pl
 ./install/bin/khaospy-live-conf-generate.pl
+
+./install/bin/khaospy-db-conf-generate.pl
 
 ./install/lib-perl/Khaospy/Constants.pm
 
@@ -62,6 +66,9 @@ crap
 
 ./install/lib-perl/Khaospy/Message.pm
 
+./install/lib-perl/Khaospy/OneWireThermometer.pm
+./install/bin/khaospy-one-wire-daemon.pl
+
 ./install/lib-perl/Khaospy/HeatingDaemon.pm
 ./install/bin/khaospy-one-wire-heating-daemon.pl
 
@@ -77,12 +84,17 @@ crap
 
 ./install/lib-perl/Khaospy/Utils.pm
 
+./install/bin/test-date.pl
+
+
+
 ./install/lib-perl/Khaospy/ZMQSubscribeAllPublishers.pm
 ./install/bin/khaospy-zmq-subscribe.pl
 
 ./install/lib-perl/Khaospy/StatusD.pm
 ./install/bin/khaospy-status-d.pl
 
+./install/lib-perl/Khaospy/DBH.pm
 
 ./install/lib-perl/Khaospy/ZMQAnyEvent.pm
 
