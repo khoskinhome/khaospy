@@ -37,6 +37,9 @@ use Khaospy::Exception qw(
 
 use Khaospy::Constants qw(
     $JSON
+
+    true false
+
     ON OFF STATUS
     $CONTROLS_CONF_FULLPATH
     $PI_HOSTS_CONF_FULLPATH
@@ -78,7 +81,8 @@ our @EXPORT_OK = qw(
     get_controls_conf
     get_controls_conf_for_host
     get_control_name_for_one_wire
-
+    is_control_rrd_graphed
+    get_rrd_create_params_for_control
 );
 
 my $check_mac = check_regex(
@@ -226,6 +230,30 @@ my $rrd_create_params = {
 # get_controls_conf();
 
 my $controls_conf;
+
+sub get_rrd_create_params_for_control {
+
+    my ($control_name) = @_;
+    get_controls_conf();
+
+    my $control = get_hashval($controls_conf,$control_name);
+
+    return if ! is_control_rrd_graphed($control_name);
+
+    return
+        get_hashval($rrd_create_params,
+            get_hashval($control,'type')
+        );
+}
+
+sub is_control_rrd_graphed {
+    my ($control_name) = @_;
+    get_controls_conf();
+
+    my $control = get_hashval($controls_conf,$control_name);
+
+    return get_hashval($control,'rrd_graph',false,false,false);
+}
 
 sub _set_controls_conf {
     # needed for testing.

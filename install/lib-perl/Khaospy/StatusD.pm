@@ -30,6 +30,8 @@ use Khaospy::Constants qw(
 
     $LOCALHOST
 
+    $RRD_DIR
+
     $ONE_WIRE_DAEMON_PERL_PORT
     $ONE_WIRE_SENDER_PERL_SCRIPT
 
@@ -44,6 +46,11 @@ use Khaospy::Constants qw(
 
     $PING_SWITCH_DAEMON_SEND_PORT
     $PING_SWITCH_DAEMON_SCRIPT
+);
+
+use Khaospy::Conf::Controls qw(
+    get_rrd_create_params_for_control
+    is_control_rrd_graphed
 );
 
 use Khaospy::Log qw(
@@ -136,6 +143,8 @@ sub output_msg {
 
     my $control_name = $dec->{control_name};
 
+    my $request_epoch_time = $dec->{request_epoch_time};
+
     my $record = {
         control_name  => $control_name,
         current_state => $dec->{current_state} || "",
@@ -145,7 +154,7 @@ sub output_msg {
         last_change_state_by => $dec->{last_change_state_by} || undef,
         manual_auto_timeout_left => $dec->{manual_auto_timeout_left} ,
         request_time =>
-            get_iso8601_utc_from_epoch($dec->{request_epoch_time}),
+            get_iso8601_utc_from_epoch($request_epoch_time),
     };
 
     my $curr_state_or_value
@@ -161,6 +170,27 @@ sub output_msg {
         $last_control_state->{$control_name} = $curr_state_or_value;
         kloginfo "Update DB with $control_name : $curr_state_or_value";
         control_status_insert( $record );
+    }
+
+
+    if ( is_control_rrd_graphed($control_name) ){
+        # does an rrd exist ? If not then create it.
+        my $rrd_filename = "$RRD_DIR/$control_name";
+        if ( ! -f $rrd_filename ){
+
+            kloginfo "Creating RRD file $rrd_filename";
+            my $cmd =
+            "rrdtool create $rrd_filename "
+                .join ( ' ', @{get_rrd_create_params_for_control($control_name)});
+
+            klogdebug "cmd = $cmd";
+            system ($cmd); # TODO error checking
+        }
+
+        kloginfo "Updating RRD file $rrd_filename $request_epoch_time:$curr_state_or_value";
+        my $cmd = "rrdtool update $rrd_filename $request_epoch_time:$curr_state_or_value";
+        system($cmd); #TODO ERROR CHECKING.
+
     }
 }
 

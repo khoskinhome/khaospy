@@ -45,6 +45,7 @@ create table control_status (
     db_update_time           timestamp with time zone not null
 );
 
+# select control_name, request_time, current_state, current_value from control_status where id in ( select max(id) from control_status group by control_name );
 
 
 

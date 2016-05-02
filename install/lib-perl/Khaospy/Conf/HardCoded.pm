@@ -245,96 +245,115 @@ sub live_controls_conf {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Karl thermometer',
             onewire_addr  => '28-041591f5e5ff',
+            rrd_graph     => true,
         },
         'therm-loft-over-kitchen' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Loft over kitchen',
             onewire_addr  => '28-000006e01389',
+            rrd_graph     => true,
         },
         'therm-kitchen' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Kitchen thermometer',
             onewire_addr  => '28-011465167eff'  ,
+            rrd_graph     => true,
         },
         'therm-alison-door' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Alison thermometer',
             onewire_addr  => '28-0000066ebc74'  ,
+            rrd_graph     => true,
         },
         'therm-playhouse' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Playhouse-tv thermometer.',
             onewire_addr  => '28-000006e04e8b' ,
+            rrd_graph     => true,
         },
         'therm-playhouse-door' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Playhouse-9e-door thermometer',
             onewire_addr  => '28-0000066fe99e' ,
+            rrd_graph     => true,
         },
         'therm-bathroom' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Bathroom thermometer',
             onewire_addr  => '28-00000670596d'  ,
+            rrd_graph     => true,
         },
         'therm-loft' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Loft thermometer',
             onewire_addr  => '28-021463277cff'  ,
+            rrd_graph     => true,
         },
         'therm-amelia-door' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Amelia thermometer',
             onewire_addr  => '28-0214632d16ff',
+            rrd_graph     => true,
         },
         'therm-upstairs-landing' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Upstairs-Landing thermometer',
             onewire_addr  => '28-021463423bff',
+            rrd_graph     => true,
         },
         'therm-outside-front-drive' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Outside-front-drive thermometer',
             onewire_addr  => '28-000006e04d3c',
+            rrd_graph     => true,
         },
         'therm-boiler-ch-in-cold' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'boiler-ch-in-cold thermometer',
             onewire_addr  => '28-000006e00a67',
+            rrd_graph     => true,
         },
         'therm-boiler-ch-out-hot' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'boiler-ch-out-hot thermometer',
             onewire_addr  => '28-0114632f89ff',
+            rrd_graph     => true,
         },
         'therm-boiler-wh-in-cold' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'boiler-wh-in-cold thermometer',
             onewire_addr  => '28-0414688dbfff',
+            rrd_graph     => true,
         },
         'therm-boiler-wh-out-hot' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'boiler-wh-out-hot thermometer',
             onewire_addr  => '28-011465cb13ff',
+            rrd_graph     => true,
         },
         'therm-boiler-room' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'boiler-room thermometer',
             onewire_addr  => '28-031463502eff',
+            rrd_graph     => true,
         },
         'therm-front-room' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'front-room thermometer',
             onewire_addr  => '28-0214630558ff',
+            rrd_graph     => true,
         },
         'therm-front-porch' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'front-porch thermometer',
             onewire_addr  => '28-000006cafb0d',
+            rrd_graph     => true,
         },
         'therm-dining-room-near-boiler' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'dining-room thermometer',
             onewire_addr  => '28-0000066ff2ac',
+            rrd_graph     => true,
         },
 
         alisonrad       => {
@@ -344,6 +363,7 @@ sub live_controls_conf {
             poll_timeout => 10,
             poll_host => 'piboiler',
             mac   => 'AC:CF:23:72:D1:FE',
+            rrd_graph     => true,
         },
         ameliarad       => {
             alias => 'Amelia Radiator',
@@ -352,6 +372,7 @@ sub live_controls_conf {
             poll_timeout => 10,
             poll_host => 'piboiler',
             mac   => 'AC-CF-23-72-F3-D4',
+            rrd_graph     => true,
         },
         karlrad         => {
             alias => 'Karl Radiator',
@@ -360,6 +381,7 @@ sub live_controls_conf {
             poll_timeout => 10,
             poll_host => 'piboiler',
             mac   => 'AC-CF-23-8D-7E-D2',
+            rrd_graph     => true,
         },
         dinningroomrad  => {
             alias => 'Dining Room Radiator',
@@ -368,6 +390,7 @@ sub live_controls_conf {
             poll_timeout => 10,
             poll_host => 'piboiler',
             mac   => 'AC-CF-23-8D-A4-8E',
+            rrd_graph     => true,
         },
         frontroomrad    => {
             alias => 'Front Room Radiator',
@@ -376,6 +399,7 @@ sub live_controls_conf {
             poll_timeout => 10,
             poll_host => 'piboiler',
             mac   => 'AC-CF-23-8D-3B-96',
+            rrd_graph     => true,
         },
 
         testsocket      => {
@@ -396,6 +420,7 @@ sub live_controls_conf {
             poll_timeout => 10,
             poll_host    => 'piboiler',
             mac          => 'AC-CF-23-72-28-30',
+            rrd_graph     => true,
         },
 
 # pi gpio
@@ -405,6 +430,7 @@ sub live_controls_conf {
             invert_state => true,
             gpio_relay  => 4,
             gpio_detect => 0,
+            rrd_graph     => true,
         },
 
         amelia_pir => { # alarm_01
@@ -413,6 +439,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 0,
             },
+            rrd_graph     => true,
         },
         amelia_window => { # alarm 02
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -420,6 +447,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 1,
             },
+            rrd_graph     => true,
         },
         alison_pir => { # alarm 03
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -427,6 +455,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 2,
             },
+            rrd_graph     => true,
         },
         alison_window => { # alarm 04
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -434,6 +463,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 3,
             },
+            rrd_graph     => true,
         },
         dining_room_pir => { # alarm 05
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -441,6 +471,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 4,
             },
+            rrd_graph     => true,
         },
         dining_room_window => { # alarm 06
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -448,6 +479,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 5,
             },
+            rrd_graph     => true,
         },
         front_room_pir => { # alarm 07
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -455,6 +487,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 6,
             },
+            rrd_graph     => true,
         },
         front_room_window => { # alarm 08
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -462,6 +495,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 7,
             },
+            rrd_graph     => true,
         },
         front_outside_door => { # alarm_09
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -469,6 +503,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 7,
             },
+            rrd_graph     => true,
         },
         front_porch_pir => { # alarm 10
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -476,6 +511,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 6,
             },
+            rrd_graph     => true,
         },
         inner_front_door => { # alarm 11
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -483,6 +519,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 5,
             },
+            rrd_graph     => true,
         },
         inner_front_door_deadlock => { # alarm 12
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -490,6 +527,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 4,
             },
+            rrd_graph     => true,
         },
         front_room_door => { # alarm 13
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -497,6 +535,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 3,
             },
+            rrd_graph     => true,
         },
         alarm_14 => { # alarm 14
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -504,6 +543,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 2,
             },
+            rrd_graph     => true,
         },
         alarm_15 => { # alarm 15
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -511,6 +551,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 1,
             },
+            rrd_graph     => true,
         },
         alarm_16 => { # alarm 16
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -518,6 +559,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 0,
             },
+            rrd_graph     => true,
         },
 
         alarm_17 => { # alarm_17
@@ -526,6 +568,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 0,
             },
+            rrd_graph     => true,
         },
         alarm_18 => { # alarm 18
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -533,6 +576,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 1,
             },
+            rrd_graph     => true,
         },
         alarm_19 => { # alarm 19
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -540,6 +584,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 2,
             },
+            rrd_graph     => true,
         },
         alarm_20 => { # alarm 20
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -547,6 +592,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 3,
             },
+            rrd_graph     => true,
         },
         alarm_21 => { # alarm 21
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -554,6 +600,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 4,
             },
+            rrd_graph     => true,
         },
         alarm_22 => { # alarm 22
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -561,6 +608,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 5,
             },
+            rrd_graph     => true,
         },
         alarm_23 => { # alarm 23
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -568,6 +616,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 6,
             },
+            rrd_graph     => true,
         },
         alarm_24 => { # alarm 24
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -575,6 +624,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'b', portnum  => 7,
             },
+            rrd_graph     => true,
         },
         alarm_25 => { # alarm_25
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -582,6 +632,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 7,
             },
+            rrd_graph     => true,
         },
         alarm_26 => { # alarm 26
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -589,6 +640,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 6,
             },
+            rrd_graph     => true,
         },
         alarm_27 => { # alarm 27
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -596,6 +648,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 5,
             },
+            rrd_graph     => true,
         },
         alarm_28 => { # alarm 28
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -603,6 +656,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 4,
             },
+            rrd_graph     => true,
         },
         alarm_tamp_1 => { # alarm tamp-1
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -610,6 +664,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 3,
             },
+            rrd_graph     => true,
         },
         alarm_tamp_2 => { # alarm tamp-2
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -617,6 +672,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 2,
             },
+            rrd_graph     => true,
         },
         alarm_tamp_3 => { # alarm tamp-3
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -624,6 +680,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 1,
             },
+            rrd_graph     => true,
         },
         alarm_tamp_4 => { # alarm tamp-4
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
@@ -631,6 +688,7 @@ sub live_controls_conf {
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x21', portname =>'a', portnum  => 0,
             },
+            rrd_graph     => true,
         },
     };
 }
@@ -829,26 +887,26 @@ sub live_pi_host_conf {
             valid_i2c_buses   => [ 0, 1 ],
             daemons => [
                 { script  => $PI_STATUS_DAEMON_SCRIPT,  options => { }, },
-                { script  =>$ONE_WIRED_SENDER_SCRIPT,
-                  options => { '--stdout_freq' => '890' },
-                },
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
-                {
-                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
-                    options => { '--host' => "pioldwifi" },
-                },
-                {
-                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
-                    options => { '--host' => "piserver" },
-                },
-                {
-                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
-                    options => { '--host' => "piloft" },
-                },
-                {
-                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
-                    options => { '--host' => "piboiler" },
-                },
+#                { script  =>$ONE_WIRED_SENDER_SCRIPT,
+#                  options => { '--stdout_freq' => '890' },
+#                },
+#                {
+#                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
+#                    options => { '--host' => "pioldwifi" },
+#                },
+#                {
+#                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
+#                    options => { '--host' => "piserver" },
+#                },
+#                {
+#                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
+#                    options => { '--host' => "piloft" },
+#                },
+#                {
+#                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
+#                    options => { '--host' => "piboiler" },
+#                },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT, options => { }, },
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT, options => { }, },
             ],
@@ -858,10 +916,10 @@ sub live_pi_host_conf {
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 1 ],
             daemons => [
-                {
-                    script  =>$ONE_WIRED_SENDER_SCRIPT,
-                    options => { '--stdout_freq' => '890' },
-                },
+#                {
+#                    script  =>$ONE_WIRED_SENDER_SCRIPT,
+#                    options => { '--stdout_freq' => '890' },
+#                },
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
                 {
                     script  =>"/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
@@ -874,10 +932,10 @@ sub live_pi_host_conf {
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 0 ],
             daemons => [
-                {
-                    script  =>$ONE_WIRED_SENDER_SCRIPT,
-                    options => { '--stdout_freq' => '890' },
-                },
+#                {
+#                    script  =>$ONE_WIRED_SENDER_SCRIPT,
+#                    options => { '--stdout_freq' => '890' },
+#                },
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
             ],
         },
@@ -886,9 +944,9 @@ sub live_pi_host_conf {
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 1 ],
             daemons => [
-                { script  =>$ONE_WIRED_SENDER_SCRIPT,
-                  options => { '--stdout_freq' => '890' },
-                },
+#                { script  =>$ONE_WIRED_SENDER_SCRIPT,
+#                  options => { '--stdout_freq' => '890' },
+#                },
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
                 { script  => $HEATING_DAEMON_SCRIPT,        options => { }, },
                 { script  => $BOILER_DAEMON_SCRIPT,         options => { }, },

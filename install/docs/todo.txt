@@ -1,6 +1,12 @@
 High Prio
 ---------
 
+get StatusD running to gracefully handle DB connection errors
+
+remove the old python one-wire-d
+
+change around the binding and connecting of $QUEUE_COMMAND_PORT
+
 pitest . ipcam recording. mount-nas . automate, daemonise.
 
 get pi-s running BST / GMT automatically. UTC is a pain with scheduling.
