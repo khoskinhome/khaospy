@@ -24,8 +24,6 @@ use Khaospy::Constants qw(
 
     $ONE_WIRE_SENDER_PERL_SCRIPT
 
-    $ONE_WIRED_SENDER_SCRIPT
-    $ONE_WIRED_RECEIVER_SCRIPT
     $HEATING_DAEMON_SCRIPT
     $BOILER_DAEMON_SCRIPT
     $PI_CONTROLLER_DAEMON_SCRIPT
@@ -888,25 +886,6 @@ sub live_pi_host_conf {
             daemons => [
                 { script  => $PI_STATUS_DAEMON_SCRIPT,  options => { }, },
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
-#                { script  =>$ONE_WIRED_SENDER_SCRIPT,
-#                  options => { '--stdout_freq' => '890' },
-#                },
-#                {
-#                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
-#                    options => { '--host' => "pioldwifi" },
-#                },
-#                {
-#                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
-#                    options => { '--host' => "piserver" },
-#                },
-#                {
-#                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
-#                    options => { '--host' => "piloft" },
-#                },
-#                {
-#                    script  => $ONE_WIRED_RECEIVER_SCRIPT,
-#                    options => { '--host' => "piboiler" },
-#                },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT, options => { }, },
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT, options => { }, },
             ],
@@ -916,10 +895,6 @@ sub live_pi_host_conf {
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 1 ],
             daemons => [
-#                {
-#                    script  =>$ONE_WIRED_SENDER_SCRIPT,
-#                    options => { '--stdout_freq' => '890' },
-#                },
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
                 {
                     script  =>"/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
@@ -932,10 +907,6 @@ sub live_pi_host_conf {
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 0 ],
             daemons => [
-#                {
-#                    script  =>$ONE_WIRED_SENDER_SCRIPT,
-#                    options => { '--stdout_freq' => '890' },
-#                },
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
             ],
         },
@@ -944,16 +915,13 @@ sub live_pi_host_conf {
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 1 ],
             daemons => [
-#                { script  =>$ONE_WIRED_SENDER_SCRIPT,
-#                  options => { '--stdout_freq' => '890' },
-#                },
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
                 { script  => $HEATING_DAEMON_SCRIPT,        options => { }, },
                 { script  => $BOILER_DAEMON_SCRIPT,         options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT,  options => { }, },
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT,  options => { }, },
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $PIBOILER_HOMEEASY_SCHEDULE_DAEMON_SCRIPT, options =>{}, },
+#                { script  => $PIBOILER_HOMEEASY_SCHEDULE_DAEMON_SCRIPT, options =>{}, },
             ],
         },
     };

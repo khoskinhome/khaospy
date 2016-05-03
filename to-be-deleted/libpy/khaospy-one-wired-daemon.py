@@ -15,7 +15,7 @@ Saying that I can't see more than one of these running on a machine.
 So a standard port of 5001 will work okay.
 
 
-By Karl Hoskin 2015-06-23
+By Karl "khaos" Hoskin 2015-06-23
 """
 
 import zmq

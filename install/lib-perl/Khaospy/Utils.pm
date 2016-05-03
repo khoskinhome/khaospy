@@ -14,7 +14,6 @@ my $json = JSON->new->allow_nonref;
 use Khaospy::Constants qw(
     true false
     ON OFF STATUS
-    $ONE_WIRED_SENDER_SCRIPT
 
     $HEATING_DAEMON_CONF_FULLPATH
     $CONTROLS_CONF_FULLPATH

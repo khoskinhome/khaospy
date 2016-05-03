@@ -1,26 +1,19 @@
 #!/usr/bin/python
 #
 
-# TO BE DELETED.
-# THIS HAS BEEN REPLACED BY khaospy-one-wired-receiver-just-listen.py
-
 import sys
 import zmq
 
 import time
 import json
 import yaml
-#import rrdtool
+import rrdtool
 
 import os.path
 
 from pprint import pprint
 
 port = "5001"
-
-
-# This script is to test that stuff is being sent by a "sender" of temperatures.
-
 
 # Socket to talk to server
 context = zmq.Context()

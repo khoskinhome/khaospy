@@ -17,8 +17,7 @@ sub true  { 1 };
 sub false { 0 };
 
 use Khaospy::Constants qw(
-    $ONE_WIRED_SENDER_SCRIPT
-    $ONE_WIRED_RECEIVER_SCRIPT
+    $ONE_WIRE_SENDER_PERL_SCRIPT
     $HEATING_DAEMON_SCRIPT
     $BOILER_DAEMON_SCRIPT
     $PI_CONTROLLER_DAEMON_SCRIPT
@@ -96,7 +95,7 @@ $pi_hosts_return = {
                 options =>{},
             },
             {
-                script=>$ONE_WIRED_SENDER_SCRIPT,
+                script=>$ONE_WIRE_SENDER_PERL_SCRIPT,
                 options =>{},
             },
         ],
@@ -116,8 +115,8 @@ ok ( $return = get_pi_hosts_running_daemon( $COMMAND_QUEUE_DAEMON_SCRIPT) ,
 cmp_deeply( $return, bag(qw/pitest/) , "Got the hosts expected" );
 
 
-ok ( $return = get_pi_hosts_running_daemon( $ONE_WIRED_SENDER_SCRIPT) ,
-     "Getting hosts that run $ONE_WIRED_SENDER_SCRIPT"
+ok ( $return = get_pi_hosts_running_daemon( $ONE_WIRE_SENDER_PERL_SCRIPT) ,
+     "Getting hosts that run $ONE_WIRE_SENDER_PERL_SCRIPT"
 );
 cmp_deeply( $return, bag(qw/pitestanother/) , "Got the hosts expected" );
 

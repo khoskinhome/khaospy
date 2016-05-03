@@ -67,13 +67,8 @@ our $PI_CONTROL_MCP23017_PINS_TIMEOUT = 0.3;
 #################
 # daemon scripts
 
-our $ONE_WIRE_SENDER            = 'khaospy-one-wired-sender.py';
-#our $ONE_WIRE_SENDER_TIMER      =
-our $ONE_WIRE_RECEIVER          = 'khaospy-one-wired-receiver.py';
-#our $ONE_WIRE_RECEIVER_TIMER    =
-
 our $ONE_WIRE_SENDER_PERL_DAEMON = 'khaospy-one-wire-daemon.pl';
-our $ONE_WIRE_SENDER_PERL_TIMER  = 30;
+our $ONE_WIRE_SENDER_PERL_TIMER  = 30; # this is how often one-wire-temperature sensors are polled in seconds.
 our $ONE_WIRE_SENSOR_DIR         = '/sys/bus/w1/devices/';
 
 our $PI_CONTROLLER_DAEMON       = 'khaospy-pi-controls-d.pl';
@@ -107,14 +102,8 @@ our $PING_SWITCH_DAEMON         = 'khaospy-ping-switch-d.pl';
 our $PING_SWITCH_DAEMON_TIMER   = 5;
 
 our $ALL_SCRIPTS = [
-    our $ONE_WIRED_SENDER_SCRIPT
-        = "$BIN_DIR/$ONE_WIRE_SENDER",
-
     our $ONE_WIRE_SENDER_PERL_SCRIPT
         = "$BIN_DIR/$ONE_WIRE_SENDER_PERL_DAEMON",
-
-    our $ONE_WIRED_RECEIVER_SCRIPT
-        = "$BIN_DIR/$ONE_WIRE_RECEIVER",
 
     our $HEATING_DAEMON_SCRIPT
         = "$BIN_DIR/khaospy-heating-daemon.pl",
@@ -182,7 +171,6 @@ our $PI_HOSTS_CONF_FULLPATH
 # TODO . almost certainly don't need this , post the boiler daemon rewrite.
 our $HEATING_CONTROL_DAEMON_PUBLISH_PORT  = 5021;
 
-our $ONE_WIRE_DAEMON_PORT                 = 5001;
 our $ONE_WIRE_DAEMON_PERL_PORT            = 5002;
 
 # TOOD QUEUE_COMMAND_PORT needs renaming to PI_OPERATE_CONTROL_SEND_PORT
@@ -279,19 +267,11 @@ our @EXPORT_OK = qw(
 
     $ALL_SCRIPTS
 
-    $ONE_WIRE_RECEIVER
-    $ONE_WIRED_RECEIVER_SCRIPT
-
-    $ONE_WIRE_SENDER
-    $ONE_WIRED_SENDER_SCRIPT
-    $ONE_WIRE_DAEMON_PORT
-
     $ONE_WIRE_SENDER_PERL_DAEMON
     $ONE_WIRE_SENDER_PERL_SCRIPT
     $ONE_WIRE_DAEMON_PERL_PORT
     $ONE_WIRE_SENDER_PERL_TIMER
     $ONE_WIRE_SENSOR_DIR
-
 
     $HEATING_DAEMON_SCRIPT
     $HEATING_CONTROL_DAEMON_PUBLISH_PORT
