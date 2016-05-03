@@ -1,5 +1,7 @@
 ./install/bin/khaospy-bash-aliases.sh
 
+./install/bin/display-latest-control-status-sql.sh
+
 #######################################################
 # Amelia's light hackit daemon
 
@@ -188,32 +190,6 @@ install/bin/khaospy-generate-rrd-graphs.pl
 
 ##############################################################################
 # ./install/bin
-
-##############################################################################
-# libpy .......
-
-./install/libpy/khaospy-one-wired-daemon.py
-./install/libpy/khaospy-one-wired-receiver-subscribe.py
-./install/libpy/khaospy-one-wired-receiver-subscribe-just-listen.py
-./install/libpy/khaospy-one-wired-receiver-subscribe-CRAP.py
-### DEVICE = 0x20
-
-
-# working here 28th Oct 15.
-./install/libpy/khaospy-i2c-alarm-poller-daemon.py
-./install/libpy/khaospy-i2c-alarm-poller-daemon-test-crap.py
-./install/libpy/khaospy-i2c-alarm-poller-receiver.py
-
-######################################################
-# i2c alarm polling
-
-./install/libpy/khaospy-i2c-alarm-poller-sender.py
-./install/libpy/khaospy-i2c-alarm-poller-daemon.py
-./install/libpy/khaospy-i2c-alarm-poller-daemon-test-crap.py
-./install/libpy/khaospy-i2c-alarm-poller-receiver.py
-
-mapping-i2c-alarm-board.py
-
 
 ##############################################################################
 # DOCS

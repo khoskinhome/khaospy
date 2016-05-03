@@ -1,9 +1,16 @@
 High Prio
 ---------
 
-get StatusD running to gracefully handle DB connection errors
-
 remove the old python one-wire-d
+
+StatusD
+    get StatusD running to gracefully handle DB connection errors
+        ( so it carries on rrd-updating )
+    get rrds updated every 2 mins with old value, if no new value has been received.
+    when a control status is "undef", keep the last defined value.
+
+
+fix graphs. get on-off graphs to display properly when infrequently updated.
 
 change around the binding and connecting of $QUEUE_COMMAND_PORT
 
@@ -12,7 +19,6 @@ pitest . ipcam recording. mount-nas . automate, daemonise.
 get pi-s running BST / GMT automatically. UTC is a pain with scheduling.
 
 install/lib-perl/Khaospy/ControlsDaemon.pm:180:    # otherwise check the entire hostname # TODO rm this line
-
 
 email-home-auto.
     pgp encryption.
@@ -61,7 +67,6 @@ QueueCommand.pm
 CommandQueueDaemon.pm :
     nothing todo at present.
 
-
 General :
 
     a quick CH Webpage, logins ( httpauth )
@@ -80,8 +85,6 @@ General :
 
     ./bin dir and a ./daemons dir. split up what's in bin-dir
     fix the KhaospyControlPiMCP23017.t tests.
-
-
 
 
 The messages to support new fields
@@ -126,20 +129,9 @@ get HeatingDaemon
     make the pi-hosts config die if there is more than one-heating-control-daemon configured.
     although the heating-daemon is now so simple, it will be replaced by the rules-d
 
-status-d
-    listens to all things.
-    has http rest api
-    use AnyEvent.
 
 get piboiler able to run the PC-queue-d.
     try reinstall of dependencies.
-
-In my loft.
-    thermometers in my room , kitchen and my loft.
-    i2c-controller.
-
-    get the outside thermometer working properly.
-
 
 
 write more tests for the the code in Khaospy::PiControlMCP23017
@@ -151,8 +143,6 @@ Test that the following stuff works
         make an ex-or type circuit and test that.
 
 Get the electronic/physical PiMCP23017 interface working
-
-
 
 
 Conf::PiHosts.
@@ -187,13 +177,11 @@ WebUI
     2fa. use mobile phone to send a 6 char passcode to when trying to login from an external source. ( i.e. not on the home-lan )
 
 
-
-
 Medium Prio
 -----------
 
 Multiway lighting, am I going to program up something in khaospy for Amelia's controller ? Am I going to build a new controller using SSRs ?
-
+    new controller that uses the ex-or gate type logic.
 
 
 does the pi-host.conf need to have valid_i2c_buses ? This can be worked out with an i2c-detect ? maybe I need both. When khaospy actually runs on the host then it can do  an i2c-detect too.
@@ -205,20 +193,13 @@ control config. an option for db-logging of state changes. ( already have the rr
 Implement for the OrviboS20 : remember the last state, and if its been manually operated by something other than khaospy. just like the PiGPIO relay-manual controls. Useful for "rules". Useful if I use them for light-switches.
 
 
-pi dns and dhcp server.
+pi dhcp server.
 
 
 pibastion that I can open to the net and just get stats.
 
 Low prio
 --------
-
-    onewire sender in perl. low priority. python one is working.
-
-    rrd-creater in perl. low prio. python one is working.
-        temp rrds
-        switch / relay / control rrds.
-
 
     conf-dist-daemon in perl. very low prio. I can do this with tar-over-ssh, scp etc.
 
