@@ -47,6 +47,8 @@ use Khaospy::Constants qw(
     MTYPE_OPERATION_STATUS
 
     $MESSAGE_TIMEOUT
+
+    $TIMER_AFTER_COMMON
 );
 
 use Khaospy::ControlOther;
@@ -116,7 +118,7 @@ sub run_daemon {
     }
 
     push @w, AnyEvent->timer(
-        after    => 0.1, # TODO. MAGIC NUMBER . should be in Constants.pm or a json-config. dunno. but not here.
+        after    => $TIMER_AFTER_COMMON,
         interval => $DAEMON_TIMER,
         cb       => \&timer_cb
     );

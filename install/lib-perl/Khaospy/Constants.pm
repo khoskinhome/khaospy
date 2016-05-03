@@ -90,16 +90,16 @@ our $COMMAND_QUEUE_DAEMON_BROADCAST_TIMER = 1.6;
 #our $STATUS_DAEMON_PUBLISH_EVERY_SECS               = 2;
 #our $RULES_DAEMON_RUN_EVERY_SECS                    = 0.5;
 
-our $PI_STATUS_DAEMON           = 'khaospy-status-d.pl';
-# TODO : does status-d need a timer ?
-# it just will subscribe to all publishers, and to an http-api port.
-# its primary mission is for the webui to be able to get the status of controls.
-our $PI_STATUS_DAEMON_TIMER     = 5;
+our $PI_STATUS_DAEMON             = 'khaospy-status-d.pl';
+our $PI_STATUS_DAEMON_TIMER       = 60;
+our $PI_STATUS_RRD_UPDATE_TIMEOUT = 120;
 
 our $MAC_SWITCH_DAEMON          = 'khaospy-mac-switch-d.pl';
 our $MAC_SWITCH_DAEMON_TIMER    = 5;
 our $PING_SWITCH_DAEMON         = 'khaospy-ping-switch-d.pl';
 our $PING_SWITCH_DAEMON_TIMER   = 5;
+
+our $TIMER_AFTER_COMMON = 0.1; # secs. The time after which a Daemon timed sub first starts.
 
 our $ALL_SCRIPTS = [
     our $ONE_WIRE_SENDER_PERL_SCRIPT
@@ -307,6 +307,9 @@ our @EXPORT_OK = qw(
     $PI_STATUS_DAEMON_TIMER
     $PI_STATUS_DAEMON_SCRIPT
     $PI_STATUS_DAEMON_SEND_PORT
+    $PI_STATUS_RRD_UPDATE_TIMEOUT
+
+    $TIMER_AFTER_COMMON
 
     $PING_SWITCH_DAEMON
     $PING_SWITCH_DAEMON_SEND_PORT

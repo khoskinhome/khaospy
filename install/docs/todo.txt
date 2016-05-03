@@ -1,13 +1,15 @@
 High Prio
 ---------
 
-remove the old python one-wire-d
+what's up with melissalight and the statusD ?
 
 StatusD
     get StatusD running to gracefully handle DB connection errors
         ( so it carries on rrd-updating )
-    get rrds updated every 2 mins with old value, if no new value has been received.
-    when a control status is "undef", keep the last defined value.
+
+    some way of cleaning up the DB table control_status when entries are over a month old. Could run as part of StatusD. Should probably be configurable.
+
+    make it so only one StatusD runs, and that it runs on the same host as the Postgres DB server.
 
 
 fix graphs. get on-off graphs to display properly when infrequently updated.

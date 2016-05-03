@@ -32,6 +32,12 @@ use Khaospy::Constants qw(
 
     $RRD_DIR
 
+    $ONEWIRE_THERM_CONTROL_TYPE
+    $PI_STATUS_RRD_UPDATE_TIMEOUT
+
+    $TIMER_AFTER_COMMON
+    $PI_STATUS_DAEMON_TIMER
+
     $ONE_WIRE_DAEMON_PERL_PORT
     $ONE_WIRE_SENDER_PERL_SCRIPT
 
@@ -51,6 +57,7 @@ use Khaospy::Constants qw(
 use Khaospy::Conf::Controls qw(
     get_rrd_create_params_for_control
     is_control_rrd_graphed
+    get_control_config
 );
 
 use Khaospy::Log qw(
@@ -66,6 +73,7 @@ use Khaospy::Conf::PiHosts qw(
 use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
 
 use Khaospy::Utils qw(
+    get_hashval
     timestamp
     burp
     get_iso8601_utc_from_epoch
@@ -105,6 +113,8 @@ sub run_status_d {
     klogstart "StatusD Subscribe all Controls, all hosts START";
     kloginfo "LOGLEVEL = ".$Khaospy::Log::OVERRIDE_CONF_LOGLEVEL;
 
+    populate_last_control_state();
+
     my @w;
 
     for my $script ( keys %$script_to_port ){
@@ -124,8 +134,43 @@ sub run_status_d {
         }
 
     }
+
+    push @w, AnyEvent->timer(
+        after    => $TIMER_AFTER_COMMON,
+        interval => $PI_STATUS_DAEMON_TIMER,
+        cb       => \&timer_cb
+    );
+
     my $quit_program = AnyEvent->condvar;
     $quit_program->recv;
+}
+
+sub timer_cb {
+
+    for my $control_name ( keys %$last_control_state ) {
+        # One wire thermometers will get a regular update,
+        # so these can be ignored :
+        my $control_conf = get_control_config($control_name);
+        next if get_hashval($control_conf, 'type')
+            eq $ONEWIRE_THERM_CONTROL_TYPE;
+
+        if ( is_control_rrd_graphed($control_name) ){
+
+            if ( $last_control_state->{$control_name}{last_rrd_update_time}
+                + $PI_STATUS_RRD_UPDATE_TIMEOUT
+                    < time
+            ){
+                kloginfo "Update RRD for $control_name with last_value (timeout)";
+                update_rrd( $control_name, time,
+                    get_hashval(
+                        get_hashval($last_control_state, $control_name),
+                        'last_value'
+                    )
+                );
+            }
+
+        }
+    }
 }
 
 sub output_msg {
@@ -160,37 +205,73 @@ sub output_msg {
     my $curr_state_or_value
         = trans_ON_to_value($dec->{current_state} || $dec->{current_value});
 
-    $curr_state_or_value = 'undefined' if ! defined $curr_state_or_value;
+    if ( ! defined $curr_state_or_value ){
+        if ( exists $last_control_state->{$control_name} ){
+            $curr_state_or_value
+                = $last_control_state->{$control_name}{last_value};
+
+            klogwarn "$control_name is undefined. Using last value for update ($curr_state_or_value)";
+        }
+    }
 
     if ( exists $last_control_state->{$control_name}
-        && $last_control_state->{$control_name} == $curr_state_or_value
+        && $last_control_state->{$control_name}{last_value} == $curr_state_or_value
     ){
         klogdebug "Do NOT update DB with $control_name : $curr_state_or_value";
     } else {
-        $last_control_state->{$control_name} = $curr_state_or_value;
+
+        init_last_control_state($control_name);
+
+        $last_control_state->{$control_name}{last_value} = $curr_state_or_value;
         kloginfo "Update DB with $control_name : $curr_state_or_value";
+
+        # TODO capture any exceptions from the following and log an error :
         control_status_insert( $record );
     }
 
+    update_rrd( $control_name, $request_epoch_time, $curr_state_or_value);
 
-    if ( is_control_rrd_graphed($control_name) ){
-        # does an rrd exist ? If not then create it.
-        my $rrd_filename = "$RRD_DIR/$control_name";
-        if ( ! -f $rrd_filename ){
+}
 
-            kloginfo "Creating RRD file $rrd_filename";
-            my $cmd =
-            "rrdtool create $rrd_filename "
-                .join ( ' ', @{get_rrd_create_params_for_control($control_name)});
+sub update_rrd {
 
-            klogdebug "cmd = $cmd";
-            system ($cmd); # TODO error checking
-        }
+    my ($control_name,$request_epoch_time,$curr_state_or_value) = @_;
 
-        kloginfo "Updating RRD file $rrd_filename $request_epoch_time:$curr_state_or_value";
-        my $cmd = "rrdtool update $rrd_filename $request_epoch_time:$curr_state_or_value";
-        system($cmd); #TODO ERROR CHECKING.
+    return if ! is_control_rrd_graphed($control_name);
 
+    init_last_control_state($control_name);
+
+    # Does an rrd exist ? If not then create it.
+    my $rrd_filename = "$RRD_DIR/$control_name";
+    if ( ! -f $rrd_filename ){
+
+        kloginfo "Creating RRD file $rrd_filename";
+        my $cmd =
+        "rrdtool create $rrd_filename "
+            .join ( ' ', @{get_rrd_create_params_for_control($control_name)});
+
+        klogdebug "cmd = $cmd";
+        system ($cmd); # TODO error checking
+    }
+
+    kloginfo "Updating RRD file $rrd_filename $request_epoch_time:$curr_state_or_value";
+    my $cmd = "rrdtool update $rrd_filename $request_epoch_time:$curr_state_or_value";
+    system($cmd); #TODO ERROR CHECKING.
+
+    $last_control_state->{$control_name}{last_rrd_update_time}
+        = $request_epoch_time;
+    $last_control_state->{$control_name}{last_value}
+        = $curr_state_or_value;
+
+}
+
+sub init_last_control_state {
+    # Only init if it doesn't already exist.
+    my ($control_name) = @_;
+    if ( ! exists $last_control_state->{$control_name} ){
+        $last_control_state->{$control_name}={};
+        $last_control_state->{$control_name}{last_value} = undef;
+        $last_control_state->{$control_name}{last_rrd_update_time} = undef;
     }
 }
 
@@ -221,17 +302,51 @@ sub control_status_insert {
 
     my $sth = dbh->prepare( $sql );
 
-    $sth->execute(
-        $values->{control_name},
-        $values->{current_state},
-        $values->{current_value},
-        $values->{last_change_state_time},
-        $values->{last_change_state_by},
-        $values->{manual_auto_timeout_left},
-        $values->{request_time},
-    );
+    #    my $current_value = $values->{current_value};
+    #    $current_value = sprintf("%0.3f",$current_value)
+    #        if defined $current_value;
+
+    eval {
+        $sth->execute(
+            $values->{control_name},
+            $values->{current_state} || undef,
+            $values->{current_value} || undef,
+            $values->{last_change_state_time} || undef,
+            $values->{last_change_state_by} || undef,
+            $values->{manual_auto_timeout_left} || undef,
+            $values->{request_time},
+        );
+    };
+
+    klogerror "$@ \n".Dumper($values) if $@;
 }
 
-# TODO the rrdupdater for those controls that are configured.
+sub populate_last_control_state {
+
+    my $sql = <<"    EOSQL";
+        select control_name, request_time, current_state, current_value
+        from control_status
+        where id in (
+            select max(id) from control_status group by control_name )
+        order by control_name
+    EOSQL
+
+    my $sth = dbh->prepare( $sql );
+    $sth->execute();
+
+    while ( my $hr = $sth->fetchrow_hashref ){
+
+        my $control_name = get_hashval($hr,"control_name");
+        init_last_control_state ($control_name);
+
+        $last_control_state->{$control_name}{last_value}
+            = trans_ON_to_value($hr->{current_state}
+                || $hr->{current_value});
+
+        $last_control_state->{$control_name}{last_rrd_update_time}
+            = time - $PI_STATUS_RRD_UPDATE_TIMEOUT;
+    }
+
+}
 
 1;
