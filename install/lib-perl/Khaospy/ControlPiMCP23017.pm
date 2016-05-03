@@ -147,7 +147,7 @@ sub init_mcp23017 {
                 );
 
                 try {
-                    my $ret = get_cmd( $cmd );
+                    my $ret = _get_mcp23017_cmd( $cmd );
                     klogdebug "Shell command '$cmd' returned '$ret'";
                 } catch {
                     klogerror
@@ -259,7 +259,7 @@ sub read_gpio {
             $MCP_GPIO->{$gpio->{portname}},
         );
 
-        my $ret = get_cmd( $cmd );
+        my $ret = _get_mcp23017_cmd( $cmd );
         klogdebug "Shell command '$cmd' returned '$ret'";
         set_pins_state_array(
             $gpio,
@@ -292,7 +292,7 @@ sub write_gpio {
             get_pins_array($gpio, $pins_out)
         )
     );
-    my $ret = get_cmd( $cmd );
+    my $ret = _get_mcp23017_cmd( $cmd );
     klogdebug "Shell command '$cmd' returned '$ret'";
 }
 
@@ -314,6 +314,11 @@ sub _num_to_pin_array {
     return [ reverse split ( //, sprintf("%08b", $num ) )];
 
 }
+
+sub _get_mcp23017_cmd {
+    return get_cmd(@_);
+}
+
 
 1;
 

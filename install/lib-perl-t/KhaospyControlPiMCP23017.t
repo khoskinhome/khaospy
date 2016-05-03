@@ -19,15 +19,31 @@ sub false { 0 };
 sub IN  {"in"};
 sub OUT {"out"};
 
-# tests broken.
-# TODO needs to override the get_cmd command and fake the return stuff.
-
 use_ok  ( "Khaospy::ControlPiMCP23017",
             "init_gpio"
         );
 
+my $fake_get_mcp23017_cmd_return ='';
+my $override_get_mcp23017_cmd
+    = Sub::Override->new(
+        'Khaospy::ControlPiMCP23017::_get_mcp23017_cmd',
+        sub {
+            return $fake_get_mcp23017_cmd_return;
+        }
+);
+
+my $test_i2cbus;
+
+if ( -e "/dev/i2c-0" ){
+    $test_i2cbus = 0;
+}elsif( -e "/dev/i2c-1"){
+    $test_i2cbus = 1;
+} else {
+    die "No i2c bus available\n";
+}
+
 my $gpio = {
-    i2c_bus  => 0,
+    i2c_bus  => $test_i2cbus,
     i2c_addr => '0x20',
     portname =>'B',
     portnum  => 5,
@@ -37,7 +53,7 @@ my $gpio = {
 init_gpio(undef,$gpio,OUT);
 
 my $gpio_in = {
-    i2c_bus  => 0,
+    i2c_bus  => $test_i2cbus,
     i2c_addr => '0x20',
     portname =>'a',
     portnum  => 2,
@@ -46,7 +62,7 @@ my $gpio_in = {
 init_gpio(undef,$gpio_in,IN);
 
 my $expect = {
-    '0' => {
+    $test_i2cbus => {
         '0x20' => {
             'b' => [qw/1 1 1 1 1 0 1 1/ ],
             'a' => [qw/1 1 1 1 1 1 1 1/ ]
@@ -82,6 +98,9 @@ my $test_bit = 5;
 $gpio_in->{portnum} = $test_bit;
 my $pins_in = Khaospy::ControlPiMCP23017->testing_get_pins_in_state();
 Khaospy::ControlPiMCP23017::set_pins_state_array($gpio_in,$pins_in,false);
+
+# faking the read from i2c mcp23017 . OxDF == bit 5 low, rest high.
+$fake_get_mcp23017_cmd_return="0xDF";
 
 for my $bit ( 0..7 ) {
     $gpio_in->{portnum} = $bit;
