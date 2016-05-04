@@ -140,6 +140,7 @@ sub live_heating_thermometer_config {
             upper_temp         => 19.5,
             lower_temp         => 18.5,
             control            => 'alisonrad',
+            window_sensor      => 'alison_window',
         },
         '28-000006e04e8b' => {
             name               => 'Playhouse-tv',
@@ -160,9 +161,10 @@ sub live_heating_thermometer_config {
         '28-0214632d16ff' => {
             name               => 'Amelia',
             rrd_group          => 'upstairs',
-            upper_temp         => 20.0,
-            lower_temp         => 19.5,
+            upper_temp         => 19.0,
+            lower_temp         => 18.0,
             control            => 'ameliarad',
+            window_sensor      => 'amelia_window',
         },
         '28-021463423bff' => {
             name               => 'Upstairs-Landing',
@@ -198,6 +200,7 @@ sub live_heating_thermometer_config {
             upper_temp         => 19.0,
             lower_temp         => 18.5,
             control            => 'frontroomrad',
+            window_sensor      => 'front_room_window',
         },
         '28-000006cafb0d' => {
             name               => 'front-porch',
@@ -209,6 +212,7 @@ sub live_heating_thermometer_config {
             upper_temp         => 19.0,
             lower_temp         => 18.5,
             control            => 'dinningroomrad',
+            window_sensor      => 'dining_room_window',
         },
         '28-041591f5e5ff' => {
             name               => 'Karl',

@@ -211,6 +211,23 @@ our $PI_MCP23017_SWITCH_CONTROL_TYPE        = "pi-mcp23017-switch";
 our $MAC_SWITCH_CONTROL_TYPE                = "mac-switch";
 our $PING_SWITCH_CONTROL_TYPE               = "ping-switch";
 
+our $SCRIPT_TO_PORT = {
+    $ONE_WIRE_SENDER_PERL_SCRIPT
+        => $ONE_WIRE_DAEMON_PERL_PORT,
+
+    $PI_CONTROLLER_DAEMON_SCRIPT
+        => $PI_CONTROLLER_DAEMON_SEND_PORT,
+
+    $OTHER_CONTROLS_DAEMON_SCRIPT
+        => $OTHER_CONTROLS_DAEMON_SEND_PORT,
+
+    $MAC_SWITCH_DAEMON_SCRIPT
+        => $MAC_SWITCH_DAEMON_SEND_PORT,
+
+    $PING_SWITCH_DAEMON_SCRIPT
+        => $PING_SWITCH_DAEMON_SEND_PORT,
+};
+
 ######################
 our @EXPORT_OK = qw(
 
@@ -342,6 +359,7 @@ our @EXPORT_OK = qw(
     $MAC_SWITCH_CONTROL_TYPE
     $PING_SWITCH_CONTROL_TYPE
 
+    $SCRIPT_TO_PORT
 );
 
 1;

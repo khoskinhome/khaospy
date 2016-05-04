@@ -40,7 +40,7 @@ create table control_status (
     current_value            real,
     last_change_state_time   timestamp with time zone null,
     last_change_state_by     text null,
-    manual_auto_timeout_left integer null,
+    manual_auto_timeout_left real null,
     request_time             timestamp with time zone not null,
     db_update_time           timestamp with time zone not null
 );

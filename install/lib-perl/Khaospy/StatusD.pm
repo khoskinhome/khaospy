@@ -18,7 +18,11 @@ use ZMQ::Constants qw(
     ZMQ_SUB
 );
 
-use Khaospy::DBH qw(dbh);
+use Khaospy::DBH qw(
+    dbh
+    get_last_control_state
+    init_last_control_state
+);
 
 use zhelpers;
 
@@ -52,6 +56,7 @@ use Khaospy::Constants qw(
 
     $PING_SWITCH_DAEMON_SEND_PORT
     $PING_SWITCH_DAEMON_SCRIPT
+    $SCRIPT_TO_PORT
 );
 
 use Khaospy::Conf::Controls qw(
@@ -77,6 +82,7 @@ use Khaospy::Utils qw(
     timestamp
     burp
     get_iso8601_utc_from_epoch
+    trans_ON_to_value_or_return_val
 );
 
 our @EXPORT_OK = qw( run_status_d );
@@ -85,24 +91,8 @@ our $LOGLEVEL;
 
 our $OPTS;
 
-my $script_to_port = {
-    $ONE_WIRE_SENDER_PERL_SCRIPT
-        => $ONE_WIRE_DAEMON_PERL_PORT,
 
-    $PI_CONTROLLER_DAEMON_SCRIPT
-        => $PI_CONTROLLER_DAEMON_SEND_PORT,
-
-    $OTHER_CONTROLS_DAEMON_SCRIPT
-        => $OTHER_CONTROLS_DAEMON_SEND_PORT,
-
-    $MAC_SWITCH_DAEMON_SCRIPT
-        => $MAC_SWITCH_DAEMON_SEND_PORT,
-
-    $PING_SWITCH_DAEMON_SCRIPT
-        => $PING_SWITCH_DAEMON_SEND_PORT,
-};
-
-my $last_control_state = {};
+my $last_control_state;
 
 sub run_status_d {
     my ( $opts ) = @_;
@@ -113,12 +103,12 @@ sub run_status_d {
     klogstart "StatusD Subscribe all Controls, all hosts START";
     kloginfo "LOGLEVEL = ".$Khaospy::Log::OVERRIDE_CONF_LOGLEVEL;
 
-    populate_last_control_state();
+    $last_control_state = get_last_control_state();
 
     my @w;
 
-    for my $script ( keys %$script_to_port ){
-        my $port = $script_to_port->{$script};
+    for my $script ( keys %$SCRIPT_TO_PORT ){
+        my $port = get_hashval($SCRIPT_TO_PORT, $script);
         for my $sub_host (
             @{get_pi_hosts_running_daemon($script)}
         ){
@@ -202,8 +192,10 @@ sub output_msg {
             get_iso8601_utc_from_epoch($request_epoch_time),
     };
 
-    my $curr_state_or_value
-        = trans_ON_to_value($dec->{current_state} || $dec->{current_value});
+    my $curr_state_or_value =
+        trans_ON_to_value_or_return_val(
+            $dec->{current_state} || $dec->{current_value}
+        );
 
     if ( ! defined $curr_state_or_value ){
         if ( exists $last_control_state->{$control_name} ){
@@ -220,7 +212,7 @@ sub output_msg {
         klogdebug "Do NOT update DB with $control_name : $curr_state_or_value";
     } else {
 
-        init_last_control_state($control_name);
+        init_last_control_state($last_control_state, $control_name);
 
         $last_control_state->{$control_name}{last_value} = $curr_state_or_value;
         kloginfo "Update DB with $control_name : $curr_state_or_value";
@@ -239,7 +231,7 @@ sub update_rrd {
 
     return if ! is_control_rrd_graphed($control_name);
 
-    init_last_control_state($control_name);
+    init_last_control_state($last_control_state, $control_name);
 
     # Does an rrd exist ? If not then create it.
     my $rrd_filename = "$RRD_DIR/$control_name";
@@ -262,28 +254,6 @@ sub update_rrd {
         = $request_epoch_time;
     $last_control_state->{$control_name}{last_value}
         = $curr_state_or_value;
-
-}
-
-sub init_last_control_state {
-    # Only init if it doesn't already exist.
-    my ($control_name) = @_;
-    if ( ! exists $last_control_state->{$control_name} ){
-        $last_control_state->{$control_name}={};
-        $last_control_state->{$control_name}{last_value} = undef;
-        $last_control_state->{$control_name}{last_rrd_update_time} = undef;
-    }
-}
-
-sub trans_ON_to_value { # and OFF to false
-    my ($ONOFF) = @_;
-
-    return $ONOFF if $ONOFF !~ /^[a-z]+$/i;
-
-    return true  if $ONOFF eq ON;
-    return false if $ONOFF eq OFF;
-
-    klogfatal "Can't translate a non ON or OFF value ($ONOFF) to value";
 
 }
 
@@ -321,32 +291,6 @@ sub control_status_insert {
     klogerror "$@ \n".Dumper($values) if $@;
 }
 
-sub populate_last_control_state {
 
-    my $sql = <<"    EOSQL";
-        select control_name, request_time, current_state, current_value
-        from control_status
-        where id in (
-            select max(id) from control_status group by control_name )
-        order by control_name
-    EOSQL
-
-    my $sth = dbh->prepare( $sql );
-    $sth->execute();
-
-    while ( my $hr = $sth->fetchrow_hashref ){
-
-        my $control_name = get_hashval($hr,"control_name");
-        init_last_control_state ($control_name);
-
-        $last_control_state->{$control_name}{last_value}
-            = trans_ON_to_value($hr->{current_state}
-                || $hr->{current_value});
-
-        $last_control_state->{$control_name}{last_rrd_update_time}
-            = time - $PI_STATUS_RRD_UPDATE_TIMEOUT;
-    }
-
-}
 
 1;

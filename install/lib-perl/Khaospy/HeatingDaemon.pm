@@ -20,6 +20,7 @@ use JSON;
 use Khaospy::Utils qw(
     timestamp
     get_hashval
+    trans_ON_to_value_or_return_val
 );
 
 use Khaospy::Constants qw(
@@ -30,6 +31,8 @@ use Khaospy::Constants qw(
 
     $ONE_WIRE_SENDER_PERL_SCRIPT
     $ONE_WIRE_DAEMON_PERL_PORT
+
+    $SCRIPT_TO_PORT
 );
 
 use Khaospy::QueueCommand qw(
@@ -52,6 +55,11 @@ use Khaospy::ZMQAnyEvent qw(
     zmq_anyevent
 );
 
+use Khaospy::DBH qw(
+    get_last_control_state
+    init_last_control_state
+);
+
 our @EXPORT_OK = qw(
     run_heating_daemon
 );
@@ -64,9 +72,13 @@ use POSIX qw(strftime);
 # getting the temperatures.
 # http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
 
+my $last_control_state = {};
+
 sub run_heating_daemon {
 
     klogstart "Heating Daemon START";
+
+    $last_control_state = get_last_control_state();
 
     my $quit_program = AnyEvent->condvar;
 
@@ -77,6 +89,7 @@ sub run_heating_daemon {
     for my $sub_host (
         @{get_pi_hosts_running_daemon($ONE_WIRE_SENDER_PERL_SCRIPT)}
     ){
+        kloginfo "Subscribing to One-Wire $sub_host : $ONE_WIRE_DAEMON_PERL_PORT";
         $count_zmq_subs++;
         push @w, zmq_anyevent({
             zmq_type          => ZMQ_SUB,
@@ -91,7 +104,46 @@ sub run_heating_daemon {
     croak "No One-Wire thermometer senders are configured. Heating-D Can't subscribe to anything."
         if ! $count_zmq_subs;
 
+    # subscribe to everything other than one-wire thermometers :
+    for my $script ( keys %$SCRIPT_TO_PORT ){
+        next if $script eq $ONE_WIRE_SENDER_PERL_SCRIPT;
+
+        my $port = get_hashval($SCRIPT_TO_PORT, $script);
+        for my $sub_host (
+            @{get_pi_hosts_running_daemon($script)}
+        ){
+            kloginfo "Subscribing to $sub_host : $script : $port";
+            push @w, zmq_anyevent({
+                zmq_type          => ZMQ_SUB,
+                host              => $sub_host,
+                port              => $port,
+                msg_handler       => \&pi_n_other_control_msg,
+                msg_handler_param => $port,
+                klog              => true,
+            });
+        }
+    }
+
     $quit_program->recv;
+}
+
+sub pi_n_other_control_msg {
+    my ($zmq_sock, $msg, $param) = @_;
+    my $msg_rh = $json->decode( $msg );
+
+
+    my $control_name = get_hashval($msg_rh, 'control_name');
+
+    my $curr_state_or_value =
+        trans_ON_to_value_or_return_val(
+            $msg_rh->{current_state} || $msg_rh->{current_value}
+        );
+
+    init_last_control_state($last_control_state, $control_name);
+    $last_control_state->{$control_name}{last_value}
+        = $curr_state_or_value;
+
+    kloginfo "Received $control_name == $curr_state_or_value";
 }
 
 {
@@ -109,14 +161,10 @@ sub run_heating_daemon {
 
         my $msg_rh = $json->decode( $msg );
 
-        my $control_name
-            = get_hashval($msg_rh, 'control_name');
-        my $owaddr
-            = get_hashval($msg_rh, 'onewire_addr');
-        my $current_value_temp
-            = get_hashval($msg_rh, 'current_value');
-        my $request_epoch_time
-            = get_hashval($msg_rh, 'request_epoch_time');
+        my $control_name       = get_hashval($msg_rh, 'control_name');
+        my $current_value_temp = get_hashval($msg_rh, 'current_value');
+        my $request_epoch_time = get_hashval($msg_rh, 'request_epoch_time');
+        my $owaddr             = get_hashval($msg_rh, 'onewire_addr');
 
         my $new_thermometer_conf ;
         eval { $new_thermometer_conf = get_one_wire_heating_control_conf();};
@@ -185,9 +233,23 @@ sub run_heating_daemon {
             $send_cmd->(OFF);
         }
         elsif ( $current_value_temp < $lower_temp ){
-            $send_cmd->(ON);
+
+            # TODO : This code is copied below. It's horrible. Needs re-writing.
+            # switch off if the window is open :
+            if ( exists $tc->{window_sensor} && $last_control_state->{$tc->{window_sensor}}{last_value} eq ON() ){
+                klogwarn "$operate_control_name is being switched off because $tc->{window_sensor} is open";
+                $send_cmd->(OFF);
+            } else {
+                $send_cmd->(ON);
+            }
         } else {
-            kloginfo "Current temperate is in correct range\n";
+
+            if ( exists $tc->{window_sensor} && $last_control_state->{$tc->{window_sensor}}{last_value} eq ON() ){
+                klogwarn "$operate_control_name is being switched off because $tc->{window_sensor} is open";
+                $send_cmd->(OFF);
+            }
+
+            kloginfo "$operate_control_name : Current temperate is in correct range\n";
         }
     }
 }

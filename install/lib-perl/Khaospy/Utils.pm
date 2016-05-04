@@ -31,6 +31,7 @@ our @EXPORT_OK = qw(
     get_hashval
     get_cmd
     get_iso8601_utc_from_epoch
+    trans_ON_to_value_or_return_val
 );
 
 sub timestamp { return strftime("%F %T", gmtime( $_[0] || time) ); }
@@ -100,4 +101,15 @@ sub get_iso8601_utc_from_epoch {
     return $dt->strftime('%F %T.%6Nz');
 }
 
+sub trans_ON_to_value_or_return_val { # and OFF to false
+    my ($ONOFF) = @_;
+
+    return $ONOFF if $ONOFF !~ /^[a-z]+$/i;
+
+    return true  if $ONOFF eq ON;
+    return false if $ONOFF eq OFF;
+
+    die "Can't translate a non ON or OFF value ($ONOFF) to value";
+
+}
 1;
