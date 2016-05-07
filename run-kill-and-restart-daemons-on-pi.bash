@@ -20,4 +20,5 @@ echo "#############################################################"
 ssh $USER@$PIHOST "sudo /opt/khaospy/bin/khaospy-ps.pl -k"
 ssh $USER@$PIHOST "sudo /opt/khaospy/bin/khaospy-run-daemons.pl"
 
+ssh $USER@$PIHOST "sudo service apache2 reload"
 
