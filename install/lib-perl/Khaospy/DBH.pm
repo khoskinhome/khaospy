@@ -30,10 +30,9 @@ sub dbh {
         my $db_password = get_hashval($db_conf, 'password');
         my $db_name     = get_hashval($db_conf, 'dbname');
         my $db_port     = get_hashval($db_conf, 'port');
+        my $db_sslmode  = get_hashval($db_conf, 'sslmode');
 
-        # TODO sslmode  should go into a DB config setting.
-
-        my $dsn = "DBI:Pg:dbname=$db_name;host=$db_host;sslmode=require;port=$db_port";
+        my $dsn = "DBI:Pg:dbname=$db_name;host=$db_host;sslmode=$db_sslmode;port=$db_port";
         $dbh = DBI->connect($dsn, $db_username, $db_password,
                     { RaiseError => 1 })
                         or die $DBI::errstr;

@@ -19,6 +19,7 @@ our $DB_USERNAME = 'khaospy_write';
 our $DB_PASSWORD = 'password';
 our $DB_NAME     = 'khaospy';
 our $DB_PORT     = 5432;
+our $DB_SSLMODE  = 'require';
 
 write_out_db_conf();
 
@@ -34,6 +35,7 @@ sub write_out_db_conf {
                 password => $DB_PASSWORD,
                 dbname   => $DB_NAME,
                 port     => $DB_PORT,
+                sslmode  => $DB_SSLMODE,
             })
     );
 
