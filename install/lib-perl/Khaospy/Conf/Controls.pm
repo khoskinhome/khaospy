@@ -83,6 +83,7 @@ our @EXPORT_OK = qw(
     get_control_name_for_one_wire
     is_control_rrd_graphed
     get_rrd_create_params_for_control
+    get_status_alias
 );
 
 my $check_mac = check_regex(
@@ -99,6 +100,8 @@ my $check_optional_integer
 my $check_types = {
     $ORVIBOS20_CONTROL_TYPE => {
         alias        => \&check_optional,
+        on_alias     => \&check_optional,
+        off_alias    => \&check_optional,
         rrd_graph    => $check_optional_boolean,
         db_log       => $check_optional_boolean,
         poll_timeout => $check_optional_integer,
@@ -118,6 +121,8 @@ my $check_types = {
     },
     $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE => {
         alias           => \&check_optional,
+        on_alias        => \&check_optional,
+        off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            =>
@@ -130,6 +135,8 @@ my $check_types = {
     },
     $PI_GPIO_RELAY_CONTROL_TYPE => {
         alias           => \&check_optional,
+        on_alias        => \&check_optional,
+        off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            =>
@@ -139,6 +146,8 @@ my $check_types = {
     },
     $PI_GPIO_SWITCH_CONTROL_TYPE => {
         alias           => \&check_optional,
+        on_alias        => \&check_optional,
+        off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            =>
@@ -148,6 +157,8 @@ my $check_types = {
     },
     $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE => {
         alias           => \&check_optional,
+        on_alias        => \&check_optional,
+        off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            =>
@@ -160,6 +171,8 @@ my $check_types = {
     },
     $PI_MCP23017_RELAY_CONTROL_TYPE => {
         alias           => \&check_optional,
+        on_alias        => \&check_optional,
+        off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            =>
@@ -169,6 +182,8 @@ my $check_types = {
     },
     $PI_MCP23017_SWITCH_CONTROL_TYPE => {
         alias           => \&check_optional,
+        on_alias        => \&check_optional,
+        off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            =>
@@ -178,6 +193,8 @@ my $check_types = {
     },
     $MAC_SWITCH_CONTROL_TYPE => {
         alias           => \&check_optional,
+        on_alias        => \&check_optional,
+        off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         mac             => $check_mac,
@@ -185,6 +202,8 @@ my $check_types = {
     },
     $PING_SWITCH_CONTROL_TYPE => {
         alias           => \&check_optional,
+        on_alias        => \&check_optional,
+        off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         host            => \&check_host,
@@ -253,6 +272,23 @@ sub is_control_rrd_graphed {
     my $control = get_hashval($controls_conf,$control_name);
 
     return get_hashval($control,'rrd_graph',false,false,false);
+}
+
+sub get_status_alias {
+    # get the on_alias or off_alias
+    # if there isn't an alias, just returns the $status.
+    my ($control_name, $status) = @_;
+    get_controls_conf();
+    my $control = get_hashval($controls_conf, $control_name);
+
+    my $status_str = "$status";
+
+    if ( $status_str eq ON and exists $control->{on_alias} ){
+        return $control->{on_alias};
+    } elsif ( $status_str eq OFF and exists $control->{off_alias} ){
+        return $control->{off_alias};
+    }
+    return $status;
 }
 
 sub _set_controls_conf {

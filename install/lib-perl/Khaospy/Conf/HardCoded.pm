@@ -446,6 +446,8 @@ sub live_controls_conf {
         amelia_window => { # alarm 02
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 02",
+            on_alias => 'open',
+            off_alias => 'closed',
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 1,
             },
@@ -462,6 +464,8 @@ sub live_controls_conf {
         alison_window => { # alarm 04
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 04",
+            on_alias => 'open',
+            off_alias => 'closed',
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 3,
             },
@@ -478,6 +482,8 @@ sub live_controls_conf {
         dining_room_window => { # alarm 06
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 06",
+            on_alias => 'open',
+            off_alias => 'closed',
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 5,
             },
@@ -494,6 +500,8 @@ sub live_controls_conf {
         front_room_window => { # alarm 08
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 08",
+            on_alias => 'open',
+            off_alias => 'closed',
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 7,
             },
@@ -502,6 +510,8 @@ sub live_controls_conf {
         front_outside_door => { # alarm_09
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 09",
+            on_alias => 'open',
+            off_alias => 'closed',
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 7,
             },
@@ -518,6 +528,8 @@ sub live_controls_conf {
         inner_front_door => { # alarm 11
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 11",
+            on_alias => 'open',
+            off_alias => 'closed',
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 5,
             },
@@ -526,6 +538,8 @@ sub live_controls_conf {
         inner_front_door_deadlock => { # alarm 12
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 12",
+            on_alias => 'unlocked',
+            off_alias => 'locked',
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 4,
             },
@@ -534,6 +548,8 @@ sub live_controls_conf {
         front_room_door => { # alarm 13
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 13",
+            on_alias => 'open',
+            off_alias => 'closed',
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 3,
             },
