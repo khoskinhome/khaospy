@@ -1,11 +1,16 @@
 views: "/opt/khaospy/www-dancer-tt/"
 
-plugins:
-    Database:
-        driver: Pg
-        database: 'khaospy'
-        host: 'localhost'
-        port: 5432
-        username: 'khaospy_write'
-        password: 'password'
-        connection_check_threshold: 10
+#plugins:
+#    Database:
+#        driver: Pg
+#        database: 'khaospy'
+#        host: 'localhost'
+#        port: 5432
+#        sslmode : 'require'
+#        username: 'khaospy_write'
+#        password: 'password'
+#        connection_check_threshold: 10
+#        dbi_params:
+#            sslmode: 'require'
+
+

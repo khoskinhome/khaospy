@@ -26,11 +26,14 @@ var control_state_value = [];
 var control_state_count = [];
 var keep_change_count = 45;
 
+// FIXME TODO template toolkit not doing this currently :
+// var dancer_base_url = [% DANCER_BASE_URL %];
+var dancer_base_url = '/dancer';
+
 $(document).ready(function(){
 
     function refresh_data(){
-        // the /dancer of api url could change . this needs to be in a template-toolkit variable.
-        $.get("/dancer/api/v1/statusall", function(data, http_status){
+        $.get(dancer_base_url + "/api/v1/statusall", function(data, http_status){
 
             for(var i=0;i<data.length;i++){
                 var data_row = data[i];
