@@ -88,7 +88,7 @@ crap.migrate.rrd.sh
 
 ./install/bin/test-date.pl
 
-
+./crap2.pl
 
 ./install/lib-perl/Khaospy/ZMQSubscribeAllPublishers.pm
 ./install/bin/khaospy-zmq-subscribe.pl
@@ -103,6 +103,7 @@ crap.migrate.rrd.sh
 ./install/lib-perl/zhelpers.pm
 
 ./install/bin/test-module-includes.pl
+./install/bin/test-db-connect.pl
 
 ./install/lib-perl/t/test-picontrollerdaemon-send-msg.pl
 ./install/lib-perl/t/test-picontrollerdaemon-listen.pl
@@ -294,6 +295,7 @@ install-run-live-conf-kill-and-restart-daemons-all.bash
 
 ./install/www-bin/dancer.pl
 ./install/www-dancer-tt/test.tt
+./install/www-dancer-tt/status.tt
 ./install/www-dancer-env/config.yml
 
 set views => '/opt/khaospy/www-dancer-tt/';

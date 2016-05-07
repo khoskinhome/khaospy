@@ -6,6 +6,8 @@ find out why HomeEasyD is broken.
 the StatusD and HeatingD are using very similar code to subscribe to Other-Controls, Pi-Controls, mac and ping switches.
 this could possibly go into a common module.
 
+StatusD needs to check DB connection status, and reconnect if its broken.
+
 Khaospy::DBH to have a config param for the sslmode
 
 Get HeatingD to subscribe to the PiControls and OtherControls.
