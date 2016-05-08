@@ -7,6 +7,7 @@ use lib "$FindBin::Bin/../lib-perl";
 use Try::Tiny;
 use Data::Dumper;
 use Dancer2;
+use Dancer2::Plugin::Auth::Tiny;
 use Khaospy::DBH qw(dbh);
 use Khaospy::Conf::Controls qw(
     get_control_config
@@ -26,13 +27,43 @@ use Khaospy::Constants qw(
     $DANCER_BASE_URL
 );
 
+get '/' => needs login => sub {
+    return template index => {};
+};
+
+get '/login' => sub {
+    print STDERR "Generate Login Page\n";
+    return template 'login' => { return_url => params->{return_url} };
+};
+
+post '/login' => sub {
+    print STDERR "Posted to Login\n";
+    my $user  = param('user');
+    my $password  = param('password');
+    my $redir_url = param('redirect_url') || '/';
+
+    print STDERR " TESTING login criteria $redir_url\n";
+
+    $user eq 'john' && $password eq 'let'
+        or redirect $redir_url;
+
+    print STDERR " PASSED login criteria\n";
+
+    session 'user' => $user;
+    #redirect '/status';
+    redirect $redir_url;
+};
+
 post '/api/v1/operate/:control/:action' => sub {
+#    session('user') or redirect('/login');
 
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
 
     my $control_name = params->{control};
     my $action       = params->{action};
+
+    print STDERR "Post action to $control_name\n";
 
     my $ret = {};
 
@@ -47,8 +78,10 @@ post '/api/v1/operate/:control/:action' => sub {
 };
 
 get '/api/v1/status/:control' => sub {
+#    session('user') or redirect('/login');
     my $stat = get_control_status(params->{control});
 
+#    print STDERR "Get status for control ".params->{control}."\n";
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
 
@@ -66,6 +99,7 @@ get '/api/v1/status/:control' => sub {
 };
 
 get '/api/v1/statusall' => sub {
+#    session('user') or redirect('/login');
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
 
@@ -74,7 +108,8 @@ get '/api/v1/statusall' => sub {
 };
 
 get '/status' => sub {
-    return template 'status.tt', {
+#    session('user') or redirect('/login');
+    return template 'status-new.tt', {
         DANCER_BASE_URL => $DANCER_BASE_URL,
         entries => get_control_status(),
     };
@@ -116,8 +151,10 @@ sub get_control_status {
         if ( defined $row->{current_value}){
             $row->{current_value}
                 = sprintf('%+0.1f', $row->{current_value});
-        } else {
-            $row->{current_state} =
+        }
+
+        if ( defined $row->{current_state} ){
+            $row->{status_alias} =
                 get_status_alias(
                     $control_name, get_hashval($row, 'current_state')
                 );
@@ -125,8 +162,12 @@ sub get_control_status {
 
         $row->{can_operate} = can_operate($control_name);
 
+# TODO. therm sensors have a range. These need CONSTANTS and the therm-config to support-range.
+#        $row->{in_range} = "too-low","correct","too-high"
+# colours will be blue==too-cold, green=correct, red=too-high.
+
         $row->{current_state_value}
-            = $row->{current_state} || $row->{current_value} ;
+            = $row->{status_alias} || $row->{current_value} ;
 
         push @$results, $row;
     }

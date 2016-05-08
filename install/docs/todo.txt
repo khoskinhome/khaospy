@@ -1,14 +1,24 @@
 High Prio
 ---------
 
+fix the mechanical switch on the inner door detection.
+
+Dancer app.
+    authentication
+    stop buttons appearing next to automated controls like the rads and boiler.
+    grouping of controls
+
+    animate the state change. Also green for off, red for On, flashing for change.
+
+
 find out why HomeEasyD is broken.
 
 the StatusD and HeatingD are using very similar code to subscribe to Other-Controls, Pi-Controls, mac and ping switches.
-this could possibly go into a common module.
+this could possibly go into a common module.  get ZMQPublishersubscribe to do something similar
+
 
 StatusD needs to check DB connection status, and reconnect if its broken.
 
-Khaospy::DBH to have a config param for the sslmode
 
 Get HeatingD to subscribe to the PiControls and OtherControls.
     use the window_sensor param . if the sensor is "on" then the associated rad will be off, irrespective of temperature state.
@@ -23,8 +33,7 @@ StatusD
 
     some way of cleaning up the DB table control_status when entries are over a month old. Could run as part of StatusD. Should probably be configurable.
 
-    make it so only one StatusD runs, and that it runs on the same host as the Postgres DB server. enforce this in the config. write a test.
-
+    make it so only one StatusD runs, enforce this in the config. write a test.
 
 fix graphs. get on-off graphs to display properly when infrequently updated.
 
@@ -45,6 +54,7 @@ manual-auto-timeout only populates if the manual-auto-timeout is set.
 
 
 PiGPIO and PiMCP. try and keep state between daemon restarts. reboots would be really hard. restarts maybe possible.
+
 ZMQ messages .encrypt.
 
 DHCP / DNS server.
@@ -54,7 +64,6 @@ Pi-Control-D
     use the ControlDispatch.pm. tricky.
     if the gpio or i2c commands fail during initialisation the daemon should die. The ports will not be in the correct state.
     rewrite the relay_manual ex_or and manual-change stuff. Its really hard to follow.
-
 
 Other-Controls-D ( initially for OrviboS20s )
 

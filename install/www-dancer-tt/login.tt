@@ -1,0 +1,23 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h1>Khaospy : Login</h1>
+        <!--TODO /dancer root could change -->
+
+        <table>
+            <form method='post' action='/dancer/login'>
+                <tr><td>
+                    <input type='text' name='user' value='' />
+                </tr></td><tr><td>
+                    <input type='password' name='password' value='' />
+                </tr></td><tr><td>
+                    <input type='submit' value='submit'/>
+                    <input type='hidden' name='return_url' value='[% return_url %]'/>
+                </tr></td>
+            </form>
+        </table>
+    </body>
+</html>
+

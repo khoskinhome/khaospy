@@ -1,0 +1,11 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h1>Khaospy : Home</h1>
+        <!--TODO /dancer root could change -->
+        <a href='/dancer/status'>Status</a>
+    </body>
+</html>
+

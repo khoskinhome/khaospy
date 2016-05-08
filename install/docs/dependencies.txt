@@ -78,7 +78,7 @@ sudo cpanm DateTime
 # Only needed on DB / WebUI :
 sudo cpanm Dancer2
 sudo cpanm Dancer2::Plugin::Database
+sudo cpanm Dancer2::Plugin::Auth::Tiny
 # installing DBD::Pg needs a /tmp of at least 166M . Best go for 250M
 sudo cpanm DBD::Pg
-
 
