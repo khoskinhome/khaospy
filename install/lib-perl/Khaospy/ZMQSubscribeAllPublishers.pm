@@ -139,38 +139,9 @@ sub output_msg {
 
 }
 
-
 sub output {
     my ($out) = @_;
     print $out;
-
-=pod
-TODO rm this lot , or properly dev something . this is a hack for alarm testing .
-
-
-=cut
-
-
-    my $dump_dir = "$RRD_IMAGE_DIR/alarm-test/";
-    return if ! -d $dump_dir;
-
-    burp ( "$dump_dir/debug-msg-".time.".txt", $out );
-
-    chdir $dump_dir ;
-    for my $filename ( <*> ) {
-
-        my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
-             $atime,$mtime,$ctime,$blksize,$blocks)
-               = stat($filename);
-
-        if ( $filename =~ /^debug-msg/ && $mtime + 15 < time ) {
-            print "going to rm $filename\n";
-            unlink $filename;
-        }
-
-    }
-
-
 }
 
 sub get_ports {
