@@ -4,20 +4,47 @@ use FindBin;
 FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
+use Try::Tiny;
 use Data::Dumper;
 use Dancer2;
 use Khaospy::DBH qw(dbh);
 use Khaospy::Conf::Controls qw(
+    get_control_config
     get_status_alias
+    can_operate
 );
+
+#install/lib-perl/Khaospy/Conf/Controls.pm:372:        try {
 
 use Khaospy::Utils qw(
     get_hashval
 );
 
+use Khaospy::QueueCommand qw/ queue_command /;
+
 use Khaospy::Constants qw(
     $DANCER_BASE_URL
 );
+
+post '/api/v1/operate/:control/:action' => sub {
+
+    header( 'Content-Type'  => 'application/json' );
+    header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
+
+    my $control_name = params->{control};
+    my $action       = params->{action};
+
+    my $ret = {};
+
+    try {
+        $ret = { msg => queue_command($control_name,$action) };
+    } catch {
+        status 'bad_request';
+        return "Couldn't operate $control_name with action '$action'";
+    };
+
+    return to_json $ret;
+};
 
 get '/api/v1/status/:control' => sub {
     my $stat = get_control_status(params->{control});
@@ -84,15 +111,19 @@ sub get_control_status {
     my $results = [];
     while ( my $row = $sth->fetchrow_hashref ){
 
+        my $control_name = get_hashval($row,'control_name');
+
         if ( defined $row->{current_value}){
             $row->{current_value}
                 = sprintf('%+0.1f', $row->{current_value});
         } else {
             $row->{current_state} =
                 get_status_alias(
-                    get_hashval($row,'control_name'),$row->{current_state}
+                    $control_name, get_hashval($row, 'current_state')
                 );
         }
+
+        $row->{can_operate} = can_operate($control_name);
 
         $row->{current_state_value}
             = $row->{current_state} || $row->{current_value} ;

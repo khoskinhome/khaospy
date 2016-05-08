@@ -84,6 +84,7 @@ our @EXPORT_OK = qw(
     is_control_rrd_graphed
     get_rrd_create_params_for_control
     get_status_alias
+    can_operate
 );
 
 my $check_mac = check_regex(
@@ -96,6 +97,13 @@ my $check_optional_boolean
 my $check_optional_integer
     = check_optional_regex(qr/^\d+$/);
 
+my $can_operate = {
+    $ORVIBOS20_CONTROL_TYPE => true,
+    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE => true,
+    $PI_GPIO_RELAY_CONTROL_TYPE => true,
+    $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE => true,
+    $PI_MCP23017_RELAY_CONTROL_TYPE => true,
+};
 
 my $check_types = {
     $ORVIBOS20_CONTROL_TYPE => {
@@ -289,6 +297,15 @@ sub get_status_alias {
         return $control->{off_alias};
     }
     return $status;
+}
+
+sub can_operate {
+    my ($control_name) = @_;
+    get_controls_conf();
+    my $control = get_hashval($controls_conf, $control_name);
+
+    return true if exists $can_operate->{get_hashval($control,'type')};
+    return false;
 }
 
 sub _set_controls_conf {

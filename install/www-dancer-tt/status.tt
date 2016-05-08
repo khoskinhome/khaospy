@@ -10,13 +10,11 @@
     background-color: red;
 }
 
-
 .controlname {
     background-color: yellow;
 }
 
 </style>
-
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 
@@ -34,6 +32,7 @@ $(document).ready(function(){
 
     function refresh_data(){
         $.get(dancer_base_url + "/api/v1/statusall", function(data, http_status){
+            //TODO check the http_status
 
             for(var i=0;i<data.length;i++){
                 var data_row = data[i];
@@ -74,6 +73,20 @@ $(document).ready(function(){
         });
     }
 
+    $("button").click(function(){
+
+        var control_name = $(this).attr('id');
+        var action       = $(this).attr('value');
+        // alert("pressed " + control_name + " " + action );
+
+        $.post(dancer_base_url + "/api/v1/operate/"+control_name+"/"+action,
+            { },
+            function(data, status){
+                // alert("Data: " + data + "\nStatus: " + status);
+            }
+        );
+    });
+
     setInterval(function(){
         refresh_data()
     }, 1000);
@@ -83,21 +96,29 @@ $(document).ready(function(){
 </script>
 
     </head>
-
     <body>
+        <h1>Control Status</h1>
+        <table>
+          [% FOREACH row IN entries %]
+            <tr>
+                <td class='controlname' >[% row.control_name %]</td>
 
-    <h1>Control Status</h1>
-    <table>
-      [% FOREACH row IN entries %]
-        <tr>
-            <td class='controlname' >[% row.control_name %]</td>
-            <td id='[% row.control_name %]-state_value'>[% row.current_state_value %]</td>
-            <td class='controlname' id='[% row.control_name %]-request_time'>[% row.request_time %]</td>
-            <td id='[% row.control_name %]-info'></td>
-        </tr>
-      [% END %]
+                    [% IF row.can_operate %]
+                        <td>
+                            <button id='[% row.control_name %]' value='on'>On</button>
+                        </td>
+                        <td>
+                            <button id='[% row.control_name %]' value='off'>Off</button>
+                        </td>
+                    [% ELSE %]
+                        <td></td><td></td>
+                    [% END %]
 
-    <table>
-
+                <td id='[% row.control_name %]-state_value'>[% row.current_state_value %]</td>
+                <td class='controlname' id='[% row.control_name %]-request_time'>[% row.request_time %]</td>
+                <td id='[% row.control_name %]-info'></td>
+            </tr>
+          [% END %]
+        </table>
     </body>
 </html>
