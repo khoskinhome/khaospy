@@ -52,6 +52,11 @@ ssh $USER@$PIHOST "rm \`find $PI_INSTALL_DIR | egrep \"\\.(py|pyc|pl|bash|sh|swp
 # not currently using libpy . so its excluded ....
 tar --exclude='./libpy' -zcf  - ./ | ssh $USER@$PIHOST "( cd $PI_INSTALL_DIR ; sudo tar zxvf - )"
 
-echo "reload apache2..."
-ssh $USER@$PIHOST "sudo service apache2 reload"
+echo ""
+echo "sudo /etc/init.d/apache2 restart ..."
+ssh $USER@$PIHOST "sudo /etc/init.d/apache2 restart"
+
+echo ""
+echo "sudo /etc/init.d/memcached restart"
+ssh $USER@$PIHOST "sudo /etc/init.d/memcached restart"
 

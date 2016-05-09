@@ -103,7 +103,7 @@ COMMIT;
 --    'test person',
 --    'test@example.com',
 --    crypt('zz_apsswrd', gen_salt('bf', 8)),
---    '07786162000'
+--    '07654321765'
 --
 --)
 --;

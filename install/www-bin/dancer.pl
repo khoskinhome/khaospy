@@ -8,14 +8,13 @@ use Try::Tiny;
 use Data::Dumper;
 use Dancer2;
 use Dancer2::Plugin::Auth::Tiny;
+use Dancer2::Session::Memcached;
 use Khaospy::DBH qw(dbh);
 use Khaospy::Conf::Controls qw(
     get_control_config
     get_status_alias
     can_operate
 );
-
-#install/lib-perl/Khaospy/Conf/Controls.pm:372:        try {
 
 use Khaospy::Utils qw(
     get_hashval
@@ -28,42 +27,39 @@ use Khaospy::Constants qw(
 );
 
 get '/' => needs login => sub {
-    return template index => {};
+    return template index => { user => session('user') };
 };
 
 get '/login' => sub {
-    print STDERR "Generate Login Page\n";
+    redirect '/' if session('user');
     return template 'login' => { return_url => params->{return_url} };
 };
 
+get '/logout' => sub {
+    session 'user' => undef;
+    redirect '/';
+};
+
 post '/login' => sub {
-    print STDERR "Posted to Login\n";
-    my $user  = param('user');
+
+    my $user      = param('user');
     my $password  = param('password');
-    my $redir_url = param('redirect_url') || '/';
+    my $redir_url = param('redirect_url') || '/login';
 
-    print STDERR " TESTING login criteria $redir_url\n";
-
-    $user eq 'john' && $password eq 'let'
-        or redirect $redir_url;
-
-    print STDERR " PASSED login criteria\n";
+    redirect $redir_url if ! get_user_login($user,$password);
 
     session 'user' => $user;
-    #redirect '/status';
+
     redirect $redir_url;
 };
 
-post '/api/v1/operate/:control/:action' => sub {
-#    session('user') or redirect('/login');
+post '/api/v1/operate/:control/:action'  => needs login => sub {
 
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
 
     my $control_name = params->{control};
     my $action       = params->{action};
-
-    print STDERR "Post action to $control_name\n";
 
     my $ret = {};
 
@@ -77,11 +73,9 @@ post '/api/v1/operate/:control/:action' => sub {
     return to_json $ret;
 };
 
-get '/api/v1/status/:control' => sub {
-#    session('user') or redirect('/login');
+get '/api/v1/status/:control' => needs login => sub {
     my $stat = get_control_status(params->{control});
 
-#    print STDERR "Get status for control ".params->{control}."\n";
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
 
@@ -98,8 +92,7 @@ get '/api/v1/status/:control' => sub {
     return to_json $stat->[0];
 };
 
-get '/api/v1/statusall' => sub {
-#    session('user') or redirect('/login');
+get '/api/v1/statusall' => needs login => sub {
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
 
@@ -107,11 +100,11 @@ get '/api/v1/statusall' => sub {
     return to_json $stat;
 };
 
-get '/status' => sub {
-#    session('user') or redirect('/login');
+get '/status'  => needs login => sub {
     return template 'status-new.tt', {
+        user            => session('user'),
         DANCER_BASE_URL => $DANCER_BASE_URL,
-        entries => get_control_status(),
+        entries         => get_control_status(),
     };
 };
 
@@ -173,6 +166,33 @@ sub get_control_status {
     }
 
     return $results;
+}
+
+sub get_user_login {
+    my ($user, $password) = @_;
+
+    my @bind_vals = ();
+
+    my $sql = <<"    EOSQL";
+    select * from users
+    where
+        lower(username) = ?
+        and passhash = crypt( ? , passhash);
+    EOSQL
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute(lc($user), $password);
+
+    my $results = [];
+    while ( my $row = $sth->fetchrow_hashref ){
+        push @$results, $row;
+    }
+
+    # TODO what if more than one record is returned ?
+    # handle error.
+
+    return $results->[0] if @$results;
+    return;
 }
 
 dance;

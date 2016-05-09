@@ -148,7 +148,12 @@ $(document).ready(function(){
 
     </head>
     <body>
-        <h1>Control Status</h1>
+        <table>
+            <tr>
+                <td><h1>Khaospy : Control Status</h1></td>
+                <td><h4> [% user %] &nbsp; <a href='/dancer/logout'>Logout</a></h4></td></tr>
+            <tr>
+        </table>
         <table>
           [% FOREACH row IN entries %]
             <tr>

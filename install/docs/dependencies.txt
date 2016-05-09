@@ -20,6 +20,9 @@ sudo apt-get install -y python-dev
 # on piserver :
 sudo apt-get install postgresql postgresql-contrib libpq-dev; sudo cpanm DBD::Pg
 
+# on piserver with Dancer and apache app :
+sudo apt-get install memcached
+
 #on piboiler where heating daemon is :
 sudo apt-get install postgresql-client libpq-dev ; sudo cpanm DBD::Pg
 
@@ -79,6 +82,8 @@ sudo cpanm DateTime
 sudo cpanm Dancer2
 sudo cpanm Dancer2::Plugin::Database
 sudo cpanm Dancer2::Plugin::Auth::Tiny
+sudo cpanm Dancer2::Session::Memcached
+
 # installing DBD::Pg needs a /tmp of at least 166M . Best go for 250M
 sudo cpanm DBD::Pg
 
