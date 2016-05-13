@@ -9,49 +9,105 @@ BEGIN;
 -- sql command inside of psql enable the crypto:
 -- create extension pgcrypto
 
-
-CREATE SEQUENCE users_seq;
-GRANT SELECT ON users_seq TO khaospy_read;
-GRANT ALL ON users_seq TO khaospy_write;
-create table users (
-    id INTEGER PRIMARY KEY DEFAULT nextval('users_seq') NOT NULL,
-    username     text not null unique,
-    name         text NOT NULL UNIQUE,
-    email        text not null unique,
-    passhash     text NOT NULL,
-    passhash_expire_timestamp timestamp with time zone,
-    is_api_user  boolean not null default false,
-    is_admin     boolean not null default false,
-    mobile_phone text not null unique,
-    can_remote   boolean not null default false
-
+---------------------
+-- controls
+---------------------
+CREATE TABLE controls (
+    control_name  TEXT PRIMARY KEY,
+    alias         TEXT,
+    in_json_cfg   BOOLEAN NOT NULL
 );
-GRANT SELECT ON users TO khaospy_read;
-GRANT ALL ON users TO khaospy_write;
+GRANT SELECT ON controls TO khaospy_read;
+GRANT ALL    ON controls TO khaospy_write;
 
-
+---------------------
+-- control_status
+---------------------
 CREATE SEQUENCE control_status_seq;
 GRANT SELECT ON control_status_seq TO khaospy_read;
 GRANT ALL ON control_status_seq TO khaospy_write;
 create table control_status (
     id INTEGER PRIMARY KEY DEFAULT nextval('control_status_seq') NOT NULL,
-    control_name             text not null,
-    current_state            text,
-    current_value            real,
-    last_change_state_time   timestamp with time zone null,
-    last_change_state_by     text null,
-    manual_auto_timeout_left real null,
-    request_time             timestamp with time zone not null,
-    db_update_time           timestamp with time zone not null
+    control_name             TEXT NOT NULL REFERENCES controls,
+    current_state            TEXT,
+    current_value            REAL,
+    last_change_state_time   TIMESTAMP WITH TIME ZONE,
+    last_change_state_by     TEXT,
+    manual_auto_timeout_left REAL,
+    request_time             TIMESTAMP WITH TIME ZONE NOT NULL,
+    db_update_time           TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
-# select control_name, request_time, current_state, current_value from control_status where id in ( select max(id) from control_status group by control_name );
-
-
+-- select control_name, request_time, current_state, current_value from control_status where id in ( select max(id) from control_status group by control_name );
 
 GRANT SELECT ON control_status TO khaospy_read;
 GRANT ALL    ON control_status TO khaospy_write;
 
+---------------------
+-- rooms
+---------------------
+CREATE SEQUENCE rooms_seq;
+GRANT SELECT ON rooms_seq TO khaospy_read;
+GRANT ALL ON rooms_seq TO khaospy_write;
+create table rooms (
+    id INTEGER PRIMARY KEY DEFAULT nextval('rooms_seq') NOT NULL,
+    name    TEXT NOT NULL UNIQUE,
+    tag     TEXT NOT NULL UNIQUE
+);
+GRANT SELECT ON rooms TO khaospy_read;
+GRANT ALL    ON rooms TO khaospy_write;
+
+---------------------
+-- control_rooms
+---------------------
+CREATE SEQUENCE control_rooms_seq;
+GRANT SELECT ON control_rooms_seq TO khaospy_read;
+GRANT ALL ON control_rooms_seq TO khaospy_write;
+CREATE TABLE control_rooms (
+    id INTEGER PRIMARY KEY DEFAULT nextval('control_rooms_seq') NOT NULL,
+    name            TEXT NOT NULL UNIQUE,
+    tag             TEXT NOT NULL UNIQUE,
+    control_name    TEXT NOT NULL REFERENCES controls,
+    room            INTEGER NOT NULL REFERENCES rooms,
+    can_view        BOOLEAN NOT NULL DEFAULT FALSE,
+    can_operate     BOOLEAN NOT NULL DEFAULT FALSE
+);
+GRANT SELECT ON control_rooms TO khaospy_read;
+GRANT ALL    ON control_rooms TO khaospy_write;
+
+---------------------
+-- users
+---------------------
+CREATE SEQUENCE users_seq;
+GRANT SELECT ON users_seq TO khaospy_read;
+GRANT ALL ON users_seq TO khaospy_write;
+create table users (
+    id INTEGER PRIMARY KEY DEFAULT nextval('users_seq') NOT NULL,
+    username                        text not null unique,
+    name                            text NOT NULL UNIQUE,
+    email                           text not null unique,
+    passhash                        text NOT NULL,
+    passhash_expire                 timestamp with time zone,
+    passhash_change_token           text NOT NULL,
+    passhash_change_token_expire    timestamp with time zone,
+    is_api_user                     boolean not null default false,
+    is_admin                        boolean not null default false,
+    can_remote                      boolean not null default false,
+    mobile_phone                    text not null unique
+);
+GRANT SELECT ON users TO khaospy_read;
+GRANT ALL ON users TO khaospy_write;
+
+---------------------
+-- user_control_rooms
+---------------------
+create table user_control_rooms (
+    user_id         INTEGER NOT NULL REFERENCES users,
+    control_room    INTEGER NOT NULL REFERENCES control_rooms
+);
+
+GRANT SELECT ON user_control_rooms TO khaospy_read;
+GRANT ALL    ON user_control_rooms TO khaospy_write;
 
 
 --INSERT INTO users (name, name ) VALUES( 'blah', 'uk-gpms');
