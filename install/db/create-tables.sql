@@ -88,7 +88,7 @@ create table users (
     email                           text not null unique,
     passhash                        text NOT NULL,
     passhash_expire                 timestamp with time zone,
-    passhash_change_token           text NOT NULL,
+    passhash_change_token           text,
     passhash_change_token_expire    timestamp with time zone,
     is_api_user                     boolean not null default false,
     is_admin                        boolean not null default false,

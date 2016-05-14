@@ -83,7 +83,7 @@ sudo cpanm Dancer2
 sudo cpanm Dancer2::Plugin::Database
 sudo cpanm Dancer2::Plugin::Auth::Tiny
 sudo cpanm Dancer2::Session::Memcached
-
+sudo cpanm Email::Send::Gmail   Email::Simple::Creator   Email::Send
 # installing DBD::Pg needs a /tmp of at least 166M . Best go for 250M
 sudo cpanm DBD::Pg
 

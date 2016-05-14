@@ -1,17 +1,16 @@
 <html>
     <head>
 
+        [% INCLUDE header_jquery.tt %]
+
     </head>
+
     <body>
-        <!--TODO /dancer root could change -->
-        <table>
-            <tr>
-                <td><h1>Khaospy : Home</h1></td>
-                <td><h4> [% user %] &nbsp; <a href='/dancer/logout'>Logout</a></h4></td></tr>
-            <tr>
-                <td><a href='/dancer/status'>Status</a></td>
-            </tr>
-        </table>
+        <div class='center'>
+
+            [% INCLUDE title_linkbar.tt %]
+
+        </div>
     </body>
 </html>
 

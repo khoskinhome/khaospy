@@ -41,6 +41,10 @@ alias psql.khaospy_read='psql -U khaospy_read -d khaospy -h localhost'
 alias psql.khaospy_write='psql -U khaospy_write -d khaospy -h localhost'
 
 alias s.apache.reload='sudo service apache2 reload'
+alias s.tail.apache.error='sudo tail -f /var/log/apache2/error.log'
+alias s.tail.apache.access='sudo tail -f /var/log/apache2/access.log'
+
+alias s.psqlclient='sudo -u postgres psql'
 alias s.postgresql.reload='sudo service postgresql reload'
 alias s.postgresql.stop='sudo service postgresql stop'
 alias s.postgresql.start='sudo service postgresql start'

@@ -46,12 +46,28 @@ post '/login' => sub {
     my $password  = param('password');
     my $redir_url = param('redirect_url') || '/login';
 
+
+    my $forgot_password = param('forgot_password');
+    warn "forgot password pressed for $user";
+=pod
+    TODO forgot password
+
+=cut
+
+
     redirect $redir_url if ! get_user_login($user,$password);
 
     session 'user' => $user;
 
     redirect $redir_url;
 };
+
+sub _send_password_token {
+
+
+
+
+}
 
 post '/api/v1/operate/:control/:action'  => needs login => sub {
 
@@ -101,9 +117,19 @@ get '/api/v1/statusall' => needs login => sub {
 };
 
 get '/status'  => needs login => sub {
-    return template 'status-new.tt', {
+    return template 'status.tt', {
+        page_title      => 'Status',
         user            => session('user'),
-        DANCER_BASE_URL => $DANCER_BASE_URL,
+#        DANCER_BASE_URL => $DANCER_BASE_URL,
+        entries         => get_control_status(),
+    };
+};
+
+get '/cctv'  => needs login => sub {
+    return template 'cctv.tt', {
+        page_title      => 'CCTV',
+        user            => session('user'),
+#        DANCER_BASE_URL => $DANCER_BASE_URL,
         entries         => get_control_status(),
     };
 };

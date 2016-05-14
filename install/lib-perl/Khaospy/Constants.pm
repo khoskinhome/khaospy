@@ -144,6 +144,7 @@ our $BOILERS_CONF                   = "boilers.json";
 # TODO KHAOSPY_GLOBAL_CONF to be deprecated. migrate to PI_HOST conf.
 our $GLOBAL_CONF                    = "global.json";
 our $DATABASE_CONF                  = "database.json";
+our $EMAIL_CONF                     = "email.json";
 our $PI_HOSTS_CONF                  = "pi-host.json";
 
 our $HEATING_DAEMON_CONF_FULLPATH
@@ -163,6 +164,9 @@ our $GLOBAL_CONF_FULLPATH
 
 our $DATABASE_CONF_FULLPATH
     = "$CONF_DIR/$DATABASE_CONF";
+
+our $EMAIL_CONF_FULLPATH
+    = "$CONF_DIR/$EMAIL_CONF";
 
 our $PI_HOSTS_CONF_FULLPATH
     = "$CONF_DIR/$PI_HOSTS_CONF";
@@ -280,6 +284,9 @@ our @EXPORT_OK = qw(
 
     $DATABASE_CONF
     $DATABASE_CONF_FULLPATH
+
+    $EMAIL_CONF
+    $EMAIL_CONF_FULLPATH
 
     $PI_HOSTS_CONF
     $PI_HOSTS_CONF_FULLPATH

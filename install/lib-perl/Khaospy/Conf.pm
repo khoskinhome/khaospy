@@ -25,6 +25,7 @@ use Khaospy::Constants qw(
     $BOILERS_CONF_FULLPATH
     $GLOBAL_CONF_FULLPATH
     $DATABASE_CONF_FULLPATH
+    $EMAIL_CONF_FULLPATH
 );
 
 use Khaospy::Utils;
@@ -34,6 +35,7 @@ our @EXPORT_OK = qw(
     get_boiler_conf
     get_global_conf
     get_database_conf
+    get_email_conf
     get_conf
 );
 
@@ -95,4 +97,11 @@ sub get_database_conf {
     my ($force_reload) = @_;
     get_conf( \$database_conf, $DATABASE_CONF_FULLPATH, $force_reload);
 }
+
+my $email_conf;
+sub get_email_conf {
+    my ($force_reload) = @_;
+    get_conf( \$email_conf, $EMAIL_CONF_FULLPATH, $force_reload);
+}
+
 1;

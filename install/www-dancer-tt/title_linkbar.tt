@@ -1,0 +1,12 @@
+
+    <!--TODO /dancer root could change -->
+    <table>
+        <tr>
+            <td><h1>Khaospy : [% page_title %]</h1></td>
+            <td><h4><a href='/dancer/logout'>Logout [% user %]</a></h4></td></tr>
+        <tr>
+            <td><a href='/dancer/status'>Status</a></td>
+            <td><a href='/dancer/cctv'>CCTV</a></td>
+        </tr>
+    </table>
+

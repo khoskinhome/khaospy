@@ -1,0 +1,22 @@
+<html>
+
+    <head>
+
+        [% INCLUDE header_jquery.tt %]
+
+    </head>
+
+    <body>
+        <div class='center'>
+
+            [% INCLUDE title_linkbar.tt %]
+
+            <embed type="application/x-vlc-plugin" pluginspage="http://www.videolan.org"
+                name="video2"
+                autoplay="no" loop="yes" width="533" height="300"
+                target="rtsp://ipcam04.khaos/ucast/11"
+            />
+        </div>
+    </body>
+</html>
+

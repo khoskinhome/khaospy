@@ -1,21 +1,10 @@
-<html>
-    <head>
-
-    <link rel="stylesheet" type="text/css" href="mystyle.css">
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-
-<script>
-
 var control_state_value = [];
 var control_state_count = [];
 var keep_change_count   = 45;
 var refresh_screen      = 1000;
 var animate_time        = 1200;
 
-// FIXME TODO template toolkit not doing this currently :
-// var dancer_base_url = [% DANCER_BASE_URL %];
+// FIXME TODO dancer base could change
 var dancer_base_url = '/dancer';
 
 $(document).ready(function(){
@@ -90,17 +79,16 @@ $(document).ready(function(){
         selector.addClass(to_class);
     }
 
-
     $("button").click(function(){
-
         var control_name = $(this).attr('id');
         var action       = $(this).attr('value');
         // alert("pressed " + control_name + " " + action );
 
         $.post(dancer_base_url + "/api/v1/operate/"+control_name+"/"+action,
             { },
-            function(data, status){
+            function(data, http_status){
                 // alert("Data: " + data + "\nStatus: " + status);
+                // TODO handle http_status errors.
             }
         );
     });
@@ -108,46 +96,5 @@ $(document).ready(function(){
     setInterval(function(){
         refresh_data()
     }, refresh_screen);
-
-
 });
-</script>
 
-    </head>
-    <body>
-
-        <table>
-            <tr>
-                <td><h1>Khaospy : Control Status</h1></td>
-                <td><h4> [% user %] &nbsp; <a href='/dancer/logout'>Logout</a></h4></td></tr>
-            <tr>
-                <td><a href='/dancer/status'>Status</a></td>
-                <td><a href='/dancer/cctv'>CCTV</a></td>
-            </tr>
-        </table>
-
-
-        <table>
-          [% FOREACH row IN entries %]
-            <tr>
-                <td class='controlname' >[% row.control_name %]</td>
-
-                    [% IF row.can_operate %]
-                        <td>
-                            <button id='[% row.control_name %]' value='on'>On</button>
-                        </td>
-                        <td>
-                            <button id='[% row.control_name %]' value='off'>Off</button>
-                        </td>
-                    [% ELSE %]
-                        <td></td><td></td>
-                    [% END %]
-
-                <td align='center' id='[% row.control_name %]-state_alias'>[% row.current_state_value %]</td>
-                <td class='controlname' id='[% row.control_name %]-request_time'>[% row.request_time %]</td>
-                <td id='[% row.control_name %]-info'></td>
-            </tr>
-          [% END %]
-        </table>
-    </body>
-</html>

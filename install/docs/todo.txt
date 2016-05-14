@@ -1,10 +1,13 @@
 High Prio
 ---------
 
+
+
 fix the mechanical switch on the inner door detection.
 
+Get undef control status to show in front-end
+
 Dancer app.
-    authentication
     stop buttons appearing next to automated controls like the rads and boiler.
     grouping of controls
 

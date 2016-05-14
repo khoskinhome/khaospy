@@ -1,0 +1,31 @@
+.no_change {
+    background-color: white;
+}
+
+.change {
+    background-color: #ff8080;
+}
+
+.state_on {
+    background-color: #ff8080;
+}
+
+.state_off {
+    background-color: #99ff99;
+}
+
+.controlname {
+    background-color: #ffff99;
+}
+
+.value_too_cold {
+    background-color: #99ffff;
+}
+
+.value_correct {
+    background-color: #99ff99;
+}
+
+.value_too_hot {
+    background-color: #ff8080;
+}
