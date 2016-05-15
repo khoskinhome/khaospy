@@ -7,9 +7,11 @@ use lib "$FindBin::Bin/../lib-perl";
 use Try::Tiny;
 use Data::Dumper;
 use Dancer2;
+use Dancer2::Core::Request;
 use Dancer2::Plugin::Auth::Tiny;
 use Dancer2::Session::Memcached;
 use Khaospy::DBH qw(dbh);
+use Khaospy::Email qw(send_email);
 use Khaospy::Conf::Controls qw(
     get_control_config
     get_status_alias
@@ -30,14 +32,17 @@ get '/' => needs login => sub {
     return template index => { user => session('user') };
 };
 
-get '/login' => sub {
-    redirect '/' if session('user');
-    return template 'login' => { return_url => params->{return_url} };
-};
-
 get '/logout' => sub {
     session 'user' => undef;
     redirect '/';
+};
+
+get '/login' => sub {
+    redirect '/' if session('user');
+    return template 'login' => {
+        return_url => params->{return_url},
+        user       => session->read('reset_username'),
+    };
 };
 
 post '/login' => sub {
@@ -46,27 +51,141 @@ post '/login' => sub {
     my $password  = param('password');
     my $redir_url = param('redirect_url') || '/login';
 
+    if (defined param('forgot_password')){
+        warn "forgot password pressed for $user";
+        redirect uri_for('/reset_password', { user => $user });
+    }
 
-    my $forgot_password = param('forgot_password');
-    warn "forgot password pressed for $user";
-=pod
-    TODO forgot password
+    redirect uri_for('/login', {
+        user => $user,
+        redirect_url =>$redir_url,
+    })
+        if ! get_user_password($user,$password);
 
-=cut
-
-
-    redirect $redir_url if ! get_user_login($user,$password);
+    # TODO has password expired ? if so redirect to a change password page.
 
     session 'user' => $user;
-
     redirect $redir_url;
 };
+
+get '/reset_password' => sub {
+
+    my $error_msg = session->read('error_msg') || "";
+    session 'error_msg' => "";
+
+    return template 'reset_password'
+        => {
+            user       => params->{user} || session->read('reset_username'),
+            return_url => params->{return_url},
+            error_msg  => $error_msg,
+        };
+};
+
+post '/reset_password' => sub {
+    my $user        = param('user');
+    my $email       = param('email');
+    my $user_record = get_user($user);
+    session 'reset_username' => $user;
+
+    if ( ! defined $user_record
+        || get_hashval($user_record,'email') ne $email){
+
+        session 'error_msg' => "username and email combination don't match any known users";
+
+        redirect '/reset_password';
+    }
+    # reset the password, and email it .
+    my $new_password = rand_password();
+    my $body = <<"EOBODY";
+Your password has been reset.
+
+This reset password will expire in 60 minutes.
+
+When you login, you will be required to change the password
+
+Password is:
+$new_password
+
+EOBODY
+
+    # TODO update the DB.
+
+
+    send_email({
+        to      => get_hashval($user_record,'email'),
+        subject => "Khaospy. Reset Password",
+        body    => $body,
+    });
+
+    session 'reset_username' => $user;
+    redirect '/login';
+};
+
+get '/change_password' => needs login => sub {
+#
+#    my $error_msg = session->read('error_msg') || "";
+#    session 'error_msg' => "";
+#
+#    return template 'reset_password'
+#        => {
+#            user       => params->{user},
+#            return_url => params->{return_url},
+#            error_msg  => $error_msg,
+#        };
+};
+
+post '/change_password' => needs login => sub {
+#    my $user        = param('user');
+#    my $email       = param('email');
+#    my $user_record = get_user($user);
+#
+#    if ( ! defined $user_record
+#        || get_hashval($user_record,'email') ne $email){
+#
+#        session 'error_msg' => "username and email combination don't match any known users";
+#
+#        redirect '/reset_password';
+#    }
+#    # reset the password, and email it .
+#    my $new_password = rand_password();
+#    my $body = <<"EOBODY";
+#Your password has been reset.
+#
+#This reset password will expire in 60 minutes.
+#
+#When you login, you will be required to change the password
+#
+#Password is:
+#$new_password
+#
+#EOBODY
+#
+#    # TODO update the DB.
+#
+#
+#    send_email({
+#        to      => get_hashval($user_record,'email'),
+#        subject => "Khaospy. Reset Password",
+#        body    => $body,
+#    });
+#
+#    session 'reset_username' => $user;
+#    redirect '/login';
+};
+
+
 
 sub _send_password_token {
 
 
+}
 
-
+sub rand_password {
+    my @alphanum = qw(
+        a b c d e f g h i j k m n p r s t u v w x y z
+        A B C D E F G H J K L M N P R S T U V W X Y Z
+        0 1 2 3 4 5 6 7 8 9);
+    return join( "", map { $alphanum[rand(int(@alphanum))] } 1 .. 10 );
 }
 
 post '/api/v1/operate/:control/:action'  => needs login => sub {
@@ -194,10 +313,8 @@ sub get_control_status {
     return $results;
 }
 
-sub get_user_login {
+sub get_user_password {
     my ($user, $password) = @_;
-
-    my @bind_vals = ();
 
     my $sql = <<"    EOSQL";
     select * from users
@@ -221,5 +338,23 @@ sub get_user_login {
     return;
 }
 
+sub get_user {
+    my ($user) = @_;
+
+    my $sql = " select * from users where lower(username) = ? ";
+    my $sth = dbh->prepare($sql);
+    $sth->execute(lc($user));
+
+    my $results = [];
+    while ( my $row = $sth->fetchrow_hashref ){
+        push @$results, $row;
+    }
+
+    # TODO what if more than one record is returned ?
+    # handle error.
+
+    return $results->[0] if @$results;
+    return;
+}
 dance;
 
