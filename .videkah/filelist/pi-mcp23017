@@ -1,3 +1,5 @@
+~/crap.sql
+
 ./install/bin/khaospy-bash-aliases.sh
 
 ./install/bin/display-latest-control-status-sql.sh
@@ -11,8 +13,6 @@ install/www-bin/lightba.pl
 
 #######################################################
 crap
-
-crap.migrate.rrd.sh
 
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
@@ -55,7 +55,6 @@ crap.migrate.rrd.sh
 
 ./install/lib-perl/Khaospy/ControlUtils.pm
 
-
 ./install/lib-perl/Khaospy/ControlsDaemon.pm
 ./install/bin/khaospy-pi-controls-d.pl
 ./install/bin/khaospy-other-controls-d.pl
@@ -86,9 +85,12 @@ crap.migrate.rrd.sh
 
 ./install/lib-perl/Khaospy/Utils.pm
 
-./install/bin/test-date.pl
-
 ./crap2.pl
+
+# TODO remove the password from in here :
+./install/lib-perl/Khaospy/Email.pm
+./install/bin/test-gmail.pl
+./install/bin/khaospy-email-conf-generate.pl
 
 ./install/lib-perl/Khaospy/ZMQSubscribeAllPublishers.pm
 ./install/bin/khaospy-zmq-subscribe.pl
@@ -264,6 +266,7 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ###################################################################
 
 install-to-pi-pi.bash
+install-reload-apache.bash
 #install-to-pi-khoskin.bash
 #install-to-pi.bash
 install-to-pi-all.bash
@@ -287,19 +290,37 @@ install-run-live-conf-kill-and-restart-daemons.bash
 install-run-live-conf-kill-and-restart-daemons-all.bash
 
 ###################################################################
-./install/www-bin/test-cgi.pl
-
-./install/www/index.html
-
-./install/www-bin/graphs.pl
+crap
+crap.pl
 
 ./install/www-bin/dancer.pl
-./install/www-dancer-tt/test.tt
+
+./install/www-dancer-tt/header.tt
+./install/www-dancer-tt/header_jquery.tt
+
+./install/www-dancer-tt/title_linkbar.tt
+
+./install/www-dancer-tt/login.tt
+./install/www-dancer-tt/reset_password.tt
+./install/www-dancer-tt/change_password.tt
+./install/www-dancer-tt/user_update.tt
+
+./install/www-dancer-tt/index.tt
+
+./install/www-dancer-tt/cctv.tt
+
 ./install/www-dancer-tt/status.tt
+./install/www/css/status.css
+./install/www/js/status.js
+
+./install/www/js/base.js
+./install/www/css/base.css
+
 ./install/www-dancer-env/config.yml
 
-set views => '/opt/khaospy/www-dancer-tt/';
-
+./install/www-bin/test-cgi.pl
+./install/www-bin/graphs.pl
+./install/www-dancer-tt/status-new.tt
 ###################################################################
 
 ./install/db/create-db.sql
@@ -309,4 +330,3 @@ set views => '/opt/khaospy/www-dancer-tt/';
 
 ./install/apache/default-ssl.conf
 
-crap

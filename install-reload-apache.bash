@@ -56,7 +56,7 @@ echo ""
 echo "sudo /etc/init.d/apache2 restart ..."
 ssh $USER@$PIHOST "sudo /etc/init.d/apache2 restart"
 
-echo ""
-echo "sudo /etc/init.d/memcached restart"
-ssh $USER@$PIHOST "sudo /etc/init.d/memcached restart"
+#echo ""
+#echo "sudo /etc/init.d/memcached restart"
+#ssh $USER@$PIHOST "sudo /etc/init.d/memcached restart"
 
