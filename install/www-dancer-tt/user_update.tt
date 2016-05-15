@@ -1,0 +1,50 @@
+<html>
+    <head>
+
+        [% INCLUDE header_jquery.tt %]
+
+    </head>
+    <body>
+        <div class='center'>
+            <table>
+                <tr><td colspan='2'>
+                    <h1>Khaospy : User Update</h1>
+                </td></tr>
+
+                <form method='post' action='/dancer/user_update'>
+                    <tr>
+                        <td>User name</td>
+                        <td><input type='text' name='user' value='[% user %]' /></td>
+                    </tr>
+                    <tr>
+                        <td> Old Password </td>
+                        <td>
+                            <input type='password' name='old_password' value='' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> New Password </td>
+                        <td>
+                            <input type='password' name='new_password' value='' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> New Password (again) </td>
+                        <td>
+                            <input type='password' name='new_password2' value='' />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input type='submit' name='change_password' value='Change Password'/>
+                            <input type='hidden' name='return_url' value='[% return_url %]'/>
+                        </td>
+                    </tr>
+                    <tr><td colspan='2'>[% error_msg %]</td></tr>
+                </form>
+            </table>
+        </div>
+    </body>
+</html>
+
