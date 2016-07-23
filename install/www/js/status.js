@@ -1,5 +1,6 @@
 var control_state_value = [];
 var control_state_count = [];
+var control_request_time = [];
 var keep_change_count   = 45;
 var refresh_screen      = 1000;
 var animate_time        = 1200;
@@ -18,6 +19,7 @@ $(document).ready(function(){
                 for(var key in data_row){
                     var control_name    = data_row['control_name'].toString();
                     var new_state_value = data_row['current_state_value'].toString();
+                    var new_request_time = data_row['request_time'].toString();
 
                     var new_state = data_row['current_state'];
 //                    if ( data_row['current_state'] !== null ){
@@ -25,20 +27,24 @@ $(document).ready(function(){
 //                    }
 
                     var old_state_value;
+                    var old_request_time;
 
                     if(control_state_value[control_name] === undefined){
                         control_state_count[control_name] = 0;
                         control_state_value[control_name] = new_state_value;
+                        control_request_time[control_name] = new_request_time;
                         old_state_value = "";
+                        old_request_time = "";
                     } else {
-                        old_state_value = control_state_value[control_name];
+                        old_state_value  = control_state_value[control_name];
+                        old_request_time = control_request_time[control_name];
                     }
 
-                    $("#" + control_name + '-request_time' ).text(data_row['request_time']);
+                    $("#" + control_name + '-request_time' ).text(new_request_time);
                     $("#" + control_name + '-state_alias' ).text(new_state_value);
 
 
-                    if ( new_state_value != old_state_value ){
+                    if ( new_state_value != old_state_value || new_request_time != old_request_time){
 
                         if ( new_state != null ){
                             // only on-off controls should have new_state defined.
@@ -67,6 +73,7 @@ $(document).ready(function(){
 
                     // console.log(control_name + ' old = ' + old_state_value + ' : new = ' + new_state_value + ' : count = ' + control_state_count[control_name] );
                     control_state_value[control_name] = new_state_value;
+                    control_request_time[control_name] = new_request_time;
                 }
             }
         });

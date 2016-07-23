@@ -165,3 +165,5 @@ COMMIT;
 
 -- select * from users where passhash = crypt(:pass, passhash);
 
+
+-- delete from  control_status where request_time < now() - interval '16 days';

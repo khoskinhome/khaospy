@@ -427,10 +427,18 @@ sub get_control_status {
         }
 
         if ( defined $row->{current_state} ){
-            $row->{status_alias} =
-                get_status_alias(
-                    $control_name, get_hashval($row, 'current_state')
-                );
+            eval {
+                $row->{status_alias} =
+                    get_status_alias(
+                        $control_name, get_hashval($row, 'current_state')
+                    );
+            };
+
+            if ($@) {
+                warn "looks like control_name has been changed."
+                    ." DB has stale data. $@";
+                next;
+            }
         }
 
         $row->{can_operate} = can_operate($control_name);

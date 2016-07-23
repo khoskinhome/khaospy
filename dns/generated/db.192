@@ -11,6 +11,7 @@ $TTL	604800
 ;
 @	IN	NS	piserver.khaos.
 
+3	IN	PTR	devvm.khaos.
 
 5	IN	PTR	piold.khaos.
 6	IN	PTR	piold-eth.khaos.

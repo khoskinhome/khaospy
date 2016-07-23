@@ -1,5 +1,17 @@
 High Prio
 ---------
+change around the binding and connecting of $QUEUE_COMMAND_PORT
+
+migrate heating daemon over to new one-wire-perl-d
+
+checkover the constantisation of control-types.
+
+get the rrd_updater in the StatusD running on piserver.
+    using new one-wire-perl-d
+
+stop the old python sender and receiver daemons from running.
+remove the old python one-wire-d
+
 
 
 

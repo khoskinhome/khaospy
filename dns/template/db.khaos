@@ -15,6 +15,8 @@ $TTL	604800
 
 ; Below are A Record Addresses
 
+devvm		IN	A	192.168.1.3
+
 ; piold piold-wifi pioldwifi
 ; 74-DA-38-05-2E-C4 pioldwifi wireless eth
 piold		IN	A	192.168.1.5
@@ -40,7 +42,7 @@ ipcam-new-15		IN	A	192.168.1.15
 piserver	IN	A	192.168.1.14
 
 
-; samsung printer :
+; 00-00-F0-AD-33-49 samsung printer :
 printer-samsung-ml2251n	IN	A	192.168.1.16
 prts		IN	CNAME	printer-samsung-ml2251n.khaos.
 

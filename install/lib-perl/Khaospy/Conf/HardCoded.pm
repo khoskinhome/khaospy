@@ -644,7 +644,7 @@ sub live_controls_conf {
             },
             rrd_graph     => true,
         },
-        alarm_25 => { # alarm_25
+        door_bell_spare => { # alarm_25
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 25",
             gpio_switch => {
@@ -652,7 +652,7 @@ sub live_controls_conf {
             },
             rrd_graph     => true,
         },
-        alarm_26 => { # alarm 26
+        door_bell_amelia => { # alarm 26
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 26",
             gpio_switch => {
@@ -660,7 +660,7 @@ sub live_controls_conf {
             },
             rrd_graph     => true,
         },
-        alarm_27 => { # alarm 27
+        door_bell_karl => { # alarm 27
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 27",
             gpio_switch => {
@@ -668,7 +668,7 @@ sub live_controls_conf {
             },
             rrd_graph     => true,
         },
-        alarm_28 => { # alarm 28
+        door_bell_main => { # alarm 28
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 28",
             gpio_switch => {
