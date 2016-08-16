@@ -48,10 +48,7 @@ crap
 ./install/lib-perl/Khaospy/ControlPiMCP23017.pm
 ./install/lib-perl-t/KhaospyControlPiMCP23017.t
 
-./install/lib-perl/Khaospy/ControlPiBoilerHomeEasy.pm
-./install/bin/khaospy-piboiler-homeeasy.pl
-./install/bin/khaospy-piboiler-homeeasy-schedule-d.pl
-./install/lib-perl-t/KhaospyControlPiBoilerHomeEasy.t
+
 
 ./install/lib-perl/Khaospy/ControlUtils.pm
 
@@ -111,6 +108,12 @@ crap
 ./install/lib-perl/t/test-picontrollerdaemon-listen.pl
 
 ./install/lib-perl-t/alltests.t
+
+######################################################
+# cctv record
+./install/bin/cctv-record.pl
+./install/bin/cctv-mount-nas.bash
+
 ######################################################
 #
 #######################################################
@@ -156,15 +159,7 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ./install/bin/helper/gpio-4-relay-off.sh
 ./install/bin/helper/gpio-0-input-status.sh
 
-./install/bin/helper/piboiler-homeeasy-1-on.sh
-./install/bin/helper/piboiler-homeeasy-1-off.sh
 
-./install/bin/helper/piboiler-homeeasy-2-on.sh
-./install/bin/helper/piboiler-homeeasy-2-off.sh
-./install/bin/helper/piboiler-homeeasy-3-on.sh
-./install/bin/helper/piboiler-homeeasy-3-off.sh
-./install/bin/helper/piboiler-homeeasy-4-on.sh
-./install/bin/helper/piboiler-homeeasy-4-off.sh
 
 
 ./install/bin/helper/zmq-get-version.pl
@@ -179,6 +174,20 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ./install/bin/helper/zmq-pull.py
 
 
+##############
+# deprecated HomeEasy
+#./install/lib-perl/Khaospy/ControlPiBoilerHomeEasy.pm
+#./install/bin/khaospy-piboiler-homeeasy.pl
+#./install/bin/khaospy-piboiler-homeeasy-schedule-d.pl
+#./install/lib-perl-t/KhaospyControlPiBoilerHomeEasy.t
+#./install/bin/helper/piboiler-homeeasy-1-on.sh
+#./install/bin/helper/piboiler-homeeasy-1-off.sh
+#./install/bin/helper/piboiler-homeeasy-2-on.sh
+#./install/bin/helper/piboiler-homeeasy-2-off.sh
+#./install/bin/helper/piboiler-homeeasy-3-on.sh
+#./install/bin/helper/piboiler-homeeasy-3-off.sh
+#./install/bin/helper/piboiler-homeeasy-4-on.sh
+#./install/bin/helper/piboiler-homeeasy-4-off.sh
 
 ##############################################################################
 
