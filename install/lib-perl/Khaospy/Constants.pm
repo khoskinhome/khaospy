@@ -111,9 +111,6 @@ our $ALL_SCRIPTS = [
     our $BOILER_DAEMON_SCRIPT
         = "$BIN_DIR/khaospy-boiler-daemon.pl",
 
-    our $PIBOILER_HOMEEASY_SCHEDULE_DAEMON_SCRIPT
-        = "$BIN_DIR/khaospy-piboiler-homeeasy-schedule-d.pl",
-
     our $PI_CONTROLLER_DAEMON_SCRIPT
         = "$BIN_DIR/$PI_CONTROLLER_DAEMON",
 
@@ -342,7 +339,6 @@ our @EXPORT_OK = qw(
     $PING_SWITCH_DAEMON_SCRIPT
     $PING_SWITCH_DAEMON_TIMER
 
-    $PIBOILER_HOMEEASY_SCHEDULE_DAEMON_SCRIPT
 
     $QUEUE_COMMAND_PORT
 

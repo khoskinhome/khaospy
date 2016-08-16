@@ -1,5 +1,8 @@
 High Prio
 ---------
+
+Deprecate the HomeEasy stuff. circuit went wrong . not worth the hassle.
+
 change around the binding and connecting of $QUEUE_COMMAND_PORT
 
 migrate heating daemon over to new one-wire-perl-d
@@ -26,7 +29,6 @@ Dancer app.
     animate the state change. Also green for off, red for On, flashing for change.
 
 
-find out why HomeEasyD is broken.
 
 the StatusD and HeatingD are using very similar code to subscribe to Other-Controls, Pi-Controls, mac and ping switches.
 this could possibly go into a common module.  get ZMQPublishersubscribe to do something similar

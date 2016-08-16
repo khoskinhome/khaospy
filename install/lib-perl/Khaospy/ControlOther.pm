@@ -1,7 +1,7 @@
 package Khaospy::ControlOther;
 use strict;
 use warnings;
-# By Karl Kaiser-Kount-Khaos Hoskin. 2015-2016
+# By Karl 'Khaos' Hoskin. 2015-2016
 
 # All the controls here are probably going to be conceptually like "relay-manual" controls.
 # i.e. they can be control by Khaospy, but other things can operate them.

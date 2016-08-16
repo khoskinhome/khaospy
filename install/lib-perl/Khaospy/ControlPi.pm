@@ -1,7 +1,7 @@
 package Khaospy::ControlPi;
 use strict;
 use warnings;
-# By Karl Kount-Khaos Hoskin. 2015-2016
+# By Karl Khaos Hoskin. 2015-2016
 
 # Has the main logic for "relay" , "switch" and "relay-manual" controls
 # and the dispatch to either ControlPiGPIO or ControlPiMCP23017

@@ -30,7 +30,6 @@ use Khaospy::Constants qw(
     $COMMAND_QUEUE_DAEMON_SCRIPT
 
     $PI_STATUS_DAEMON_SCRIPT
-    $PIBOILER_HOMEEASY_SCHEDULE_DAEMON_SCRIPT
 
     $OTHER_CONTROLS_DAEMON_SCRIPT
 
@@ -941,7 +940,6 @@ sub live_pi_host_conf {
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT,  options => { }, },
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT,  options => { }, },
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-#                { script  => $PIBOILER_HOMEEASY_SCHEDULE_DAEMON_SCRIPT, options =>{}, },
             ],
         },
     };
