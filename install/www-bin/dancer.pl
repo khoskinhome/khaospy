@@ -345,12 +345,14 @@ post '/api/v1/operate/:control/:action'  => needs login => sub {
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
 
+
     my $control_name = params->{control};
     my $action       = params->{action};
 
     my $ret = {};
 
     try {
+        # TODO this needs to have a timeout :
         $ret = { msg => queue_command($control_name,$action) };
     } catch {
         status 'bad_request';

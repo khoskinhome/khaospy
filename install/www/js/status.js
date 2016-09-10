@@ -2,8 +2,10 @@ var control_state_value = [];
 var control_state_count = [];
 var control_request_time = [];
 var keep_change_count   = 45;
-var refresh_screen      = 1000;
-var animate_time        = 1200;
+var refresh_screen      = 2000;
+var animate_time        = 2400;
+
+// TODO dynamically change the refresh screen to slightly longer than the last get status request took.
 
 // FIXME TODO dancer base could change
 var dancer_base_url = '/dancer';
@@ -89,7 +91,7 @@ $(document).ready(function(){
     $("button").click(function(){
         var control_name = $(this).attr('id');
         var action       = $(this).attr('value');
-        // alert("pressed " + control_name + " " + action );
+        console.log("pressed " + control_name + " " + action );
 
         $.post(dancer_base_url + "/api/v1/operate/"+control_name+"/"+action,
             { },

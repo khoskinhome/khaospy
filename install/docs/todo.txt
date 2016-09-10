@@ -1,6 +1,16 @@
 High Prio
 ---------
 
+
+when the WebUI tries to queue_command sending the message can hang. This needs to timeout.
+    post '/api/v1/operate/:control/:action'
+    in dancer.pl
+
+
+write a script to be cron-ed that will keep the last 1 months cctv data on the nas.
+
+
+
 Deprecate the HomeEasy stuff. circuit went wrong . not worth the hassle.
 
 change around the binding and connecting of $QUEUE_COMMAND_PORT

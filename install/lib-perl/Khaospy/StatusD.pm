@@ -57,6 +57,9 @@ use Khaospy::Constants qw(
     $PING_SWITCH_DAEMON_SEND_PORT
     $PING_SWITCH_DAEMON_SCRIPT
     $SCRIPT_TO_PORT
+
+    $DB_CONTROL_STATUS_DAYS_HISTORY
+    $DB_CONTROL_STATUS_PURGE_TIMEOUT_SECS
 );
 
 use Khaospy::Conf::Controls qw(
@@ -91,7 +94,7 @@ our $LOGLEVEL;
 
 our $OPTS;
 
-
+my $last_db_control_status_purge;
 my $last_control_state;
 
 sub run_status_d {
@@ -104,6 +107,8 @@ sub run_status_d {
     kloginfo "LOGLEVEL = ".$Khaospy::Log::OVERRIDE_CONF_LOGLEVEL;
 
     $last_control_state = get_last_control_state();
+
+    $last_db_control_status_purge = time;
 
     my @w;
 
@@ -161,6 +166,11 @@ sub timer_cb {
 
         }
     }
+
+    purge_control_status()
+        if ( time > $last_db_control_status_purge +
+            $DB_CONTROL_STATUS_PURGE_TIMEOUT_SECS
+        );
 }
 
 sub output_msg {
@@ -289,6 +299,27 @@ sub control_status_insert {
     };
 
     klogerror "$@ \n".Dumper($values) if $@;
+}
+
+sub purge_control_status {
+
+    return if not $DB_CONTROL_STATUS_DAYS_HISTORY;
+
+    klogdebug "Purging the DB control_status data older than "
+        .$DB_CONTROL_STATUS_DAYS_HISTORY;
+
+    my $sql = <<"    EOSQL";
+        delete from control_status
+        where request_time < NOW() - interval '$DB_CONTROL_STATUS_DAYS_HISTORY days';
+    EOSQL
+
+    my $sth = dbh->prepare( $sql );
+
+    eval {
+        $sth->execute();
+    };
+
+    klogerror "$@ \n" if $@;
 }
 
 
