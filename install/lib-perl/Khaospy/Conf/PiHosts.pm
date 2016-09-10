@@ -1,7 +1,7 @@
 package Khaospy::Conf::PiHosts;
 use strict;
 use warnings;
-# by Karl Kount-Khaos Hoskin. 2015-2016
+# by Karl Khaos Hoskin. 2015-2016
 
 use Try::Tiny;
 use Carp qw/confess croak/;

@@ -70,12 +70,11 @@ sudo cpanm Sub::Override
 sudo cpanm Test::More
 sudo cpanm Test::Exception
 sudo cpanm Test::Deep
+sudo cpanm DateTime
 
 sudo cpanm Exception::Class
 
-sudo cpanm Clone JSON AnyEvent ZMQ::LibZMQ3 List::Compare Sub::Override Test::More Test::Exception Test::Deep Exception::Class
-
-sudo cpanm DateTime
+sudo cpanm Clone JSON AnyEvent ZMQ::LibZMQ3 List::Compare Sub::Override Test::More Test::Exception Test::Deep Exception::Class DateTime
 
 
 # Only needed on DB / WebUI :

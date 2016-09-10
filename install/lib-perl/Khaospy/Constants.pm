@@ -229,7 +229,6 @@ our $SCRIPT_TO_PORT = {
         => $PING_SWITCH_DAEMON_SEND_PORT,
 };
 
-our $DANCER_BASE_URL = '/dancer';
 
 ######################
 our @EXPORT_OK = qw(
@@ -365,8 +364,6 @@ our @EXPORT_OK = qw(
     $PING_SWITCH_CONTROL_TYPE
 
     $SCRIPT_TO_PORT
-
-    $DANCER_BASE_URL
 );
 
 1;

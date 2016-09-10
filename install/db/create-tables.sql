@@ -68,9 +68,7 @@ CREATE TABLE control_rooms (
     name            TEXT NOT NULL UNIQUE,
     tag             TEXT NOT NULL UNIQUE,
     control_name    TEXT NOT NULL REFERENCES controls,
-    room            INTEGER NOT NULL REFERENCES rooms,
-    can_view        BOOLEAN NOT NULL DEFAULT FALSE,
-    can_operate     BOOLEAN NOT NULL DEFAULT FALSE
+    room            INTEGER NOT NULL REFERENCES rooms
 );
 GRANT SELECT ON control_rooms TO khaospy_read;
 GRANT ALL    ON control_rooms TO khaospy_write;
@@ -102,7 +100,9 @@ GRANT ALL ON users TO khaospy_write;
 ---------------------
 create table user_control_rooms (
     user_id         INTEGER NOT NULL REFERENCES users,
-    control_room    INTEGER NOT NULL REFERENCES control_rooms
+    control_room    INTEGER NOT NULL REFERENCES control_rooms,
+    can_view        BOOLEAN NOT NULL DEFAULT FALSE,
+    can_operate     BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 GRANT SELECT ON user_control_rooms TO khaospy_read;
