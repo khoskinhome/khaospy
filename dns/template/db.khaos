@@ -55,6 +55,9 @@ melissapc	IN	A	192.168.1.17
 nas		IN	A	192.168.1.19
 
 
+; b8:27:eb:ab:e8:ec picctv
+picctv  	IN	A	192.168.1.22
+
 ; 00-C0-EE-43-C4-CE  00:C0:EE:43:C4:CE kyocera printer :
 printer-kyocera-fsc5100dn	IN	A	192.168.1.24
 prtk		IN	CNAME	printer-kyocera-fsc5100dn.khaos.

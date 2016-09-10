@@ -19,6 +19,7 @@ $TTL	604800
 8	IN	PTR	piloft.khaos.
 9	IN	PTR	piboiler.khaos.
 
+
 10	IN	PTR	ipcam-new-10.khaos.
 15	IN	PTR	ipcam-new-15.khaos.
 
@@ -28,6 +29,8 @@ $TTL	604800
 17	IN	PTR	melissapc.khaos.
 
 19	IN	PTR	nas.khaos.
+
+22	IN	PTR	picctv.khaos.
 
 24	IN	PTR	printer-kyocera-fsc5100dn.khaos.
 
