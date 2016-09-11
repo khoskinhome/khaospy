@@ -43,6 +43,7 @@ sub dbh {
 # TODO the last_control_state should really be in a separate module.
 
 sub get_last_control_state {
+    # TODO this should use the "controls" table now.
 
     my $last_control_state = {};
 
@@ -82,6 +83,7 @@ sub init_last_control_state {
         $last_control_state->{$control_name}={};
         $last_control_state->{$control_name}{last_value} = undef;
         $last_control_state->{$control_name}{last_rrd_update_time} = undef;
+        $last_control_state->{$control_name}{statusd_updated} = undef;
     }
 }
 

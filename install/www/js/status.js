@@ -2,7 +2,7 @@ var control_state_value = [];
 var control_state_count = [];
 var control_request_time = [];
 var keep_change_count   = 45;
-var refresh_screen      = 2000;
+var refresh_screen      = 333;
 var animate_time        = 2400;
 
 // TODO dynamically change the refresh screen to slightly longer than the last get status request took.

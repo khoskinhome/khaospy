@@ -74,6 +74,10 @@ use Khaospy::Log qw(
     DEBUG
 );
 
+use Khaospy::WebUI::DB qw(
+    control_status_insert
+);
+
 use Khaospy::Conf::PiHosts qw(
     get_pi_hosts_running_daemon
 );
@@ -218,6 +222,7 @@ sub output_msg {
 
     if ( exists $last_control_state->{$control_name}
         && $last_control_state->{$control_name}{last_value} == $curr_state_or_value
+        && $last_control_state->{$control_name}{statusd_updated}
     ){
         klogdebug "Do NOT update DB with $control_name : $curr_state_or_value";
     } else {
@@ -229,6 +234,7 @@ sub output_msg {
 
         # TODO capture any exceptions from the following and log an error :
         control_status_insert( $record );
+        $last_control_state->{$control_name}{statusd_updated} = true;
     }
 
     update_rrd( $control_name, $request_epoch_time, $curr_state_or_value);
@@ -267,41 +273,8 @@ sub update_rrd {
 
 }
 
-sub control_status_insert {
-    my ( $values ) = @_;
-    my $sql = <<"    EOSQL";
-    INSERT INTO control_status
-    ( control_name, current_state, current_value,
-      last_change_state_time, last_change_state_by,
-      manual_auto_timeout_left,
-      request_time, db_update_time
-    )
-    VALUES
-    ( ?,?,?,?,?,?,?,NOW() );
-    EOSQL
-
-    my $sth = dbh->prepare( $sql );
-
-    #    my $current_value = $values->{current_value};
-    #    $current_value = sprintf("%0.3f",$current_value)
-    #        if defined $current_value;
-
-    eval {
-        $sth->execute(
-            $values->{control_name},
-            $values->{current_state} || undef,
-            $values->{current_value} || undef,
-            $values->{last_change_state_time} || undef,
-            $values->{last_change_state_by} || undef,
-            $values->{manual_auto_timeout_left} || undef,
-            $values->{request_time},
-        );
-    };
-
-    klogerror "$@ \n".Dumper($values) if $@;
-}
-
 sub purge_control_status {
+    # TODO should this be moved to Khaospy::WebUI::DB ?
 
     return if not $DB_CONTROL_STATUS_DAYS_HISTORY;
 
@@ -321,7 +294,5 @@ sub purge_control_status {
 
     klogerror "$@ \n" if $@;
 }
-
-
 
 1;

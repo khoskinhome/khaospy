@@ -79,7 +79,7 @@ sub klog {
     my $tval = $type_to_val->{$type};
 
     # only warn, info and debug can be switched off from logging
-    print $line if $tval <= $log_level_val or $tval <= 3;
+    print STDERR $line if $tval <= $log_level_val or $tval <= 3;
 }
 
 1;

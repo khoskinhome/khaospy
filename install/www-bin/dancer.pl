@@ -22,7 +22,7 @@ use Khaospy::QueueCommand qw/ queue_command /;
 use Khaospy::WebUI::DB qw(
     get_user
     get_user_password
-    get_control_status
+    get_controls_from_db
     update_user_password
 
 );
@@ -363,7 +363,7 @@ post '/api/v1/operate/:control/:action'  => needs login => sub {
 };
 
 get '/api/v1/status/:control' => needs login => sub {
-    my $stat = get_control_status(params->{control});
+    my $stat = get_controls_from_db(params->{control});
 
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
@@ -385,7 +385,7 @@ get '/api/v1/statusall' => needs login => sub {
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
 
-    my $stat = get_control_status();
+    my $stat = get_controls_from_db();
     return to_json $stat;
 };
 
@@ -394,7 +394,7 @@ get '/status'  => needs login => sub {
         page_title      => 'Status',
         user            => session('user'),
 #        DANCER_BASE_URL => $DANCER_BASE_URL,
-        entries         => get_control_status(),
+        entries         => get_controls_from_db(),
     };
 };
 
@@ -403,7 +403,7 @@ get '/cctv'  => needs login => sub {
         page_title      => 'CCTV',
         user            => session('user'),
 #        DANCER_BASE_URL => $DANCER_BASE_URL,
-        entries         => get_control_status(),
+        entries         => get_controls_from_db(),
     };
 };
 

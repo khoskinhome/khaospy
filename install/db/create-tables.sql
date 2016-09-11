@@ -15,8 +15,15 @@ BEGIN;
 CREATE TABLE controls (
     control_name  TEXT PRIMARY KEY,
     alias         TEXT,
-    in_json_cfg   BOOLEAN NOT NULL
+    current_state            TEXT,
+    current_value            REAL,
+    last_change_state_time   TIMESTAMP WITH TIME ZONE,
+    last_change_state_by     TEXT,
+    manual_auto_timeout_left REAL,
+    request_time             TIMESTAMP WITH TIME ZONE,
+    db_update_time           TIMESTAMP WITH TIME ZONE
 );
+
 GRANT SELECT ON controls TO khaospy_read;
 GRANT ALL    ON controls TO khaospy_write;
 
@@ -37,6 +44,13 @@ create table control_status (
     request_time             TIMESTAMP WITH TIME ZONE NOT NULL,
     db_update_time           TIMESTAMP WITH TIME ZONE NOT NULL
 );
+
+create index control_status_control_name_idx on control_status (control_name);
+
+ALTER TABLE control_status SET (autovacuum_vacuum_scale_factor = 0.0);
+ALTER TABLE control_status SET (autovacuum_vacuum_threshold = 5000);
+ALTER TABLE control_status SET (autovacuum_analyze_scale_factor = 0.0);
+ALTER TABLE control_status SET (autovacuum_analyze_threshold = 5000);
 
 -- select control_name, request_time, current_state, current_value from control_status where id in ( select max(id) from control_status group by control_name );
 
