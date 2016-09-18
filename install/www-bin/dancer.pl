@@ -101,16 +101,16 @@ post '/login' => sub {
         return;
     }
 
-    my $passhash_expire
-        = get_hashval($user_record,'passhash_expire', true) ;
+    my $is_passhash_expired
+        = get_hashval($user_record,'is_passhash_expired', true) ;
 
-    if ( $passhash_expire ) {
-
-        # TODO has password expired ? if so redirect to a change password page.
-        # TODO check if password has expired, if it has redirect to change_password    # if there is a must change then redirect to reset_password and raise an error message saying saying the emailed password has expired.
-
-
-
+    if ( $is_passhash_expired ) {
+        session 'error_msg' => 'Your password has expired, you have to change it';
+        redirect uri_for('/change_password', {
+            user         => $user,
+            redirect_url => $redir_url,
+        });
+        return;
     }
 
     session 'user' => $user;
@@ -159,8 +159,6 @@ Your password has been reset.
 This reset password will expire in $exp_mins minutes.
 
 When you login, you will be required to change the password.
-
-WORKING TODO RM THIS 
 
 Password is:
 

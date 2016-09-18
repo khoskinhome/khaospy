@@ -29,10 +29,13 @@ sub get_user_password {
     my ($user, $password) = @_;
 
     my $sql = <<"    EOSQL";
-    select * from users
-    where
-        lower(username) = ?
-        and passhash = crypt( ? , passhash);
+    SELECT * ,
+        ( passhash_expire IS NOT NULL AND passhash_expire < NOW())
+            as is_passhash_expired
+    FROM users
+    WHERE
+        LOWER(username) = ?
+        AND passhash = crypt( ? , passhash);
     EOSQL
 
     my $sth = dbh->prepare($sql);
@@ -53,7 +56,13 @@ sub get_user_password {
 sub get_user {
     my ($user) = @_;
 
-    my $sql = " select * from users where lower(username) = ? ";
+    my $sql =<<"    EOSQL";
+    SELECT *,
+        ( passhash_expire IS NOT NULL AND passhash_expire < NOW())
+            as is_passhash_expired
+    FROM users WHERE LOWER(username) = ?
+    EOSQL
+
     my $sth = dbh->prepare($sql);
     $sth->execute(lc($user));
 
