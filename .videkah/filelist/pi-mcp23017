@@ -69,6 +69,7 @@ crap
 
 ./install/lib-perl/Khaospy/HeatingDaemon.pm
 ./install/bin/khaospy-one-wire-heating-daemon.pl
+./install/bin/khaospy-heating-daemon.pl
 
 ./install/lib-perl/Khaospy/OrviboS20.pm
 ./install/lib-perl/t-scripts/test-khaospy-orvibos20.pl
@@ -265,7 +266,7 @@ install/bin/khaospy-generate-rrd-graphs.pl
 
 ./dns/scp-dns-to-hosts.bash
 
-##############################################################################
+###################################################################
 
 ./install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl
 
@@ -301,6 +302,20 @@ install-run-live-conf-kill-and-restart-daemons-all.bash
 ###################################################################
 crap
 crap.pl
+
+./install/lib-perl/Khaospy/Constants.pm
+
+./install/lib-perl/Khaospy/WebUI/Constants.pm
+./install/lib-perl/Khaospy/WebUI/UserLogin.pm
+./install/lib-perl/Khaospy/WebUI/DB.pm
+./install/lib-perl/Khaospy/DBH/Controls.pm
+./install/lib-perl/Khaospy/DBH/Users.pm
+./install/lib-perl/Khaospy/DBH/Rooms.pm
+
+
+
+
+
 
 ./install/www-bin/dancer.pl
 
@@ -338,4 +353,6 @@ crap.pl
 
 
 ./install/apache/default-ssl.conf
+##############################
 
+crap
