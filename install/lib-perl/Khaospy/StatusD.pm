@@ -74,7 +74,7 @@ use Khaospy::Log qw(
     DEBUG
 );
 
-use Khaospy::WebUI::DB qw(
+use Khaospy::DBH::Controls qw(
     control_status_insert
 );
 
@@ -274,7 +274,7 @@ sub update_rrd {
 }
 
 sub purge_control_status {
-    # TODO should this be moved to Khaospy::WebUI::DB ?
+    # TODO should this be moved to Khaospy::DBH::Controls ?
 
     return if not $DB_CONTROL_STATUS_DAYS_HISTORY;
 

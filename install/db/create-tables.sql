@@ -21,14 +21,15 @@ CREATE TABLE controls (
     last_change_state_by     TEXT,
     manual_auto_timeout_left REAL,
     request_time             TIMESTAMP WITH TIME ZONE,
-    db_update_time           TIMESTAMP WITH TIME ZONE
+    db_update_time           TIMESTAMP WITH TIME ZONE,
+    room                     INTEGER REFERENCES rooms
 );
 
 GRANT SELECT ON controls TO khaospy_read;
 GRANT ALL    ON controls TO khaospy_write;
 
 ---------------------
--- control_status
+-- control_status . should be renamed "control_logs"
 ---------------------
 CREATE SEQUENCE control_status_seq;
 GRANT SELECT ON control_status_seq TO khaospy_read;
@@ -66,26 +67,11 @@ GRANT ALL ON rooms_seq TO khaospy_write;
 create table rooms (
     id INTEGER PRIMARY KEY DEFAULT nextval('rooms_seq') NOT NULL,
     name    TEXT NOT NULL UNIQUE,
-    tag     TEXT NOT NULL UNIQUE
+    tag     TEXT NOT NULL UNIQUE,
+    parent_id INTEGER REFERENCES rooms
 );
 GRANT SELECT ON rooms TO khaospy_read;
 GRANT ALL    ON rooms TO khaospy_write;
-
----------------------
--- control_rooms
----------------------
-CREATE SEQUENCE control_rooms_seq;
-GRANT SELECT ON control_rooms_seq TO khaospy_read;
-GRANT ALL ON control_rooms_seq TO khaospy_write;
-CREATE TABLE control_rooms (
-    id INTEGER PRIMARY KEY DEFAULT nextval('control_rooms_seq') NOT NULL,
-    name            TEXT NOT NULL UNIQUE,
-    tag             TEXT NOT NULL UNIQUE,
-    control_name    TEXT NOT NULL REFERENCES controls,
-    room            INTEGER NOT NULL REFERENCES rooms
-);
-GRANT SELECT ON control_rooms TO khaospy_read;
-GRANT ALL    ON control_rooms TO khaospy_write;
 
 ---------------------
 -- users
@@ -93,35 +79,54 @@ GRANT ALL    ON control_rooms TO khaospy_write;
 CREATE SEQUENCE users_seq;
 GRANT SELECT ON users_seq TO khaospy_read;
 GRANT ALL ON users_seq TO khaospy_write;
-create table users (
+CREATE TABLE users (
     id INTEGER PRIMARY KEY DEFAULT nextval('users_seq') NOT NULL,
-    username                        text not null unique,
-    name                            text NOT NULL UNIQUE,
-    email                           text not null unique,
-    passhash                        text NOT NULL,
-    passhash_expire                 timestamp with time zone,
-    passhash_must_change            boolean,
-    is_api_user                     boolean not null default false,
-    is_admin                        boolean not null default false,
-    can_remote                      boolean not null default false,
-    mobile_phone                    text not null unique
+    username                        TEXT NOT NULL UNIQUE,
+    name                            TEXT NOT NULL UNIQUE,
+    email                           TEXT NOT NULL UNIQUE,
+    email_confirm_hash              TEXT,
+    passhash                        TEXT NOT NULL,
+    passhash_expire                 TIMESTAMP WITH TIME ZONE,
+    passhash_must_change            BOOLEAN,
+    is_api_user                     BOOLEAN NOT NULL DEFAULT FALSE,
+    is_admin                        BOOLEAN NOT NULL DEFAULT FALSE,
+    can_remote                      BOOLEAN NOT NULL DEFAULT FALSE,
+    mobile_phone                    TEXT NOT NULL UNIQUE
 );
 GRANT SELECT ON users TO khaospy_read;
 GRANT ALL ON users TO khaospy_write;
 
 ---------------------
--- user_control_rooms
+-- user_rooms
 ---------------------
-create table user_control_rooms (
+CREATE TABLE user_rooms (
     user_id         INTEGER NOT NULL REFERENCES users,
-    control_room    INTEGER NOT NULL REFERENCES control_rooms,
+    room_id         INTEGER NOT NULL REFERENCES rooms,
     can_view        BOOLEAN NOT NULL DEFAULT FALSE,
-    can_operate     BOOLEAN NOT NULL DEFAULT FALSE
+    can_operate     BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT u_user_rooms_user_room UNIQUE ( user_id, room_id )
 );
 
-GRANT SELECT ON user_control_rooms TO khaospy_read;
-GRANT ALL    ON user_control_rooms TO khaospy_write;
+-- unique index on user_id and room_id
 
+GRANT SELECT ON user_rooms TO khaospy_read;
+GRANT ALL    ON user_rooms TO khaospy_write;
+
+---------------------
+-- user_controls
+---------------------
+CREATE TABLE user_controls (
+    user_id         INTEGER NOT NULL REFERENCES users,
+    control_name    TEXT    NOT NULL REFERENCES controls,
+    can_view        BOOLEAN NOT NULL DEFAULT FALSE,
+    can_operate     BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT u_user_controls_user_control_name UNIQUE ( user_id, control_name )
+);
+
+-- unique index on user_id and control_name
+
+GRANT SELECT ON user_controls TO khaospy_read;
+GRANT ALL    ON user_controls TO khaospy_write;
 
 --INSERT INTO users (name, name ) VALUES( 'blah', 'uk-gpms');
 
@@ -179,5 +184,5 @@ COMMIT;
 
 -- select * from users where passhash = crypt(:pass, passhash);
 
-
 -- delete from  control_status where request_time < now() - interval '16 days';
+

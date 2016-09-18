@@ -19,12 +19,14 @@ use Khaospy::Utils qw(
 
 use Khaospy::QueueCommand qw/ queue_command /;
 
-use Khaospy::WebUI::DB qw(
+use Khaospy::DBH::Users qw(
     get_user
     get_user_password
-    get_controls_from_db
     update_user_password
+);
 
+use Khaospy::DBH::Controls qw(
+    get_controls_from_db
 );
 
 use Khaospy::WebUI::Constants qw(
@@ -106,8 +108,6 @@ post '/login' => sub {
 
         # TODO has password expired ? if so redirect to a change password page.
         # TODO check if password has expired, if it has redirect to change_password    # if there is a must change then redirect to reset_password and raise an error message saying saying the emailed password has expired.
-
-    
 
 
 
