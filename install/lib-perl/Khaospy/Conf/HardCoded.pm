@@ -921,14 +921,14 @@ sub live_pi_host_conf {
                 },
             ],
         },
-        piold => {
-            log_level         => 'info',
-            valid_gpios       => [ 0..7 ],
-            valid_i2c_buses   => [ 0 ],
-            daemons => [
-                { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
-            ],
-        },
+#        piold => {
+#            log_level         => 'info',
+#            valid_gpios       => [ 0..7 ],
+#            valid_i2c_buses   => [ 0 ],
+#            daemons => [
+#                { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
+#            ],
+#        },
         piboiler => {
             log_level         => 'info',
             valid_gpios       => [ 0..7 ],

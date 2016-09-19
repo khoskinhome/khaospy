@@ -131,19 +131,18 @@ sub pi_n_other_control_msg {
     my ($zmq_sock, $msg, $param) = @_;
     my $msg_rh = $json->decode( $msg );
 
-
     my $control_name = get_hashval($msg_rh, 'control_name');
 
-    my $curr_state_or_value =
-        trans_ON_to_value_or_return_val(
-            $msg_rh->{current_state} || $msg_rh->{current_value}
-        );
+    my $csorv = $msg_rh->{current_state} || $msg_rh->{current_value};
 
-    init_last_control_state($last_control_state, $control_name);
-    $last_control_state->{$control_name}{last_value}
-        = $curr_state_or_value;
+    if ( defined $csorv ){
+        my $curr_state_or_value = trans_ON_to_value_or_return_val($csorv);
 
-    kloginfo "Received $control_name == $curr_state_or_value";
+        init_last_control_state($last_control_state, $control_name);
+        $last_control_state->{$control_name}{last_value} = $curr_state_or_value;
+
+        kloginfo ("Received $control_name == $curr_state_or_value");
+    }
 }
 
 {

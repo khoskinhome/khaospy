@@ -130,13 +130,14 @@ sub operate_orvibo_s20 {
             $control->{host}, $control->{mac}, $action
         );
     };
+    klogerror $@ if $@;
 
-    $c_state->{current_state} = $current_state;
-
-    if ( $@ || ! $current_state ){
-        klogerror $_;
+    if ( ! $current_state ){
+        klogerror "Can't get current_state for $control_name";
         return {};
     }
+
+    $c_state->{current_state} = $current_state;
 
     if ( ! exists $c_state->{last_change_state}
         || $c_state->{last_change_state} ne $current_state

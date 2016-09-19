@@ -37,7 +37,6 @@ use zhelpers;
 
 use Khaospy::Message qw(
     validate_control_msg_json
-    validate_control_msg_fields
 );
 
 use Khaospy::Constants qw(
@@ -163,7 +162,14 @@ sub message_from_controller {
 
     klogdebug "$param FROM CONTROLLER : $msg";
 
-    my $mkey = validate_control_msg_json($msg)->{mkey};
+    my $mkey ;
+    eval {
+        $mkey = validate_control_msg_json($msg)->{mkey};
+    };
+    if ($@){
+        klogerror "Problem with message format. $@";
+        return;
+    }
 
     if ( exists $msg_queue->{$mkey} ){
         kloginfo "Deleting message $mkey";

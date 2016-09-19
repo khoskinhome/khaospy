@@ -60,7 +60,6 @@ use Khaospy::Log qw(
 );
 
 use Khaospy::Message qw(
-    validate_control_msg_fields
     validate_control_msg_json
 );
 use Khaospy::Utils qw(
@@ -159,7 +158,7 @@ sub controller_message {
     my $msg_p;
     eval { $msg_p = validate_control_msg_json($msg); };
     if ( $@ || ! $msg_p ) {
-        klogerror $_;
+        klogerror ( "validate control msg json :: $@ :: $msg" );
         return;
     }
 

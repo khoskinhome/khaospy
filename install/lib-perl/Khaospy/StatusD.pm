@@ -163,7 +163,8 @@ sub timer_cb {
                 update_rrd( $control_name, time,
                     get_hashval(
                         get_hashval($last_control_state, $control_name),
-                        'last_value'
+                        'last_value',
+                        true
                     )
                 );
             }

@@ -42,6 +42,7 @@ use Khaospy::Message qw(
 
 use Khaospy::Log qw(
     klogdebug
+    klogerror
 );
 
 use Khaospy::Utils qw(
@@ -83,7 +84,12 @@ sub queue_command {
         control_type        => get_hashval($control, "type"),
     };
 
-    validate_control_msg_fields($msg);
+    eval { validate_control_msg_fields($msg); };
+    if ($@){
+        my $errmsg = "ERROR: validating msg before sending. $@";
+        klogerror $errmsg;
+        return $errmsg;
+    }
 
     my $json_msg = $JSON->encode($msg);
 

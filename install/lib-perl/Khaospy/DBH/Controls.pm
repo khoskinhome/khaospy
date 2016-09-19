@@ -184,7 +184,7 @@ sub get_controls_from_db {
 # colours will be blue==too-cold, green=correct, red=too-high.
 
         $row->{current_state_value}
-            = $row->{status_alias} || $row->{current_value} ;
+            = $row->{status_alias} || $row->{current_value} || '' ;
 
         push @$results, $row;
     }
@@ -255,7 +255,7 @@ sub get_control_status {
 # colours will be blue==too-cold, green=correct, red=too-high.
 
         $row->{current_state_value}
-            = $row->{status_alias} || $row->{current_value} ;
+            = $row->{status_alias} || $row->{current_value} || '' ;
 
         push @$results, $row;
     }
