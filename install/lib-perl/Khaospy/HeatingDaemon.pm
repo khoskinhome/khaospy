@@ -74,6 +74,8 @@ use POSIX qw(strftime);
 
 my $last_control_state = {};
 
+my $window_sensor_to_control_name_map = {};
+
 sub run_heating_daemon {
 
     klogstart "Heating Daemon START";
@@ -127,6 +129,17 @@ sub run_heating_daemon {
     $quit_program->recv;
 }
 
+sub send_cmd {
+    my ( $operate_control_name, $action ) = @_;
+    my $retval;
+    kloginfo "Send command to '$operate_control_name' '$action'";
+    eval { $retval = queue_command($operate_control_name, $action); };
+    if ( $@ ) {
+        klogerror "$@";
+        return
+    }
+}
+
 sub pi_n_other_control_msg {
     my ($zmq_sock, $msg, $param) = @_;
     my $msg_rh = $json->decode( $msg );
@@ -142,6 +155,16 @@ sub pi_n_other_control_msg {
         $last_control_state->{$control_name}{last_value} = $curr_state_or_value;
 
         kloginfo ("Received $control_name == $curr_state_or_value");
+
+        # TODO can't just assume the last_value == true means the window is open.
+        # some sensors could be the other way around.
+        if ( exists $window_sensor_to_control_name_map->{$control_name}
+            &&  $curr_state_or_value == true ) {
+            my $operate_control_name
+                 = $window_sensor_to_control_name_map->{$control_name};
+
+            send_cmd( $operate_control_name, OFF() );
+        }
     }
 }
 
@@ -217,39 +240,68 @@ sub pi_n_other_control_msg {
         kloginfo "$name : $owaddr : $current_value_temp C : lower = $lower_temp C : upper = $upper_temp C";
         klogdebug "msg", $msg_rh;
 
-        my $send_cmd = sub {
-            my ( $action ) = @_;
-            my $retval;
-            kloginfo "Send command to '$operate_control_name' '$action'";
-            eval { $retval = queue_command($operate_control_name, $action); };
-            if ( $@ ) {
-                klogerror "$@";
-                return
-            }
-        };
+#        my $send_cmd = sub {
+#            my ( $action ) = @_;
+#            my $retval;
+#            kloginfo "Send command to '$operate_control_name' '$action'";
+#            eval { $retval = queue_command($operate_control_name, $action); };
+#            if ( $@ ) {
+#                klogerror "$@";
+#                return
+#            }
+#        };
+
+#        my $window_sensor ==
+        if ( exists $tc->{window_sensor}) {
+            kloginfo "$operate_control_name . $tc->{window_sensor} is $last_control_state->{$tc->{window_sensor}}{last_value}";
+
+            $window_sensor_to_control_name_map->{$tc->{window_sensor}} = $operate_control_name;
+        }
+
 
         if ( $current_value_temp > $upper_temp ){
-            $send_cmd->(OFF);
+            send_cmd($operate_control_name, OFF);
         }
         elsif ( $current_value_temp < $lower_temp ){
 
             # TODO : This code is copied below. It's horrible. Needs re-writing.
             # switch off if the window is open :
-            if ( exists $tc->{window_sensor} && $last_control_state->{$tc->{window_sensor}}{last_value} eq ON() ){
-                klogwarn "$operate_control_name is being switched off because $tc->{window_sensor} is open";
-                $send_cmd->(OFF);
+            if ( exists $tc->{window_sensor}  ){
+
+                # TODO can't just assume the last_value == true means the window is open.
+                # some sensors could be the other way around.
+                if ( $last_control_state->{$tc->{window_sensor}}{last_value} == true ){
+                    klogwarn "$operate_control_name is being switched off because $tc->{window_sensor} is open";
+                    send_cmd($operate_control_name, OFF);
+                } else {
+                    kloginfo "$operate_control_name is being switched on. $tc->{window_sensor} is closed";
+
+                    send_cmd($operate_control_name, ON);
+                }
+
             } else {
-                $send_cmd->(ON);
+
+                kloginfo "$operate_control_name doesn't have a window sensor";
+
+                send_cmd($operate_control_name, ON);
             }
         } else {
 
-            if ( exists $tc->{window_sensor} && $last_control_state->{$tc->{window_sensor}}{last_value} eq ON() ){
-                klogwarn "$operate_control_name is being switched off because $tc->{window_sensor} is open";
-                $send_cmd->(OFF);
+            if ( exists $tc->{window_sensor}) {
+
+                # TODO can't just assume the last_value == true means the window is open.
+                # some sensors could be the other way around.
+                if ( $last_control_state->{$tc->{window_sensor}}{last_value} == true ){
+                    klogwarn "$operate_control_name is being switched off because $tc->{window_sensor} is open";
+                    send_cmd($operate_control_name, OFF);
+                } else {
+                    kloginfo "$operate_control_name is being left on. $tc->{window_sensor} is closed";
+                }
             }
 
             kloginfo "$operate_control_name : Current temperate is in correct range\n";
         }
     }
 }
+
 1;
