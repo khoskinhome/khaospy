@@ -33,6 +33,8 @@ use Khaospy::Constants qw(
 
     $OTHER_CONTROLS_DAEMON_SCRIPT
 
+    $ERROR_LOG_DAEMON_SCRIPT
+
     $ORVIBOS20_CONTROL_TYPE
     $ONEWIRE_THERM_CONTROL_TYPE
     $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE
@@ -136,8 +138,8 @@ sub live_heating_thermometer_config {
         '28-0000066ebc74' => {
             name               => 'Alison',
             rrd_group          => 'upstairs',
-            upper_temp         => 19.5,
-            lower_temp         => 18.5,
+            upper_temp         => 22.0,
+            lower_temp         => 21,
             control            => 'alisonrad',
             window_sensor      => 'alison_window',
         },
@@ -196,8 +198,8 @@ sub live_heating_thermometer_config {
         '28-0214630558ff' => {
             name               => 'front-room',
             rrd_group          => 'downstairs',
-            upper_temp         => 19.0,
-            lower_temp         => 18.5,
+            upper_temp         => 22.0,
+            lower_temp         => 21.0,
             control            => 'frontroomrad',
             window_sensor      => 'front_room_window',
         },
@@ -209,15 +211,15 @@ sub live_heating_thermometer_config {
             name               => 'dinning-room',
             rrd_group          => 'downstairs',
             upper_temp         => 19.0,
-            lower_temp         => 18.5,
+            lower_temp         => 18.0,
             control            => 'dinningroomrad',
             window_sensor      => 'dining_room_window',
         },
         '28-041591f5e5ff' => {
             name               => 'Karl',
             rrd_group          => 'downstairs',
-            upper_temp         => 17.0,
-            lower_temp         => 16.0,
+            upper_temp         => 19.0,
+            lower_temp         => 18,
             control            => 'karlrad',
         },
         '28-000006e01389' => {
@@ -228,7 +230,6 @@ sub live_heating_thermometer_config {
             name          => 'Kitchen',
             rrd_group     => 'downstairs',
         },
-
 
     };
 }
@@ -361,7 +362,7 @@ sub live_controls_conf {
             alias => 'Alison Radiator',
             type  => $ORVIBOS20_CONTROL_TYPE,
             host  => 'alisonrad.khaos',
-            poll_timeout => 2,
+            poll_timeout => 5,
             poll_host => 'piserver',
             mac   => 'AC:CF:23:72:D1:FE',
             rrd_graph     => true,
@@ -370,8 +371,8 @@ sub live_controls_conf {
             alias => 'Amelia Radiator',
             type  => $ORVIBOS20_CONTROL_TYPE,
             host  => 'ameliarad.khaos',
-            poll_timeout => 2,
-            poll_host => 'piserver',
+            poll_timeout => 5,
+            poll_host => 'piboiler',
             mac   => 'AC-CF-23-72-F3-D4',
             rrd_graph     => true,
         },
@@ -908,6 +909,8 @@ sub live_pi_host_conf {
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT, options => { }, },
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT, options => { }, },
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $ERROR_LOG_DAEMON_SCRIPT, options => { }, },
+
             ],
         },
         piloft => {

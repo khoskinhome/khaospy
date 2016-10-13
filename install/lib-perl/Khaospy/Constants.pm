@@ -99,6 +99,9 @@ our $MAC_SWITCH_DAEMON_TIMER    = 5;
 our $PING_SWITCH_DAEMON         = 'khaospy-ping-switch-d.pl';
 our $PING_SWITCH_DAEMON_TIMER   = 5;
 
+our $ERROR_LOG_DAEMON           = 'khaospy-error-log-d.pl';
+our $ERROR_LOG_DAEMON_TIMER     = 5;
+
 our $TIMER_AFTER_COMMON = 0.1; # secs. The time after which a Daemon timed sub first starts.
 
 our $ALL_SCRIPTS = [
@@ -128,8 +131,10 @@ our $ALL_SCRIPTS = [
 
     our $COMMAND_QUEUE_DAEMON_SCRIPT
         = "$BIN_DIR/$COMMAND_QUEUE_DAEMON",
-];
 
+    our $ERROR_LOG_DAEMON_SCRIPT
+        = "$BIN_DIR/$ERROR_LOG_DAEMON",
+];
 
 #############
 # json confs
@@ -183,8 +188,10 @@ our $PI_STATUS_DAEMON_SEND_PORT           = 5064;
 
 our $OTHER_CONTROLS_DAEMON_SEND_PORT      = 5065;
 
-our $MAC_SWITCH_DAEMON_SEND_PORT               = 5005;
-our $PING_SWITCH_DAEMON_SEND_PORT              = 5006;
+our $MAC_SWITCH_DAEMON_SEND_PORT          = 5005;
+our $PING_SWITCH_DAEMON_SEND_PORT         = 5006;
+
+our $ERROR_LOG_DAEMON_SEND_PORT           = 5066;
 
 our $MESSAGES_OVER_SECS_INVALID = 3600;
 our $MESSAGE_TIMEOUT            = 10; # seconds.
@@ -227,6 +234,7 @@ our $SCRIPT_TO_PORT = {
 
     $PING_SWITCH_DAEMON_SCRIPT
         => $PING_SWITCH_DAEMON_SEND_PORT,
+
 };
 
 our $DB_CONTROL_STATUS_DAYS_HISTORY = '365';
@@ -369,6 +377,11 @@ our @EXPORT_OK = qw(
 
     $DB_CONTROL_STATUS_DAYS_HISTORY
     $DB_CONTROL_STATUS_PURGE_TIMEOUT_SECS
+
+    $ERROR_LOG_DAEMON
+    $ERROR_LOG_DAEMON_SCRIPT
+    $ERROR_LOG_DAEMON_SEND_PORT
+    $ERROR_LOG_DAEMON_TIMER
 );
 
 1;

@@ -10,6 +10,21 @@ use Data::Dumper;
 use Khaospy::Conf::PiHosts qw/get_this_pi_host_config/;
 use Khaospy::Utils qw/timestamp/;
 
+use Khaospy::Constants qw(
+    $JSON
+    $ZMQ_CONTEXT
+    $ERROR_LOG_DAEMON_SEND_PORT
+    $ERROR_LOG_DAEMON_SCRIPT
+);
+
+use Khaospy::Conf::PiHosts qw(
+    get_pi_hosts_running_daemon
+);
+
+use ZMQ::LibZMQ3;
+use ZMQ::Constants qw( ZMQ_PUB );
+use zhelpers;
+
 sub START {"start"};
 sub FATAL {"fatal"};
 sub ERROR {"error"};
@@ -52,9 +67,34 @@ my $type_to_val = {
 
 our $OVERRIDE_CONF_LOGLEVEL;
 
+my $zmq_publisher = [] ;
+
+sub _get_zmq_pub {
+
+    return if @$zmq_publisher;
+
+    for my $pub_host (@{get_pi_hosts_running_daemon($ERROR_LOG_DAEMON_SCRIPT)}){
+
+        my $zmq_p = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
+
+        my $pub_to_port = "tcp://$pub_host:$ERROR_LOG_DAEMON_SEND_PORT";
+
+        if ( my $zmq_state = zmq_connect($zmq_p, $pub_to_port )){
+            # zmq_connect returns zero on success.
+            warn "context is $ZMQ_CONTEXT\n";
+            confess "zmq can't connect to $pub_to_port. status = $zmq_state. $!\n";
+        };
+
+        push @$zmq_publisher, $zmq_p;
+
+    }
+}
+
 sub klog {
-    my ( $type, $msg, $dump, $exception ) = @_;
+    my ( $type, $msg, $dump, $exception, $no_publish, $control_name ) = @_;
     $type = lc ($type);
+
+    _get_zmq_pub();
 
     my $pi_host_log_level ;
     eval { $pi_host_log_level = get_this_pi_host_config()->{log_level}; };
@@ -72,6 +112,26 @@ sub klog {
     my $line = timestamp."|".uc($type)."|".hostname."|$$|$msg|";
     $line .= "Dump :\n".Dumper($dump) if $dump;
     $line .= "\n";
+
+    if ( $type eq "fatal" || $type eq "error" ){
+        my $send_msg = {
+            e_host         => hostname,
+            e_script       => $0,
+            e_time         => time,
+            e_timestamp    => timestamp,
+            e_message      => $msg,
+            e_control_name => $control_name,
+        };
+
+        # TODO add the $dump ?
+
+        my $json_msg = $JSON->encode($send_msg);
+
+        for my $elog_pub ( @$zmq_publisher ) {
+            zhelpers::s_send( $elog_pub, "$json_msg" );
+        }
+
+    }
 
     $exception->throw($line) if $exception;
     confess $line if $type eq "fatal" ;
