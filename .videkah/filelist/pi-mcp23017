@@ -1,5 +1,7 @@
 ~/crap.sql
 
+install/bin/khaospy-bash-aliases.sh:83:#TODO RM this before release
+
 ./install/bin/khaospy-bash-aliases.sh
 
 ./install/bin/display-latest-control-status-sql.sh
@@ -48,6 +50,10 @@ crap
 ./install/lib-perl/Khaospy/ControlPiMCP23017.pm
 ./install/lib-perl-t/KhaospyControlPiMCP23017.t
 
+
+
+./install/lib-perl/Khaospy/ErrorLogDaemon.pm
+./install/bin/khaospy-error-log-d.pl
 
 
 ./install/lib-perl/Khaospy/ControlUtils.pm
@@ -308,11 +314,11 @@ crap.pl
 ./install/lib-perl/Khaospy/WebUI/Constants.pm
 ./install/lib-perl/Khaospy/WebUI/UserLogin.pm
 ./install/lib-perl/Khaospy/WebUI/DB.pm
+./install/lib-perl/Khaospy/WebUI/Util.pm
+
 ./install/lib-perl/Khaospy/DBH/Controls.pm
 ./install/lib-perl/Khaospy/DBH/Users.pm
 ./install/lib-perl/Khaospy/DBH/Rooms.pm
-
-
 
 
 
@@ -356,3 +362,70 @@ crap.pl
 ##############################
 
 crap
+
+
+khoskin@khoskin-P5K-E:~/github.com/khaospy$ g.grep current_state_value
+install/lib-perl/Khaospy/DBH/Controls.pm:186:        $row->{current_state_value}
+install/lib-perl/Khaospy/DBH/Controls.pm:257:        $row->{current_state_value}
+install/www-dancer-tt/status-new.tt:31:                    var new_state_value = data_row['current_state_value'].toString();
+install/www-dancer-tt/status-new.tt:146:                <td align='center' id='[% row.control_name %]-state_alias'>[% row.current_state_value %]</td>
+install/www-dancer-tt/status.tt:40:                <td align='center' id='[% row.control_name %]-state_alias'>[% row.current_state_value %]</td>
+install/www/js/status.js:23:                    var new_state_value = data_row['current_state_value'].toString();
+
+
+
+
+g.grep klogerror | grep -i control
+install/lib-perl/Khaospy/ControlOther.pm:43:    klogstart klogfatal klogerror
+install/lib-perl/Khaospy/ControlOther.pm:137:        klogerror $_;
+install/lib-perl/Khaospy/ControlPi.pm:47:    klogstart klogfatal klogerror
+install/lib-perl/Khaospy/ControlPi.pm:231:        klogerror "Can only operate a switch with 'status'. ( not '$action' )"
+install/lib-perl/Khaospy/ControlPi.pm:507:    klogerror sprintf ("%s : %s : %s : gpio = { %s }",
+install/lib-perl/Khaospy/ControlPiGPIO.pm:18:    klogstart klogfatal klogerror
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:22:    klogstart klogfatal klogerror
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:153:                    klogerror
+install/lib-perl/Khaospy/ControlsDaemon.pm:58:    klogstart klogfatal klogerror
+install/lib-perl/Khaospy/ControlsDaemon.pm:159:    klogerror ( "msg is empty or undef" ) if ! $msg;
+install/lib-perl/Khaospy/ControlsDaemon.pm:160:    klogerror ( "msg == AnyEvent " ) if $msg =~ /AnyEvent/;
+install/lib-perl/Khaospy/ControlsDaemon.pm:165:        klogerror ( "ControlsDaemon line 165");
+install/lib-perl/Khaospy/ControlsDaemon.pm:166:        klogerror ($msg, $_);
+install/lib-perl/Khaospy/DBH/Controls.pm:12:    klogstart klogfatal klogerror
+install/lib-perl/Khaospy/DBH/Controls.pm:68:        klogerror "$@ \n".Dumper($values) if $@;
+install/lib-perl/Khaospy/DBH/Controls.pm:96:        klogerror "$@ \n".Dumper($values) if $@;
+install/lib-perl/Khaospy/DBH/Controls.pm:128:    klogerror "$@ \n".Dumper($values) if $@;
+install/lib-perl/Khaospy/HeatingDaemon.pm:201:            klogerror "Both the 'upper_temp' and 'control' need to be defined";
+install/lib-perl/Khaospy/HeatingDaemon.pm:203:            klogerror "control    = '$operate_control_name'";
+install/lib-perl/Khaospy/HeatingDaemon.pm:213:            klogerror "Cannot operate this control.";
+khoskin@khoskin-P5K-E:~/github.com/khaospy$ 
+
+
+ g.grep validate_control_msg_fields
+install/lib-perl/Khaospy/CommandQueueDaemon.pm:40:    validate_control_msg_fields
+install/lib-perl/Khaospy/ControlsDaemon.pm:63:    validate_control_msg_fields
+install/lib-perl/Khaospy/Message.pm:24:    validate_control_msg_fields
+install/lib-perl/Khaospy/Message.pm:40:    eval{$msg_key = validate_control_msg_fields($msg_rh)};
+install/lib-perl/Khaospy/Message.pm:52:sub validate_control_msg_fields {
+install/lib-perl/Khaospy/QueueCommand.pm:40:    validate_control_msg_fields
+install/lib-perl/Khaospy/QueueCommand.pm:86:    validate_control_msg_fields($msg);
+
+
+
+
+install/bin/test-module-includes.pl:49:use Khaospy::ZMQAnyEvent;
+
+install/lib-perl/Khaospy/BoilerDaemon.pm:33:use Khaospy::ZMQAnyEvent  qw( subscribe_to_controller_daemons );
+install/lib-perl/Khaospy/CommandQueueDaemon.pm:69:use Khaospy::ZMQAnyEvent qw(
+install/lib-perl/Khaospy/ControlsDaemon.pm:69:use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
+install/lib-perl/Khaospy/HeatingDaemon.pm:54:use Khaospy::ZMQAnyEvent qw(
+install/lib-perl/Khaospy/OneWireThermometer.pm:40:use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
+install/lib-perl/Khaospy/StatusD.pm:85:use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
+install/lib-perl/Khaospy/ZMQAnyEvent.pm:1:package Khaospy::ZMQAnyEvent;
+install/lib-perl/Khaospy/ZMQSubscribeAllPublishers.pm:51:use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
+
+
+
+
+
+
+
+
