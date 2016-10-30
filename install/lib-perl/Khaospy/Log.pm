@@ -30,6 +30,7 @@ sub FATAL {"fatal"};
 sub ERROR {"error"};
 sub WARN  {"warn"};
 sub INFO  {"info"};
+sub EXTRA {"extra"};
 sub DEBUG {"debug"};
 
 sub klogstart ($;$) { klog(START,@_) };
@@ -37,12 +38,13 @@ sub klogfatal ($;$$){ klog(FATAL,@_) };
 sub klogerror ($;$) { klog(ERROR,@_) };
 sub klogwarn  ($;$) { klog(WARN ,@_) };
 sub kloginfo  ($;$) { klog(INFO ,@_) };
+sub klogextra ($;$) { klog(EXTRA,@_) };
 sub klogdebug ($;$) { klog(DEBUG,@_) };
 
 our @EXPORT_OK = qw(
-    klog START FATAL ERROR WARN INFO DEBUG
+    klog START FATAL ERROR WARN INFO EXTRA DEBUG
     klogstart klogfatal klogerror
-    klogwarn  kloginfo  klogdebug
+    klogwarn  kloginfo  klogextra klogdebug
 );
 =pod
     types
@@ -62,7 +64,8 @@ my $type_to_val = {
     error =>3,
     warn  =>4,
     info  =>5,
-    debug =>6,
+    extra =>6,
+    debug =>7,
 };
 
 our $OVERRIDE_CONF_LOGLEVEL;

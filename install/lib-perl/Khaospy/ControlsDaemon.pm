@@ -56,7 +56,7 @@ use Khaospy::ControlPi;
 
 use Khaospy::Log qw(
     klogstart klogfatal klogerror
-    klogwarn  kloginfo  klogdebug
+    klogwarn  kloginfo  klogextra klogdebug
 );
 
 use Khaospy::Message qw(
@@ -132,9 +132,12 @@ sub timer_cb {
     $CONTROLLER_CLASS->poll_controls(\&poll_callback);
 
     for my $mkey ( keys %$msg_actioned ){
-        my $msg_rh = $msg_actioned->{$mkey}{msg_p}{hashref};
+        my $r_epoch_t = get_hashval(get_hashval($msg_actioned,$mkey), 'request_epoch_time');
+
+        next if ( $r_epoch_t > time - $MESSAGE_TIMEOUT );
+
+        klogextra "deleting mkey '$mkey'";
         delete $msg_actioned->{$mkey}
-            if ( $msg_rh->{request_epoch_time} < time - $MESSAGE_TIMEOUT );
     }
 }
 
@@ -155,18 +158,20 @@ sub poll_callback {
 sub controller_message {
     my ($zmq_sock, $msg, $param ) = @_;
 
-    my $msg_p;
-    eval { $msg_p = validate_control_msg_json($msg); };
-    if ( $@ || ! $msg_p ) {
+    my $msg_val_struct;
+    eval { $msg_val_struct = validate_control_msg_json($msg); };
+    if ( $@ || ! $msg_val_struct ) {
         klogerror ( "validate control msg json :: $@ :: $msg" );
         return;
     }
 
-    my $msg_rh       = get_hashval($msg_p,  'hashref');
-    my $mkey         = get_hashval($msg_p,  'mkey');
+    my $msg_rh = get_hashval($msg_val_struct,  'hashref');
+    my $mkey   = get_hashval($msg_val_struct,  'mkey');
 
-    my $control_name = get_hashval($msg_rh, 'control_name');
-    my $action       = get_hashval($msg_rh, 'action');
+    my $request_epoch_time = get_hashval($msg_rh, 'request_epoch_time');
+    my $control_name       = get_hashval($msg_rh, 'control_name');
+    my $action             = get_hashval($msg_rh, 'action');
+    my $request_host       = get_hashval($msg_rh, 'request_host') || "";
 
     my $control = get_control_config($control_name);
 
@@ -197,18 +202,30 @@ sub controller_message {
             my $status
                 = $CONTROLLER_CLASS->operate_control($control_name, $control, $action);
 
-            # TODO probably need to unpack the contents of $status and $msg_rh
-            # and make sure the return_msg is SANE !
+            # Below, the $return_msg needs to be constructed exactly in this way to ensure
+            # duplicate keys ( mainly request_epoch_time from $status)
+            # gets overwritten by the later keys
+            #
+            # The keys control_name, action, request_host and request_epoch_time are explicitly
+            # stated at the end because they are crucial for the "mkey" message signature.
+            #
+            # So the below code will break with unthinking movement of key defs :
             my $return_msg = {
               %$status,
-              %$msg_rh, # This NEEDS to be after $status ( key overwriting of request_epoch_time)
+              %$msg_rh,
+
               action_epoch_time  => time,
               message_from       => $DAEMON_NAME,
               message_type       => MTYPE_OPERATION_STATUS,
+
+              request_epoch_time => $request_epoch_time,
+              control_name       => $control_name,
+              action             => $action,
+              request_host       => $request_host,
             };
 
-            $msg_actioned->{$mkey}{json_send}  = $JSON->encode($return_msg);
-            $msg_actioned->{$mkey}{msg_p} = $msg_p;
+            $msg_actioned->{$mkey}{json_send} = $JSON->encode($return_msg);
+            $msg_actioned->{$mkey}{request_epoch_time} = $request_epoch_time;
         }
 
         zhelpers::s_send( $zmq_publisher, $msg_actioned->{$mkey}{json_send} );

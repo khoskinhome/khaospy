@@ -1018,8 +1018,7 @@ sub test_pi_host_conf {
     return {
 #        %{live_pi_host_conf()},
         pitest => {
-#            log_level         => 'debug',
-            log_level         => 'info',
+            log_level         => 'extra',
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 0, 1 ], # could do an i2cdetect too.
             daemons => [
