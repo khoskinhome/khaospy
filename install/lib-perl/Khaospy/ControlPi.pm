@@ -45,7 +45,7 @@ use Khaospy::Exception qw(
 
 use Khaospy::Log qw(
     klogstart klogfatal klogerror
-    klogwarn  kloginfo  klogdebug
+    klogwarn  kloginfo  klogextra klogdebug
 );
 
 use Khaospy::Utils qw ( get_hashval );
@@ -348,7 +348,7 @@ sub _calc_current_relay_manual_circuit_state {
 
         $ret = trans_true_to_ON( invert_state( $control,$exoredval));
 
-        kloginfo "(calc-state exor) Control $control_name rel=$relay_state, det=$detect_state, exoredval=$exoredval, current-state=$ret";
+        klogextra "(calc-state exor) Control $control_name rel=$relay_state, det=$detect_state, exoredval=$exoredval, current-state=$ret";
 
     } else {
 
@@ -356,7 +356,7 @@ sub _calc_current_relay_manual_circuit_state {
             invert_state($control, $detect_state)
         );
 
-        kloginfo "(calc-state) Control $control_name relay=$relay_state, detect=$detect_state, current-state = $ret";
+        klogextra "(calc-state) Control $control_name relay=$relay_state, detect=$detect_state, current-state = $ret";
     }
 
     return $ret;
