@@ -1,13 +1,77 @@
-./iall
+./install-reload-apache.bash piserver
 
-./install-to-pi.bash piserver
-./install-to-pi-pi.bash piboiler
+./install-to-pi-pi.bash piserver
 
-
-./install-to-pi-pi.bash pitest
-
+./install-to-pi-pi.bash picctv
 
 ./install-to-pi-all.bash
+
+./install-to-pi-pi.bash piserver
+./install-to-pi-pi.bash piold
+./install-to-pi-pi.bash piboiler
+./install-to-pi-pi.bash piloft
+./install-to-pi-pi.bash pitest
+
+#########
+
+./run-test-conf-update-on-pi-all.bash
+
+./run-test-conf-update-on-pi.bash pitest
+./run-test-conf-update-on-pi.bash piserver
+./run-test-conf-update-on-pi.bash piold
+./run-test-conf-update-on-pi.bash piboiler
+./run-test-conf-update-on-pi.bash piloft
+
+#########
+
+./run-live-conf-update-on-pi.bash pitest
+./run-live-conf-update-on-pi.bash piserver
+./run-live-conf-update-on-pi.bash piold
+./run-live-conf-update-on-pi.bash piboiler
+./run-live-conf-update-on-pi.bash piloft
+./run-live-conf-update-on-pi-all.bash
+
+#########
+
+./run-kill-all-daemons-on-pi.bash pitest
+./run-kill-all-daemons-on-pi.bash piserver
+./run-kill-all-daemons-on-pi.bash piold
+./run-kill-all-daemons-on-pi.bash piboiler
+./run-kill-all-daemons-on-pi.bash piloft
+./run-kill-all-daemons-on-pi-all.bash
+
+#########
+
+# also restarts apache :
+
+./run-kill-and-restart-daemons-on-pi.bash pitest
+./run-kill-and-restart-daemons-on-pi.bash piserver
+./run-kill-and-restart-daemons-on-pi.bash piold
+./run-kill-and-restart-daemons-on-pi.bash piboiler
+./run-kill-and-restart-daemons-on-pi.bash piloft
+./run-kill-and-restart-daemons-on-pi-all.bash
+
+#########
+
+./install-run-test-conf-kill-and-restart-daemons.bash pitest
+./install-run-test-conf-kill-and-restart-daemons.bash piserver
+./install-run-test-conf-kill-and-restart-daemons.bash piold
+./install-run-test-conf-kill-and-restart-daemons.bash piboiler
+./install-run-test-conf-kill-and-restart-daemons.bash piloft
+./install-run-test-conf-kill-and-restart-daemons-all.bash
+
+#########
+
+# also restarts apache :
+
+./install-run-live-conf-kill-and-restart-daemons.bash pitest
+./install-run-live-conf-kill-and-restart-daemons.bash piserver
+./install-run-live-conf-kill-and-restart-daemons.bash piold
+./install-run-live-conf-kill-and-restart-daemons.bash piboiler
+./install-run-live-conf-kill-and-restart-daemons.bash piloft
+./install-run-live-conf-kill-and-restart-daemons-all.bash
+
+#########
 
 ./install-to-pi.bash pioldwifi && ./install-to-pi.bash piloft && ./install-to-pi.bash pimain && ./install-to-pi.bash khaospy
 ./install-to-pi.bash pioldwifi
@@ -16,3 +80,7 @@
 #this script will accept a hostname get kicked off for
 
 ./install-to-pi-pi.bash pitest
+
+
+
+
