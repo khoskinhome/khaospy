@@ -1,86 +1,140 @@
+~/crap.sql
+
+install/bin/khaospy-bash-aliases.sh:83:#TODO RM this before release
+
 ./install/bin/khaospy-bash-aliases.sh
 
+./install/bin/display-latest-control-status-sql.sh
 
 #######################################################
 # Amelia's light hackit daemon
 
 ./install/bin/khaospy-amelia-hackit-daemon.pl
-
-# this still has more stuff under /home/khoskin/github.com//k-ha-os/amelia-light/
-# the web page stuff.
-# plus there is setup with the /tmp/
-
+install/www-bin/lightba.pl
+##./install/www/img/ where the images are
 
 #######################################################
-./install/lib-perl/Khaospy/PiControllerDaemon.pm
-./install/bin/khaospy-controller-daemon.pl
-./install/lib-perl/t/test-picontrollerdaemon-send-msg.pl
-./install/lib-perl/t/test-picontrollerdaemon-listen.pl
-
-./install/lib-perl/Khaospy/PiGPIO.pm
-./install/lib-perl/t/KhaospyTest/PiGPIO.pm
-
-./install/lib-perl/Khaospy/PiMCP23017.pm
-./install/lib-perl/t/KhaospyTest/PiMCP23017.pm
-
-./install/bin/test-module-includes.pl
+crap
 
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
 
-./install/lib-perl/Khaospy/BoilerMessage.pm
+
 ./install/lib-perl/Khaospy/Conf.pm
+./install/lib-perl/Khaospy/Conf/Controls.pm
 
-./install/lib-perl/Khaospy/Controls.pm
-./install/bin/khaospy-operate-control.pl
+./install/lib-perl-t/KhaospyConfControls.t
 
-./install/bin/just-send-stuff-to-5061.pl
-./install/bin/khaospy-zmq-just-listen.py
-./install/bin/khaospy-zmq-just-send.py
+./install/lib-perl/Khaospy/Conf/PiHosts.pm
+./install/lib-perl-t/KhaospyConfPiHosts.t
 
-./install/bin/zmq-req.py
-./install/bin/zmq-reply.py
+./install/bin/test-dump-all-confs.pl
 
-./install/bin/zmq-push.py
-./install/bin/zmq-pull.py
+./install/lib-perl/Khaospy/Conf/HardCoded.pm
 
+./install/lib-perl-t/crap.t
+./install/bin/khaospy-test-conf-generate.pl
+./install/bin/khaospy-live-conf-generate.pl
 
+./install/bin/khaospy-db-conf-generate.pl
 
 ./install/lib-perl/Khaospy/Constants.pm
 
-./install/lib-perl/Khaospy/OneWireHeatingDaemon.pm
+./install/lib-perl/Khaospy/ControlDispatch.pm
+
+./install/lib-perl/Khaospy/ControlOther.pm
+
+./install/lib-perl/Khaospy/ControlPi.pm
+./crap-rewrite.pl
+./install/lib-perl/Khaospy/ControlPiGPIO.pm
+./install/lib-perl/Khaospy/ControlPiMCP23017.pm
+./install/lib-perl-t/KhaospyControlPiMCP23017.t
+
+
+
+./install/lib-perl/Khaospy/ErrorLogDaemon.pm
+./install/bin/khaospy-error-log-d.pl
+
+
+./install/lib-perl/Khaospy/ControlUtils.pm
+
+./install/lib-perl/Khaospy/ControlsDaemon.pm
+./install/bin/khaospy-pi-controls-d.pl
+./install/bin/khaospy-other-controls-d.pl
+
+./install/lib-perl/Khaospy/ControlOrviboS20.pm
+
+./install/lib-perl/Khaospy/Exception.pm
+
+./install/lib-perl/Khaospy/Log.pm
+
+./install/lib-perl/Khaospy/Message.pm
+
+./install/lib-perl/Khaospy/OneWireThermometer.pm
+./install/bin/khaospy-one-wire-daemon.pl
+
+./install/lib-perl/Khaospy/HeatingDaemon.pm
 ./install/bin/khaospy-one-wire-heating-daemon.pl
-
-
-./install/lib-perl/Khaospy/Utils.pm:77:
+./install/bin/khaospy-heating-daemon.pl
 
 ./install/lib-perl/Khaospy/OrviboS20.pm
 ./install/lib-perl/t-scripts/test-khaospy-orvibos20.pl
 
+./install/lib-perl/Khaospy/QueueCommand.pm
+./install/bin/khaospy-operate-control.pl
+./install/bin/khaospy-operate-orvibos20-direct.pl
+
+./install/lib-perl/Khaospy/CommandQueueDaemon.pm
+./install/bin/khaospy-command-queue-d.pl
+
+./install/lib-perl/Khaospy/Utils.pm
+
+./crap2.pl
+
+# TODO remove the password from in here :
+./install/lib-perl/Khaospy/Email.pm
+./install/bin/test-gmail.pl
+./install/bin/khaospy-email-conf-generate.pl
+
+./install/lib-perl/Khaospy/ZMQSubscribeAllPublishers.pm
+./install/bin/khaospy-zmq-subscribe.pl
+
+./install/lib-perl/Khaospy/StatusD.pm
+./install/bin/khaospy-status-d.pl
+
+./install/lib-perl/Khaospy/DBH.pm
+
+./install/lib-perl/Khaospy/ZMQAnyEvent.pm
+
+./install/lib-perl/zhelpers.pm
+
+./install/bin/test-module-includes.pl
+./install/bin/test-db-connect.pl
+
+./install/lib-perl/t/test-picontrollerdaemon-send-msg.pl
+./install/lib-perl/t/test-picontrollerdaemon-listen.pl
+
+./install/lib-perl-t/alltests.t
 
 ######################################################
-# 
+# cctv record
+./install/bin/cctv-record.pl
+./install/bin/cctv-mount-nas.bash
 
-
-./to-be-deleted/bin/khaospy-operate-orvibos20.pl
-./to-be-deleted/bin/khaospy-one-wire-heating-daemon-old.pl
-./to-be-deleted/bin/khaospy-boiler-daemon-old.pl
-./to-be-deleted/bin/khaospy-orvibo-s20-radiator.pl
-./to-be-deleted/bin/orvibo-s20-control-karl-hack.pl
-./to-be-deleted/bin/zmq-subscribe-to-thermometers.pl
-./to-be-deleted/bin/orvibo-s20-control.pl
+######################################################
+#
 #######################################################
 # running all the scripts
 
-
-./install/bin/khaospy-generate-json-configs.pl
 ./install/bin/khaospy-run-daemons.pl
 
+./install/bin/khaospy-stop-daemons.pl
+./install/bin/khaospy-restart-daemons.pl
 
-to-be-deleted/bin/khaospy-run-daemons.py
+./install/bin/khaospy-ps.pl
+
 #######################################################
 # one wire thermometer stuff :
-
 
 ./install/bin/khaospy-one-wired-sender.py
 
@@ -88,46 +142,61 @@ to-be-deleted/bin/khaospy-run-daemons.py
 ./install/bin/khaospy-one-wired-receiver.py
 ./install/bin/khaospy-one-wired-receiver-just-listen.py
 
-
-
-./to-be-deleted/libpy/khaospy-one-wired-daemon.py
-./to-be-deleted/libpy/khaospy-one-wired-receiver-subscribe-just-listen.py
-./to-be-deleted/libpy/khaospy-one-wired-receiver-subscribe-piloft.py
-./to-be-deleted/libpy/khaospy-one-wired-receiver-subscribe-pioldwifi.py
 ##############################################################################
 # graphing of rrds.
 
-crap.pl
 install/bin/khaospy-generate-rrd-graphs.pl
 
-to-be-deleted/bin/rrdcreategraph.sh
-to-be-deleted/bin/rrdcreategraph.pl
-to-be-deleted/bin/rrdcreategraph-orig.sh
 ##############################################################################
 
-######################################################
-# i2c alarm polling
-
-./install/libpy/khaospy-i2c-alarm-poller-sender.py
-./install/libpy/khaospy-i2c-alarm-poller-daemon.py
-./install/libpy/khaospy-i2c-alarm-poller-daemon-test-crap.py
-./install/libpy/khaospy-i2c-alarm-poller-receiver.py
-
-mapping-i2c-alarm-board.py
 
 ######################################################
 
-Useful bits of python (coz I'm a noobie !)
-./install/hackingpython/test-cli.py
 
+######################################################
+
+# this still has more stuff under /home/khoskin/github.com//k-ha-os/amelia-light/
+# the web page stuff.
+# plus there is setup with the /tmp/
+./install/bin/helper/get-all-rad-status.sh
+
+./install/bin/helper/gpio-1-relay-on.sh
+./install/bin/helper/gpio-1-relay-off.sh
+./install/bin/helper/gpio-4-relay-on.sh
+./install/bin/helper/gpio-4-relay-off.sh
+./install/bin/helper/gpio-0-input-status.sh
+
+
+
+
+./install/bin/helper/zmq-get-version.pl
+
+./install/bin/helper/zmq-ventilator.pl
+./install/bin/helper/zmq-worker.pl
+
+./install/bin/helper/zmq-req.py
+./install/bin/helper/zmq-reply.py
+
+./install/bin/helper/zmq-push.py
+./install/bin/helper/zmq-pull.py
+
+
+##############
+# deprecated HomeEasy
+#./install/lib-perl/Khaospy/ControlPiBoilerHomeEasy.pm
+#./install/bin/khaospy-piboiler-homeeasy.pl
+#./install/bin/khaospy-piboiler-homeeasy-schedule-d.pl
+#./install/lib-perl-t/KhaospyControlPiBoilerHomeEasy.t
+#./install/bin/helper/piboiler-homeeasy-1-on.sh
+#./install/bin/helper/piboiler-homeeasy-1-off.sh
+#./install/bin/helper/piboiler-homeeasy-2-on.sh
+#./install/bin/helper/piboiler-homeeasy-2-off.sh
+#./install/bin/helper/piboiler-homeeasy-3-on.sh
+#./install/bin/helper/piboiler-homeeasy-3-off.sh
+#./install/bin/helper/piboiler-homeeasy-4-on.sh
+#./install/bin/helper/piboiler-homeeasy-4-off.sh
 
 ##############################################################################
-crap
-crap.sql
-crap.c
-crap.js
-
-./install/
 
 ##############################################################################
 # ./install/www
@@ -142,236 +211,198 @@ crap.js
 # ./install/bin
 
 ##############################################################################
-# libpy .......
-
-## hacky test scripts :
-./install/libpy/test.py
-./install/libpy/testhack.py
-./install/libpy/testgethostname.py
-./install/libpy/testjsonconf.py
-./install/libpy/test.py
-
-
-####
-
-./install/libpy/khaospy-daemon-run.py
-
-./install/libpy/khaospy-one-wired-daemon.py
-./install/libpy/khaospy-one-wired-receiver-subscribe.py
-./install/libpy/khaospy-one-wired-receiver-subscribe-just-listen.py
-./install/libpy/khaospy-one-wired-receiver-subscribe-CRAP.py
-### DEVICE = 0x20
-
-
-# working here 28th Oct 15.
-./install/libpy/khaospy-i2c-alarm-poller-daemon.py
-./install/libpy/khaospy-i2c-alarm-poller-daemon-test-crap.py
-./install/libpy/khaospy-i2c-alarm-poller-receiver.py
-
-
-
-
-
-
-
-
-#./install/libpy/khaospy/
-./install/libpy/khaospy/__init__.py
-
-
-
-./install/libpy/khaospy/daemon.py
-## ./install/libpy/khaospy/config.py
-./install/libpy/khaospy/utils.py
-./install/libpy/khaospy/exception.py
-
-##############################
-## mcp23017 intefaced devices :
-#############
-
-./install/libpy/khaospy/devicef.py
-
-./install/libpy/khaospy/devicec.py
-
-./install/libpy/khaospy/deviceb.py
-
-./install/libpy/khaospy/mcp23017.py
-
-./install/libpy/khaospy/mcp23017MultiLightSingleWayManual.py
-./install/libpy/khaospy/mcp23017SingleLightTwoWayManual.py
-
-./install/libpy/khaospy/mcp23017BoilerRadiator.py
-
-#### ./install/libpy/khaospy/mcp23017TSL2561LightSensor.py ## not sure about the light sensor I have.
-
-./install/libpy/khaospy/mcp23017AlarmSwitch.py
-
-./install/libpy/khaospy/mcp23017DoorWindowSwitch.py
-
-./install/libpy/khaospy/mcp23017PIRSwitch.py
-###############################
-
-####### ./install/libpy/khaospy/i2cPort.py
-####### ./install/libpy/khaospy/i2cPortsCollection.py
-
-###############################
-## oneWire interface devices :
-
-./install/libpy/khaospy/oneWire.py
-
-./install/libpy/khaospy/oneWireTemperatureSensor.py
-
-##############################################################################
-
+# DOCS
 ##############################################################################
 
 ./install/docs
 
+./install/docs/todo.txt
+
 ./install/docs/setup-pi.txt
 
-./install/docs/dependencies.txt
+./install/docs/pi-gpio-pins-wiringpi.txt
 
+./install/docs/dependencies.txt
+./install/docs/anyevent-zmq-links.txt
 ./install/docs/proj_khaospy-home-auto-software.txt
 ./install/docs/proj_khaospy-home-auto-software2.txt
+
+./install/docs/boiler-daemon.txt
 ./install/docs/lighting-wiring-circuits.txt
 ./install/docs/heating-control.txt
 ./install/docs/lighting-control.txt
 ./install/docs/khaospy-why.txt
+./install/docs/controls-relays-switches-sensors-conf.txt
+./install/docs/controls-config-settings.txt
 
+./install/docs/ipcams.txt
 
+./install/docs/apache2-sites-enabled-orig-pi.txt
 
-##############################################################################
-./perl-port/stdout-json-cfg.pl
+./install/docs/to-be-deleted-file-list
 
-./perl-port/khaospy-pi-rest-daemon-req-resp-structure.pl
+##################################
+# DNS
+##################################
+## ./dns/piloft/etc/bind/bind.keys
+#./dns/piloft/etc/bind/db.192
+## ./dns/piloft/etc/bind/db.root
+## ./dns/piloft/etc/bind/db.empty
+## ./dns/piloft/etc/bind/db.local
+## ./dns/piloft/etc/bind/db.0
+## ./dns/piloft/etc/bind/zones.rfc1918
+## ./dns/piloft/etc/bind/db.127
+## ./dns/piloft/etc/bind/rndc.key
+#./dns/piloft/etc/bind/named.conf.options
+## ./dns/piloft/etc/bind/db.255
+#./dns/piloft/etc/bind/db.khaos
+#./dns/piloft/etc/bind/named.conf.local
+##./dns/piloft/etc/bind/named.conf
+##./dns/piloft/etc/bind/named.conf.default-zones
+
+./dns/template/db.192
+./dns/template/db.khaos
+./dns/template/named.conf.local
+./dns/template/named.conf.options
+
+# where the templates get written to :
+./dns/generated/
+
+./dns/generate-and-scp-to-hosts.pl
+
+./dns/scp-dns-to-hosts.bash
+
+###################################################################
 
 ./install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl
-
 
 ./install/bin/orvibo-s20-control.pl
 ./install/bin/orvibo-s20-control-karl-hack.pl
 
-##############################################################################
-./install/hackingpython/
-
-./install/hackingpython/multiprocessing-karl.py
-
-
-./install/hackingpython/redirect.py
-
-./install/hackingpython/wbk/webby.py
-./install/hackingpython/web-user.xml
-
-./install/hackingpython/os.json.py
-
-./install/hackingpython/generators.py
-./install/hackingpython/generators2.py
-./install/hackingpython/zip.py
-
-
-./install/hackingpython/zeromqkarl.py
-./install/hackingpython/zeromqkarl2.py
-./install/hackingpython/zmqpairserver.py
-./install/hackingpython/zmqpairclient.py
-
-./install/hackingpython/zmqpublish.py
-./install/hackingpython/zmqsubscribe.py
-
-./install/hackingpython/generators-fib.py
-
-./install/hackingpython/greenlet.py
-./install/hackingpython/gevent.py
-
-./install/hackingpython/daemon.py
-./install/hackingpython/spam.py
-
-./install/hackingpython/list-comprehension.py
-./install/hackingpython/email.py
-
-./install/hackingpython/read.json.py
-
-./install/hackingpython/ginkgo-hacking.py
-
-./install/hackingpython/quickstart.py
-./install/hackingpython/quickstart2.py
-
-./install/hackingpython/coroutines.py
-
-install/hackingpython/generators/apachelog.py
-install/hackingpython/generators/broadcast.py
-install/hackingpython/generators/bytesgen.py
-install/hackingpython/generators/consumer.py
-install/hackingpython/generators/downloads.py
-install/hackingpython/generators/fieldmap.py
-install/hackingpython/generators/follow.py
-install/hackingpython/generators/gencat.py
-install/hackingpython/generators/Generators.pdf
-install/hackingpython/generators/genevents.py
-install/hackingpython/generators/genfind.py
-install/hackingpython/generators/gengrep.py
-install/hackingpython/generators/genlog.py
-install/hackingpython/generators/genmessages.py
-install/hackingpython/generators/genmulti.py
-install/hackingpython/generators/genopen.py
-install/hackingpython/generators/genpickle.py
-install/hackingpython/generators/genqueue.py
-install/hackingpython/generators/genreceive.py
-install/hackingpython/generators/genshutdown.py
-install/hackingpython/generators/gentrace.py
-install/hackingpython/generators/hosts.py
-install/hackingpython/generators/index.html
-install/hackingpython/generators/largefiles.py
-install/hackingpython/generators/largest.py
-install/hackingpython/generators/linesdir.py
-install/hackingpython/generators/logcoroutine.py
-install/hackingpython/generators/makebig.py
-install/hackingpython/generators/msgtest.py
-install/hackingpython/generators/netsend.py
-install/hackingpython/generators/nongenlog.py
-install/hackingpython/generators/query404.py
-install/hackingpython/generators/realtime404.py
-install/hackingpython/generators/receivefrom.py
-install/hackingpython/generators/recvcount.py
-install/hackingpython/generators/redict.py
-install/hackingpython/generators/retuple.py
-install/hackingpython/generators/robots.py
-install/hackingpython/generators/runservers.py
-install/hackingpython/generators/runservers.sh
-install/hackingpython/generators/sendto.py
-install/hackingpython/generators/shutdownevt.py
-install/hackingpython/generators/storelast.py
-install/hackingpython/generators/thrsend.py
 ###################################################################
 
 install-to-pi-pi.bash
-install-to-pi-khoskin.bash
-install-to-pi.bash
+install-reload-apache.bash
+#install-to-pi-khoskin.bash
+#install-to-pi.bash
 install-to-pi-all.bash
 
+run-test-conf-update-on-pi.bash
+run-test-conf-update-on-pi-all.bash
+
+run-live-conf-update-on-pi.bash
+run-live-conf-update-on-pi-all.bash
+
+run-kill-all-daemons-on-pi.bash
+run-kill-all-daemons-on-pi-all.bash
+
+run-kill-and-restart-daemons-on-pi.bash
+run-kill-and-restart-daemons-on-pi-all.bash
+
+install-run-test-conf-kill-and-restart-daemons.bash
+install-run-test-conf-kill-and-restart-daemons-all.bash
+
+install-run-live-conf-kill-and-restart-daemons.bash
+install-run-live-conf-kill-and-restart-daemons-all.bash
+
 ###################################################################
+crap
+crap.pl
 
-./install/www/index.html
+./install/lib-perl/Khaospy/Constants.pm
 
+./install/lib-perl/Khaospy/WebUI/Constants.pm
+./install/lib-perl/Khaospy/WebUI/UserLogin.pm
+./install/lib-perl/Khaospy/WebUI/DB.pm
+./install/lib-perl/Khaospy/WebUI/Util.pm
+
+./install/lib-perl/Khaospy/DBH/Controls.pm
+./install/lib-perl/Khaospy/DBH/Users.pm
+./install/lib-perl/Khaospy/DBH/Rooms.pm
+
+
+
+
+./install/www-bin/dancer.pl
+
+./install/www-dancer-tt/header.tt
+./install/www-dancer-tt/header_jquery.tt
+
+./install/www-dancer-tt/title_linkbar.tt
+
+./install/www-dancer-tt/login.tt
+./install/www-dancer-tt/reset_password.tt
+./install/www-dancer-tt/change_password.tt
+./install/www-dancer-tt/user_update.tt
+
+./install/www-dancer-tt/index.tt
+
+./install/www-dancer-tt/cctv.tt
+
+./install/www-dancer-tt/status.tt
+./install/www/css/status.css
+./install/www/js/status.js
+
+./install/www/js/base.js
+./install/www/css/base.css
+
+./install/www-dancer-env/config.yml
+
+./install/www-bin/test-cgi.pl
 ./install/www-bin/graphs.pl
-
+./install/www-dancer-tt/status-new.tt
 ###################################################################
 
-
-grep -rin get_heating_thermometer_conf *
-install/lib-perl/Khaospy/Utils.pm:27:    get_heating_thermometer_conf
-install/lib-perl/Khaospy/OneWireHeatingDaemon.pm:37:# get_heating_thermometer_conf
-to-be-deleted/bin/khaospy-one-wire-heating-daemon-old.pl:34:    get_heating_thermometer_conf
-to-be-deleted/bin/khaospy-one-wire-heating-daemon-old.pl:110:    my $thermometer_conf = get_heating_thermometer_conf();
+./install/db/create-db.sql
+./install/db/grant-db.sql
+./install/db/create-tables.sql
 
 
-khoskin@khoskin-P5K-E:~/github.com/khaospy$ grep -r send_command ./ | grep Khaospy
-./install/lib-perl/Khaospy/Controls.pm:    send_command
-./install/lib-perl/Khaospy/Controls.pm:sub send_command {
-./install/lib-perl/Khaospy/BoilerDaemon.pm:use Khaospy::QueueCommand qw( send_command );
-./install/lib-perl/Khaospy/BoilerDaemon.pm:    eval { $ret = send_command( $control, $action ); };
-Binary file ./install/lib-perl/Khaospy/.Controls.pm.swp matches
-./install/lib-perl/Khaospy/PiControllerDaemon.pm:use Khaospy::QueueCommand qw( send_command );
-./install/lib-perl/Khaospy/PiControllerDaemon.pm:#    eval { $ret = send_command( $control, $action ); };
-./install/lib-perl/Khaospy/OneWireHeatingDaemon.pm:    send_command
-./install/lib-perl/Khaospy/OneWireHeatingDaemon.pm:            eval { $retval = send_command($control_name, $action); };
+./install/apache/default-ssl.conf
+##############################
+
+# greping crap
+
+
+
+#g.grep init_mcp23017
+install/lib-perl-t/KhaospyControlPiMCP23017.t:80:Khaospy::ControlPiMCP23017::init_mcp23017();
+install/lib-perl/Khaospy/ControlPi.pm:37:    init_mcp23017
+install/lib-perl/Khaospy/ControlPi.pm:58:    init_mcp23017();
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:32:    init_mcp23017
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:132:sub init_mcp23017 {
+
+
+
+#g.grep write_gpio
+install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl:216:sub write_gpio_conf_to_fs{
+install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl:376:        write_gpio_conf_to_fs();
+install/lib-perl-t/KhaospyControlPiMCP23017.t:85:Khaospy::ControlPiMCP23017->write_gpio($gpio, true);
+install/lib-perl/Khaospy/ControlPi.pm:272:        write_gpio(
+install/lib-perl/Khaospy/ControlPi.pm:453:        write_gpio(
+install/lib-perl/Khaospy/ControlPi.pm:516:sub write_gpio{
+install/lib-perl/Khaospy/ControlPi.pm:519:        return $pin_class->write_gpio( $gpio, $new_state );
+install/lib-perl/Khaospy/ControlPiGPIO.pm:25:    write_gpio
+install/lib-perl/Khaospy/ControlPiGPIO.pm:56:sub write_gpio {
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:35:    write_gpio
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:277:sub write_gpio {
+
+
+# g.grep init_gpio
+install/lib-perl-t/KhaospyControlPiMCP23017.t:23:            "init_gpio"
+install/lib-perl-t/KhaospyControlPiMCP23017.t:53:init_gpio(undef,$gpio,OUT);
+install/lib-perl-t/KhaospyControlPiMCP23017.t:62:init_gpio(undef,$gpio_in,IN);
+install/lib-perl/Khaospy/ControlPi.pm:188:        init_gpio($pin_class,$gpio_num, IN);
+install/lib-perl/Khaospy/ControlPi.pm:253:        init_gpio($pin_class,$gpio_num, OUT);
+install/lib-perl/Khaospy/ControlPi.pm:315:        init_gpio($pin_class,$gpio_relay_num, OUT);
+install/lib-perl/Khaospy/ControlPi.pm:318:        init_gpio($pin_class,$gpio_detect_num, IN);
+install/lib-perl/Khaospy/ControlPi.pm:498:sub init_gpio{
+install/lib-perl/Khaospy/ControlPi.pm:501:        return $pin_class->init_gpio($gpio, $iodir);
+install/lib-perl/Khaospy/ControlPiGPIO.pm:23:    init_gpio
+install/lib-perl/Khaospy/ControlPiGPIO.pm:40:sub init_gpio {
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:33:    init_gpio
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:88:sub init_gpio {
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:133:    # needs to be called once all the pins are init-ed by init_gpio()
+
+
 
