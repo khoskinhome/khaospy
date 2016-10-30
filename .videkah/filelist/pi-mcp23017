@@ -361,71 +361,46 @@ crap.pl
 ./install/apache/default-ssl.conf
 ##############################
 
-crap
-
-
-khoskin@khoskin-P5K-E:~/github.com/khaospy$ g.grep current_state_value
-install/lib-perl/Khaospy/DBH/Controls.pm:186:        $row->{current_state_value}
-install/lib-perl/Khaospy/DBH/Controls.pm:257:        $row->{current_state_value}
-install/www-dancer-tt/status-new.tt:31:                    var new_state_value = data_row['current_state_value'].toString();
-install/www-dancer-tt/status-new.tt:146:                <td align='center' id='[% row.control_name %]-state_alias'>[% row.current_state_value %]</td>
-install/www-dancer-tt/status.tt:40:                <td align='center' id='[% row.control_name %]-state_alias'>[% row.current_state_value %]</td>
-install/www/js/status.js:23:                    var new_state_value = data_row['current_state_value'].toString();
+# greping crap
 
 
 
-
-g.grep klogerror | grep -i control
-install/lib-perl/Khaospy/ControlOther.pm:43:    klogstart klogfatal klogerror
-install/lib-perl/Khaospy/ControlOther.pm:137:        klogerror $_;
-install/lib-perl/Khaospy/ControlPi.pm:47:    klogstart klogfatal klogerror
-install/lib-perl/Khaospy/ControlPi.pm:231:        klogerror "Can only operate a switch with 'status'. ( not '$action' )"
-install/lib-perl/Khaospy/ControlPi.pm:507:    klogerror sprintf ("%s : %s : %s : gpio = { %s }",
-install/lib-perl/Khaospy/ControlPiGPIO.pm:18:    klogstart klogfatal klogerror
-install/lib-perl/Khaospy/ControlPiMCP23017.pm:22:    klogstart klogfatal klogerror
-install/lib-perl/Khaospy/ControlPiMCP23017.pm:153:                    klogerror
-install/lib-perl/Khaospy/ControlsDaemon.pm:58:    klogstart klogfatal klogerror
-install/lib-perl/Khaospy/ControlsDaemon.pm:159:    klogerror ( "msg is empty or undef" ) if ! $msg;
-install/lib-perl/Khaospy/ControlsDaemon.pm:160:    klogerror ( "msg == AnyEvent " ) if $msg =~ /AnyEvent/;
-install/lib-perl/Khaospy/ControlsDaemon.pm:165:        klogerror ( "ControlsDaemon line 165");
-install/lib-perl/Khaospy/ControlsDaemon.pm:166:        klogerror ($msg, $_);
-install/lib-perl/Khaospy/DBH/Controls.pm:12:    klogstart klogfatal klogerror
-install/lib-perl/Khaospy/DBH/Controls.pm:68:        klogerror "$@ \n".Dumper($values) if $@;
-install/lib-perl/Khaospy/DBH/Controls.pm:96:        klogerror "$@ \n".Dumper($values) if $@;
-install/lib-perl/Khaospy/DBH/Controls.pm:128:    klogerror "$@ \n".Dumper($values) if $@;
-install/lib-perl/Khaospy/HeatingDaemon.pm:201:            klogerror "Both the 'upper_temp' and 'control' need to be defined";
-install/lib-perl/Khaospy/HeatingDaemon.pm:203:            klogerror "control    = '$operate_control_name'";
-install/lib-perl/Khaospy/HeatingDaemon.pm:213:            klogerror "Cannot operate this control.";
-khoskin@khoskin-P5K-E:~/github.com/khaospy$ 
-
-
- g.grep validate_control_msg_fields
-install/lib-perl/Khaospy/CommandQueueDaemon.pm:40:    validate_control_msg_fields
-install/lib-perl/Khaospy/ControlsDaemon.pm:63:    validate_control_msg_fields
-install/lib-perl/Khaospy/Message.pm:24:    validate_control_msg_fields
-install/lib-perl/Khaospy/Message.pm:40:    eval{$msg_key = validate_control_msg_fields($msg_rh)};
-install/lib-perl/Khaospy/Message.pm:52:sub validate_control_msg_fields {
-install/lib-perl/Khaospy/QueueCommand.pm:40:    validate_control_msg_fields
-install/lib-perl/Khaospy/QueueCommand.pm:86:    validate_control_msg_fields($msg);
+#g.grep init_mcp23017
+install/lib-perl-t/KhaospyControlPiMCP23017.t:80:Khaospy::ControlPiMCP23017::init_mcp23017();
+install/lib-perl/Khaospy/ControlPi.pm:37:    init_mcp23017
+install/lib-perl/Khaospy/ControlPi.pm:58:    init_mcp23017();
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:32:    init_mcp23017
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:132:sub init_mcp23017 {
 
 
 
-
-install/bin/test-module-includes.pl:49:use Khaospy::ZMQAnyEvent;
-
-install/lib-perl/Khaospy/BoilerDaemon.pm:33:use Khaospy::ZMQAnyEvent  qw( subscribe_to_controller_daemons );
-install/lib-perl/Khaospy/CommandQueueDaemon.pm:69:use Khaospy::ZMQAnyEvent qw(
-install/lib-perl/Khaospy/ControlsDaemon.pm:69:use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
-install/lib-perl/Khaospy/HeatingDaemon.pm:54:use Khaospy::ZMQAnyEvent qw(
-install/lib-perl/Khaospy/OneWireThermometer.pm:40:use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
-install/lib-perl/Khaospy/StatusD.pm:85:use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
-install/lib-perl/Khaospy/ZMQAnyEvent.pm:1:package Khaospy::ZMQAnyEvent;
-install/lib-perl/Khaospy/ZMQSubscribeAllPublishers.pm:51:use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
-
-
-
+#g.grep write_gpio
+install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl:216:sub write_gpio_conf_to_fs{
+install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl:376:        write_gpio_conf_to_fs();
+install/lib-perl-t/KhaospyControlPiMCP23017.t:85:Khaospy::ControlPiMCP23017->write_gpio($gpio, true);
+install/lib-perl/Khaospy/ControlPi.pm:272:        write_gpio(
+install/lib-perl/Khaospy/ControlPi.pm:453:        write_gpio(
+install/lib-perl/Khaospy/ControlPi.pm:516:sub write_gpio{
+install/lib-perl/Khaospy/ControlPi.pm:519:        return $pin_class->write_gpio( $gpio, $new_state );
+install/lib-perl/Khaospy/ControlPiGPIO.pm:25:    write_gpio
+install/lib-perl/Khaospy/ControlPiGPIO.pm:56:sub write_gpio {
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:35:    write_gpio
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:277:sub write_gpio {
 
 
-
-
+# g.grep init_gpio
+install/lib-perl-t/KhaospyControlPiMCP23017.t:23:            "init_gpio"
+install/lib-perl-t/KhaospyControlPiMCP23017.t:53:init_gpio(undef,$gpio,OUT);
+install/lib-perl-t/KhaospyControlPiMCP23017.t:62:init_gpio(undef,$gpio_in,IN);
+install/lib-perl/Khaospy/ControlPi.pm:188:        init_gpio($pin_class,$gpio_num, IN);
+install/lib-perl/Khaospy/ControlPi.pm:253:        init_gpio($pin_class,$gpio_num, OUT);
+install/lib-perl/Khaospy/ControlPi.pm:315:        init_gpio($pin_class,$gpio_relay_num, OUT);
+install/lib-perl/Khaospy/ControlPi.pm:318:        init_gpio($pin_class,$gpio_detect_num, IN);
+install/lib-perl/Khaospy/ControlPi.pm:498:sub init_gpio{
+install/lib-perl/Khaospy/ControlPi.pm:501:        return $pin_class->init_gpio($gpio, $iodir);
+install/lib-perl/Khaospy/ControlPiGPIO.pm:23:    init_gpio
+install/lib-perl/Khaospy/ControlPiGPIO.pm:40:sub init_gpio {
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:33:    init_gpio
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:88:sub init_gpio {
+install/lib-perl/Khaospy/ControlPiMCP23017.pm:133:    # needs to be called once all the pins are init-ed by init_gpio()
 
