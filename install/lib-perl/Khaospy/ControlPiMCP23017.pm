@@ -88,9 +88,9 @@ sub testing_set_pins_out_state { $pins_out = $_[0] }
 sub init_gpio {
     my ($class, $gpio, $IN_OUT ) = @_;
     # inits a single gpio pin
-    _init_pins( $gpio, $pins_cfg      , $IN_OUT, true  );
-    _init_pins( $gpio, $pins_in ,undef   , true  ) if $IN_OUT eq IN;
-    _init_pins( $gpio, $pins_out,undef   , false ) if $IN_OUT eq OUT;
+    _init_pins( $gpio, $pins_cfg, $IN_OUT, true  );
+    _init_pins( $gpio, $pins_in , undef  , true  ) if $IN_OUT eq IN;
+    _init_pins( $gpio, $pins_out, undef  , false ) if $IN_OUT eq OUT;
 
     # TODO. Could I do this better ?
     # A bit of a hack , since this will affect a higher level datastructure.
@@ -148,7 +148,7 @@ sub init_mcp23017 {
 
                 try {
                     my $ret = _get_mcp23017_cmd( $cmd );
-                    klogdebug "Shell command '$cmd' returned '$ret'";
+                    kloginfo "init_mcp23017(). Shell command '$cmd' returned '$ret'";
                 } catch {
                     klogerror
                         sprintf ("i2c_bus = %s : i2c_addr = %s : port = %s \n%s" ,
@@ -246,31 +246,37 @@ sub set_pins_state_array {
 sub read_gpio {
     my ( $class, $gpio ) = @_;
 
+    my ( $MCP_register, $pins_i );
+
     if ( get_hashval($gpio, 'iodir') eq OUT ){
-        return get_pins_array($gpio, $pins_out)->[ get_hashval($gpio,'portnum') ]
+        $pins_i       = $pins_out;
+        $MCP_register = $OLAT;
+    } else { # must be "IN"
+        $pins_i       = $pins_in;
+        $MCP_register = $MCP_GPIO;
     };
 
-    my $last_update = last_update($gpio, $pins_in);
+    my $last_update = last_update($gpio, $pins_i);
     if ( $last_update + $PI_CONTROL_MCP23017_PINS_TIMEOUT < time ){
         my $cmd = sprintf("%s -y %s %s %s",
             $PI_I2C_GET,
             $gpio->{i2c_bus},
             $gpio->{i2c_addr},
-            $MCP_GPIO->{$gpio->{portname}},
+            $MCP_register->{$gpio->{portname}},
         );
 
         my $ret = _get_mcp23017_cmd( $cmd );
         klogdebug "Shell command '$cmd' returned '$ret'";
         set_pins_state_array(
             $gpio,
-            $pins_in,
+            $pins_i,
             _num_to_pin_array( hex( $ret ) ),
         );
 
-        set_last_update($gpio, $pins_in)
+        set_last_update($gpio, $pins_i)
     }
 
-    return get_pins_array( $gpio, $pins_in )
+    return get_pins_array( $gpio, $pins_i )
         ->[ get_hashval($gpio, 'portnum') ];
 }
 
