@@ -90,11 +90,10 @@ sub get_control_message_key {
 
     my $request_epoch_time = $msg_rh->{request_epoch_time};
     my $control_name       = $msg_rh->{control_name};
-    my $control_host       = $msg_rh->{control_host};
     my $action             = $msg_rh->{action};
     my $request_host       = $msg_rh->{request_host} || "";
 
-    return "$control_name|$control_host|$action|$request_host|$request_epoch_time";
+    return "$control_name|$action|$request_host|$request_epoch_time";
 }
 
 sub validate_action {
