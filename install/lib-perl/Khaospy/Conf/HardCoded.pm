@@ -714,34 +714,34 @@ sub live_controls_conf {
 sub test_controls_conf {
     ## TODO find a way of using the host name from /etc/hosts to get the ip and mac.
     return {
-        %{live_controls_conf()},
+#        %{live_controls_conf()},
 
 ## pi gpio
-        pigpio_relay => {
-            alias => 'pi gpio relay',
-            type  => $PI_GPIO_RELAY_CONTROL_TYPE,
-            host  => 'pitest',
-            invert_state => true,
-            gpio_relay   => 1,
-        },
-
+#        pigpio_relay => {
+#            alias => 'pi gpio relay',
+#            type  => $PI_GPIO_RELAY_CONTROL_TYPE,
+#            host  => 'pitest',
+#            invert_state => true,
+#            gpio_relay   => 1,
+#        },
+#
 #        pigpio_switch => {
 #            type => $PI_GPIO_SWITCH_CONTROL_TYPE,
 #            host => "pitest",
 #            invert_state => false,
 #            gpio_switch => 7,
 #        },
-
-        pigpio_relay_manual => {
-            type => $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE,
-            host => "pitest",
-            ex_or_for_state => false,
-            invert_state => false,
-            manual_auto_timeout => 20,
-            gpio_relay  => 4,
-            gpio_detect => 0,
-        },
-
+#
+#        pigpio_relay_manual => {
+#            type => $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE,
+#            host => "pitest",
+#            ex_or_for_state => false,
+#            invert_state => false,
+#            manual_auto_timeout => 20,
+#            gpio_relay  => 4,
+#            gpio_detect => 0,
+#        },
+#
 # pi mcp23017
 #        mcp_relay_man_0 => {
 #            type => $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE,
@@ -791,44 +791,107 @@ sub test_controls_conf {
             host => "pitest",
             ex_or_for_state => true,
             invert_state => false,
-            manual_auto_timeout => 20,
+            manual_auto_timeout => 0,
             gpio_relay => {
                 i2c_bus  => 1,
 		i2c_addr => '0x27',
 		portname =>'b',
-		portnum  => 3,
+		portnum  => 7,
             },
             gpio_detect => {
                 i2c_bus  => 1,
 		i2c_addr => '0x27',
 		portname =>'b',
-		portnum  => 0,
+		portnum  => 5,
             },
         },
 
-        mcp_relay_1 => {
-            type => $PI_MCP23017_RELAY_CONTROL_TYPE,
-            host => "pitest",
-            invert_state => false,
-            gpio_relay => {
-                i2c_bus  => 1,
-		i2c_addr => '0x27',
-		portname =>'b',
-		portnum  => 1,
-            },
-        },
-
-        mcp_switch_1 => {
-            type => $PI_MCP23017_SWITCH_CONTROL_TYPE,
-            host => "pitest",
-            invert_state => false,
-            gpio_switch => {
-                i2c_bus  => 1,
-		i2c_addr => '0x27',
-		portname =>'b',
-		portnum  => 2,
-            },
-        },
+#        mcp_relay_7 => {
+#            type => $PI_MCP23017_RELAY_CONTROL_TYPE,
+#            host => "pitest",
+#            invert_state => true,
+#            gpio_relay => {
+#                i2c_bus  => 1, i2c_addr => '0x27',
+#		portname =>'b', portnum  => 7,
+#            },
+#        },
+#
+#        mcp_switch_6 => {
+#            type => $PI_MCP23017_SWITCH_CONTROL_TYPE,
+#            host => "pitest",
+#            invert_state => true,
+#            gpio_switch => {
+#                i2c_bus  => 1 , i2c_addr => '0x27',
+#		portname =>'b', portnum  => 6,
+#            },
+#        },
+#
+#        mcp_switch_5 => {
+#            type => $PI_MCP23017_SWITCH_CONTROL_TYPE,
+#            host => "pitest",
+#            invert_state => true,
+#            gpio_switch => {
+#                i2c_bus  => 1 , i2c_addr => '0x27',
+#		portname =>'b', portnum  => 5,
+#            },
+#        },
+#
+#
+#        mcp_relay_4 => {
+#            type => $PI_MCP23017_RELAY_CONTROL_TYPE,
+#            host => "pitest",
+#            invert_state => true,
+#            gpio_relay => {
+#                i2c_bus  => 1 , i2c_addr => '0x27',
+#		portname =>'b', portnum  => 4,
+#            },
+#        },
+#
+#        mcp_relay_3 => {
+#            type => $PI_MCP23017_RELAY_CONTROL_TYPE,
+#            host => "pitest",
+#            invert_state => true,
+#            gpio_relay => {
+#                i2c_bus  => 1 , i2c_addr => '0x27',
+#		portname =>'b', portnum  => 3,
+#            },
+#        },
+#
+#        mcp_switch_2 => {
+#            type => $PI_MCP23017_SWITCH_CONTROL_TYPE,
+#            host => "pitest",
+#            invert_state => true,
+#            gpio_switch => {
+#                i2c_bus  => 1 , i2c_addr => '0x27',
+#		portname =>'b', portnum  => 2,
+#            },
+#        },
+#
+#        mcp_switch_1 => {
+#            type => $PI_MCP23017_SWITCH_CONTROL_TYPE,
+#            host => "pitest",
+#            invert_state => true,
+#            gpio_switch => {
+#                i2c_bus  => 1,
+#		i2c_addr => '0x27',
+#		portname =>'b',
+#		portnum  => 1,
+#            },
+#        },
+#
+#
+#        mcp_relay_0 => {
+#            type => $PI_MCP23017_RELAY_CONTROL_TYPE,
+#            host => "pitest",
+#            invert_state => true,
+#            gpio_relay => {
+#                i2c_bus  => 1,
+#		i2c_addr => '0x27',
+#		portname =>'b',
+#		portnum  => 0,
+#            },
+#        },
+#
 
     };
 }
@@ -861,8 +924,8 @@ sub live_boilers_conf {
 }
 
 sub test_boilers_conf {
-    return live_boilers_conf();
-#    return {
+#    return live_boilers_conf();
+    return {
 #        # frontroomrad is being using as the boiler control. This needs fixing.
 #        karlrad => {
 #            on_delay_secs => 120, # TODO this should really be 120
@@ -872,7 +935,7 @@ sub test_boilers_conf {
 #            /],
 #
 #        },
-#    };
+    };
 }
 
 # TODO to be deprecated.
@@ -953,8 +1016,9 @@ sub live_pi_host_conf {
 
 sub test_pi_host_conf {
     return {
-        %{live_pi_host_conf()},
+#        %{live_pi_host_conf()},
         pitest => {
+#            log_level         => 'debug',
             log_level         => 'info',
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 0, 1 ], # could do an i2cdetect too.
