@@ -146,7 +146,7 @@ sub timer_cb {
             + $COMMAND_QUEUE_DAEMON_BROADCAST_TIMER
                 > time;
 
-        kloginfo "Publish message $msg_queue->{$mkey}{json_from}";
+        kloginfo "Publish message $mkey";
         zmq_sendmsg( $zmq_publisher, $msg_queue->{$mkey}{json_from} );
         $msg_rh->{last_broadcast_time} = time;
 
@@ -160,7 +160,6 @@ sub timer_cb {
 sub message_from_controller {
     my ($zmq_sock, $msg, $param ) = @_;
 
-    klogdebug "$param FROM CONTROLLER : $msg";
 
     my $mkey ;
     eval {
@@ -171,18 +170,19 @@ sub message_from_controller {
         return;
     }
 
+    kloginfo "$param FROM CONTROLLER : '$mkey' ";
+
     if ( exists $msg_queue->{$mkey} ){
         kloginfo "Deleting message $mkey";
         delete $msg_queue->{$mkey};
     } else {
-        klogdebug "Don't have message $mkey in queue";
+        kloginfo "Don't have message $mkey in queue";
     }
 }
 
 sub queue_message {
     my ($zmq_sock, $msg, $param ) = @_;
 
-    kloginfo "Queuing message $msg";
     #my ($topic, $msgdata) = $msg =~ m/(.*?)\s+(.*)$/;
 
     my $msg_p;
@@ -194,6 +194,7 @@ sub queue_message {
     }
 
     my $mkey = $msg_p->{mkey};
+    kloginfo "Queuing message '$mkey'";
 
     my $msg_p_rh = $msg_p->{hashref};
     $msg_p_rh->{message_from} = $COMMAND_QUEUE_DAEMON;
