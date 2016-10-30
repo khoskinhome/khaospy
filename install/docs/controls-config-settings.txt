@@ -63,7 +63,7 @@
 # However there is one extra part to this ..... ex_or_for_state.
 #
 # The wiring diagrams of some controls the voltage that is applied to the "gpio_detect" pin is the voltage of what is being applied to another relay. ( makes for less wiring, and simpler control electronics ! )
-# Now on this circuit the gpio_relay output and the gpio_relay have to be exclusively-or-ed to get the circuit state ( 2 way lighting control is effectively an ex-or ), it is the result of this ex_or that invert_state operates on, this is what will be returned as the state of the control.
+# Now on this circuit the gpio_relay output and the gpio_detect have to be exclusively-or-ed to get the circuit state ( 2 way lighting control is effectively an ex-or ), it is the result of this ex_or that invert_state operates on, this is what will be returned as the state of the control.
 #
 # This is best shown with some diagrams. That will be somewhere !
 #
