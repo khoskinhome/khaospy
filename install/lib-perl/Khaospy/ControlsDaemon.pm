@@ -132,7 +132,7 @@ sub timer_cb {
     $CONTROLLER_CLASS->poll_controls(\&poll_callback);
 
     for my $mkey ( keys %$msg_actioned ){
-        my $msg_rh = $msg_actioned->{$mkey}{hashref};
+        my $msg_rh = $msg_actioned->{$mkey}{msg_p}{hashref};
         delete $msg_actioned->{$mkey}
             if ( $msg_rh->{request_epoch_time} < time - $MESSAGE_TIMEOUT );
     }
@@ -184,30 +184,34 @@ sub controller_message {
         return;
     }
 
-    if ( exists $msg_actioned->{$mkey} ){
-        klogdebug "message $mkey already actioned";
-        return;
-    }
-
-    kloginfo  "Message received. '$control_name' '$action'";
+    kloginfo  "Message '$mkey' received. ";
     klogdebug "Message Dump", ($msg_rh);
 
     try {
-        my $status
-            = $CONTROLLER_CLASS->operate_control($control_name, $control, $action);
 
-        my $return_msg = {
-          %$msg_rh, %$status,
-          action_epoch_time  => time,
-          message_from       => $DAEMON_NAME,
-          message_type       => MTYPE_OPERATION_STATUS,
-        };
+        if ( exists $msg_actioned->{$mkey} ){
 
-        my $json_msg = $JSON->encode($return_msg);
-        zhelpers::s_send( $zmq_publisher, "$json_msg" );
+            kloginfo "Message '$mkey' already actioned";
 
-        $msg_actioned->{$mkey} = $msg_p;
+        } else {
+            my $status
+                = $CONTROLLER_CLASS->operate_control($control_name, $control, $action);
 
+            # TODO probably need to unpack the contents of $status and $msg_rh
+            # and make sure the return_msg is SANE !
+            my $return_msg = {
+              %$status,
+              %$msg_rh, # This NEEDS to be after $status ( key overwriting of request_epoch_time)
+              action_epoch_time  => time,
+              message_from       => $DAEMON_NAME,
+              message_type       => MTYPE_OPERATION_STATUS,
+            };
+
+            $msg_actioned->{$mkey}{json_send}  = $JSON->encode($return_msg);
+            $msg_actioned->{$mkey}{msg_p} = $msg_p;
+        }
+
+        zhelpers::s_send( $zmq_publisher, $msg_actioned->{$mkey}{json_send} );
 
     } catch {
         if (ref $_ eq 'KhaospyExcept::UnhandledControl'){
