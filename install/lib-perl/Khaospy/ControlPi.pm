@@ -341,13 +341,25 @@ sub _calc_current_relay_manual_circuit_state {
     my $relay_state  = read_gpio($pin_class,$control->{gpio_relay});
     my $detect_state = read_gpio($pin_class,$control->{gpio_detect});
 
-    return trans_true_to_ON(
-            invert_state($control, ( $relay_state xor $detect_state) )
-        ) if ( $control->{ex_or_for_state} );
+    my $ret;
 
-    return trans_true_to_ON(
+    if (  $control->{ex_or_for_state} ) {
+        my $exoredval = ( (($relay_state * 1) xor ( $detect_state * 1)) ? 1 : 0 );
+
+        $ret = trans_true_to_ON( invert_state( $control,$exoredval));
+
+        kloginfo "(calc-state exor) Control $control_name rel=$relay_state, det=$detect_state, exoredval=$exoredval, current-state=$ret";
+
+    } else {
+
+        $ret = trans_true_to_ON(
             invert_state($control, $detect_state)
         );
+
+        kloginfo "(calc-state) Control $control_name relay=$relay_state, detect=$detect_state, current-state = $ret";
+    }
+
+    return $ret;
 }
 
 sub poll_relay_manual {
@@ -361,7 +373,12 @@ sub poll_relay_manual {
         my $gpio_detect_value = read_gpio($pin_class,$gpio_detect_num);
 
         if ( $gpio_detect_value != $pi_c_state->{last_manual_gpio_detect_change} ){
-            kloginfo "Control $control_name has been manually operated";
+
+            my $current_state = _calc_current_relay_manual_circuit_state (
+                $pin_class, $control_name, $control
+            );
+
+            kloginfo "Control $control_name has been manually operated ($current_state)";
             $pi_c_state->{last_change_state_time} = time;
             $pi_c_state->{last_change_state_by}   = MANUAL;
             $pi_c_state->{last_manual_gpio_detect_change_time} = time;
@@ -370,14 +387,11 @@ sub poll_relay_manual {
                 'last_manual_gpio_detect_change_time'
             );
 
-            $callback->({
-                control_name  => $control_name,
-                control_host  => $control->{host},
-                current_state => _calc_current_relay_manual_circuit_state (
-                    $pin_class, $control_name, $control
-                ),
-                %{$pi_c_state},
-            }) if defined $callback;
+            $pi_c_state->{control_name}  = $control_name;
+            $pi_c_state->{control_host}  = $control->{host};
+            $pi_c_state->{current_state} = $current_state;
+
+            $callback->($pi_c_state) if defined $callback;
         }
     };
 }
@@ -454,7 +468,7 @@ sub operate_relay_manual {
             if ( $gpio_detect_value != $pi_c_state->{last_manual_gpio_detect_change} ){
                 $pi_c_state->{last_manual_gpio_detect_change_time} = time;
                 $pi_c_state->{last_manual_gpio_detect_change}      = $gpio_detect_value;
-                klogwarn "Control $control_name (exor = true) had its manual unexpectedly gpio_detect change. Could be a problem, could be someone changing the control mid auto-operation"
+                klogwarn "Control $control_name (exor = true) had its manual unexpectedly gpio_detect change. Could be a problem, could be someone changing the control mid auto-operation. Could be a configuration issue."
             }
         } else {
             # The auto operation should have changed the voltage input on the gpio_detect
@@ -542,7 +556,7 @@ sub invert_state {
 
         return ($val eq ON) ? OFF : ON ;
 
-    } elsif ($val eq true or $val eq false) {
+    } elsif ($val == true or $val == false) {
 
         return ( $val ) ? false : true ;
 
