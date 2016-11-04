@@ -162,8 +162,8 @@ sub live_heating_thermometer_config {
         '28-0214632d16ff' => {
             name               => 'Amelia',
             rrd_group          => 'upstairs',
-            upper_temp         => 19.0,
-            lower_temp         => 18.0,
+            upper_temp         => 20.5,
+            lower_temp         => 19.5,
             control            => 'ameliarad',
             window_sensor      => 'amelia_window',
         },
