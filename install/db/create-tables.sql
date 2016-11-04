@@ -13,7 +13,7 @@ BEGIN;
 -- controls
 ---------------------
 CREATE TABLE controls (
-    control_name  TEXT PRIMARY KEY,
+    control_name  TEXT PRIMARY KEY NOT NULL,
     alias         TEXT,
     current_state            TEXT,
     current_value            REAL,
@@ -21,16 +21,16 @@ CREATE TABLE controls (
     last_change_state_by     TEXT,
     manual_auto_timeout_left REAL,
     request_time             TIMESTAMP WITH TIME ZONE,
-    db_update_time           TIMESTAMP WITH TIME ZONE,
-    room                     INTEGER REFERENCES rooms
+    db_update_time           TIMESTAMP WITH TIME ZONE
 );
+
 
 GRANT SELECT ON controls TO khaospy_read;
 GRANT ALL    ON controls TO khaospy_write;
 
----------------------
--- control_status . should be renamed "control_logs"
----------------------
+----------------
+-- control_status
+----------------
 CREATE SEQUENCE control_status_seq;
 GRANT SELECT ON control_status_seq TO khaospy_read;
 GRANT ALL ON control_status_seq TO khaospy_write;
@@ -46,7 +46,10 @@ create table control_status (
     db_update_time           TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
+
 create index control_status_control_name_idx on control_status (control_name);
+
+
 
 ALTER TABLE control_status SET (autovacuum_vacuum_scale_factor = 0.0);
 ALTER TABLE control_status SET (autovacuum_vacuum_threshold = 5000);
@@ -67,11 +70,28 @@ GRANT ALL ON rooms_seq TO khaospy_write;
 create table rooms (
     id INTEGER PRIMARY KEY DEFAULT nextval('rooms_seq') NOT NULL,
     name    TEXT NOT NULL UNIQUE,
-    tag     TEXT NOT NULL UNIQUE,
-    parent_id INTEGER REFERENCES rooms
+    tag     TEXT NOT NULL UNIQUE
 );
 GRANT SELECT ON rooms TO khaospy_read;
 GRANT ALL    ON rooms TO khaospy_write;
+
+---------------------
+-- control_rooms
+---------------------
+CREATE SEQUENCE control_rooms_seq;
+GRANT SELECT ON control_rooms_seq TO khaospy_read;
+GRANT ALL    ON control_rooms_seq TO khaospy_write;
+
+CREATE TABLE control_rooms (
+    id            INTEGER PRIMARY KEY DEFAULT nextval('control_rooms_seq') NOT NULL,
+    room_id       INTEGER NOT NULL REFERENCES rooms,
+    control_name  TEXT NOT NULL REFERENCES controls,
+    name          TEXT NOT NULL UNIQUE,
+    tag           TEXT NOT NULL UNIQUE
+);
+
+GRANT SELECT ON control_rooms TO khaospy_read;
+GRANT ALL    ON control_rooms TO khaospy_write;
 
 ---------------------
 -- users
@@ -84,58 +104,33 @@ CREATE TABLE users (
     username                        TEXT NOT NULL UNIQUE,
     name                            TEXT NOT NULL UNIQUE,
     email                           TEXT NOT NULL UNIQUE,
-    email_confirm_hash              TEXT,
     passhash                        TEXT NOT NULL,
-    passhash_expire                 TIMESTAMP WITH TIME ZONE,
-    passhash_must_change            BOOLEAN,
     is_api_user                     BOOLEAN NOT NULL DEFAULT FALSE,
     is_admin                        BOOLEAN NOT NULL DEFAULT FALSE,
+    mobile_phone                    TEXT NOT NULL UNIQUE,
     can_remote                      BOOLEAN NOT NULL DEFAULT FALSE,
-    mobile_phone                    TEXT NOT NULL UNIQUE
+    passhash_expire                 TIMESTAMP WITH TIME ZONE,
+    passhash_must_change            BOOLEAN,
+    email_confirm_hash              TEXT
 );
 GRANT SELECT ON users TO khaospy_read;
 GRANT ALL ON users TO khaospy_write;
 
 ---------------------
--- user_rooms
+-- user_control_rooms
 ---------------------
-CREATE TABLE user_rooms (
+CREATE TABLE user_control_rooms (
     user_id         INTEGER NOT NULL REFERENCES users,
-    room_id         INTEGER NOT NULL REFERENCES rooms,
+    control_room_id INTEGER NOT NULL REFERENCES control_rooms,
     can_view        BOOLEAN NOT NULL DEFAULT FALSE,
     can_operate     BOOLEAN NOT NULL DEFAULT FALSE,
-    CONSTRAINT u_user_rooms_user_room UNIQUE ( user_id, room_id )
+    CONSTRAINT u_user_control_rooms_user_control_room UNIQUE ( user_id, control_room_id )
 );
 
--- unique index on user_id and room_id
+GRANT SELECT ON user_control_rooms TO khaospy_read;
+GRANT ALL    ON user_control_rooms TO khaospy_write;
 
-GRANT SELECT ON user_rooms TO khaospy_read;
-GRANT ALL    ON user_rooms TO khaospy_write;
-
----------------------
--- user_controls
----------------------
-CREATE TABLE user_controls (
-    user_id         INTEGER NOT NULL REFERENCES users,
-    control_name    TEXT    NOT NULL REFERENCES controls,
-    can_view        BOOLEAN NOT NULL DEFAULT FALSE,
-    can_operate     BOOLEAN NOT NULL DEFAULT FALSE,
-    CONSTRAINT u_user_controls_user_control_name UNIQUE ( user_id, control_name )
-);
-
--- unique index on user_id and control_name
-
-GRANT SELECT ON user_controls TO khaospy_read;
-GRANT ALL    ON user_controls TO khaospy_write;
-
---INSERT INTO users (name, name ) VALUES( 'blah', 'uk-gpms');
-
---UPDATE blahtable
---    SET afield = ( SELECT id FROM users WHERE tag = 'blah' ),
---        name = 'dosumin'
---    WHERE id = 1;
-
--- ROLLBACK
+--ROLLBACK;
 
 COMMIT;
 
