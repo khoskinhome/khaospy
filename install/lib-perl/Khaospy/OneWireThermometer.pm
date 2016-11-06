@@ -89,7 +89,7 @@ sub timer_cb {
         }
 
         my $temp;
-        if ( ($temp) = $data[1] =~ /t=(\d{5})/ ){
+        if ( ($temp) = $data[1] =~ /t=(\-?\d{2,})/ ){
             $temp = $temp/1000;
         } else {
             klogerror "Extracting temp from $onewire_addr";
