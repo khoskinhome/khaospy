@@ -15,7 +15,7 @@
                 <form method='post' action='/dancer/login'>
                     <tr>
                         <td>User name</td>
-                        <td><input type='text' name='user' value='' /></td>
+                        <td><input type='text' name='user' value='[% user %]' /></td>
                     </tr>
                     <tr>
                         <td>Password</td>

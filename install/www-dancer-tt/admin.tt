@@ -1,0 +1,15 @@
+<html>
+<head>
+
+    [% INCLUDE header_jquery.tt %]
+
+</head>
+<body>
+    <div class='center'>
+
+        [% INCLUDE title_linkbar.tt %]
+
+
+    </div>
+</body>
+</html>
