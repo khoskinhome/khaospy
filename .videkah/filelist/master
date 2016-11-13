@@ -203,6 +203,8 @@ install/bin/khaospy-generate-rrd-graphs.pl
 
 ##############################################################################
 # ./install/conf
+./install/conf/etc_logrotate.d_khaospy
+
 
 ##############################################################################
 # ./install/www-bin
@@ -281,6 +283,7 @@ install/bin/khaospy-generate-rrd-graphs.pl
 
 ###################################################################
 
+install-to-pi.bash
 install-to-pi-pi.bash
 install-reload-apache.bash
 #install-to-pi-khoskin.bash
@@ -312,9 +315,7 @@ crap.pl
 ./install/lib-perl/Khaospy/Constants.pm
 
 ./install/lib-perl/Khaospy/WebUI/Constants.pm
-./install/lib-perl/Khaospy/WebUI/UserLogin.pm
 ./install/lib-perl/Khaospy/WebUI/DB.pm
-./install/lib-perl/Khaospy/WebUI/Util.pm
 
 ./install/lib-perl/Khaospy/DBH/Controls.pm
 ./install/lib-perl/Khaospy/DBH/Users.pm
@@ -322,13 +323,20 @@ crap.pl
 
 
 
-
 ./install/www-bin/dancer.pl
+./install/lib-perl/Khaospy/WebUI.pm
+./install/lib-perl/Khaospy/WebUI/UserLogin.pm
+./install/lib-perl/Khaospy/WebUI/User.pm
+./install/lib-perl/Khaospy/WebUI/Admin.pm
+./install/lib-perl/Khaospy/WebUI/Status.pm
+./install/lib-perl/Khaospy/WebUI/Util.pm
+
 
 ./install/www-dancer-tt/header.tt
 ./install/www-dancer-tt/header_jquery.tt
 
 ./install/www-dancer-tt/title_linkbar.tt
+./install/www-dancer-tt/title_linkbar_admin.tt
 
 ./install/www-dancer-tt/login.tt
 ./install/www-dancer-tt/reset_password.tt
@@ -343,6 +351,18 @@ crap.pl
 ./install/www/css/status.css
 ./install/www/js/status.js
 
+./install/www-dancer-tt/user.tt
+
+./install/www-dancer-tt/admin.tt
+
+./install/www-dancer-tt/admin_list_users.tt
+./install/www/js/admin_list_users.js
+./install/www/css/admin_list_users.css
+
+./install/www-dancer-tt/permission_denied.tt
+
+
+
 ./install/www/js/base.js
 ./install/www/css/base.css
 
@@ -356,6 +376,7 @@ crap.pl
 ./install/db/create-db.sql
 ./install/db/grant-db.sql
 ./install/db/create-tables.sql
+./install/db/drop-tables.sql
 
 
 ./install/apache/default-ssl.conf
@@ -363,46 +384,6 @@ crap.pl
 
 # greping crap
 
-
-
-#g.grep init_mcp23017
-install/lib-perl-t/KhaospyControlPiMCP23017.t:80:Khaospy::ControlPiMCP23017::init_mcp23017();
-install/lib-perl/Khaospy/ControlPi.pm:37:    init_mcp23017
-install/lib-perl/Khaospy/ControlPi.pm:58:    init_mcp23017();
-install/lib-perl/Khaospy/ControlPiMCP23017.pm:32:    init_mcp23017
-install/lib-perl/Khaospy/ControlPiMCP23017.pm:132:sub init_mcp23017 {
-
-
-
-#g.grep write_gpio
-install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl:216:sub write_gpio_conf_to_fs{
-install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl:376:        write_gpio_conf_to_fs();
-install/lib-perl-t/KhaospyControlPiMCP23017.t:85:Khaospy::ControlPiMCP23017->write_gpio($gpio, true);
-install/lib-perl/Khaospy/ControlPi.pm:272:        write_gpio(
-install/lib-perl/Khaospy/ControlPi.pm:453:        write_gpio(
-install/lib-perl/Khaospy/ControlPi.pm:516:sub write_gpio{
-install/lib-perl/Khaospy/ControlPi.pm:519:        return $pin_class->write_gpio( $gpio, $new_state );
-install/lib-perl/Khaospy/ControlPiGPIO.pm:25:    write_gpio
-install/lib-perl/Khaospy/ControlPiGPIO.pm:56:sub write_gpio {
-install/lib-perl/Khaospy/ControlPiMCP23017.pm:35:    write_gpio
-install/lib-perl/Khaospy/ControlPiMCP23017.pm:277:sub write_gpio {
-
-
-# g.grep init_gpio
-install/lib-perl-t/KhaospyControlPiMCP23017.t:23:            "init_gpio"
-install/lib-perl-t/KhaospyControlPiMCP23017.t:53:init_gpio(undef,$gpio,OUT);
-install/lib-perl-t/KhaospyControlPiMCP23017.t:62:init_gpio(undef,$gpio_in,IN);
-install/lib-perl/Khaospy/ControlPi.pm:188:        init_gpio($pin_class,$gpio_num, IN);
-install/lib-perl/Khaospy/ControlPi.pm:253:        init_gpio($pin_class,$gpio_num, OUT);
-install/lib-perl/Khaospy/ControlPi.pm:315:        init_gpio($pin_class,$gpio_relay_num, OUT);
-install/lib-perl/Khaospy/ControlPi.pm:318:        init_gpio($pin_class,$gpio_detect_num, IN);
-install/lib-perl/Khaospy/ControlPi.pm:498:sub init_gpio{
-install/lib-perl/Khaospy/ControlPi.pm:501:        return $pin_class->init_gpio($gpio, $iodir);
-install/lib-perl/Khaospy/ControlPiGPIO.pm:23:    init_gpio
-install/lib-perl/Khaospy/ControlPiGPIO.pm:40:sub init_gpio {
-install/lib-perl/Khaospy/ControlPiMCP23017.pm:33:    init_gpio
-install/lib-perl/Khaospy/ControlPiMCP23017.pm:88:sub init_gpio {
-install/lib-perl/Khaospy/ControlPiMCP23017.pm:133:    # needs to be called once all the pins are init-ed by init_gpio()
 
 
 
