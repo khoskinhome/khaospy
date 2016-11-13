@@ -78,6 +78,13 @@ post '/api/v1/admin/list_user/update/:user_id/:field'  => needs login => sub {
     my $field   = params->{field};
     my $value   = params->{value};
 
+    if ( $user_id == session->read('user_id') &&
+        ( $field eq 'is_admin' || $field eq 'is_enabled' || $field eq 'username' )
+    ){
+        status 'bad_request';
+        return "current admin user is not allowed to disable themself or change their username";
+    }
+
     my $ret = {};
 
     try {
