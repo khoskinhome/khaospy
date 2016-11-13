@@ -4,6 +4,8 @@ var dancer_base_url = '/dancer';
 $(document).ready(function(){
 
     var old_values = [];
+    var change_password_user_id;
+    var change_password_username;
 
     $("input[type=text]").focusin( function() {
         var id = $(this).attr('id');
@@ -52,10 +54,60 @@ $(document).ready(function(){
         );
     });
 
+    function changePassword() {
+
+        var new_password = $('input#new_password').val();
+
+        $.post(dancer_base_url + "/api/v1/admin/list_user/update_password/"+change_password_user_id,
+            {"password" : new_password },
+            function(data){
+//                var str = JSON.stringify(data);
+//                update_output("Success : " + str );
+                update_output("changed password : " + change_password_username );
+                $('div#dialog-password-error').text('');
+                dialog_password.dialog( "close" );
+            }
+        )
+        .fail(
+            function(data){
+                $('div#dialog-password-error').text( data.responseText );
+            }
+        );
+    };
+
+    var dialog_password = $( "#dialog-password" ).dialog({
+        height: 250,
+        width: 350,
+        modal: true,
+        buttons: {
+            "Change Password": function() {
+                changePassword();
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+
+    dialog_password.dialog("close");
+
+    var form = dialog_password.find( "form" ).on( "submit", function( event ) {
+      event.preventDefault();
+      changePassword();
+    });
+
     $("button.change_password").click( function() {
-        var id = $(this).attr('id');
-        console.log(id + " change password was clicked");
-        update_output("Not yet implemented : TODO");
+        id = $(this).attr('id') ;
+
+        var extractFieldNUserId = /^(.*)-user_id(\d+)$/g;
+        var match = extractFieldNUserId.exec( id );
+
+        change_password_user_id  = match[2];
+        change_password_username = $('#username-user_id'+change_password_user_id).val();
+        $('div#dialog-password-error').text('');
+
+        dialog_password.dialog( "open" );
+        $("span.ui-dialog-title").text("Change Password : "+change_password_username);
     });
 
     $("button.delete").click( function() {

@@ -11,6 +11,11 @@ use Dancer2::Session::Memcached;
 use Khaospy::DBH::Users qw(
     get_users
     update_field_by_user_id
+    update_user_id_password
+);
+
+use Khaospy::Utils qw(
+    password_meets_restrictions
 );
 
 get '/admin' => needs login => sub {
@@ -82,6 +87,42 @@ post '/api/v1/admin/list_user/update/:user_id/:field'  => needs login => sub {
             user_id => $user_id,
             field   => $field,
             value   => $value
+        };
+    } catch {
+        # TODO could get the Exception and give a better error message.
+        status 'bad_request';
+        $ret = "error updating DB";
+    };
+
+    return $ret if ref $ret ne 'HASH';
+    return to_json $ret;
+};
+
+post '/api/v1/admin/list_user/update_password/:user_id'  => needs login => sub {
+
+    header( 'Content-Type'  => 'application/json' );
+    header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
+
+    if ( ! session->read('user_is_admin')){
+        status 'bad_request';
+        return "user is not an admin";
+    }
+
+    my $user_id      = params->{user_id};
+    my $new_password = params->{password};
+
+    if( ! password_meets_restrictions($new_password)){
+        status 'bad_request';
+        return "The new password needs to be at least 8 characters long, contain one UPPER case and one lower case letter plus one number";
+    }
+
+    my $ret = {};
+
+    try {
+        update_user_id_password($user_id,$new_password);
+        $ret = {
+            msg     => 'Success',
+            user_id => $user_id,
         };
     } catch {
         # TODO could get the Exception and give a better error message.

@@ -13,6 +13,7 @@ use Khaospy::Email qw(send_email);
 use Khaospy::Utils qw(
     get_hashval
     get_iso8601_utc_from_epoch
+    password_meets_restrictions
 );
 
 use Khaospy::DBH::Users qw(
@@ -249,11 +250,7 @@ post '/change_password' => sub { # don't need login for this root.
     # password complexity rules.
     # At least 8 chars long.
     # At least one lower case letter, one Upper case, one number.
-    if(    $new_password !~ /[A-Z]/
-         || $new_password !~ /[a-z]/
-         || $new_password !~ /[0-9]/
-         || length($new_password) < 8
-    ){
+    if( ! password_meets_restrictions($new_password)){
         session 'error_msg' => "The new password needs to be at least 8 characters long,<br> contain one UPPER case and one lower case letter plus one number";
         redirect uri_for('/change_password', {
             user         => $user,

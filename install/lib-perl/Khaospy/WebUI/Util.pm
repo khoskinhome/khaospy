@@ -12,10 +12,9 @@ use Dancer2::Plugin::Auth::Tiny;
 use Dancer2::Session::Memcached;
 
 #use Khaospy::DBH qw(dbh);
-#use Khaospy::Constants qw(
-#    true false
-#);
-
+use Khaospy::Constants qw(
+    true false
+);
 
 #use Khaospy::Utils qw(
 #    get_hashval

@@ -32,6 +32,7 @@ our @EXPORT_OK = qw(
     get_cmd
     get_iso8601_utc_from_epoch
     trans_ON_to_value_or_return_val
+    password_meets_restrictions
 );
 
 sub timestamp { return strftime("%F %T", gmtime( $_[0] || time) ); }
@@ -112,4 +113,16 @@ sub trans_ON_to_value_or_return_val { # and OFF to false
     die "Can't translate a non ON or OFF value ($ONOFF) to value";
 
 }
+
+sub password_meets_restrictions {
+    my ($new_password) = @_;
+
+    if ( $new_password !~ /[A-Z]/
+      || $new_password !~ /[a-z]/
+      || $new_password !~ /[0-9]/
+      || length($new_password) < 8
+    ){ return false }
+    return true;
+}
+
 1;

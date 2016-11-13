@@ -29,6 +29,7 @@ our @EXPORT_OK = qw(
     get_users
     get_user_password
     update_user_password
+    update_user_id_password
     update_field_by_user_id
 );
 
@@ -102,12 +103,31 @@ sub get_users {
     return $results;
 }
 
+sub update_user_id_password {
+    my ($user_id, $password, $must_change, $expire_time) = @_;
+
+    #truncate password to 72 chars. That is all "bf" can handle.
+
+    if ( $must_change ) { $must_change = 'true' }
+    else { $must_change = 'false' }
+
+    my $sql =<<"    EOSQL";
+        update users
+        set passhash             = crypt( ? ,gen_salt('bf',8)) ,
+            passhash_must_change = ? ,
+            passhash_expire      = ?
+        where id  = ?
+    EOSQL
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute($password, $must_change, $expire_time, $user_id );
+
+}
+
 sub update_user_password {
     my ($user,$password, $must_change, $expire_time) = @_;
 
     #truncate password to 72 chars. That is all "bf" can handle.
-
-    #$expire_time = 'null' if ! $expire_time ;
 
     if ( $must_change ) { $must_change = 'true' }
     else { $must_change = 'false' }
