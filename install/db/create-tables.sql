@@ -111,7 +111,8 @@ CREATE TABLE users (
     can_remote                      BOOLEAN NOT NULL DEFAULT FALSE,
     passhash_expire                 TIMESTAMP WITH TIME ZONE,
     passhash_must_change            BOOLEAN,
-    email_confirm_hash              TEXT
+    email_confirm_hash              TEXT,
+    is_enabled                      BOOLEAN NOT NULL DEFAULT TRUE
 );
 GRANT SELECT ON users TO khaospy_read;
 GRANT ALL ON users TO khaospy_write;
@@ -176,6 +177,8 @@ COMMIT;
 --
 --)
 --;
+
+-- update users set passhash crypt('zz_apsswrd', gen_salt('bf', 8)) where id = ? ;
 
 -- select * from users where passhash = crypt(:pass, passhash);
 

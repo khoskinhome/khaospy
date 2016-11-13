@@ -218,8 +218,8 @@ sub live_heating_thermometer_config {
         '28-041591f5e5ff' => {
             name               => 'Karl',
             rrd_group          => 'downstairs',
-            upper_temp         => 17,
-            lower_temp         => 16,
+            upper_temp         => 19,
+            lower_temp         => 18,
             control            => 'karlrad',
         },
         '28-000006e01389' => {

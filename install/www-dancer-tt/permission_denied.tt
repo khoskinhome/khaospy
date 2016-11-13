@@ -7,7 +7,12 @@
 <body>
     <div class='center'>
 
-        [% INCLUDE title_linkbar_admin.tt %]
+        [% INCLUDE title_linkbar.tt %]
+
+    </div>
+    <div class='center'>
+
+        Permission Denied
 
     </div>
 </body>

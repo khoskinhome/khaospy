@@ -49,6 +49,7 @@ get '/' => needs login => sub {
 
 get '/logout' => sub {
     session 'user' => undef;
+    session 'user_is_admin' => undef;
     redirect '/';
 };
 
@@ -108,6 +109,8 @@ post '/login' => sub {
     }
 
     session 'user' => $user;
+    session 'user_is_admin' => get_hashval($user_record,'is_admin');
+
     redirect $redir_url;
 };
 

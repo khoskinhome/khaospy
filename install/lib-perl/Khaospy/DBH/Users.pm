@@ -19,10 +19,17 @@ use Khaospy::Utils qw(
     get_iso8601_utc_from_epoch
 );
 
+use Khaospy::Exception qw(
+    KhaospyExcept::InvalidFieldName
+);
+#install/lib-perl/Khaospy/Conf/Controls.pm:15:use Khaospy::Exception qw(
+
 our @EXPORT_OK = qw(
     get_user
+    get_users
     get_user_password
     update_user_password
+    update_field_by_user_id
 );
 
 sub get_user_password {
@@ -78,6 +85,23 @@ sub get_user {
     return;
 }
 
+sub get_users {
+
+    my $sql =<<"    EOSQL";
+    SELECT * FROM users order by username
+    EOSQL
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute();
+
+    my $results = [];
+    while ( my $row = $sth->fetchrow_hashref ){
+        push @$results, $row;
+    }
+
+    return $results;
+}
+
 sub update_user_password {
     my ($user,$password, $must_change, $expire_time) = @_;
 
@@ -98,6 +122,37 @@ sub update_user_password {
 
     my $sth = dbh->prepare($sql);
     $sth->execute($password, $must_change, $expire_time ,lc($user));
+}
+
+sub update_field_by_user_id {
+    my ($user_id, $field, $value ) = @_;
+
+    # should really get this from the DB schema ...
+    # these are the only fields that an admin can update on the "list_users" page.
+    my $valid_field = {
+        username              =>1,
+        name                  =>1,
+        email                 =>1,
+        is_api_user           =>1,
+        is_admin              =>1,
+        mobile_phone          =>1,
+        can_remote            =>1,
+        passhash_must_change  =>1,
+        is_enabled            =>1,
+    };
+
+    KhaospyExcept::InvalidFieldName->throw(
+        error => "Invalid field '$field' passed to update_field_by_user_id"
+    ) if ! exists $valid_field->{$field};
+
+    my $sql =<<"    EOSQL";
+        update users
+        set $field = ?
+        where id = ?
+    EOSQL
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute($value, $user_id);
 }
 
 1;

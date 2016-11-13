@@ -1,0 +1,14 @@
+
+
+<table>
+
+    <tr><td>
+        [% INCLUDE title_linkbar.tt %]
+    </td></tr>
+
+    <tr>
+        <td><a href='/dancer/admin/list_users'>Users</a></td>
+    </tr>
+
+</table>
+

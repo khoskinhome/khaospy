@@ -1,0 +1,73 @@
+<html>
+<head>
+    [% INCLUDE header_jquery.tt %]
+    <script src="/js/admin_list_users.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/admin_list_users.css">
+
+</head>
+<body>
+    <div class='center'>
+        <div class='left'>
+
+            [% INCLUDE title_linkbar_admin.tt %]
+
+            <div id='update-output'></div>
+
+            <table>
+                <tr>
+                    <th>User</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Enabled</th>
+                    <th>API User</th>
+                    <th>Admin</th>
+                    <th>Remote</th>
+                    <th>Must Change Password</th>
+                    <th></th>
+                    <th></th>
+
+                </tr>
+
+              [% FOREACH row IN list_users %]
+                <tr>
+                    <td>
+                        <input type='text' id='username-user_id[% row.id %]' value='[% row.username %]'/>
+                    </td>
+                    <td>
+                        <input type='text' id='name-user_id[% row.id %]' value='[% row.name %]'/>
+                    </td>
+                    <td>
+                        <input type='text' id='email-user_id[% row.id %]' value='[% row.email %]'/>
+                    </td>
+                    <td>
+                        <input type='text' id='mobile_phone-user_id[% row.id %]' value='[% row.mobile_phone %]'/>
+                    </td>
+                    <td>
+                        <input type='checkbox' id='is_enabled-user_id[% row.id %]'  [% IF row.is_enabled %]checked='checked'[% END %]/>
+                    </td>
+                    <td>
+                        <input type='checkbox' id='is_api_user-user_id[% row.id %]' [% IF row.is_api_user %]checked='checked'[% END %]/>
+                    </td>
+                    <td>
+                        <input type='checkbox' id='is_admin-user_id[% row.id %]'    [% IF row.is_admin %]checked='checked'[% END %]/>
+                    </td>
+                    <td>
+                        <input type='checkbox' id='can_remote-user_id[% row.id %]'  [% IF row.can_remote %]checked='checked'[% END %]/>
+                    </td>
+                    <td>
+                        <input type='checkbox' id='passhash_must_change-user_id[% row.id %]' [% IF row.passhash_must_change %]checked='checked'[% END %]/>
+                    </td>
+                    <td>
+                        <button class='change_password' id='change_password-user_id[% row.id %]'>Password</button>
+                    </td>
+                    <td>
+                        <button class='delete' id='delete-user_id[% row.id %]'>Delete</button>
+                    </td>
+                </tr>
+              [% END %]
+            </table>
+        </div>
+    </div>
+</body>
+</html>

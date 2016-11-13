@@ -31,6 +31,8 @@ use Exception::Class (
     'KhaospyExcept::UnhandledControl',
     'KhaospyExcept::GeneralError',
 
+    'KhaospyExcept::InvalidFieldName',
+
 );
 
 

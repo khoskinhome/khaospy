@@ -30,7 +30,6 @@ post '/api/v1/operate/:control/:action'  => needs login => sub {
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
 
-
     my $control_name = params->{control};
     my $action       = params->{action};
 
@@ -41,9 +40,10 @@ post '/api/v1/operate/:control/:action'  => needs login => sub {
         $ret = { msg => queue_command($control_name,$action) };
     } catch {
         status 'bad_request';
-        return "Couldn't operate $control_name with action '$action'";
+        $ret = "Couldn't operate $control_name with action '$action'";
     };
 
+    return $ret if ref $ret ne 'HASH';
     return to_json $ret;
 };
 
