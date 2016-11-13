@@ -77,10 +77,22 @@ post '/login' => sub {
 
     my $user_record = get_user_password($user,$password);
     if ( ! $user_record ){
-        session 'error_msg' => 'Incorrect user and/or password';
+        session 'error_msg' => 'Incorrect user / password';
         redirect uri_for('/login', {
             user => $user,
             redirect_url =>$redir_url,
+        });
+        return;
+    }
+
+    if ( ! get_hashval($user_record,'is_enabled') ){
+
+        session 'error_msg'
+            => "user is disabled. Please contact the admin";
+
+        redirect uri_for('/login', {
+            user         => $user,
+            redirect_url => $redir_url,
         });
         return;
     }
@@ -144,6 +156,20 @@ post '/reset_password' => sub { # don't need login for this root.
 
         return;
     }
+
+    if ( ! get_hashval($user_record,'is_enabled') ){
+
+        session 'error_msg'
+            => "user is disabled. Please contact the admin";
+
+        redirect uri_for('/login', {
+            user         => $user,
+            redirect_url => $redir_url,
+        });
+
+        return;
+    }
+
     # reset the password, and email it .
     my $new_password = rand_password();
 
@@ -228,6 +254,20 @@ post '/change_password' => sub { # don't need login for this root.
         });
         return;
     }
+
+    if ( ! get_hashval($user_record,'is_enabled') ){
+
+        session 'error_msg'
+            => "user is disabled. Please contact the admin";
+
+        redirect uri_for('/login', {
+            user         => $user,
+            redirect_url => $redir_url,
+        });
+
+        return;
+    }
+
 
     if ( $new_password ne $new_password2 ){
         session 'error_msg' => "The new passwords do not match";
