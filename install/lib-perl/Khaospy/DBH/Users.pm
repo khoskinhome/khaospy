@@ -17,15 +17,16 @@ use Khaospy::Log qw(
 use Khaospy::Utils qw(
     get_hashval
     get_iso8601_utc_from_epoch
+    password_meets_restrictions
 );
 
 use Khaospy::Exception qw(
     KhaospyExcept::InvalidFieldName
 );
-#install/lib-perl/Khaospy/Conf/Controls.pm:15:use Khaospy::Exception qw(
 
 our @EXPORT_OK = qw(
     get_user
+    get_user_by_id
     get_users
     get_user_password
     update_user_password
@@ -35,6 +36,8 @@ our @EXPORT_OK = qw(
 
 sub get_user_password {
     my ($user, $password) = @_;
+
+    $password = _trunc_password($password);
 
     my $sql = <<"    EOSQL";
     SELECT * ,
@@ -55,7 +58,7 @@ sub get_user_password {
     }
 
     # TODO what if more than one record is returned ?
-    # handle error.
+    # handle error. A few of these in this file ...
 
     return $results->[0] if @$results;
     return;
@@ -79,8 +82,27 @@ sub get_user {
         push @$results, $row;
     }
 
-    # TODO what if more than one record is returned ?
-    # handle error.
+    return $results->[0] if @$results;
+    return;
+}
+
+sub get_user_by_id {
+    my ($user_id) = @_;
+
+    my $sql =<<"    EOSQL";
+    SELECT *,
+        ( passhash_expire IS NOT NULL AND passhash_expire < NOW())
+            as is_passhash_expired
+    FROM users WHERE id = ?
+    EOSQL
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute($user_id);
+
+    my $results = [];
+    while ( my $row = $sth->fetchrow_hashref ){
+        push @$results, $row;
+    }
 
     return $results->[0] if @$results;
     return;
@@ -106,7 +128,10 @@ sub get_users {
 sub update_user_id_password {
     my ($user_id, $password, $must_change, $expire_time) = @_;
 
-    #truncate password to 72 chars. That is all "bf" can handle.
+    $password = _trunc_password($password);
+    # could raise an exception ...
+    die "password doesn't meet restrictions"
+        if ! password_meets_restrictions($password);
 
     if ( $must_change ) { $must_change = 'true' }
     else { $must_change = 'false' }
@@ -127,7 +152,10 @@ sub update_user_id_password {
 sub update_user_password {
     my ($user,$password, $must_change, $expire_time) = @_;
 
-    #truncate password to 72 chars. That is all "bf" can handle.
+    $password = _trunc_password($password);
+    # could raise an exception ...
+    die "password doesn't meet restrictions"
+        if ! password_meets_restrictions($password);
 
     if ( $must_change ) { $must_change = 'true' }
     else { $must_change = 'false' }
@@ -173,6 +201,18 @@ sub update_field_by_user_id {
 
     my $sth = dbh->prepare($sql);
     $sth->execute($value, $user_id);
+}
+
+sub _trunc_password {
+    my ($password) = @_;
+
+    # postgres bf algorithm truncates at 72 chars
+    # not sure if this is necessary, but I guess its best to be safe.
+    if (length($password) > 72){
+        return substr $password,0,72;
+    }
+
+    return $password;
 }
 
 1;

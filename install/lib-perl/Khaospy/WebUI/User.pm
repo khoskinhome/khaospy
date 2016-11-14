@@ -13,6 +13,7 @@ use Khaospy::Email qw(send_email);
 use Khaospy::Utils qw(
     get_hashval
     password_meets_restrictions
+    password_restriction_desc
 );
 
 use Khaospy::DBH::Users qw(
@@ -111,7 +112,8 @@ post '/user/change_password' => sub { # don't need login for this root.
     # At least 8 chars long.
     # At least one lower case letter, one Upper case, one number.
     if( ! password_meets_restrictions($new_password)){
-        session 'error_msg' => "The new password needs to be at least 8 characters long,<br> contain one UPPER case and one lower case letter plus one number";
+        session 'error_msg' => password_restriction_desc;
+
         redirect uri_for('/user/change_password', {
             user         => $user,
             redirect_url => $redir_url,

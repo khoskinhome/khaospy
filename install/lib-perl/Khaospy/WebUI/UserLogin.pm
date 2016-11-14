@@ -13,7 +13,6 @@ use Khaospy::Email qw(send_email);
 use Khaospy::Utils qw(
     get_hashval
     get_iso8601_utc_from_epoch
-    password_meets_restrictions
 );
 
 use Khaospy::DBH::Users qw(

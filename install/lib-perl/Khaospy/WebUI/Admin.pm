@@ -8,14 +8,19 @@ use Dancer2 appname => 'Khaospy::WebUI';
 use Dancer2::Core::Request;
 use Dancer2::Plugin::Auth::Tiny;
 use Dancer2::Session::Memcached;
-use Khaospy::DBH::Users qw(
-    get_users
-    update_field_by_user_id
-    update_user_id_password
+
+use Khaospy::Email qw(send_email);
+use Khaospy::Utils qw(
+    get_hashval
+    password_meets_restrictions
+    password_restriction_desc
 );
 
-use Khaospy::Utils qw(
-    password_meets_restrictions
+use Khaospy::DBH::Users qw(
+    get_users
+    get_user_by_id
+    update_field_by_user_id
+    update_user_id_password
 );
 
 get '/admin' => needs login => sub {
@@ -87,6 +92,29 @@ post '/api/v1/admin/list_user/update/:user_id/:field'  => needs login => sub {
 
     my $ret = {};
 
+    my $user_record = get_user_by_id($user_id);
+    if ( ! $user_record ){
+        status 'bad_request';
+        return "can't get the user record";
+    }
+
+    my $email_body ;
+    if ( $field eq 'is_enabled' ) {
+        my $disabled_enabled = lc($value) eq 'true' ? "enabled" : "disabled";
+        $email_body = "The administrator has $disabled_enabled your account";
+    }
+
+    if ( $field eq 'email' || $field eq 'mobile_phone' ){
+        my $disabled_enabled = $value ? "enabled" : "disabled";
+        $email_body = "The administrator has changed your $field to $value";
+    }
+
+    send_email({
+        to      => get_hashval($user_record,'email'),
+        subject => "Khaospy. Adminstrator has changed your account",
+        body    => $email_body,
+    }) if $email_body;
+
     try {
         update_field_by_user_id($user_id, $field,$value);
         $ret = {
@@ -120,11 +148,22 @@ post '/api/v1/admin/list_user/update_password/:user_id'  => needs login => sub {
 
     if( ! password_meets_restrictions($new_password)){
         status 'bad_request';
-        return "The new password needs to be at least 8 characters long, contain one UPPER case and one lower case letter plus one number";
+        return password_restriction_desc;
     }
 
-    my $ret = {};
+    my $user_record = get_user_by_id($user_id);
+    if ( ! $user_record ){
+        status 'bad_request';
+        return "can't get the user record";
+    }
 
+    send_email({
+        to      => get_hashval($user_record,'email'),
+        subject => "Khaospy. Adminstrator has changed your password",
+        body    => "The administrator has changed your password",
+    });
+
+    my $ret = {};
     try {
         update_user_id_password($user_id,$new_password);
         $ret = {

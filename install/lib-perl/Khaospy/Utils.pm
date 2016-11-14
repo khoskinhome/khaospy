@@ -33,6 +33,7 @@ our @EXPORT_OK = qw(
     get_iso8601_utc_from_epoch
     trans_ON_to_value_or_return_val
     password_meets_restrictions
+    password_restriction_desc
 );
 
 sub timestamp { return strftime("%F %T", gmtime( $_[0] || time) ); }
@@ -115,14 +116,25 @@ sub trans_ON_to_value_or_return_val { # and OFF to false
 }
 
 sub password_meets_restrictions {
-    my ($new_password) = @_;
+    my ($password) = @_;
 
-    if ( $new_password !~ /[A-Z]/
-      || $new_password !~ /[a-z]/
-      || $new_password !~ /[0-9]/
-      || length($new_password) < 8
-    ){ return false }
-    return true;
+    if ( $password =~ /[A-Z]/
+      && $password =~ /[a-z]/
+      && $password =~ /[0-9]/
+      && length($password) > 7
+    ){ return true }
+
+    if ( $password =~ /[A-Z]/i
+      && $password =~ /\W/
+      && $password =~ /[0-9]/
+      && length($password) > 7
+    ){ return true }
+
+    return false;
+}
+
+sub password_restriction_desc {
+    return "Passwords need to be at least 8 characters long and contain one UPPER and one lower case letter plus one number. Alternatively you can have a password that has one letter, one number and one non-word char that is 8 chararacters long. Passwords longer than 72 characters are truncated";
 }
 
 1;
