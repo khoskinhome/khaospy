@@ -48,27 +48,6 @@ get '/admin/list_users'  => needs login => sub {
     };
 };
 
-get '/admin/user_update_create'  => needs login => sub {
-    redirect '/admin' if ! session->read('user_is_admin');
-
-    # for admin users to update details
-    # username, name, email, mobile_phone is_api_user is_admin can_remote
-    # password
-    # needs to check the current logged in user is_admin=true
-
-
-};
-
-post '/admin/user_update_create'  => needs login => sub {
-    redirect '/admin' if ! session->read('user_is_admin');
-
-    # for admin users to update details
-    # name, email, mobile_phone
-    # needs to check the current logged in user is_admin=true
-
-
-};
-
 post '/api/v1/admin/list_user/update/:user_id/:field'  => needs login => sub {
 
     header( 'Content-Type'  => 'application/json' );
@@ -82,6 +61,8 @@ post '/api/v1/admin/list_user/update/:user_id/:field'  => needs login => sub {
     my $user_id = params->{user_id};
     my $field   = params->{field};
     my $value   = params->{value};
+
+    # TODO verify the field formats.
 
     if ( $user_id == session->read('user_id') &&
         ( $field eq 'is_admin' || $field eq 'is_enabled' || $field eq 'username' )
@@ -178,6 +159,46 @@ post '/api/v1/admin/list_user/update_password/:user_id'  => needs login => sub {
 
     return $ret if ref $ret ne 'HASH';
     return to_json $ret;
+};
+
+post '/api/v1/admin/delete_user/:user_id'  => needs login => sub {
+
+    header( 'Content-Type'  => 'application/json' );
+    header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
+
+    if ( ! session->read('user_is_admin')){
+        status 'bad_request';
+        return "user is not an admin";
+    }
+
+    my $user_id      = params->{user_id};
+
+    # for admin users to delete
+    # TODO
+
+};
+
+get '/admin/add_user'  => needs login => sub {
+    redirect '/admin' if ! session->read('user_is_admin');
+
+    #TODO stuff here.
+    # verify the field formats.
+
+    return template 'admin_add_user' => {
+        page_title      => 'Admin : Add User',
+        user            => session('user'),
+#        add => {},
+    };
+
+};
+
+post '/admin/add_user'  => needs login => sub {
+    redirect '/admin' if ! session->read('user_is_admin');
+
+    #TODO
+    redirect uri_for('/admin/add_user', {
+    });
+
 };
 
 1;

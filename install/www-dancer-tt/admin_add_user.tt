@@ -1,0 +1,64 @@
+<html>
+<head>
+    [% INCLUDE header_jquery.tt %]
+    <script src="/js/admin_add_user.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/admin_add_user.css">
+</head>
+<body>
+    <div class='center'>
+        <div class='left'>
+
+            [% INCLUDE title_linkbar_admin.tt %]
+
+            <form method='post' action='/dancer/admin/add_user'>
+                <table>
+                    <tr>
+                        <td>Username</td>
+                        <td><input type='text' name='username' value='[% add.username %]'/></td>
+                    </tr>
+                    <tr>
+                        <td>Name</td>
+                        <td><input type='text' name='name' value='[% add.name %]'/></td>
+                    </tr>
+                    <tr>
+                        <td>Password</td>
+                        <td><input type="password" name="password" /></td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td><input type='text' name='email' value='[% add.email %]'/></td>
+                    </tr>
+                    <tr>
+                        <td>Mobile</td>
+                        <td><input type='text' name='mobile_phone' value='[% add.mobile_phone %]'/></td>
+                    </tr>
+                    <tr>
+                        <td>Enabled</td>
+                        <td><input type='checkbox' name='is_enabled' checked='checked'/></td>
+                    </tr>
+                    <tr>
+                        <td>API User</td>
+                        <td><input type='checkbox' name='is_api_user'/></td>
+                    </tr>
+                    <tr>
+                        <td>Admin</td>
+                        <td><input type='checkbox' name='is_admin'/></td>
+                    </tr>
+                    <tr>
+                        <td>Remote</td>
+                        <td><input type='checkbox' name='can_remote'/></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input type='submit' name='Add User' value='add_user'/>
+                            <input type='hidden' name='return_url' value='[% return_url %]'/>
+                        </td>
+                    </tr>
+                    <tr><td colspan='2'>[% error_msg %]</td></tr>
+                </table>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

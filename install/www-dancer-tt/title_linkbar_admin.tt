@@ -8,6 +8,7 @@
 
     <tr>
         <td><a href='/dancer/admin/list_users'>Users</a></td>
+        <td><a href='/dancer/admin/add_user'>Add User</a></td>
     </tr>
 
 </table>
