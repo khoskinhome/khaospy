@@ -33,13 +33,13 @@ sub INFO  {"info"};
 sub EXTRA {"extra"};
 sub DEBUG {"debug"};
 
-sub klogstart ($;$) { klog(START,@_) };
-sub klogfatal ($;$$){ klog(FATAL,@_) };
-sub klogerror ($;$) { klog(ERROR,@_) };
-sub klogwarn  ($;$) { klog(WARN ,@_) };
-sub kloginfo  ($;$) { klog(INFO ,@_) };
-sub klogextra ($;$) { klog(EXTRA,@_) };
-sub klogdebug ($;$) { klog(DEBUG,@_) };
+sub klogstart ($;$$$$) { klog(START,@_) };
+sub klogfatal ($;$$$$) { klog(FATAL,@_) };
+sub klogerror ($;$$$$) { klog(ERROR,@_) };
+sub klogwarn  ($;$$$$) { klog(WARN ,@_) };
+sub kloginfo  ($;$$$$) { klog(INFO ,@_) };
+sub klogextra ($;$$$$) { klog(EXTRA,@_) };
+sub klogdebug ($;$$$$) { klog(DEBUG,@_) };
 
 our @EXPORT_OK = qw(
     klog START FATAL ERROR WARN INFO EXTRA DEBUG
@@ -116,7 +116,9 @@ sub klog {
     $line .= "Dump :\n".Dumper($dump) if $dump;
     $line .= "\n";
 
-    if ( $type eq "fatal" || $type eq "error" ){
+    if ( ( $type eq "fatal" || $type eq "error" )
+        && ! $no_publish
+    ){
         my $send_msg = {
             e_host         => hostname,
             e_script       => $0,

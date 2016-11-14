@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use 5.14.2;
 
+use Try::Tiny;
 use Exporter qw/import/;
 use Email::Send;
 use Email::Send::Gmail;
@@ -17,12 +18,22 @@ use Khaospy::Log qw(
     klogerror
 );
 
+use Khaospy::Constants qw(
+    true false
+);
+
 # only currently sends stuff to gmail. hmmm.
 
 sub send_email {
     my ($p) = @_;
 
-    my $email_cfg = get_email_conf();
+    my $email_cfg;
+    try {
+        $email_cfg = get_email_conf();
+    } catch {
+        klogerror("Error getting email config\ncouldn't send email : ", $p, undef, true );
+    };
+    return if ! $email_cfg;
 
     my $username = get_hashval($email_cfg,'username');
 
