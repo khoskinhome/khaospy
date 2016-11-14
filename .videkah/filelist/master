@@ -19,7 +19,6 @@ crap
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
 
-
 ./install/lib-perl/Khaospy/Conf.pm
 ./install/lib-perl/Khaospy/Conf/Controls.pm
 
@@ -321,8 +320,6 @@ crap.pl
 ./install/lib-perl/Khaospy/DBH/Users.pm
 ./install/lib-perl/Khaospy/DBH/Rooms.pm
 
-
-
 ./install/www-bin/dancer.pl
 ./install/lib-perl/Khaospy/WebUI.pm
 ./install/lib-perl/Khaospy/WebUI/UserLogin.pm
@@ -330,7 +327,6 @@ crap.pl
 ./install/lib-perl/Khaospy/WebUI/Admin.pm
 ./install/lib-perl/Khaospy/WebUI/Status.pm
 ./install/lib-perl/Khaospy/WebUI/Util.pm
-
 
 ./install/www-dancer-tt/header.tt
 ./install/www-dancer-tt/header_jquery.tt
@@ -360,9 +356,11 @@ crap.pl
 ./install/www/js/admin_list_users.js
 ./install/www/css/admin_list_users.css
 
+./install/www-dancer-tt/admin_add_user.tt
+./install/www/js/admin_add_user.js
+./install/www/css/admin_add_user.css
+
 ./install/www-dancer-tt/permission_denied.tt
-
-
 
 ./install/www/js/base.js
 ./install/www/css/base.css
@@ -384,7 +382,6 @@ crap.pl
 ##############################
 
 # greping crap
-
-
+crap
 
 
