@@ -337,6 +337,7 @@ crap.pl
 
 ./install/www-dancer-tt/title_linkbar.tt
 ./install/www-dancer-tt/title_linkbar_admin.tt
+./install/www-dancer-tt/title_linkbar_user.tt
 
 ./install/www-dancer-tt/login.tt
 ./install/www-dancer-tt/reset_password.tt
