@@ -7,7 +7,7 @@
 <body>
     <div class='center'>
 
-        [% INCLUDE title_linkbar.tt %]
+        [% INCLUDE title_linkbar_user.tt %]
 
 
     </div>
