@@ -61,6 +61,8 @@ my $np;
 
 my $mac_to_control_name = {};
 
+my $control_name_current_state = {};
+
 my $nmap_args;
 my $nmap_iprange;
 
@@ -113,7 +115,7 @@ sub run_mac_switch_daemon {
 }
 
 sub timer_cb {
-    klogextra "in timer ";
+    kloginfo "Scanning for MAC state changes ... (in timer)";
 
     $np->parsescan( $NMAP_EXECUTABLE, $nmap_args, $nmap_iprange );
 
@@ -132,44 +134,52 @@ sub timer_cb {
         $hmac = _get_mac_if_ip_is_this_host($hip) if ! $hmac;
 
         if ( $hmac ){
-            my $mtcn = get_hashval($mac_to_control_name,$hmac, true );
+            my $mtcn = $mac_to_control_name->{$hmac};
             if ( $mtcn ) { # mac found in control config.
                 my $control_name = get_hashval($mtcn,'control_name');
                 delete $not_found_ctrls->{$control_name};
-                kloginfo "$control_name with MAC $hmac is ON";
-                my $send_msg = {
-                    control_name       => $control_name,
-                    request_epoch_time => time,
-                    request_host       => hostname,
-                    current_state      => ON,
-                    action             => ON,
-                    mac_addr           => $hmac,
-                    ip_addr            => $hip,
-                };
-
-                my $json_msg = $JSON->encode($send_msg);
-                zhelpers::s_send( $zmq_publisher, "$json_msg" );
+                if ( ! exists $control_name_current_state->{$control_name}
+                    || $control_name_current_state->{$control_name} ne ON
+                ){
+                    kloginfo "$control_name with MAC $hmac is ON";
+                    my $send_msg = {
+                        control_name       => $control_name,
+                        request_epoch_time => time,
+                        request_host       => hostname,
+                        current_state      => ON,
+                        action             => ON,
+                        mac_addr           => $hmac,
+                        ip_addr            => $hip,
+                    };
+                    my $json_msg = $JSON->encode($send_msg);
+                    zhelpers::s_send( $zmq_publisher, "$json_msg" );
+                    $control_name_current_state->{$control_name} = ON;
+                }
             } else { # mac not found in control config
                 klogerror "MAC $hmac not found in control config";
             }
         }
     }
 
-    for my $control_name_not_found ( keys %$not_found_ctrls ){
-        my $hmac = get_hashval($not_found_ctrls,$control_name_not_found);
-        kloginfo "$control_name_not_found with MAC $hmac is OFF";
-        my $send_msg = {
-            control_name       => $control_name_not_found,
-            request_epoch_time => time,
-            request_host       => hostname,
-            current_state      => OFF,
-            action             => OFF,
-            mac_addr           => $hmac,
-            ip_addr            => undef,
-        };
-
-        my $json_msg = $JSON->encode($send_msg);
-        zhelpers::s_send( $zmq_publisher, "$json_msg" );
+    for my $control_name_nf ( keys %$not_found_ctrls ){
+        my $hmac = get_hashval($not_found_ctrls,$control_name_nf);
+        if ( ! exists $control_name_current_state->{$control_name_nf}
+            || $control_name_current_state->{$control_name_nf} ne OFF
+        ){
+            kloginfo "$control_name_nf with MAC $hmac is OFF";
+            my $send_msg = {
+                control_name       => $control_name_nf,
+                request_epoch_time => time,
+                request_host       => hostname,
+                current_state      => OFF,
+                action             => OFF,
+                mac_addr           => $hmac,
+                ip_addr            => undef,
+            };
+            my $json_msg = $JSON->encode($send_msg);
+            zhelpers::s_send( $zmq_publisher, "$json_msg" );
+            $control_name_current_state->{$control_name_nf} = OFF;
+        }
     }
 }
 

@@ -759,6 +759,8 @@ sub live_controls_conf {
         'mac-swann-pvr'                     => { type => 'mac-switch', mac => '00:23:63:26:24:91'},
         'mac-testsocket'                    => { type => 'mac-switch', mac => 'AC:CF:23:8D:BE:24'},
         'mac-three-home-signal'             => { type => 'mac-switch', mac => '00:1B:67:0C:5C:96'},
+        'mac-humax-pvr'                     => { type => 'mac-switch', mac => 'DC:D3:21:B2:87:AD'},
+        
 
 
     };
