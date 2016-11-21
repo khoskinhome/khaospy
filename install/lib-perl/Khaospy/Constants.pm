@@ -94,8 +94,14 @@ our $PI_STATUS_DAEMON             = 'khaospy-status-d.pl';
 our $PI_STATUS_DAEMON_TIMER       = 60;
 our $PI_STATUS_RRD_UPDATE_TIMEOUT = 120;
 
+# MAC_SWITCH ARGS and TIMER can be overridden with
+# CLI options to the khaospy-mac-switch-d.pl script
+our $MAC_SWITCH_NMAP_ARGS       = '-sP -PE -PA21,23,80,3389';
 our $MAC_SWITCH_DAEMON          = 'khaospy-mac-switch-d.pl';
-our $MAC_SWITCH_DAEMON_TIMER    = 5;
+our $MAC_SWITCH_DAEMON_TIMER    = 60; #nmap-ing 256 address takes 8 ish seconds
+our $NMAP_EXECUTABLE            = '/usr/bin/nmap';
+
+# TODO PING_SWITCH is going to be deprecated. No point, I'm nmap-ing by MAC address
 our $PING_SWITCH_DAEMON         = 'khaospy-ping-switch-d.pl';
 our $PING_SWITCH_DAEMON_TIMER   = 5;
 
@@ -324,6 +330,8 @@ our @EXPORT_OK = qw(
     $MAC_SWITCH_DAEMON_SEND_PORT
     $MAC_SWITCH_DAEMON_SCRIPT
     $MAC_SWITCH_DAEMON_TIMER
+    $MAC_SWITCH_NMAP_ARGS
+    $NMAP_EXECUTABLE
 
     $OTHER_CONTROLS_DAEMON
     $OTHER_CONTROLS_DAEMON_SCRIPT

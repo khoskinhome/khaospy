@@ -206,8 +206,9 @@ my $check_types = {
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         mac             => $check_mac,
-        poll_host       => check_host_runs($MAC_SWITCH_DAEMON_SCRIPT),
     },
+    # TODO don't really need a ping switch if I'm mapping MAC as above.
+    # deprecate this code :
     $PING_SWITCH_CONTROL_TYPE => {
         alias           => \&check_optional,
         on_alias        => \&check_optional,

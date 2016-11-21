@@ -51,6 +51,8 @@ for my $daemon_cfg ( @{$conf->{daemons}} ){
         $cli_opts     .= " $opt=$options_rh->{$opt}";
     }
 
+    $pid_log_name =~ s/\//_/g;
+
     my $command = "$script $cli_opts";
 
     print "Checking $command\n";

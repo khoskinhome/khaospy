@@ -23,6 +23,7 @@ use Khaospy::Constants qw(
     $PI_HOSTS_CONF
 
     $ONE_WIRE_SENDER_PERL_SCRIPT
+    $MAC_SWITCH_DAEMON_SCRIPT
 
     $HEATING_DAEMON_SCRIPT
     $BOILER_DAEMON_SCRIPT
@@ -708,6 +709,58 @@ sub live_controls_conf {
             },
             rrd_graph     => true,
         },
+
+        'mac-nas'                           => { type => 'mac-switch', mac => '00:10:18:33:41:E1'},
+        'mac-chromecast-melissa'            => { type => 'mac-switch', mac => '6C:AD:F8:9F:07:A3'},
+        'mac-lewlews-htc-phone'             => { type => 'mac-switch', mac => '84:7A:88:9B:9A:79'},
+        'mac-panasonic-probably-55inchtv'   => { type => 'mac-switch', mac => 'A8:13:74:36:E5:4B'},
+        'mac-samsung-printer'               => { type => 'mac-switch', mac => '00:00:F0:AD:33:49'},
+        'mac-unidentified-sony'             => { type => 'mac-switch', mac => '0C:FE:45:BF:DE:12'},
+        'mac-alisonradiator'                => { type => 'mac-switch', mac => 'AC:CF:23:72:D1:FE'},
+        'mac-amelia-ipad'                   => { type => 'mac-switch', mac => 'E0:B9:BA:34:0B:88'},
+        'mac-amelia-iphone-6s-plus'         => { type => 'mac-switch', mac => '0C:D7:46:35:D3:EB'},
+        'mac-lewis-iphone-6'                => { type => 'mac-switch', mac => '78:D7:5F:E7:89:F3'},
+        'mac-ameliaradiator'                => { type => 'mac-switch', mac => 'AC:CF:23:72:F3:D4'},
+        'mac-android-8933d3eb8a28c5b'       => { type => 'mac-switch', mac => '84:38:38:B4:5D:5A'},
+        'mac-chromecast2-karl'              => { type => 'mac-switch', mac => '54:60:09:3C:FD:46'},
+        'mac-dinningroomrad'                => { type => 'mac-switch', mac => 'AC:CF:23:8D:A4:8E'},
+        'mac-espdev'                        => { type => 'mac-switch', mac => '18:FE:34:D6:78:6D'},
+        'mac-frontroomrad'                  => { type => 'mac-switch', mac => 'AC:CF:23:8D:3B:96'},
+        'mac-ipcam01'                       => { type => 'mac-switch', mac => '00:12:15:2E:2E:9C'},
+        'mac-ipcam02'                       => { type => 'mac-switch', mac => '00:B9:6A:0D:1A:C5'},
+        'mac-ipcam03'                       => { type => 'mac-switch', mac => '00:12:15:37:05:35'},
+        'mac-ipcam04'                       => { type => 'mac-switch', mac => '00:18:A9:76:7D:D3'},
+        'mac-karl-desktop'                  => { type => 'mac-switch', mac => '78:24:AF:8C:F6:39'},
+        'mac-karl-moto-g4-phone'            => { type => 'mac-switch', mac => 'E0:98:61:70:A6:22'},
+        'mac-karl-s4-active'                => { type => 'mac-switch', mac => '40:0E:85:42:EE:90'},
+        'mac-karlradiator'                  => { type => 'mac-switch', mac => 'AC:CF:23:8D:7E:D2'},
+        'mac-khaosamelia'                   => { type => 'mac-switch', mac => 'C4:6E:1F:47:80:23'},
+        'mac-khaosbthub'                    => { type => 'mac-switch', mac => '18:62:2C:32:67:4A'},
+        'mac-khaoskarl'                     => { type => 'mac-switch', mac => 'C4:6E:1F:EC:F7:15'},
+        'mac-khaoskitchen'                  => { type => 'mac-switch', mac => 'C4:6E:1F:47:77:71'},
+        'mac-khaosloft'                     => { type => 'mac-switch', mac => '10:FE:ED:C1:94:88'},
+        'mac-khaosplayhouse'                => { type => 'mac-switch', mac => 'A0:F3:C1:BF:A8:8E'},
+        'mac-khoskin-pc-probably-old'       => { type => 'mac-switch', mac => '1C:65:9D:82:46:50'},
+        'mac-lenovo-laptop-wifi-melissa'    => { type => 'mac-switch', mac => 'B8:81:98:43:FF:E4'},
+        'mac-melissa-pc'                    => { type => 'mac-switch', mac => 'D8:50:E6:DC:FE:41'},
+        'mac-melissa-s5-samsung-phone'      => { type => 'mac-switch', mac => 'E8:3A:12:DC:AF:DA'},
+        'mac-melissa-wii-u'                 => { type => 'mac-switch', mac => '8C:CD:E8:04:8A:3C'},
+        'mac-melissalight'                  => { type => 'mac-switch', mac => 'AC:CF:23:72:28:30'},
+        'mac-panasonic-55-tv'               => { type => 'mac-switch', mac => 'BC:30:7D:EB:9C:BE'},
+        'mac-panasonic-blu-ray'             => { type => 'mac-switch', mac => 'A8:13:74:07:86:65'},
+        'mac-panasonic-karl-tv'             => { type => 'mac-switch', mac => 'A8:13:74:0E:9D:48'},
+        'mac-piboiler'                      => { type => 'mac-switch', mac => 'B8:27:EB:95:75:4E'},
+        'mac-picctv-probably'               => { type => 'mac-switch', mac => 'B8:27:EB:FE:BD:B9'},
+        'mac-piloft'                        => { type => 'mac-switch', mac => 'B8:27:EB:98:BC:C3'},
+        'mac-piold-wired'                   => { type => 'mac-switch', mac => 'B8:27:EB:A6:13:6F'},
+        'mac-pioldwifi'                     => { type => 'mac-switch', mac => '74:DA:38:05:2E:C4'},
+        'mac-piserver'                      => { type => 'mac-switch', mac => 'B8:27:EB:96:88:FC'},
+        'mac-pitest'                        => { type => 'mac-switch', mac => 'B8:27:EB:1A:32:6D'},
+        'mac-swann-pvr'                     => { type => 'mac-switch', mac => '00:23:63:26:24:91'},
+        'mac-testsocket'                    => { type => 'mac-switch', mac => 'AC:CF:23:8D:BE:24'},
+        'mac-three-home-signal'             => { type => 'mac-switch', mac => '00:1B:67:0C:5C:96'},
+
+
     };
 }
 
@@ -973,7 +1026,10 @@ sub live_pi_host_conf {
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT, options => { }, },
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $ERROR_LOG_DAEMON_SCRIPT, options => { }, },
-
+                {
+                    script  => $MAC_SWITCH_DAEMON_SCRIPT,
+                    options => { '-i' => '192.168.1.0/24' }
+                },
             ],
         },
         piloft => {
