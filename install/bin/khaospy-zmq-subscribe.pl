@@ -25,7 +25,6 @@ CLI switches say "just listen to the port for this" :
     command-queue
     status
     mac
-    ping
     one-wire
 
 =cut
@@ -39,7 +38,6 @@ my %opts = (
     "o|other-control" => \my $other_control,
     "s|status"        => \my $status,
     "m|mac"           => \my $mac,
-    "g|ping"          => \my $ping,
     "f|filter-control=s"=> \my $filter_control,
     "h|help"        => \my $help,
 );
@@ -61,7 +59,6 @@ run_subscribe_all( {
     "other-control" => $other_control,
     "status"        => $status,
     "mac"           => $mac,
-    "ping"          => $ping,
     "filter-control"=> $filter_control,
 } );
 

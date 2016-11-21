@@ -45,7 +45,6 @@ use Khaospy::Exception qw(
 use Khaospy::Constants qw(
     $PI_CONTROLLER_DAEMON_SCRIPT
     $OTHER_CONTROLS_DAEMON_SCRIPT
-    $PING_SWITCH_DAEMON_SCRIPT
     $MAC_SWITCH_DAEMON_SCRIPT
 
     $ORVIBOS20_CONTROL_TYPE
@@ -57,8 +56,6 @@ use Khaospy::Constants qw(
     $PI_MCP23017_RELAY_CONTROL_TYPE
     $PI_MCP23017_SWITCH_CONTROL_TYPE
     $MAC_SWITCH_CONTROL_TYPE
-    $PING_SWITCH_CONTROL_TYPE
-
 );
 
 # TODO test the loading of a JSON file, for the pi-hosts and controls.
@@ -78,7 +75,6 @@ my $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
     },
@@ -315,7 +311,6 @@ $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
     },
@@ -345,7 +340,6 @@ $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
     },
@@ -367,7 +361,6 @@ $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
     },
@@ -407,7 +400,6 @@ $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
     },
@@ -418,7 +410,6 @@ $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
     },
@@ -533,7 +524,6 @@ $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
     },
@@ -605,7 +595,6 @@ $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
     },
@@ -640,7 +629,6 @@ $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
     },
@@ -772,7 +760,6 @@ $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
     },
@@ -783,7 +770,6 @@ $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
     },
@@ -845,7 +831,6 @@ $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
     },
@@ -856,7 +841,6 @@ $pi_hosts_return = {
         daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
-                { script  => $PING_SWITCH_DAEMON_SCRIPT , options => { }, },
                 { script  => $MAC_SWITCH_DAEMON_SCRIPT , options => { }, },
         ],
 

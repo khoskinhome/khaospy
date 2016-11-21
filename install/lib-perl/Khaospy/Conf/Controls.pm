@@ -47,7 +47,6 @@ use Khaospy::Constants qw(
     $PI_CONTROLLER_DAEMON_SCRIPT
     $OTHER_CONTROLS_DAEMON_SCRIPT
     $MAC_SWITCH_DAEMON_SCRIPT
-    $PING_SWITCH_DAEMON_SCRIPT
 
     $ORVIBOS20_CONTROL_TYPE
     $ONEWIRE_THERM_CONTROL_TYPE
@@ -58,7 +57,6 @@ use Khaospy::Constants qw(
     $PI_MCP23017_RELAY_CONTROL_TYPE
     $PI_MCP23017_SWITCH_CONTROL_TYPE
     $MAC_SWITCH_CONTROL_TYPE
-    $PING_SWITCH_CONTROL_TYPE
 
 );
 
@@ -207,17 +205,6 @@ my $check_types = {
         db_log          => $check_optional_boolean,
         mac             => $check_mac,
     },
-    # TODO don't really need a ping switch if I'm mapping MAC as above.
-    # deprecate this code :
-    $PING_SWITCH_CONTROL_TYPE => {
-        alias           => \&check_optional,
-        on_alias        => \&check_optional,
-        off_alias       => \&check_optional,
-        rrd_graph       => $check_optional_boolean,
-        db_log          => $check_optional_boolean,
-        host            => \&check_host,
-        poll_host       => check_host_runs($PING_SWITCH_DAEMON_SCRIPT),
-    }
 };
 
 my $rrd_create_thermometer = [qw(
@@ -250,7 +237,6 @@ my $rrd_create_params = {
     $PI_MCP23017_RELAY_CONTROL_TYPE         => $rrd_create_switch,
     $PI_MCP23017_SWITCH_CONTROL_TYPE        => $rrd_create_switch,
     $MAC_SWITCH_CONTROL_TYPE                => $rrd_create_switch,
-    $PING_SWITCH_CONTROL_TYPE               => $rrd_create_switch,
 };
 
 # TODO need a better way of forcing the loading of the control config

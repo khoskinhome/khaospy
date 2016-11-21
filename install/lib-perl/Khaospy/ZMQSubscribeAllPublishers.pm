@@ -33,8 +33,6 @@ use Khaospy::Constants qw(
     $OTHER_CONTROLS_DAEMON_SEND_PORT
     $PI_STATUS_DAEMON_SEND_PORT
     $MAC_SWITCH_DAEMON_SEND_PORT
-    $PING_SWITCH_DAEMON_SEND_PORT
-
 
     $RRD_IMAGE_DIR
 );
@@ -167,9 +165,6 @@ sub get_ports {
     push @ports, $MAC_SWITCH_DAEMON_SEND_PORT
         if $opts->{"mac"};
 
-    push @ports, $PING_SWITCH_DAEMON_SEND_PORT
-        if $opts->{"ping"};
-
     @ports = (
         $ONE_WIRE_DAEMON_PERL_PORT,
         $COMMAND_QUEUE_DAEMON_SEND_PORT,
@@ -177,7 +172,6 @@ sub get_ports {
         $OTHER_CONTROLS_DAEMON_SEND_PORT,
         $PI_STATUS_DAEMON_SEND_PORT,
         $MAC_SWITCH_DAEMON_SEND_PORT,
-        $PING_SWITCH_DAEMON_SEND_PORT,
     ) if ! @ports;
 
     return @ports;

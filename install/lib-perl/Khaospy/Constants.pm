@@ -101,10 +101,6 @@ our $MAC_SWITCH_DAEMON          = 'khaospy-mac-switch-d.pl';
 our $MAC_SWITCH_DAEMON_TIMER    = 60; #nmap-ing 256 address takes 8 ish seconds
 our $NMAP_EXECUTABLE            = '/usr/bin/nmap';
 
-# TODO PING_SWITCH is going to be deprecated. No point, I'm nmap-ing by MAC address
-our $PING_SWITCH_DAEMON         = 'khaospy-ping-switch-d.pl';
-our $PING_SWITCH_DAEMON_TIMER   = 5;
-
 our $ERROR_LOG_DAEMON           = 'khaospy-error-log-d.pl';
 our $ERROR_LOG_DAEMON_TIMER     = 5;
 
@@ -128,9 +124,6 @@ our $ALL_SCRIPTS = [
 
     our $MAC_SWITCH_DAEMON_SCRIPT
         = "$BIN_DIR/$MAC_SWITCH_DAEMON",
-
-    our $PING_SWITCH_DAEMON_SCRIPT
-        = "$BIN_DIR/$PING_SWITCH_DAEMON",
 
     our $PI_STATUS_DAEMON_SCRIPT
         = "$BIN_DIR/$PI_STATUS_DAEMON",
@@ -195,7 +188,6 @@ our $PI_STATUS_DAEMON_SEND_PORT           = 5064;
 our $OTHER_CONTROLS_DAEMON_SEND_PORT      = 5065;
 
 our $MAC_SWITCH_DAEMON_SEND_PORT          = 5005;
-our $PING_SWITCH_DAEMON_SEND_PORT         = 5006;
 
 our $ERROR_LOG_DAEMON_SEND_PORT           = 5066;
 
@@ -223,7 +215,6 @@ our $PI_MCP23017_RELAY_CONTROL_TYPE         = "pi-mcp23017-relay";
 our $PI_MCP23017_SWITCH_CONTROL_TYPE        = "pi-mcp23017-switch";
 
 our $MAC_SWITCH_CONTROL_TYPE                = "mac-switch";
-our $PING_SWITCH_CONTROL_TYPE               = "ping-switch";
 
 our $SCRIPT_TO_PORT = {
     $ONE_WIRE_SENDER_PERL_SCRIPT
@@ -237,9 +228,6 @@ our $SCRIPT_TO_PORT = {
 
     $MAC_SWITCH_DAEMON_SCRIPT
         => $MAC_SWITCH_DAEMON_SEND_PORT,
-
-    $PING_SWITCH_DAEMON_SCRIPT
-        => $PING_SWITCH_DAEMON_SEND_PORT,
 
 };
 
@@ -351,12 +339,6 @@ our @EXPORT_OK = qw(
 
     $TIMER_AFTER_COMMON
 
-    $PING_SWITCH_DAEMON
-    $PING_SWITCH_DAEMON_SEND_PORT
-    $PING_SWITCH_DAEMON_SCRIPT
-    $PING_SWITCH_DAEMON_TIMER
-
-
     $QUEUE_COMMAND_PORT
 
     MTYPE_QUEUE_COMMAND
@@ -379,7 +361,6 @@ our @EXPORT_OK = qw(
     $PI_MCP23017_RELAY_CONTROL_TYPE
     $PI_MCP23017_SWITCH_CONTROL_TYPE
     $MAC_SWITCH_CONTROL_TYPE
-    $PING_SWITCH_CONTROL_TYPE
 
     $SCRIPT_TO_PORT
 

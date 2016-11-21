@@ -102,7 +102,7 @@ sub timer_cb {
             = get_control_name_for_one_wire($onewire_addr)
                 || "UNCONFIGURED CONTROL";
 
-        kloginfo "$control_name : $onewire_addr = $temp \n";
+        kloginfo "$control_name : $onewire_addr : $temp Celcius";
 
         my $send_msg = {
             control_name => $control_name,
