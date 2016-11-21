@@ -1,4 +1,6 @@
 package Khaospy::OneWireThermometer;
+# should really be called Khaospy::OneWireThermometerDaemon
+# if it is to follow the naming of the other Daemon modules.
 use strict;
 use warnings;
 

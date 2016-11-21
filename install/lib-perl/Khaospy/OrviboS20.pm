@@ -2,9 +2,6 @@ package Khaospy::OrviboS20;
 use strict;
 use warnings;
 
-# needs renaming to Khaospy::ControlOrviboS20
-# or I need a new package Khaospy::ControlOrviboS20, so this can possibly be put on cpan.
-
 use Exporter qw/import/;
 our @EXPORT_OK = qw( signal_control );
 
@@ -13,8 +10,6 @@ use IO::Select;
 use Data::Dumper;
 use Net::Ping;
 use Time::HiRes qw/usleep time/;
-
-
 
 # ATTRIBUTION
 #
