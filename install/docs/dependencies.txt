@@ -49,6 +49,7 @@ sudo apt-get install libapache2-mod-perl2 libapache2-mod-perl2-dev  libapache2-r
 
 # only need this on hosts running Khaospy::MACSwitchDaemon.pm / khaospy-mac-switch-d.pl
 sudo apt-get install nmap
+sudo cpanm Nmap::Parser Net::Address::Ethernet
 
 # libzmq-dev \
 
@@ -90,6 +91,5 @@ sudo cpanm Email::Send::Gmail   Email::Simple::Creator   Email::Send
 # installing DBD::Pg needs a /tmp of at least 166M . Best go for 250M
 sudo cpanm DBD::Pg
 
-sudo cpanm Nmap::Parser Net::Address::Ethernet
 
 
