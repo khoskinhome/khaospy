@@ -69,6 +69,9 @@ crap
 
 ./install/lib-perl/Khaospy/Message.pm
 
+./install/lib-perl/Khaospy/MACSwitchDaemon.pm
+./install/bin/khaospy-mac-switch-d.pl
+
 ./install/lib-perl/Khaospy/OneWireThermometer.pm
 ./install/bin/khaospy-one-wire-daemon.pl
 
@@ -384,4 +387,16 @@ crap.pl
 # greping crap
 crap
 
+g.grep get_controls_conf_for_host
+install/lib-perl-t/KhaospyConfControls.t:21:            'get_controls_conf_for_host',
+install/lib-perl-t/KhaospyConfControls.t:838:## test get_controls_conf_for_host
+install/lib-perl-t/KhaospyConfControls.t:882:ok ( exists get_controls_conf_for_host("pitest")->{pitest_pi_gpio_switch},
+install/lib-perl-t/KhaospyConfControls.t:886:ok ( ! exists get_controls_conf_for_host("pitest")->{pianother_pi_gpio_switch},
+install/lib-perl-t/KhaospyConfControls.t:890:ok ( exists get_controls_conf_for_host("pianother")->{pianother_pi_gpio_switch},
+install/lib-perl/Khaospy/Conf/Controls.pm:82:    get_controls_conf_for_host
+install/lib-perl/Khaospy/Conf/Controls.pm:328:sub get_controls_conf_for_host {
+install/lib-perl/Khaospy/ControlOther.pm:19:    get_controls_conf_for_host
+install/lib-perl/Khaospy/ControlOther.pm:84:        get_controls_conf_for_host(undef,check_host_field()),
+install/lib-perl/Khaospy/ControlPi.pm:17:    get_controls_conf_for_host
+install/lib-perl/Khaospy/ControlPi.pm:112:    $controls_for_host = get_controls_conf_for_host();
 
