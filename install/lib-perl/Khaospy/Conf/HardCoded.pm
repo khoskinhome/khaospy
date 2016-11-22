@@ -1021,7 +1021,13 @@ sub live_pi_host_conf {
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 0, 1 ],
             daemons => [
-                { script  => $PI_STATUS_DAEMON_SCRIPT,  options => { }, },
+                { script  => $PI_STATUS_DAEMON_SCRIPT,
+                  options => {
+                    '--log-level'       => 'extra',
+                    '--days-to-keep'    => 21,
+                    '--purge-seconds'   => 86400,
+                  },
+                },
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT, options => { }, },
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT, options => { }, },

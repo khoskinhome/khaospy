@@ -45,7 +45,7 @@ for my $daemon_cfg ( @{$conf->{daemons}} ){
     my $cli_opts     = '';
 
     my $options_rh = $daemon_cfg->{options};
-    for my $opt ( keys %{$options_rh} ){
+    for my $opt ( sort keys %{$options_rh} ){
         $pid_log_name .= "_${opt}_$options_rh->{$opt}";
         # TODO could get quoting issues with the following :
         $cli_opts     .= " $opt=$options_rh->{$opt}";

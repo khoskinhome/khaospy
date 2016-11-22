@@ -183,7 +183,7 @@ our $ONE_WIRE_DAEMON_PERL_PORT            = 5002;
 our $QUEUE_COMMAND_PORT                   = 5063;
 our $COMMAND_QUEUE_DAEMON_SEND_PORT       = 5061;
 our $PI_CONTROLLER_DAEMON_SEND_PORT       = 5062;
-our $PI_STATUS_DAEMON_SEND_PORT           = 5064;
+our $PI_STATUS_DAEMON_SEND_PORT           = 5064; # not currently used.
 
 our $OTHER_CONTROLS_DAEMON_SEND_PORT      = 5065;
 
@@ -231,6 +231,7 @@ our $SCRIPT_TO_PORT = {
 
 };
 
+# These are the DEFAULTS. Can be overridden in khaospy-status-d.pl
 our $DB_CONTROL_STATUS_DAYS_HISTORY = '365';
 our $DB_CONTROL_STATUS_PURGE_TIMEOUT_SECS = 3600;
 

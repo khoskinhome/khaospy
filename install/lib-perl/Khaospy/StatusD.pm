@@ -56,8 +56,6 @@ use Khaospy::Constants qw(
 
     $SCRIPT_TO_PORT
 
-    $DB_CONTROL_STATUS_DAYS_HISTORY
-    $DB_CONTROL_STATUS_PURGE_TIMEOUT_SECS
 );
 
 use Khaospy::Conf::Controls qw(
@@ -68,8 +66,7 @@ use Khaospy::Conf::Controls qw(
 
 use Khaospy::Log qw(
     klogstart klogfatal klogerror
-    klogwarn  kloginfo  klogdebug
-    DEBUG
+    klogwarn  kloginfo  klogextra klogdebug
 );
 
 use Khaospy::DBH::Controls qw(
@@ -94,19 +91,33 @@ our @EXPORT_OK = qw( run_status_d );
 
 our $LOGLEVEL;
 
-our $OPTS;
-
 my $last_db_control_status_purge;
 my $last_control_state;
+
+my $days_to_keep;
+my $purge_secs;
 
 sub run_status_d {
     my ( $opts ) = @_;
     $opts = {} if ! $opts;
-    $OPTS = $opts;
-    $Khaospy::Log::OVERRIDE_CONF_LOGLEVEL = $opts->{"log-level"} || DEBUG;
 
     klogstart "StatusD Subscribe all Controls, all hosts START";
-    kloginfo "LOGLEVEL = ".$Khaospy::Log::OVERRIDE_CONF_LOGLEVEL;
+
+    $Khaospy::Log::OVERRIDE_CONF_LOGLEVEL = $opts->{"log_level"}
+        if $opts->{"log_level"};
+
+    kloginfo "CLI : log_level = ".$Khaospy::Log::OVERRIDE_CONF_LOGLEVEL
+        if defined $Khaospy::Log::OVERRIDE_CONF_LOGLEVEL;
+
+    $days_to_keep = $opts->{"days_to_keep"} if $opts->{"days_to_keep"};
+    kloginfo  "CLI : days_to_keep = $days_to_keep" if defined $days_to_keep;
+    klogfatal "CLI : days_to_keep is not a positive integer"
+        if defined $days_to_keep && $days_to_keep !~ /^\d+$/;
+
+    $purge_secs = $opts->{"purge_secs"} if defined $opts->{"purge_secs"};
+    kloginfo  "CLI : purge_secs = $purge_secs" if defined $purge_secs;
+    klogfatal "CLI : purge_secs is not a positive integer"
+        if defined $purge_secs && $purge_secs !~ /^\d+$/;
 
     $last_control_state = get_last_control_state();
 
@@ -157,7 +168,7 @@ sub timer_cb {
                 + $PI_STATUS_RRD_UPDATE_TIMEOUT
                     < time
             ){
-                kloginfo "Update RRD for $control_name with last_value (timeout)";
+                klogextra "Update RRD for $control_name with last_value (timeout)";
                 update_rrd( $control_name, time,
                     get_hashval(
                         get_hashval($last_control_state, $control_name),
@@ -171,8 +182,8 @@ sub timer_cb {
     }
 
     purge_control_status()
-        if ( time > $last_db_control_status_purge +
-            $DB_CONTROL_STATUS_PURGE_TIMEOUT_SECS
+        if ( $purge_secs
+             && time > $last_db_control_status_purge + $purge_secs
         );
 }
 
@@ -229,7 +240,7 @@ sub output_msg {
         init_last_control_state($last_control_state, $control_name);
 
         $last_control_state->{$control_name}{last_value} = $curr_state_or_value;
-        kloginfo "Update DB with $control_name : $curr_state_or_value";
+        klogextra "Update DB with $control_name : $curr_state_or_value";
 
         # TODO capture any exceptions from the following and log an error :
         control_status_insert( $record );
@@ -261,7 +272,7 @@ sub update_rrd {
         system ($cmd); # TODO error checking
     }
 
-    kloginfo "Updating RRD file $rrd_filename $request_epoch_time:$curr_state_or_value";
+    klogextra "Updating RRD file $rrd_filename $request_epoch_time:$curr_state_or_value";
     my $cmd = "rrdtool update $rrd_filename $request_epoch_time:$curr_state_or_value";
     system($cmd); #TODO ERROR CHECKING.
 
@@ -273,23 +284,24 @@ sub update_rrd {
 }
 
 sub purge_control_status {
-    # TODO should this be moved to Khaospy::DBH::Controls ?
 
-    return if not $DB_CONTROL_STATUS_DAYS_HISTORY;
+    return if not $days_to_keep;
 
-    klogdebug "Purging the DB control_status data older than "
-        .$DB_CONTROL_STATUS_DAYS_HISTORY;
+    kloginfo "Purging the DB control_status data older than $days_to_keep days";
+
+    # days_to_keep is validated as only containing integer digits.
+    # So there shouldn't be any SQL injection vector via the CLI in this code.
+    klogfatal "purge_control_status() : days_to_keep is not a positive integer"
+        if $days_to_keep !~ /^\d+$/;
 
     my $sql = <<"    EOSQL";
         delete from control_status
-        where request_time < NOW() - interval '$DB_CONTROL_STATUS_DAYS_HISTORY days';
+        where request_time < NOW() - interval '$days_to_keep days';
     EOSQL
 
     my $sth = dbh->prepare( $sql );
 
-    eval {
-        $sth->execute();
-    };
+    eval { $sth->execute(); };
 
     klogerror "$@ \n" if $@;
 }
