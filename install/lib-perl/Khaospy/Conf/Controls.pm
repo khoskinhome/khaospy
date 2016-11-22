@@ -57,6 +57,7 @@ use Khaospy::Constants qw(
     $PI_MCP23017_RELAY_CONTROL_TYPE
     $PI_MCP23017_SWITCH_CONTROL_TYPE
     $MAC_SWITCH_CONTROL_TYPE
+    $MAC_SWITCH_CONTROL_SUB_TYPE_ALL
 
 );
 
@@ -204,6 +205,7 @@ my $check_types = {
         rrd_graph       => $check_optional_boolean,
         db_log          => $check_optional_boolean,
         mac             => $check_mac,
+        sub_type        => \&check_mac_sub_type,
     },
 };
 
@@ -595,6 +597,19 @@ sub check_pi_mcp23017 {
 sub check_optional {
     # Do absolutely "nuffin MATE !"
     # aka "null op".
+}
+
+sub check_mac_sub_type {
+    my ($control_name, $control, $chk) = @_;
+    check_exists(@_);
+    my $val = $control->{$chk};
+
+    KhaospyExcept::ControlsConfigKeysInvalidValue->throw(
+        error => "Control '$control_name' has an invalid '$chk' "
+            ."($val) configured"
+    )
+        if ! exists $MAC_SWITCH_CONTROL_SUB_TYPE_ALL->{$val};
+
 }
 
 sub _is_host_resolvable {
