@@ -76,6 +76,7 @@ sudo cpanm Test::More
 sudo cpanm Test::Exception
 sudo cpanm Test::Deep
 sudo cpanm DateTime
+sudo cpanm Email::Valid
 
 sudo cpanm Exception::Class
 

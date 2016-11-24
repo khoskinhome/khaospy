@@ -6,6 +6,7 @@
 
         <tr>
             <td><a href='/dancer/user/change_password'>Change Password</a></td>
+            <td><a href='/dancer/user/update'>Update</a></td>
         </tr>
     </table>
 [% ELSE %]

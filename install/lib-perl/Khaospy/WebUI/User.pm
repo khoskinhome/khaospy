@@ -4,6 +4,7 @@ use strict; use warnings;
 use Try::Tiny;
 use Data::Dumper;
 use DateTime;
+use Email::Valid;
 use Dancer2 appname => 'Khaospy::WebUI';
 use Dancer2::Core::Request;
 use Dancer2::Plugin::Auth::Tiny;
@@ -11,14 +12,17 @@ use Dancer2::Session::Memcached;
 
 use Khaospy::Email qw(send_email);
 use Khaospy::Utils qw(
+    trim
     get_hashval
     password_meets_restrictions
     password_restriction_desc
 );
 
 use Khaospy::DBH::Users qw(
+    get_user
     get_user_password
     update_user_password
+    update_user_name_email_phone
 );
 
 use Khaospy::WebUI::Constants qw(
@@ -58,10 +62,10 @@ get '/user/change_password' => sub { # don't need login for this root.
 };
 
 post '/user/change_password' => sub { # don't need login for this root.
-    my $user          = param('user');
-    my $old_password  = param('old_password');
-    my $new_password  = param('new_password');
-    my $new_password2 = param('new_password2');
+    my $user          = trim(param('user'));
+    my $old_password  = trim(param('old_password'));
+    my $new_password  = trim(param('new_password'));
+    my $new_password2 = trim(param('new_password2'));
     my $redir_url     = param('redir_url');
 
     my $user_record = get_user_password($user,$old_password);
@@ -89,7 +93,6 @@ post '/user/change_password' => sub { # don't need login for this root.
         return;
     }
 
-
     if ( $new_password ne $new_password2 ){
         session 'error_msg' => "The new passwords do not match";
         redirect uri_for('/user/change_password', {
@@ -108,12 +111,8 @@ post '/user/change_password' => sub { # don't need login for this root.
         return;
     }
 
-    # password complexity rules.
-    # At least 8 chars long.
-    # At least one lower case letter, one Upper case, one number.
     if( ! password_meets_restrictions($new_password)){
         session 'error_msg' => password_restriction_desc;
-
         redirect uri_for('/user/change_password', {
             user         => $user,
             redirect_url => $redir_url,
@@ -121,12 +120,15 @@ post '/user/change_password' => sub { # don't need login for this root.
         return;
     }
 
-
-    eval {
+    my $error_msg;
+    try {
         update_user_password($user,$new_password,false);
+    } catch {
+        $error_msg = $_;
     };
-    if( $@ ){
-        warn "Issue updating password for $user. $@";
+
+    if( $error_msg ){
+        warn "Issue updating password for $user. $error_msg";
         session 'error_msg' => "Error updating password. Admin needs to look at logs";
         redirect uri_for('/user/change_password', {
             user         => $user,
@@ -134,7 +136,6 @@ post '/user/change_password' => sub { # don't need login for this root.
         });
         return;
     }
-
 
     my $body = <<"EOBODY";
 Your password has been changed by the web interface.
@@ -162,15 +163,58 @@ get '/user/update'  => needs login => sub {
     # name, email, mobile_phone
     # warning that giving an invalid email address will require an admin user to fix it. especially if they want to change their password.
 
+    my $user = session->read('user');
 
+    my $user_record = get_user($user);
 
+    return template 'user_update' => {
+        page_title   => 'User : Update',
+        user         => $user,
+        name         => get_hashval($user_record,'name'),
+        email        => get_hashval($user_record,'email'),
+        mobile_phone => get_hashval($user_record,'mobile_phone'),
+#        return_url  => params->{return_url},
+        error_msg   => pop_error_msg(),
+    };
 };
 
 post '/user/update'  => needs login => sub {
     # for non-admin users to update details
     # name, email, mobile_phone
 
+    my $user         = session->read('user');
+    my $name         = trim(param('name'));
+    my $email        = trim(param('email'));
+    my $mobile_phone = trim(param('mobile_phone'));
+    my $error_msg;
 
+    # TODO filter name, email for xss things ?
+
+    if ( ! Email::Valid->address($email) ){
+        $error_msg .= 'The email is invalid. ';
+    }
+
+    if ( $mobile_phone !~ /^\+?[\d-\s_]+$/ ){
+        $error_msg .= 'The mobile phone number can only have an optional prefixed-plus-sign, digits, (minus-sign), (underscore) or (space) characters. ';
+    }
+
+    if ( $error_msg ){
+        session 'error_msg' => $error_msg;
+    } else {
+        try {
+            update_user_name_email_phone(
+                $user,
+                $name,
+                $email,
+                $mobile_phone,
+            );
+        } catch {
+            $error_msg = $_;
+        };
+        session 'error_msg' => $error_msg || 'Updated';
+    }
+
+    redirect uri_for('/user/update', { });
 };
 
 1;

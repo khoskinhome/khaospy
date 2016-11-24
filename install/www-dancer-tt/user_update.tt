@@ -6,38 +6,32 @@
     </head>
     <body>
         <div class='center'>
-            <table>
-                <tr><td colspan='2'>
-                    <h1>Khaospy : User Update</h1>
-                </td></tr>
 
-                <form method='post' action='/dancer/user_update'>
+            [% INCLUDE title_linkbar_user.tt %]
+            <table>
+
+                <form method='post' action='/dancer/user/update'>
                     <tr>
-                        <td>User name</td>
-                        <td><input type='text' name='user' value='[% user %]' /></td>
-                    </tr>
-                    <tr>
-                        <td> Old Password </td>
+                        <td>Name</td>
                         <td>
-                            <input type='password' name='old_password' value='' />
+                            <input type='text' name='name' value='[% name %]' />
                         </td>
                     </tr>
+
                     <tr>
-                        <td> New Password </td>
-                        <td>
-                            <input type='password' name='new_password' value='' />
-                        </td>
+                        <td>Email</td>
+                        <td><input type='text' name='email' value='[% email %]' /></td>
                     </tr>
                     <tr>
-                        <td> New Password (again) </td>
+                        <td>Mobile Phone </td>
                         <td>
-                            <input type='password' name='new_password2' value='' />
+                            <input type='text' name='mobile_phone' value='[% mobile_phone %]' />
                         </td>
                     </tr>
                     <tr>
                         <td></td>
                         <td>
-                            <input type='submit' name='change_password' value='Change Password'/>
+                            <input type='submit' name='update' value='Update'/>
                             <input type='hidden' name='return_url' value='[% return_url %]'/>
                         </td>
                     </tr>

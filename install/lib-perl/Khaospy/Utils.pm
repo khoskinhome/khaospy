@@ -25,6 +25,7 @@ use Khaospy::Exception qw(
 );
 
 our @EXPORT_OK = qw(
+    trim
     timestamp
     slurp
     burp
@@ -135,6 +136,13 @@ sub password_meets_restrictions {
 
 sub password_restriction_desc {
     return "Passwords need to be at least 8 characters long and contain one UPPER and one lower case letter plus one number. Alternatively you can have a password that has one letter, one number and one non-word char that is 8 chararacters long. Passwords longer than 72 characters are truncated";
+}
+
+sub trim {
+    my ($txt) = @_;
+    $txt =~ s/^\s+//g;
+    $txt =~ s/\s+$//g;
+    return $txt;
 }
 
 1;

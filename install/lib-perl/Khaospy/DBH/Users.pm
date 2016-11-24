@@ -32,6 +32,7 @@ our @EXPORT_OK = qw(
     update_user_password
     update_user_id_password
     update_field_by_user_id
+    update_user_name_email_phone
 );
 
 sub get_user_password {
@@ -64,7 +65,7 @@ sub get_user_password {
     return;
 }
 
-sub get_user {
+sub get_user { # get user by username
     my ($user) = @_;
 
     my $sql =<<"    EOSQL";
@@ -147,6 +148,21 @@ sub update_user_id_password {
     my $sth = dbh->prepare($sql);
     $sth->execute($password, $must_change, $expire_time, $user_id );
 
+}
+
+sub update_user_name_email_phone {
+    my ($user, $name, $email, $mobile_phone) = @_;
+
+    my $sql =<<"    EOSQL";
+        update users
+        set name         = ? ,
+            email        = ? ,
+            mobile_phone = ?
+        where username  = ?
+    EOSQL
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute($name, $email, $mobile_phone, $user);
 }
 
 sub update_user_password {
