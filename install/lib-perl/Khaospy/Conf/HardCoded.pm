@@ -228,8 +228,8 @@ sub live_heating_thermometer_config {
         '28-041591f5e5ff' => {
             name               => 'Karl',
             rrd_group          => 'downstairs',
-            upper_temp         => 19,
-            lower_temp         => 18,
+            upper_temp         => 20,
+            lower_temp         => 19,
             control            => 'karlrad',
         },
         '28-000006e01389' => {
@@ -753,6 +753,10 @@ sub live_controls_conf {
         },
         'mac-amelia-iphone-6s-plus' => {
             type => $MAC_SWITCH_CONTROL_TYPE, mac => '0C:D7:46:35:D3:EB',
+            sub_type => $MAC_SWITCH_CONTROL_SUB_TYPE_PHONE,
+        },
+        'mac-apple-iphone-millie-or-rob' => {
+            type => $MAC_SWITCH_CONTROL_TYPE, mac => 'B8:53:AC:45:CD:7A',
             sub_type => $MAC_SWITCH_CONTROL_SUB_TYPE_PHONE,
         },
         'mac-lewis-iphone-6' => {
