@@ -15,38 +15,47 @@
                     <tr>
                         <td>Username</td>
                         <td><input type='text' name='username' value='[% add.username %]'/></td>
+                        <td>[% error.username %]</td>
                     </tr>
                     <tr>
                         <td>Name</td>
                         <td><input type='text' name='name' value='[% add.name %]'/></td>
+                        <td>[% error.name %]</td>
                     </tr>
                     <tr>
                         <td>Password</td>
-                        <td><input type="password" name="password" /></td>
+                        <td><input type="password" name="password" value='[% add.password %]'/></td>
+                        <td>[% error.password %]</td>
                     </tr>
                     <tr>
                         <td>Email</td>
                         <td><input type='text' name='email' value='[% add.email %]'/></td>
+                        <td>[% error.email %]</td>
                     </tr>
                     <tr>
                         <td>Mobile</td>
                         <td><input type='text' name='mobile_phone' value='[% add.mobile_phone %]'/></td>
+                        <td>[% error.mobile_phone %]</td>
                     </tr>
                     <tr>
                         <td>Enabled</td>
-                        <td><input type='checkbox' name='is_enabled' checked='checked'/></td>
+                        <td><input type='checkbox' name='is_enabled' [% IF add.is_enabled %]checked='checked'[% END %]/></td>
+                        <td>[% error.is_enabled %]</td>
                     </tr>
                     <tr>
                         <td>API User</td>
-                        <td><input type='checkbox' name='is_api_user'/></td>
+                        <td><input type='checkbox' name='is_api_user' [% IF add.is_api_user %]checked='checked'[% END %]/></td>
+                        <td>[% error.is_api_user %]</td>
                     </tr>
                     <tr>
                         <td>Admin</td>
-                        <td><input type='checkbox' name='is_admin'/></td>
+                        <td><input type='checkbox' name='is_admin' [% IF add.is_admin %]checked='checked'[% END %]/></td>
+                        <td>[% error.is_admin %]</td>
                     </tr>
                     <tr>
                         <td>Remote</td>
-                        <td><input type='checkbox' name='can_remote'/></td>
+                        <td><input type='checkbox' name='can_remote' [% IF add.can_remote %]checked='checked'[% END %]/></td>
+                        <td>[% error.can_remote %]</td>
                     </tr>
                     <tr>
                         <td></td>

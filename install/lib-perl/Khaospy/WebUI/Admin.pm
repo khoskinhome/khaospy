@@ -11,9 +11,8 @@ use Dancer2::Session::Memcached;
 
 use Khaospy::Email qw(send_email);
 use Khaospy::Utils qw(
+    trim
     get_hashval
-    password_meets_restrictions
-    password_restriction_desc
 );
 
 use Khaospy::DBH::Users qw(
@@ -21,7 +20,27 @@ use Khaospy::DBH::Users qw(
     get_user_by_id
     update_field_by_user_id
     update_user_id_password
+    insert_user
+
+    password_valid
+    password_desc
+
+    email_address_valid
+    email_address_desc
+
+    mobile_phone_valid
+    mobile_phone_desc
+
+    users_field_valid
+    users_field_desc
+
 );
+
+use Khaospy::WebUI::Util qw(
+    pop_error_msg
+);
+
+sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
 
 get '/admin' => needs login => sub {
 
@@ -62,8 +81,6 @@ post '/api/v1/admin/list_user/update/:user_id/:field'  => needs login => sub {
     my $field   = params->{field};
     my $value   = params->{value};
 
-    # TODO verify the field formats.
-
     if ( $user_id == session->read('user_id') &&
         ( $field eq 'is_admin' || $field eq 'is_enabled' || $field eq 'username' )
     ){
@@ -77,6 +94,11 @@ post '/api/v1/admin/list_user/update/:user_id/:field'  => needs login => sub {
     if ( ! $user_record ){
         status 'bad_request';
         return "can't get the user record";
+    }
+
+    if ( ! users_field_valid($field,$value) ){
+        status 'bad_request';
+        return users_field_desc($field);
     }
 
     my $email_body ;
@@ -107,7 +129,7 @@ post '/api/v1/admin/list_user/update/:user_id/:field'  => needs login => sub {
     } catch {
         # TODO could get the Exception and give a better error message.
         status 'bad_request';
-        $ret = "error updating DB";
+        $ret = "Error updating DB";
     };
 
     return $ret if ref $ret ne 'HASH';
@@ -127,9 +149,9 @@ post '/api/v1/admin/list_user/update_password/:user_id'  => needs login => sub {
     my $user_id      = params->{user_id};
     my $new_password = params->{password};
 
-    if( ! password_meets_restrictions($new_password)){
+    if( ! password_valid($new_password)){
         status 'bad_request';
-        return password_restriction_desc;
+        return password_desc;
     }
 
     my $user_record = get_user_by_id($user_id);
@@ -181,13 +203,11 @@ post '/api/v1/admin/delete_user/:user_id'  => needs login => sub {
 get '/admin/add_user'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');
 
-    #TODO stuff here.
-    # verify the field formats.
-
     return template 'admin_add_user' => {
-        page_title      => 'Admin : Add User',
-        user            => session('user'),
-#        add => {},
+        page_title  => 'Admin : Add User',
+        add         => {is_enabled => true },
+        user        => session('user'),
+        error_msg   => pop_error_msg(),
     };
 
 };
@@ -195,10 +215,51 @@ get '/admin/add_user'  => needs login => sub {
 post '/admin/add_user'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');
 
-    #TODO
-    redirect uri_for('/admin/add_user', {
-    });
+    my $add = {};
+    my $error ={};
+    my $error_msg = '';
 
+    for my $fld (qw(
+        username name password email mobile_phone
+        is_enabled is_api_user is_admin can_remote
+    )){
+        my $val = trim(param($fld));
+        next if ! defined $val;
+
+        $add->{$fld} = $val;
+        if ( ! users_field_valid($fld, $add->{$fld}) ){
+            $error->{$fld} = users_field_desc($fld);
+            $error_msg     = "field errors";
+        }
+    };
+
+    if ( $error_msg ){
+        session 'error_msg' => $error_msg;
+        return template 'admin_add_user' => {
+            page_title  => 'Admin : Add User',
+            user        => session('user'),
+            error_msg   => pop_error_msg(),
+            add         => $add,
+            error       => $error,
+        };
+    }
+
+    try {
+        insert_user($add);
+    } catch {
+        $error_msg = "Error inserting into DB. $_";
+    };
+
+    return template 'admin_add_user' => {
+        page_title  => 'Admin : Add User',
+        user        => session('user'),
+        error_msg   => $error_msg,
+        add         => $add,
+    } if $error_msg;
+
+    session 'error_msg' => "user '$add->{username}' added";
+    redirect uri_for('/admin/add_user', {});
+    return;
 };
 
 1;

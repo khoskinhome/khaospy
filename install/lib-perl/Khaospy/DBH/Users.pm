@@ -3,6 +3,8 @@ use strict; use warnings;
 
 use Exporter qw/import/;
 
+use Email::Valid;
+
 use Khaospy::DBH qw(dbh);
 use Khaospy::Constants qw(
     true false
@@ -15,9 +17,9 @@ use Khaospy::Log qw(
 );
 
 use Khaospy::Utils qw(
+    trim
     get_hashval
     get_iso8601_utc_from_epoch
-    password_meets_restrictions
 );
 
 use Khaospy::Exception qw(
@@ -33,6 +35,20 @@ our @EXPORT_OK = qw(
     update_user_id_password
     update_field_by_user_id
     update_user_name_email_phone
+
+    insert_user
+
+    password_valid
+    password_desc
+
+    email_address_valid
+    email_address_desc
+
+    mobile_phone_valid
+    mobile_phone_desc
+
+    users_field_valid
+    users_field_desc
 );
 
 sub get_user_password {
@@ -132,7 +148,7 @@ sub update_user_id_password {
     $password = _trunc_password($password);
     # could raise an exception ...
     die "password doesn't meet restrictions"
-        if ! password_meets_restrictions($password);
+        if ! password_valid($password);
 
     if ( $must_change ) { $must_change = 'true' }
     else { $must_change = 'false' }
@@ -171,7 +187,7 @@ sub update_user_password {
     $password = _trunc_password($password);
     # could raise an exception ...
     die "password doesn't meet restrictions"
-        if ! password_meets_restrictions($password);
+        if ! password_valid($password);
 
     if ( $must_change ) { $must_change = 'true' }
     else { $must_change = 'false' }
@@ -190,24 +206,15 @@ sub update_user_password {
 
 sub update_field_by_user_id {
     my ($user_id, $field, $value ) = @_;
+    $field = lc($field);
 
-    # should really get this from the DB schema ...
-    # these are the only fields that an admin can update on the "list_users" page.
-    my $valid_field = {
-        username              =>1,
-        name                  =>1,
-        email                 =>1,
-        is_api_user           =>1,
-        is_admin              =>1,
-        mobile_phone          =>1,
-        can_remote            =>1,
-        passhash_must_change  =>1,
-        is_enabled            =>1,
-    };
+    KhaospyExcept::InvalidFieldName->throw( error =>
+        "password field cannot be updated by update_field_by_user_id()"
+    ) if $field eq 'password';
 
     KhaospyExcept::InvalidFieldName->throw(
-        error => "Invalid field '$field' passed to update_field_by_user_id"
-    ) if ! exists $valid_field->{$field};
+        error => users_field_desc($field)
+    ) if !  users_field_valid($field,$value);
 
     my $sql =<<"    EOSQL";
         update users
@@ -229,6 +236,168 @@ sub _trunc_password {
     }
 
     return $password;
+}
+
+sub insert_user {
+    my ( $add ) = @_;
+
+    my ( @fields, @values, @placeholders );
+
+    for my $fld ( keys %$add ){
+        KhaospyExcept::InvalidFieldName->throw(
+            error => users_field_desc($fld)
+        ) if ! users_field_valid($fld,$add->{$fld});
+
+        if ( $fld eq 'password' ) {
+            push @fields, "passhash";
+            push @values, "crypt( ? ,gen_salt('bf',8))";
+            push @placeholders, '?';
+        } else {
+            push @fields, $fld;
+            push @values, $add->{$fld};
+            push @placeholders, '?';
+        }
+    }
+
+    my $sql = " INSERT INTO users "
+        ."(".join( ", ",@fields).")"
+        ." VALUES (".join( ", ", @placeholders).")";
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute(@values);
+}
+
+####
+# User field validation
+
+sub username_valid {
+    my ($username) = @_;
+    return false if length($username) < 4;
+
+    return true if $username =~ /^[a-z][a-z0-9\-_]+$/;
+    return false;
+}
+
+sub username_desc {
+    return "The 'username' must be at least 4 characters long, start with a letter, only contain lower case a-z, numerics, underscore or hyphen. ";
+}
+
+sub name_valid {
+    return true if length($_[0]) > 2;
+    return false;
+}
+
+sub name_desc {
+    return "The 'name' must be at least 3 characters long. ";
+}
+
+sub password_valid {
+    my ($password) = @_;
+
+    if ( $password =~ /[A-Z]/
+      && $password =~ /[a-z]/
+      && $password =~ /[0-9]/
+      && length($password) > 7
+    ){ return true }
+
+    if ( $password =~ /[A-Z]/i
+      && $password =~ /\W/
+      && $password =~ /[0-9]/
+      && length($password) > 7
+    ){ return true }
+
+    return false;
+}
+
+sub password_desc {
+    return "Passwords need to be at least 8 characters long and contain one UPPER and one lower case letter plus one number. Alternatively you can have a password that has one letter, one number and one non-word char that is 8 chararacters long. Passwords longer than 72 characters are truncated. ";
+}
+
+sub email_address_valid { Email::Valid->address($_[0]) }
+
+sub email_address_desc {
+    return "email address must conform to normal standards. ";
+}
+
+sub mobile_phone_valid {
+    my ($mobile_phone) = @_;
+
+    return true if
+        ! defined $mobile_phone
+        || $mobile_phone eq "";
+
+    if ( $mobile_phone !~ /^\+?[\d\-\s_]+$/ ){
+        return false;
+    }
+    return true;
+}
+
+sub mobile_phone_desc {
+    return 'The mobile phone number can only have an optional prefixed-plus-sign, digits, (minus-sign), (underscore) or (space) characters. The mobile phone can be left blank. ';
+}
+
+sub boolean_valid {
+    # TODO maybe some checking here.
+    return 1;
+}
+
+sub boolean_desc_sub {
+    my ($field) = @_;
+    $field = lc($field);
+
+    return sub {
+        return "$field is not a boolean. ";
+    }
+}
+
+sub users_field_valid {
+    my ($field, $value) = @_;
+    $field = lc($field);
+
+    my $valid_field_sub = {
+        username                => \&username_valid,
+        name                    => \&name_valid,
+        password                => \&password_valid,
+        email                   => \&email_address_valid,
+        mobile_phone            => \&mobile_phone_valid,
+        is_enabled              => \&boolean_valid,
+        is_api_user             => \&boolean_valid,
+        is_admin                => \&boolean_valid,
+        can_remote              => \&boolean_valid,
+        passhash_must_change    => \&boolean_valid,
+    };
+
+    KhaospyExcept::InvalidFieldName->throw(
+        error => "users_field_valid() : Invalid field '$field'"
+    ) if ! exists $valid_field_sub->{$field};
+
+    return true if $valid_field_sub->{$field}->($value);
+
+    return false;
+}
+
+sub users_field_desc {
+    my ($field) = @_;
+    $field = lc($field);
+
+    my $desc_field_sub = {
+        username                => \&username_desc,
+        name                    => \&name_desc,
+        password                => \&password_desc,
+        email                   => \&email_address_desc,
+        mobile_phone            => \&mobile_phone_desc,
+        is_enabled              => boolean_desc_sub('is_enabled'),
+        is_api_user             => boolean_desc_sub('is_api_user'),
+        is_admin                => boolean_desc_sub('is_admin'),
+        can_remote              => boolean_desc_sub('can_remote'),
+        passhash_must_change    => boolean_desc_sub('passhash_must_change'),
+   };
+
+    KhaospyExcept::InvalidFieldName->throw(
+        error => "users_field_desc() : Invalid field '$field'"
+    ) if ! exists $desc_field_sub->{$field};
+
+    return $desc_field_sub->{$field}->();
 }
 
 1;

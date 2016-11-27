@@ -4,7 +4,6 @@ use strict; use warnings;
 use Try::Tiny;
 use Data::Dumper;
 use DateTime;
-use Email::Valid;
 use Dancer2 appname => 'Khaospy::WebUI';
 use Dancer2::Core::Request;
 use Dancer2::Plugin::Auth::Tiny;
@@ -14,8 +13,6 @@ use Khaospy::Email qw(send_email);
 use Khaospy::Utils qw(
     trim
     get_hashval
-    password_meets_restrictions
-    password_restriction_desc
 );
 
 use Khaospy::DBH::Users qw(
@@ -23,6 +20,16 @@ use Khaospy::DBH::Users qw(
     get_user_password
     update_user_password
     update_user_name_email_phone
+
+    password_valid
+    password_desc
+
+    email_address_valid
+    email_address_desc
+
+    mobile_phone_valid
+    mobile_phone_desc
+
 );
 
 use Khaospy::WebUI::Constants qw(
@@ -111,8 +118,8 @@ post '/user/change_password' => sub { # don't need login for this root.
         return;
     }
 
-    if( ! password_meets_restrictions($new_password)){
-        session 'error_msg' => password_restriction_desc;
+    if( ! password_valid($new_password)){
+        session 'error_msg' => password_desc;
         redirect uri_for('/user/change_password', {
             user         => $user,
             redirect_url => $redir_url,
@@ -190,13 +197,11 @@ post '/user/update'  => needs login => sub {
 
     # TODO filter name, email for xss things ?
 
-    if ( ! Email::Valid->address($email) ){
-        $error_msg .= 'The email is invalid. ';
-    }
+    $error_msg .= email_address_desc()
+        if ! email_address_valid($email);
 
-    if ( $mobile_phone !~ /^\+?[\d-\s_]+$/ ){
-        $error_msg .= 'The mobile phone number can only have an optional prefixed-plus-sign, digits, (minus-sign), (underscore) or (space) characters. ';
-    }
+    $error_msg .= mobile_phone_desc()
+        if ! mobile_phone_valid($mobile_phone);
 
     if ( $error_msg ){
         session 'error_msg' => $error_msg;
