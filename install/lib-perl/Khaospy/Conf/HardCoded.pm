@@ -1,7 +1,7 @@
 package Khaospy::Conf::HardCoded;
 use strict;
 use warnings;
-# by Karl Kount-Khaos Hoskin. 2015-2016
+# by Karl 'Khaos' Hoskin. 2015-2016
 
 # for the hard coded live and test confs whilst dev-ing khaospy.
 # will probably get deprecated at some point in the future.
@@ -739,6 +739,10 @@ sub live_controls_conf {
             type => $MAC_SWITCH_CONTROL_TYPE, mac => '00:00:F0:AD:33:49',
             sub_type => $MAC_SWITCH_CONTROL_SUB_TYPE_PRINTER,
         },
+        'mac-samsung-40inch-tv' => {
+            type => $MAC_SWITCH_CONTROL_TYPE, mac => 'E4:E0:C5:3E:14:9C',
+            sub_type => $MAC_SWITCH_CONTROL_SUB_TYPE_AV,
+        },
         'mac-unidentified-sony' => {
             type => $MAC_SWITCH_CONTROL_TYPE, mac => '0C:FE:45:BF:DE:12',
             sub_type => $MAC_SWITCH_CONTROL_SUB_TYPE_AV,
@@ -755,8 +759,12 @@ sub live_controls_conf {
             type => $MAC_SWITCH_CONTROL_TYPE, mac => '0C:D7:46:35:D3:EB',
             sub_type => $MAC_SWITCH_CONTROL_SUB_TYPE_PHONE,
         },
-        'mac-apple-iphone-millie-or-rob' => {
+        'mac-apple-iphone-probably-rob' => {
             type => $MAC_SWITCH_CONTROL_TYPE, mac => 'B8:53:AC:45:CD:7A',
+            sub_type => $MAC_SWITCH_CONTROL_SUB_TYPE_PHONE,
+        },
+        'mac-apple-iphone-probably-millie' => {
+            type => $MAC_SWITCH_CONTROL_TYPE, mac => '7C:01:91:58:07:7B',
             sub_type => $MAC_SWITCH_CONTROL_SUB_TYPE_PHONE,
         },
         'mac-lewis-iphone-6' => {

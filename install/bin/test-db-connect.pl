@@ -8,7 +8,7 @@ FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
 use Data::Dumper;
-use Khaospy::DBH qw(dbh get_last_control_state);
+use Khaospy::DBH qw(dbh);
 
 my $dbh = dbh();
 

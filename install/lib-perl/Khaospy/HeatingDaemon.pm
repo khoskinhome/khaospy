@@ -55,7 +55,7 @@ use Khaospy::ZMQAnyEvent qw(
     zmq_anyevent
 );
 
-use Khaospy::DBH qw(
+use Khaospy::DBH::Controls qw(
     get_last_control_state
     init_last_control_state
 );

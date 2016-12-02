@@ -18,8 +18,10 @@ use ZMQ::Constants qw(
     ZMQ_SUB
 );
 
-use Khaospy::DBH qw(
-    dbh
+use Khaospy::DBH qw( dbh );
+
+use Khaospy::DBH::Controls qw(
+    control_status_insert
     get_last_control_state
     init_last_control_state
 );
@@ -67,10 +69,6 @@ use Khaospy::Conf::Controls qw(
 use Khaospy::Log qw(
     klogstart klogfatal klogerror
     klogwarn  kloginfo  klogextra klogdebug
-);
-
-use Khaospy::DBH::Controls qw(
-    control_status_insert
 );
 
 use Khaospy::Conf::PiHosts qw(
@@ -291,6 +289,8 @@ sub purge_control_status {
 
     # days_to_keep is validated as only containing integer digits.
     # So there shouldn't be any SQL injection vector via the CLI in this code.
+    # The regular DBI way of ? placeholders breaks because of the single quotes
+    # on the "interval" function.
     klogfatal "purge_control_status() : days_to_keep is not a positive integer"
         if $days_to_keep !~ /^\d+$/;
 

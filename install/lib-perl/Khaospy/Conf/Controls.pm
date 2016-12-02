@@ -77,6 +77,7 @@ use Khaospy::Utils qw(
 
 our @EXPORT_OK = qw(
     get_control_config
+    control_exists
     get_controls_conf
     get_controls_conf_for_host
     get_control_name_for_one_wire
@@ -331,6 +332,17 @@ sub get_controls_conf_for_host {
 
     return $ret_controls;
 }
+
+sub control_exists {
+    # only use where you wish to avoid the error thrown by
+    # get_control_config
+    # deliberately doesn't return the control's config.
+    my ( $control_name, $force_reload ) = @_;
+    get_controls_conf($force_reload);
+
+    return exists $controls_conf->{$control_name};
+}
+
 
 sub get_control_config {
     my ( $control_name, $force_reload ) = @_;

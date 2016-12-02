@@ -3,6 +3,7 @@ use strict; use warnings;
 
 use Exporter qw/import/;
 
+use Try::Tiny;
 use Khaospy::DBH qw(dbh);
 use Khaospy::Constants qw(
     true false
@@ -17,17 +18,24 @@ use Khaospy::Log qw(
 use Khaospy::Utils qw(
     get_hashval
     get_iso8601_utc_from_epoch
+    trans_ON_to_value_or_return_val
 );
 
 use Khaospy::Conf::Controls qw(
+    control_exists
     get_status_alias
     can_operate
 );
 
+use Khaospy::Constants qw(
+    $PI_STATUS_RRD_UPDATE_TIMEOUT
+);
+
 our @EXPORT_OK = qw(
-    get_control_status
     get_controls_from_db
     control_status_insert
+    get_last_control_state
+    init_last_control_state
 );
 
 sub control_status_insert {
@@ -156,6 +164,11 @@ sub get_controls_from_db {
     while ( my $row = $sth->fetchrow_hashref ){
 
         my $control_name = get_hashval($row,'control_name');
+        if ( ! control_exists($control_name)){
+            warn "looks like control '$control_name' has been changed."
+                ." DB has stale data. $@";
+            next;
+        }
 
         if ( defined $row->{current_value}){
             $row->{current_value}
@@ -163,18 +176,10 @@ sub get_controls_from_db {
         }
 
         if ( defined $row->{current_state} ){
-            eval {
-                $row->{status_alias} =
-                    get_status_alias(
-                        $control_name, get_hashval($row, 'current_state')
-                    );
-            };
-
-            if ($@) {
-                warn "looks like control_name has been changed."
-                    ." DB has stale data. $@";
-                next;
-            }
+            $row->{status_alias} =
+                get_status_alias(
+                    $control_name, get_hashval($row, 'current_state')
+                );
         }
 
         $row->{can_operate} = can_operate($control_name);
@@ -261,6 +266,57 @@ sub get_control_status {
     }
 
     return $results;
+}
+
+sub get_last_control_state {
+    # should be refactored with other methods in this module.
+    # TODO this should use the "controls" table now.
+
+    my $last_control_state = {};
+
+    my $sql = <<"    EOSQL";
+        select control_name, request_time, current_state, current_value
+        from control_status
+        where id in (
+            select max(id) from control_status group by control_name )
+        order by control_name
+    EOSQL
+
+    my $sth = dbh->prepare( $sql );
+    $sth->execute();
+
+    while ( my $hr = $sth->fetchrow_hashref ){
+
+        my $control_name = get_hashval($hr,"control_name");
+        if ( ! control_exists($control_name)){
+            warn "looks like control '$control_name' has been changed."
+                ." DB has stale data. $@";
+            next;
+        }
+
+        init_last_control_state ($last_control_state, $control_name);
+
+        $last_control_state->{$control_name}{last_value}
+            = trans_ON_to_value_or_return_val(
+                $hr->{current_state} || $hr->{current_value}
+            );
+
+        $last_control_state->{$control_name}{last_rrd_update_time}
+            = time - $PI_STATUS_RRD_UPDATE_TIMEOUT;
+    }
+
+    return $last_control_state;
+}
+
+sub init_last_control_state {
+    # Only init if it doesn't already exist.
+    my ($last_control_state, $control_name) = @_;
+    if ( ! exists $last_control_state->{$control_name} ){
+        $last_control_state->{$control_name}={};
+        $last_control_state->{$control_name}{last_value} = undef;
+        $last_control_state->{$control_name}{last_rrd_update_time} = undef;
+        $last_control_state->{$control_name}{statusd_updated} = undef;
+    }
 }
 
 1;
