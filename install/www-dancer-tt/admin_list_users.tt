@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
     [% INCLUDE header_jquery.tt %]
@@ -7,9 +8,9 @@
 </head>
 <body>
     <div class='center'>
-        <div class='left'>
-
-            [% INCLUDE title_linkbar_admin.tt %]
+            <table>
+                <tr><td>[% INCLUDE title_linkbar_admin.tt %]</td></tr>
+            </table>
 
             <div id="dialog-password" title="Change Password">
 
@@ -79,7 +80,6 @@
                 </tr>
               [% END %]
             </table>
-        </div>
     </div>
 </body>
 </html>

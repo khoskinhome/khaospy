@@ -13,7 +13,7 @@ use warnings;
 #
 
 my $html = "Content-Type: text/html
-
+<!DOCTYPE html>
 <HTML>
 <HEAD>
 <TITLE>Hello World</TITLE>

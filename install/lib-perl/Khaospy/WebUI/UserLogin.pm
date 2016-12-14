@@ -41,6 +41,7 @@ get '/' => needs login => sub {
     my $error_msg = pop_error_msg();
 
     return template index => {
+        page_title => "Home",
         user      => session->read('user'),
         error_msg => $error_msg,
     };

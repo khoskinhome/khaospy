@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
 
@@ -10,7 +11,9 @@
 <body>
     <div class='center'>
 
-        [% INCLUDE title_linkbar.tt %]
+        <table>
+            <tr><td>[% INCLUDE title_linkbar.tt %]</td></tr>
+        </table>
 
         <table>
             <tr>

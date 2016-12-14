@@ -1,15 +1,11 @@
 
 
-<table>
 
-    <tr><td>
-        [% INCLUDE title_linkbar.tt %]
-    </td></tr>
+    [% INCLUDE title_linkbar.tt %]
 
-    <tr>
-        <td><a href='/dancer/admin/list_users'>Users</a></td>
-        <td><a href='/dancer/admin/add_user'>Add User</a></td>
-    </tr>
+    <ul class='link_bar'>
+        <li class='nav_link'><a href='/dancer/admin/list_users'>Users</a></li>
+        <li class='nav_link'><a href='/dancer/admin/add_user'>Add User</a></li>
+    </ul>
 
-</table>
 

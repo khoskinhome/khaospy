@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
     [% INCLUDE header_jquery.tt %]
@@ -6,9 +7,9 @@
 </head>
 <body>
     <div class='center'>
-        <div class='left'>
-
-            [% INCLUDE title_linkbar_admin.tt %]
+            <table>
+                <tr><td>[% INCLUDE title_linkbar_admin.tt %]</td></tr>
+            </table>
 
             <form method='post' action='/dancer/admin/add_user'>
                 <table>
@@ -67,7 +68,6 @@
                     <tr><td colspan='2'>[% error_msg %]</td></tr>
                 </table>
             </form>
-        </div>
     </div>
 </body>
 </html>

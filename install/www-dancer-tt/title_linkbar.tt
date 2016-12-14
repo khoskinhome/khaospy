@@ -1,15 +1,11 @@
 
     <!--TODO /dancer root could change -->
-    <table>
-        <tr>
-            <td colspan='6' ><h1>Khaospy : [% page_title %]</h1></td>
-        </tr>
-        <tr>
-            <td><a href='/dancer/status'>Status</a></td>
-            <td><a href='/dancer/cctv'>CCTV</a></td>
-            <td><a href='/dancer/admin'>Admin</a></td>
-            <td><a href='/dancer/user'>User</a></td>
-            <td><a href='/dancer/logout'>Logout [% user %]</a></td>
-        </tr>
-    </table>
+    [% INCLUDE title.tt %]
+    <ul class='link_bar'>
+            <li class='nav_link'><a href='/dancer/status'>Status</a></li>
+            <li class='nav_link'><a href='/dancer/cctv'>CCTV</a></li>
+            <li class='nav_link'><a href='/dancer/admin'>Admin</a></li>
+            <li class='nav_link'><a href='/dancer/user'>User</a></li>
+            <li class='nav_link'><a href='/dancer/logout'>Logout [% user %]</a></li>
+    </ul>
 

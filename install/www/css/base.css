@@ -58,3 +58,47 @@ div.left
     margin: auto;
     background-color: green;
 }
+
+
+
+ul.title_main {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+ul.link_bar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+li.nav_link {
+    float: left;
+}
+
+li.nav_link a {
+    display: block;
+    text-decoration: none;
+    padding: 8px;
+    color: black;
+    background-color: #dddddd;
+    border-right: 1px solid #bbb;
+    border-left: 1px solid #bbb;
+    border-top: 1px solid #bbb;
+    border-bottom: 1px solid #bbb;
+}
+
+li.nav_link a:hover {
+    background-color: #555;
+    color: white;
+}
+
+li.nav_link:last-child {
+    border-right: none;
+}
+
+
+

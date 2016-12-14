@@ -1,19 +1,10 @@
 [% IF user %]
-    <table>
-        <tr><td>
-            [% INCLUDE title_linkbar.tt %]
-        </td></tr>
-
-        <tr>
-            <td><a href='/dancer/user/change_password'>Change Password</a></td>
-            <td><a href='/dancer/user/update'>Update</a></td>
-        </tr>
-    </table>
+   [% INCLUDE title_linkbar.tt %]
+    <ul class='link_bar'>
+        <li class='nav_link'><a href='/dancer/user/change_password'>Change Password</a></li>
+        <li class='nav_link'><a href='/dancer/user/update'>Update</a></li>
+    </ul>
 [% ELSE %]
-    <table>
-        <tr>
-            <td colspan='6' ><h1>Khaospy : [% page_title %]</h1></td>
-        </tr>
-    </table>
+    [% INCLUDE title.tt %]
 [% END %]
 

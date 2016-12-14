@@ -187,6 +187,7 @@ my $sizebigger  = $size + 5;
 
 print <<"EOSTR";
 
+<!DOCTYPE html>
 <html>
 
 <head>
