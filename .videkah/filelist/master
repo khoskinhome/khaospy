@@ -15,6 +15,7 @@ install/www-bin/lightba.pl
 
 #######################################################
 crap
+crapnew
 
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
@@ -314,6 +315,8 @@ install-run-live-conf-kill-and-restart-daemons-all.bash
 crap
 crap.pl
 
+crap.diff.pl
+
 ./install/lib-perl/Khaospy/Constants.pm
 
 ./install/lib-perl/Khaospy/WebUI/Constants.pm
@@ -334,6 +337,7 @@ crap.pl
 ./install/www-dancer-tt/header.tt
 ./install/www-dancer-tt/header_jquery.tt
 
+./install/www-dancer-tt/title.tt
 ./install/www-dancer-tt/title_linkbar.tt
 ./install/www-dancer-tt/title_linkbar_admin.tt
 ./install/www-dancer-tt/title_linkbar_user.tt
@@ -380,23 +384,36 @@ crap.pl
 ./install/db/create-tables.sql
 ./install/db/drop-tables.sql
 
+./install/db/amelia-heating.sql
+./install/db/melissa-heating.sql
+./install/db/alison-heating.sql
+
 
 ./install/apache/default-ssl.conf
 ##############################
 
 # greping crap
-crap
 
-g.grep get_controls_conf_for_host
-install/lib-perl-t/KhaospyConfControls.t:21:            'get_controls_conf_for_host',
-install/lib-perl-t/KhaospyConfControls.t:838:## test get_controls_conf_for_host
-install/lib-perl-t/KhaospyConfControls.t:882:ok ( exists get_controls_conf_for_host("pitest")->{pitest_pi_gpio_switch},
-install/lib-perl-t/KhaospyConfControls.t:886:ok ( ! exists get_controls_conf_for_host("pitest")->{pianother_pi_gpio_switch},
-install/lib-perl-t/KhaospyConfControls.t:890:ok ( exists get_controls_conf_for_host("pianother")->{pianother_pi_gpio_switch},
-install/lib-perl/Khaospy/Conf/Controls.pm:82:    get_controls_conf_for_host
-install/lib-perl/Khaospy/Conf/Controls.pm:328:sub get_controls_conf_for_host {
-install/lib-perl/Khaospy/ControlOther.pm:19:    get_controls_conf_for_host
-install/lib-perl/Khaospy/ControlOther.pm:84:        get_controls_conf_for_host(undef,check_host_field()),
-install/lib-perl/Khaospy/ControlPi.pm:17:    get_controls_conf_for_host
-install/lib-perl/Khaospy/ControlPi.pm:112:    $controls_for_host = get_controls_conf_for_host();
+
+# ~/github.com/khaospy$ g.grep title_linkbar.tt
+.videkah/filelist/master:338:./install/www-dancer-tt/title_linkbar.tt
+.videkah/filelist/pi-mcp23017:331:./install/www-dancer-tt/title_linkbar.tt
+install/www-dancer-tt/cctv.tt:12:            [% INCLUDE title_linkbar.tt %]
+install/www-dancer-tt/index.tt:11:            [% INCLUDE title_linkbar.tt %]
+install/www-dancer-tt/permission_denied.tt:10:        [% INCLUDE title_linkbar.tt %]
+install/www-dancer-tt/status.tt:13:        [% INCLUDE title_linkbar.tt %]
+install/www-dancer-tt/title_linkbar_admin.tt:6:        [% INCLUDE title_linkbar.tt %]
+install/www-dancer-tt/title_linkbar_user.tt:4:            [% INCLUDE title_linkbar.tt %]
+
+
+
+
+
+
+
+
+
+
+
+
 
