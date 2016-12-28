@@ -6,7 +6,8 @@
 
     </head>
     <body>
-        <div class='center'>
+        <div class='center main'>
+          <div class='left'>
             <table>
                 <tr><td>[% INCLUDE title_linkbar_user.tt %]</td></tr>
             </table>
@@ -41,6 +42,7 @@
                     <tr><td colspan='2'>[% error_msg %]</td></tr>
                 </form>
             </table>
+          </div>
         </div>
     </body>
 </html>

@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="/css/admin_add_user.css">
 </head>
 <body>
-    <div class='center'>
+    <div class='center main'>
             <table>
                 <tr><td>[% INCLUDE title_linkbar_admin.tt %]</td></tr>
             </table>

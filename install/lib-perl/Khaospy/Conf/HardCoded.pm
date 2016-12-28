@@ -172,8 +172,8 @@ sub live_heating_thermometer_config {
         '28-0214632d16ff' => {
             name               => 'Amelia',
             rrd_group          => 'upstairs',
-            upper_temp         => 20,
-            lower_temp         => 19,
+            upper_temp         => 21,
+            lower_temp         => 20,
             control            => 'ameliarad',
             window_sensor      => 'amelia_window',
         },
@@ -208,8 +208,8 @@ sub live_heating_thermometer_config {
         '28-0214630558ff' => {
             name               => 'front-room',
             rrd_group          => 'downstairs',
-            upper_temp         => 22.0,
-            lower_temp         => 21.0,
+            upper_temp         => 21.0,
+            lower_temp         => 20.0,
             control            => 'frontroomrad',
             window_sensor      => 'front_room_window',
         },
@@ -220,8 +220,8 @@ sub live_heating_thermometer_config {
         '28-0000066ff2ac' => {
             name               => 'dinning-room',
             rrd_group          => 'downstairs',
-            upper_temp         => 19.0,
-            lower_temp         => 18.0,
+            upper_temp         => 20.0,
+            lower_temp         => 19.0,
             control            => 'dinningroomrad',
             window_sensor      => 'dining_room_window',
         },

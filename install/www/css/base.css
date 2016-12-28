@@ -4,6 +4,12 @@ div.center
     text-align: center;
 }
 
+div.main
+{
+    max-width: 1400;
+    margin: auto;
+}
+
 div.center table
 {
     margin: 0 auto;
