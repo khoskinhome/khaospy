@@ -1,13 +1,17 @@
+div.main
+{
+    margin: auto;
+    width: 95%;
+}
 
 div.center
 {
-    text-align: center;
+    /*text-align: center;*/
 }
 
-div.main
+div.left
 {
-    max-width: 1400;
-    margin: auto;
+    width: 100%;
 }
 
 div.center table
@@ -15,12 +19,6 @@ div.center table
     margin: 0 auto;
     text-align: left;
 }
-
-div.left
-{
-    text-align: left;
-}
-
 
 
 
