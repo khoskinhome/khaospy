@@ -78,16 +78,11 @@ GRANT ALL    ON rooms TO khaospy_write;
 ---------------------
 -- control_rooms
 ---------------------
-CREATE SEQUENCE control_rooms_seq;
-GRANT SELECT ON control_rooms_seq TO khaospy_read;
-GRANT ALL    ON control_rooms_seq TO khaospy_write;
 
 CREATE TABLE control_rooms (
-    id            INTEGER PRIMARY KEY DEFAULT nextval('control_rooms_seq') NOT NULL,
     room_id       INTEGER NOT NULL REFERENCES rooms,
     control_name  TEXT NOT NULL REFERENCES controls,
-    name          TEXT NOT NULL UNIQUE,
-    tag           TEXT NOT NULL UNIQUE
+    CONSTRAINT    u_control_rooms UNIQUE ( control_name, room_id )
 );
 
 GRANT SELECT ON control_rooms TO khaospy_read;
@@ -118,18 +113,20 @@ GRANT SELECT ON users TO khaospy_read;
 GRANT ALL ON users TO khaospy_write;
 
 ---------------------
--- user_control_rooms
+-- user_rooms
 ---------------------
-CREATE TABLE user_control_rooms (
+CREATE TABLE user_rooms (
     user_id         INTEGER NOT NULL REFERENCES users,
-    control_room_id INTEGER NOT NULL REFERENCES control_rooms,
+    room_id         INTEGER NOT NULL REFERENCES rooms,
     can_view        BOOLEAN NOT NULL DEFAULT FALSE,
     can_operate     BOOLEAN NOT NULL DEFAULT FALSE,
-    CONSTRAINT u_user_control_rooms_user_control_room UNIQUE ( user_id, control_room_id )
+    name            TEXT NOT NULL UNIQUE,
+    tag             TEXT NOT NULL UNIQUE,
+    CONSTRAINT      u_user_rooms UNIQUE ( user_id, room_id )
 );
 
-GRANT SELECT ON user_control_rooms TO khaospy_read;
-GRANT ALL    ON user_control_rooms TO khaospy_write;
+GRANT SELECT ON user_rooms TO khaospy_read;
+GRANT ALL    ON user_rooms TO khaospy_write;
 
 --ROLLBACK;
 

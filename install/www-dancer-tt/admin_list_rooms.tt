@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    [% INCLUDE header_jquery.tt %]
+    <script src="/js/admin_list_rooms.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/admin_list_rooms.css">
+</head>
+<body>
+    <div class='main'>
+        <table>
+            <tr><td>[% INCLUDE title_linkbar_admin.tt %]</td></tr>
+        </table>
+
+        <table>
+            <tr>
+                <th>Room</th>
+                <th>Tag</th>
+            </tr>
+
+          [% FOREACH row IN list_rooms %]
+            <tr>
+                <td>
+                    [% row.name %]
+                </td>
+                <td>
+                    [% row.tag %]
+                </td>
+                <td>
+                    <button class='edit'   id='edit-room_id[% row.id %]'>Edit</button>
+                </td>
+                <td>
+                    <button class='delete' id='delete-room_id[% row.id %]'>Delete</button>
+                </td>
+            </tr>
+          [% END %]
+        </table>
+    </div>
+</body>
+</html>
