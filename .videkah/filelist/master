@@ -351,6 +351,7 @@ crap.diff.pl
 
 ./install/www-dancer-tt/cctv.tt
 
+# status
 ./install/www-dancer-tt/status.tt
 ./install/www/css/status.css
 ./install/www/js/status.js
@@ -359,6 +360,7 @@ crap.diff.pl
 
 ./install/www-dancer-tt/admin.tt
 
+# admin users
 ./install/www-dancer-tt/admin_list_users.tt
 ./install/www/js/admin_list_users.js
 ./install/www/css/admin_list_users.css
@@ -366,6 +368,17 @@ crap.diff.pl
 ./install/www-dancer-tt/admin_add_user.tt
 ./install/www/js/admin_add_user.js
 ./install/www/css/admin_add_user.css
+
+
+# admin rooms
+./install/www-dancer-tt/admin_list_rooms.tt
+./install/www/js/admin_list_rooms.js
+./install/www/css/admin_list_rooms.css
+
+./install/www-dancer-tt/admin_add_room.tt
+./install/www/js/admin_add_room.js
+./install/www/css/admin_add_room.css
+
 
 ./install/www-dancer-tt/permission_denied.tt
 
