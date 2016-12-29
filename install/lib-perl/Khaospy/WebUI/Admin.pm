@@ -36,6 +36,19 @@ use Khaospy::DBH::Users qw(
 
 );
 
+use Khaospy::DBH::Rooms qw(
+    get_rooms
+    insert_room
+    update_room
+    delete_room
+
+    room_name_valid
+    room_name_desc
+
+    room_tag_valid
+    room_tag_desc
+);
+
 use Khaospy::WebUI::Util qw(
     pop_error_msg
 );
@@ -259,6 +272,78 @@ post '/admin/add_user'  => needs login => sub {
 
     session 'error_msg' => "user '$add->{username}' added";
     redirect uri_for('/admin/add_user', {});
+    return;
+};
+
+get '/admin/list_rooms'  => needs login => sub {
+    redirect '/admin' if ! session->read('user_is_admin');
+
+    return template 'admin_list_rooms' => {
+        page_title      => 'Admin : List Rooms',
+        user            => session('user'),
+        list_rooms      => get_rooms(),
+    };
+};
+
+get '/admin/add_room'  => needs login => sub {
+    redirect '/admin' if ! session->read('user_is_admin');
+
+    return template 'admin_add_room' => {
+        page_title  => 'Admin : Add Room',
+        user        => session('user'),
+        error_msg   => pop_error_msg(),
+    };
+
+};
+
+post '/admin/add_room'  => needs login => sub {
+    redirect '/admin' if ! session->read('user_is_admin');
+    #TODO
+
+#    my $add = {};
+#    my $error ={};
+#    my $error_msg = '';
+#
+#    for my $fld (qw(
+#        username name password email mobile_phone
+#        is_enabled is_api_user is_admin can_remote
+#    )){
+#        my $val = trim(param($fld));
+#        next if ! defined $val;
+#
+#        $add->{$fld} = $val;
+#        if ( ! users_field_valid($fld, $add->{$fld}) ){
+#            $error->{$fld} = users_field_desc($fld);
+#            $error_msg     = "field errors";
+#        }
+#    };
+#
+#    if ( $error_msg ){
+#        session 'error_msg' => $error_msg;
+#        return template 'admin_add_user' => {
+#            page_title  => 'Admin : Add User',
+#            user        => session('user'),
+#            error_msg   => pop_error_msg(),
+#            add         => $add,
+#            error       => $error,
+#        };
+#    }
+#
+#    try {
+#        insert_user($add);
+#    } catch {
+#        $error_msg = "Error inserting into DB. $_";
+#    };
+#
+#    return template 'admin_add_user' => {
+#        page_title  => 'Admin : Add User',
+#        user        => session('user'),
+#        error_msg   => $error_msg,
+#        add         => $add,
+#    } if $error_msg;
+#
+#    session 'error_msg' => "user '$add->{username}' added";
+    redirect uri_for('/admin/add_room', {});
     return;
 };
 
