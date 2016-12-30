@@ -84,6 +84,7 @@ li.nav_link {
 }
 
 li.nav_link a {
+    font-size: 30px;
     display: block;
     text-decoration: none;
     padding: 8px;
@@ -104,5 +105,7 @@ li.nav_link:last-child {
     border-right: none;
 }
 
-
+td, button, input {
+    font-size: 25px;
+}
 
