@@ -3,44 +3,46 @@ var dancer_base_url = '/dancer';
 
 $(document).ready(function(){
 
-    $("button.list-rooms").click( function() {
+    $("button.listrooms").click( function() {
+        run_func_on_db_id($(this), function(jThis, h_id, db_id){
 
-        id = $(this).attr('id') ;
-        console.log(id + " list rooms was clicked");
-        update_output("List Rooms. Not yet implemented : TODO");
+            console.log(h_id + " listrooms was clicked . db_id = "+db_id );
+            update_output(h_id + "listrooms. Not yet implemented . db_id = " + db_id );
 
-//        var extractFieldNUserId = /^(.*)-user_id(\d+)$/g;
-//        var match = extractFieldNUserId.exec( id );
-//
-//        change_password_user_id  = match[2];
-//        change_password_username = $('#username-user_id'+change_password_user_id).val();
-//        $('div#dialog-password-error').text('');
-//
-//        dialog_password.dialog( "open" );
-//        $("span.ui-dialog-title").text("Change Password : "+change_password_username);
+
+        });
 
     });
 
     $("button.configure").click( function() {
-        var id = $(this).attr('id');
-        console.log(id + " configure was clicked");
-        update_output("Configure. Not yet implemented : TODO");
+        run_func_on_db_id($(this), function(jThis, h_id, db_id){
+
+            console.log(h_id + " configure was clicked . db_id = "+db_id );
+            update_output(h_id + "configure. Not yet implemented . db_id = " + db_id );
+
+
+        });
     });
 
     $("button.edit").click( function() {
-        var id = $(this).attr('id');
-        console.log(id + " edit was clicked");
-        update_output("Edit. Not yet implemented : TODO");
+        run_func_on_db_id($(this), function(jThis, h_id, db_id){
+
+            console.log(h_id + " edit was clicked . db_id = "+db_id );
+            update_output(h_id + "edit. Not yet implemented . db_id = " + db_id );
+
+
+        });
     });
 
     $("button.delete").click( function() {
-        var id = $(this).attr('id');
-        console.log(id + " delete was clicked");
-        update_output("Delete. Not yet implemented : TODO");
+        run_func_on_db_id($(this), function(jThis, h_id, db_id){
+
+            console.log(h_id + " delete was clicked . db_id = "+db_id );
+            update_output(h_id + "delete. Not yet implemented . db_id = " + db_id );
+
+
+        });
     });
-
-    function update_output(msg){ $('#update-output').text(msg); };
-
 });
 
 //    var old_values = [];

@@ -20,22 +20,19 @@ $(document).ready(function(){
     });
 
     $("input").change( function() {
-        var id = $(this).attr('id');
+      run_func_on_db_id($(this), function(jThis, h_id, db_id, field){
 
-        var extractFieldNUserId = /^(.*)-user_id(\d+)$/g;
-        var match = extractFieldNUserId.exec(id);
-        var field   = match[1];
-        var user_id = match[2];
+        console.log(h_id + "change input. db_id = "+db_id );
 
-        if ( $(this).attr('type') == 'checkbox'){
-            var value = $(this).is(':checked');
+        if ( jThis.attr('type') == 'checkbox'){
+            var value = jThis.is(':checked');
         } else { // all the rest are textboxes :
-            var value = $(this).val();
+            var value = jThis.val();
         }
 
-        console.log( id + " input changed to " + value );
+        console.log( h_id + " input changed to " + value );
 
-        $.post(dancer_base_url + "/api/v1/admin/list_user/update/"+user_id+"/"+field,
+        $.post(dancer_base_url + "/api/v1/admin/list_user/update/"+db_id+"/"+field,
             {"value" : value },
             function(data){
                 var str = JSON.stringify(data);
@@ -44,14 +41,15 @@ $(document).ready(function(){
         )
         .fail(
             function(data){
-                if ( $( "#"+ id ).attr('type') == 'checkbox'){
-                    $( "#"+ id ).prop('checked', old_values[id] );
+                if ( jThis.attr('type') == 'checkbox'){
+                    jThis.prop('checked', old_values[h_id] );
                 } else { // all the rest are textboxes :
-                    $( "#"+ id ).val( old_values[id] );
+                    jThis.val( old_values[h_id] );
                 }
-                update_output("FAIL " + data.responseText + "\n\n old val = " + old_values[id] );
+                update_output("FAIL " + data.responseText + "\n\n old val = " + old_values[h_id] );
             }
         );
+      });
     });
 
     function changePassword() {
@@ -97,49 +95,37 @@ $(document).ready(function(){
     });
 
     $("button.change_password").click( function() {
-        id = $(this).attr('id') ;
-
-        var extractFieldNUserId = /^(.*)-user_id(\d+)$/g;
-        var match = extractFieldNUserId.exec( id );
-
-        change_password_user_id  = match[2];
-        change_password_username = $('#username-user_id'+change_password_user_id).val();
+      run_func_on_db_id($(this), function(jThis, h_id, db_id){
+        change_password_user_id  = db_id;
+        change_password_username = $('#username-id'+change_password_user_id).val();
         $('div#dialog-password-error').text('');
-
         dialog_password.dialog( "open" );
         $("span.ui-dialog-title").text("Change Password : "+change_password_username);
+      })
     });
 
-    $("button.list-rooms").click( function() {
+    $("button.listrooms").click( function() {
+      run_func_on_db_id($(this), function(jThis, h_id, db_id){
+          console.log(h_id + " listrooms was clicked . db_id = "+db_id );
+          update_output(h_id + "listrooms. Not yet implemented . db_id = " + db_id );
 
-        id = $(this).attr('id') ;
-        console.log(id + " list rooms was clicked");
-        update_output("List Rooms. Not yet implemented : TODO");
 
-//        var extractFieldNUserId = /^(.*)-user_id(\d+)$/g;
-//        var match = extractFieldNUserId.exec( id );
-//
-//        change_password_user_id  = match[2];
-//        change_password_username = $('#username-user_id'+change_password_user_id).val();
-//        $('div#dialog-password-error').text('');
-//
-//        dialog_password.dialog( "open" );
-//        $("span.ui-dialog-title").text("Change Password : "+change_password_username);
+      });
 
     });
 
     $("button.edit").click( function() {
-        var id = $(this).attr('id');
-        console.log(id + " edit was clicked");
-        update_output("Edit. Not yet implemented : TODO");
+      run_func_on_db_id($(this), function(jThis, h_id, db_id){
+          console.log(h_id + " edit was clicked . db_id = "+db_id );
+          update_output(h_id + "edit. Not yet implemented . db_id = " + db_id );
+      });
     });
 
     $("button.delete").click( function() {
-        var id = $(this).attr('id');
-        console.log(id + " delete was clicked");
-        update_output("Not yet implemented : TODO");
+      run_func_on_db_id($(this), function(jThis, h_id, db_id){
+          console.log(h_id + " delete was clicked . db_id = "+db_id );
+          update_output(h_id + "delete. Not yet implemented . db_id = " + db_id );
+      });
     });
-
-    function update_output(msg){ $('#update-output').text(msg); };
 
 });

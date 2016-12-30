@@ -37,17 +37,17 @@
                 </td>
 
                 <td>
-                    <button class='list-rooms' id='list-rooms-control_id[% row.id %]'>Rooms</button>
+                    <button class='listrooms' id='listrooms-id[% row.id %]'>Rooms</button>
                 </td>
                 <td>
-                    <button class='configure' id='configure-control_id[% row.id %]'>Configure</button>
+                    <button class='configure' id='configure-id[% row.id %]'>Configure</button>
                 </td>
 
                 <td>
-                    <button class='edit' id='edit-control_id[% row.id %]'>Edit</button>
+                    <button class='edit' id='edit-id[% row.id %]'>Edit</button>
                 </td>
                 <td>
-                    <button class='delete' id='delete-control_id[% row.id %]'>Delete</button>
+                    <button class='delete' id='delete-id[% row.id %]'>Delete</button>
                 </td>
             </tr>
           [% END %]

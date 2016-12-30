@@ -51,8 +51,12 @@ INSERT INTO control_types VALUES
 -- controls
 ---------------------
 -- eventually control_type should be NOT NULL.
+CREATE SEQUENCE controls_seq;
+GRANT SELECT ON controls_seq TO khaospy_read;
+GRANT ALL    ON controls_seq TO khaospy_write;
 
 CREATE TABLE controls (
+    id INTEGER UNIQUE DEFAULT nextval('controls_seq') NOT NULL,
     control_name  TEXT PRIMARY KEY NOT NULL,
     alias         TEXT,
     control_type             TEXT REFERENCES control_types,

@@ -32,16 +32,16 @@
                     [% row.tag %]
                 </td>
                 <td>
-                    <button class='list-users' id='list-users-room_id[% row.id %]'>Users</button>
+                    <button class='listusers' id='listusers-id[% row.id %]'>Users</button>
                 </td>
                 <td>
-                    <button class='list-controls' id='list-controls-room_id[% row.id %]'>Controls</button>
+                    <button class='listcontrols' id='listcontrols-id[% row.id %]'>Controls</button>
                 </td>
                 <td>
-                    <button class='edit' id='edit-room_id[% row.id %]'>Edit</button>
+                    <button class='edit' id='edit-id[% row.id %]'>Edit</button>
                 </td>
                 <td>
-                    <button class='delete' id='delete-room_id[% row.id %]'>Delete</button>
+                    <button class='delete' id='delete-id[% row.id %]'>Delete</button>
                 </td>
             </tr>
           [% END %]

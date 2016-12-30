@@ -3,57 +3,92 @@ var dancer_base_url = '/dancer';
 
 $(document).ready(function(){
 
-    $("button.list-users").click( function() {
+    $("button.listusers").click( function() {
+        run_func_on_db_id($(this), function(jThis, h_id, db_id){
 
-        id = $(this).attr('id') ;
-        console.log(id + " list users was clicked");
-        update_output("List Users. Not yet implemented : TODO");
+            console.log(h_id + " listusers was clicked . db_id = "+db_id );
+            update_output(h_id + "listusers. Not yet implemented . db_id = " + db_id );
 
-//        var extractFieldNUserId = /^(.*)-user_id(\d+)$/g;
-//        var match = extractFieldNUserId.exec( id );
-//
-//        change_password_user_id  = match[2];
-//        change_password_username = $('#username-user_id'+change_password_user_id).val();
-//        $('div#dialog-password-error').text('');
-//
-//        dialog_password.dialog( "open" );
-//        $("span.ui-dialog-title").text("Change Password : "+change_password_username);
-
+        });
     });
 
-    $("button.list-controls").click( function() {
+    $("button.listcontrols").click( function() {
+        run_func_on_db_id($(this), function(jThis, h_id, db_id){
 
-        id = $(this).attr('id') ;
-        console.log(id + " list controls was clicked");
-        update_output("List Controls. Not yet implemented : TODO");
+            console.log(h_id + " listcontrols was clicked . db_id = "+db_id );
+            update_output(h_id + "listcontrols. Not yet implemented . db_id = " + db_id );
 
-//        var extractFieldNUserId = /^(.*)-user_id(\d+)$/g;
-//        var match = extractFieldNUserId.exec( id );
-//
-//        change_password_user_id  = match[2];
-//        change_password_username = $('#username-user_id'+change_password_user_id).val();
-//        $('div#dialog-password-error').text('');
-//
-//        dialog_password.dialog( "open" );
-//        $("span.ui-dialog-title").text("Change Password : "+change_password_username);
 
+        });
     });
 
     $("button.edit").click( function() {
-        var id = $(this).attr('id');
-        console.log(id + " edit was clicked");
-        update_output("Edit. Not yet implemented : TODO");
+        run_func_on_db_id($(this), function(jThis, h_id, db_id){
+
+            console.log(h_id + " edit was clicked . db_id = "+db_id );
+            update_output(h_id + "Edit. Not yet implemented . db_id = " + db_id );
+
+
+        });
     });
 
     $("button.delete").click( function() {
-        var id = $(this).attr('id');
-        console.log(id + " delete was clicked");
-        update_output("Delete. Not yet implemented : TODO");
+      run_func_on_db_id($(this), function(jThis, h_id, db_id){
+
+          console.log(h_id + " delete was clicked . db_id = "+db_id );
+          update_output(h_id + "delete. Not yet implemented . db_id = " + db_id );
+
+
+      });
     });
 
-    function update_output(msg){ $('#update-output').text(msg); };
 
 });
+
+//        id = $(this).attr('id') ;
+//
+//        var extractFieldNUserId = /^(.*)-id(\d+)$/g;
+//        var match = extractFieldNUserId.exec( id );
+//
+//        if ( ! $.isArray(match)){
+//            console.log("Can't get room_id for "+id);
+//            return;
+//        }
+//
+//        var room_id  = match[2];
+//
+//        console.log(id + " list users was clicked. room-id="+room_id);
+//        update_output("List Users. Not yet implemented . room-id="+room_id);
+//
+//        change_password_username = $('#username-user_id'+change_password_user_id).val();
+//        $('div#dialog-password-error').text('');
+//
+//        dialog_password.dialog( "open" );
+//        $("span.ui-dialog-title").text("Change Password : "+change_password_username);
+
+//        id = $(this).attr('id') ;
+//
+//        var extractFieldNUserId = /^(.*)-id(\d+)$/g;
+//        var match = extractFieldNUserId.exec( id );
+//
+//        if ( ! $.isArray(match)){
+//            console.log("Can't get room_id for "+id);
+//            return;
+//        }
+//
+//        var room_id  = match[2];
+//
+//        console.log(id + " list controls was clicked . room-id="+room_id);
+//        update_output("List Controls. Not yet implemented : room-id="+room_id);
+//
+
+
+//        change_password_username = $('#username-user_id'+change_password_user_id).val();
+//        $('div#dialog-password-error').text('');
+//
+//        dialog_password.dialog( "open" );
+//        $("span.ui-dialog-title").text("Change Password : "+change_password_username);
+
 
 //    var old_values = [];
 //    var change_password_user_id;
