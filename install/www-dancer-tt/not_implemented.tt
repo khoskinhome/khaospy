@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    [% INCLUDE header_jquery.tt %]
+
+</head>
+<body>
+    <div class='main'>
+
+        [% INCLUDE title_linkbar.tt %]
+
+    </div>
+    <div class='center'>
+
+        Not Yet Implemented
+
+    </div>
+</body>
+</html>

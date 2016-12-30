@@ -110,6 +110,30 @@ $(document).ready(function(){
         $("span.ui-dialog-title").text("Change Password : "+change_password_username);
     });
 
+    $("button.list-rooms").click( function() {
+
+        id = $(this).attr('id') ;
+        console.log(id + " list rooms was clicked");
+        update_output("List Rooms. Not yet implemented : TODO");
+
+//        var extractFieldNUserId = /^(.*)-user_id(\d+)$/g;
+//        var match = extractFieldNUserId.exec( id );
+//
+//        change_password_user_id  = match[2];
+//        change_password_username = $('#username-user_id'+change_password_user_id).val();
+//        $('div#dialog-password-error').text('');
+//
+//        dialog_password.dialog( "open" );
+//        $("span.ui-dialog-title").text("Change Password : "+change_password_username);
+
+    });
+
+    $("button.edit").click( function() {
+        var id = $(this).attr('id');
+        console.log(id + " edit was clicked");
+        update_output("Edit. Not yet implemented : TODO");
+    });
+
     $("button.delete").click( function() {
         var id = $(this).attr('id');
         console.log(id + " delete was clicked");

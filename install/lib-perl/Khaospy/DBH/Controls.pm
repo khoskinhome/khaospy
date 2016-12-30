@@ -32,6 +32,7 @@ use Khaospy::Constants qw(
 );
 
 our @EXPORT_OK = qw(
+    get_controls
     get_controls_from_db
     control_status_insert
     get_last_control_state
@@ -136,7 +137,25 @@ sub control_status_insert {
     klogerror "$@ \n".Dumper($values) if $@;
 }
 
+sub get_controls {
+    # This version just gets db fields
+
+    my $sql = <<"    EOSQL";
+    select * from controls
+    order by control_name
+    EOSQL
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute();
+    my $results = [];
+    while ( my $row = $sth->fetchrow_hashref ){
+        push @$results, $row;
+    }
+    return $results;
+}
+
 sub get_controls_from_db {
+    # This version calcs things for display
     my ($control_name) = @_;
 
     my $control_select = '';

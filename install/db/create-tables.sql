@@ -10,11 +10,52 @@ BEGIN;
 -- create extension pgcrypto
 
 ---------------------
+-- control_types
+---------------------
+
+CREATE TABLE control_types (
+    control_type TEXT PRIMARY KEY NOT NULL
+);
+GRANT SELECT ON control_types TO khaospy_read;
+GRANT ALL    ON control_types TO khaospy_write;
+
+-- control_type is one of the following
+-- enums from Khaospy::Constants :
+--    $ORVIBOS20_CONTROL_TYPE
+--    $ONEWIRE_THERM_CONTROL_TYPE
+--    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE
+--    $PI_GPIO_RELAY_CONTROL_TYPE
+--    $PI_GPIO_SWITCH_CONTROL_TYPE
+--    $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE
+--    $PI_MCP23017_RELAY_CONTROL_TYPE
+--    $PI_MCP23017_SWITCH_CONTROL_TYPE
+--    $MAC_SWITCH_CONTROL_TYPE
+
+-- TODO some way of populating this from the code :
+INSERT INTO control_types VALUES
+    ('orvibos20'),
+    ('onewire-thermometer'),
+
+    ('pi-gpio-relay-manual'),
+    ('pi-gpio-relay'),
+    ('pi-gpio-switch'),
+
+    ('pi-mcp23017-relay-manual'),
+    ('pi-mcp23017-relay'),
+    ('pi-mcp23017-switch'),
+
+    ('mac-switch')
+;
+
+---------------------
 -- controls
 ---------------------
+-- eventually control_type should be NOT NULL.
+
 CREATE TABLE controls (
     control_name  TEXT PRIMARY KEY NOT NULL,
     alias         TEXT,
+    control_type             TEXT REFERENCES control_types,
     current_state            TEXT,
     current_value            REAL,
     last_change_state_time   TIMESTAMP WITH TIME ZONE,
@@ -24,12 +65,11 @@ CREATE TABLE controls (
     db_update_time           TIMESTAMP WITH TIME ZONE
 );
 
-
 GRANT SELECT ON controls TO khaospy_read;
 GRANT ALL    ON controls TO khaospy_write;
 
 ----------------
--- control_status
+-- control_status  ( should really be called control_log )
 ----------------
 CREATE SEQUENCE control_status_seq;
 GRANT SELECT ON control_status_seq TO khaospy_read;
@@ -120,8 +160,6 @@ CREATE TABLE user_rooms (
     room_id         INTEGER NOT NULL REFERENCES rooms,
     can_view        BOOLEAN NOT NULL DEFAULT FALSE,
     can_operate     BOOLEAN NOT NULL DEFAULT FALSE,
-    name            TEXT NOT NULL UNIQUE,
-    tag             TEXT NOT NULL UNIQUE,
     CONSTRAINT      u_user_rooms UNIQUE ( user_id, room_id )
 );
 

@@ -9,7 +9,12 @@
 <body>
     <div class='main'>
             <table>
-                <tr><td>[% INCLUDE title_linkbar_admin.tt %]</td></tr>
+                <tr><td>
+                    [% INCLUDE title_linkbar_admin.tt %]
+                    <ul class='link_bar'>
+                        <li class='nav_link'><a href='/dancer/admin/add_user'>Add User</a></li>
+                    </ul>
+                </td></tr>
             </table>
 
             <div id="dialog-password" title="Change Password">
@@ -72,7 +77,13 @@
                         <input type='checkbox' id='passhash_must_change-user_id[% row.id %]' [% IF row.passhash_must_change %]checked='checked'[% END %]/>
                     </td>
                     <td>
+                        <button class='list-rooms' id='list-rooms-user_id[% row.id %]'>Rooms</button>
+                    </td>
+                    <td>
                         <button class='change_password' id='change_password-user_id[% row.id %]'>Password</button>
+                    </td>
+                    <td>
+                        <button class='edit' id='edit-user_id[% row.id %]'>Edit</button>
                     </td>
                     <td>
                         <button class='delete' id='delete-user_id[% row.id %]'>Delete</button>

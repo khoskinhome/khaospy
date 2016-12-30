@@ -36,6 +36,9 @@ our @EXPORT_OK = qw(
 
     room_tag_valid
     room_tag_desc
+
+    rooms_field_valid
+    rooms_field_desc
 );
 
 sub get_rooms {
@@ -56,64 +59,54 @@ sub get_rooms {
 }
 
 sub update_room {
-    # TODO
-#    my ($user_id, $password, $must_change, $expire_time) = @_;
-#
-#    $password = _trunc_password($password);
-#    # could raise an exception ...
-#    die "password doesn't meet restrictions"
-#        if ! password_valid($password);
-#
-#    if ( $must_change ) { $must_change = 'true' }
-#    else { $must_change = 'false' }
-#
-#    my $sql =<<"    EOSQL";
-#        update users
-#        set passhash             = crypt( ? ,gen_salt('bf',8)) ,
-#            passhash_must_change = ? ,
-#            passhash_expire      = ?
-#        where id  = ?
-#    EOSQL
-#
-#    my $sth = dbh->prepare($sql);
-#    $sth->execute($password, $must_change, $expire_time, $user_id );
+    my ($room_id, $update) = @_;
 
+    my ( @fields, @values, @placeholders );
+
+    for my $fld ( keys %$update ){
+        KhaospyExcept::InvalidFieldName->throw(
+            error => rooms_field_desc($fld)
+        ) if ! rooms_field_valid($fld,$update->{$fld});
+
+        push @fields, " $fld = ? ";
+        push @values, $update->{$fld};
+    }
+
+    my $sql = " UPDATE rooms set"
+        .join( ", ",@fields)
+        ." WHERE id  = ?";
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute(@values,$room_id);
 }
 
 sub insert_room {
     my ( $add ) = @_;
-    # TODO
-#    my ( @fields, @values, @placeholders );
-#
-#    for my $fld ( keys %$add ){
-#        KhaospyExcept::InvalidFieldName->throw(
-#            error => users_field_desc($fld)
-#        ) if ! users_field_valid($fld,$add->{$fld});
-#
-#        if ( $fld eq 'password' ) {
-#            push @fields, "passhash";
-#            push @values, "crypt( ? ,gen_salt('bf',8))";
-#            push @placeholders, '?';
-#        } else {
-#            push @fields, $fld;
-#            push @values, $add->{$fld};
-#            push @placeholders, '?';
-#        }
-#    }
-#
-#    my $sql = " INSERT INTO users "
-#        ."(".join( ", ",@fields).")"
-#        ." VALUES (".join( ", ", @placeholders).")";
-#
-#    my $sth = dbh->prepare($sql);
-#    $sth->execute(@values);
+    my ( @fields, @values, @placeholders );
 
+    for my $fld ( keys %$add ){
+        KhaospyExcept::InvalidFieldName->throw(
+            error => rooms_field_desc($fld)
+        ) if ! rooms_field_valid($fld,$add->{$fld});
+
+        push @fields, $fld;
+        push @values, $add->{$fld};
+        push @placeholders, '?';
+    }
+
+    my $sql = " INSERT INTO rooms "
+        ."(".join( ", ",@fields).")"
+        ." VALUES (".join( ", ", @placeholders).")";
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute(@values);
 }
 
 sub delete_room {
-    my ( $add ) = @_;
-    # TODO
+    my ( $del ) = @_;
+    die "TODO delete_room() not yet implemented"; # TODO
 }
+
 ####
 # User field validation
 
@@ -140,5 +133,40 @@ sub room_tag_valid {
 sub room_tag_desc {
     return "The 'tag-name' must be at least 3 characters long, must start with lower-case a-z and only contain lower-case a-z, numerics, underscore or hyphen. ";
 }
+
+sub rooms_field_valid {
+    my ($field, $value) = @_;
+    $field = lc($field);
+
+    my $valid_field_sub = {
+        name => \&room_name_valid,
+        tag  => \&room_tag_valid,
+    };
+
+    KhaospyExcept::InvalidFieldName->throw(
+        error => "users_field_valid() : Invalid field '$field'"
+    ) if ! exists $valid_field_sub->{$field};
+
+    return true if $valid_field_sub->{$field}->($value);
+
+    return false;
+}
+
+sub rooms_field_desc {
+    my ($field) = @_;
+    $field = lc($field);
+
+    my $desc_field_sub = {
+        name => \&room_name_desc,
+        tag  => \&room_tag_desc,
+   };
+
+    KhaospyExcept::InvalidFieldName->throw(
+        error => "users_field_desc() : Invalid field '$field'"
+    ) if ! exists $desc_field_sub->{$field};
+
+    return $desc_field_sub->{$field}->();
+}
+
 
 1;

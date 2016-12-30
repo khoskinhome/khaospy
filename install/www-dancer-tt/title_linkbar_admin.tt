@@ -5,9 +5,8 @@
 
     <ul class='link_bar'>
         <li class='nav_link'><a href='/dancer/admin/list_users'>Users</a></li>
-        <li class='nav_link'><a href='/dancer/admin/add_user'>Add User</a></li>
         <li class='nav_link'><a href='/dancer/admin/list_rooms'>Rooms</a></li>
-        <li class='nav_link'><a href='/dancer/admin/add_room'>Add Room</a></li>
+        <li class='nav_link'><a href='/dancer/admin/list_controls'>Controls</a></li>
 
     </ul>
 

@@ -8,9 +8,15 @@
 <body>
     <div class='main'>
         <table>
-            <tr><td>[% INCLUDE title_linkbar_admin.tt %]</td></tr>
+            <tr><td>
+                [% INCLUDE title_linkbar_admin.tt %]
+                <ul class='link_bar'>
+                    <li class='nav_link'><a href='/dancer/admin/add_room'>Add Room</a></li>
+                </ul>
+            </td></tr>
         </table>
 
+        <div class='center' id='update-output'></div>
         <table>
             <tr>
                 <th>Room</th>
@@ -26,7 +32,13 @@
                     [% row.tag %]
                 </td>
                 <td>
-                    <button class='edit'   id='edit-room_id[% row.id %]'>Edit</button>
+                    <button class='list-users' id='list-users-room_id[% row.id %]'>Users</button>
+                </td>
+                <td>
+                    <button class='list-controls' id='list-controls-room_id[% row.id %]'>Controls</button>
+                </td>
+                <td>
+                    <button class='edit' id='edit-room_id[% row.id %]'>Edit</button>
                 </td>
                 <td>
                     <button class='delete' id='delete-room_id[% row.id %]'>Delete</button>
