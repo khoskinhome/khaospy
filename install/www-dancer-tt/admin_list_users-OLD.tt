@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    [% INCLUDE header_jquery.tt %]
+    <script src="/js/admin_list_users.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/admin_list_users.css">
+
+</head>
+<body>
+    <div class='main'>
+            <table>
+                <tr><td>
+                    [% INCLUDE title_linkbar_admin.tt %]
+                    <ul class='link_bar'>
+                        <li class='nav_link'><a href='/dancer/admin/add_user'>Add User</a></li>
+                    </ul>
+                </td></tr>
+            </table>
+
+            <div id="dialog-password" title="Change Password">
+
+                <form>
+                    <input type="password" name="password" id="new_password" value="xxxxxxx" class="text ui-widget-content ui-corner-all" size='30'>
+
+                    <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                    <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+                </form>
+                <div id="dialog-password-error"></div>
+
+            </div>
+
+            <div class='center' id='update-output'></div>
+
+            <table>
+                <tr>
+                    <th>User</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Enabled</th>
+                    <th>API User</th>
+                    <th>Admin</th>
+                    <th>Remote</th>
+                    <th>Must Change Password</th>
+                    <th></th>
+                    <th></th>
+
+                </tr>
+
+              [% FOREACH row IN list_users %]
+                <tr>
+                    <td>
+                        <input type='text' id='username-id[% row.id %]' value='[% row.username %]'/>
+                    </td>
+                    <td>
+                        <input type='text' id='name-id[% row.id %]' value='[% row.name %]'/>
+                    </td>
+                    <td>
+                        <input type='text' id='email-id[% row.id %]' value='[% row.email %]'/>
+                    </td>
+                    <td>
+                        <input type='text' id='mobile_phone-id[% row.id %]' value='[% row.mobile_phone %]'/>
+                    </td>
+                    <td>
+                        <input type='checkbox' id='is_enabled-id[% row.id %]'  [% IF row.is_enabled %]checked='checked'[% END %]/>
+                    </td>
+                    <td>
+                        <input type='checkbox' id='is_api_user-id[% row.id %]' [% IF row.is_api_user %]checked='checked'[% END %]/>
+                    </td>
+                    <td>
+                        <input type='checkbox' id='is_admin-id[% row.id %]'    [% IF row.is_admin %]checked='checked'[% END %]/>
+                    </td>
+                    <td>
+                        <input type='checkbox' id='can_remote-id[% row.id %]'  [% IF row.can_remote %]checked='checked'[% END %]/>
+                    </td>
+                    <td>
+                        <input type='checkbox' id='passhash_must_change-id[% row.id %]' [% IF row.passhash_must_change %]checked='checked'[% END %]/>
+                    </td>
+                    <td>
+                        <button class='listrooms' id='listrooms-id[% row.id %]'>Rooms</button>
+                    </td>
+                    <td>
+                        <button class='change_password' id='change_password-id[% row.id %]'>Password</button>
+                    </td>
+                    <td>
+                        <button class='edit' id='edit-id[% row.id %]'>Edit</button>
+                    </td>
+                    <td>
+                        <button class='delete' id='delete-id[% row.id %]'>Delete</button>
+                    </td>
+                </tr>
+              [% END %]
+            </table>
+    </div>
+</body>
+</html>
