@@ -238,8 +238,8 @@ get '/admin/add_user'  => needs login => sub {
 post '/admin/add_user'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');
 
-    my $add = {};
-    my $error ={};
+    my $add       = {};
+    my $error     = {};
     my $error_msg = '';
 
     for my $fld (qw(
@@ -282,6 +282,99 @@ post '/admin/add_user'  => needs login => sub {
 
     session 'error_msg' => "user '$add->{username}' added";
     redirect uri_for('/admin/add_user', {});
+    return;
+};
+
+get '/admin/update_user/:user_id'  => needs login => sub {
+    redirect '/admin' if ! session->read('user_is_admin');
+
+    my $user_id     = params->{user_id};
+    my $user_record = get_user_by_id($user_id);
+    if ( ! $user_record ){
+        status 'bad_request';
+        redirect uri_for('/admin/list_users', {
+#TODO fix the error message : update_output =>"can't get the user record $user_id",
+        });
+    }
+
+    return template 'admin_update_user' => {
+        page_title  => 'Admin : Update User',
+        data        => $user_record,
+        user        => session('user'),
+        error_msg   => pop_error_msg(),
+    };
+};
+
+post '/admin/update_user'  => needs login => sub {
+    redirect '/admin' if ! session->read('user_is_admin');
+    my $data      = {};
+    my $error     = {};
+    my $error_msg = '';
+
+    my $user_id = trim(param('user_id'));
+    $data->{id} = $user_id;
+
+    my $user_record = get_user_by_id($user_id);
+    if ( ! $user_record ){
+        status 'bad_request';
+        redirect uri_for('/admin/list_users', {
+#TODO fix the error message : update_output =>"can't get the user record $user_id",
+        });
+    }
+
+    if ( $user_id == session->read('user_id') ){
+        #this is the current admin user. make sure they don't disable themself.
+        for my $fld (qw(is_admin is_enabled)){
+            my $val = trim(param($fld)) eq 'on' ? 1 : 0 ;
+
+warn ( "update user : $fld new val == $val. old_val == $user_record->{$fld}\n");
+            if ($val ne $user_record->{$fld}){
+                $error->{$fld} = "current admin user can't disable their own user account";
+                $error_msg     = "field errors";
+            }
+        }
+    }
+#HERE
+    for my $fld (qw(
+        username name email mobile_phone
+        is_enabled is_api_user is_admin can_remote
+    )){
+        my $val = trim(param($fld));
+        next if ! defined $val;
+
+        $data->{$fld} = $val;
+        if ( ! users_field_valid($fld, $data->{$fld}) ){
+            $error->{$fld} = users_field_desc($fld);
+            $error_msg     = "field errors";
+        }
+    };
+
+    if ( $error_msg ){
+        session 'error_msg' => $error_msg;
+        return template 'admin_update_user' => {
+            page_title  => 'Admin : Add User',
+            user        => session('user'),
+            error_msg   => pop_error_msg(),
+            data        => $data,
+            error       => $error,
+        };
+    }
+
+#    try {
+#        # update_user($data);
+#    } catch {
+#        $error_msg = "Error inserting into DB. $_";
+#    };
+#
+#    return template 'admin_add_user' => {
+#        page_title  => 'Admin : Add User',
+#        user        => session('user'),
+#        error_msg   => $error_msg,
+#        data        => $data,
+#    } if $error_msg;
+#
+#    session 'error_msg' => "user '$data->{username}' added";
+    redirect uri_for("/admin/list_users", {});
     return;
 };
 

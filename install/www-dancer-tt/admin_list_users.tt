@@ -29,53 +29,22 @@
 
             </div>
 
-            <div class='center' id='update-output'></div>
+            <div class='center' id='update-output'>[% update_output %]</div>
 
             <table>
                 <tr>
                     <th>User</th>
                     <th>Name</th>
-                    <th>Email</th>
-                    <th>Mobile</th>
-                    <th>Enabled</th>
-                    <th>API User</th>
-                    <th>Admin</th>
-                    <th>Remote</th>
-                    <th>Must Change Password</th>
                     <th></th>
                     <th></th>
-
+                    <th></th>
+                    <th></th>
                 </tr>
 
               [% FOREACH row IN list_users %]
                 <tr>
-                    <td>
-                        <input type='text' id='username-id[% row.id %]' value='[% row.username %]'/>
-                    </td>
-                    <td>
-                        <input type='text' id='name-id[% row.id %]' value='[% row.name %]'/>
-                    </td>
-                    <td>
-                        <input type='text' id='email-id[% row.id %]' value='[% row.email %]'/>
-                    </td>
-                    <td>
-                        <input type='text' id='mobile_phone-id[% row.id %]' value='[% row.mobile_phone %]'/>
-                    </td>
-                    <td>
-                        <input type='checkbox' id='is_enabled-id[% row.id %]'  [% IF row.is_enabled %]checked='checked'[% END %]/>
-                    </td>
-                    <td>
-                        <input type='checkbox' id='is_api_user-id[% row.id %]' [% IF row.is_api_user %]checked='checked'[% END %]/>
-                    </td>
-                    <td>
-                        <input type='checkbox' id='is_admin-id[% row.id %]'    [% IF row.is_admin %]checked='checked'[% END %]/>
-                    </td>
-                    <td>
-                        <input type='checkbox' id='can_remote-id[% row.id %]'  [% IF row.can_remote %]checked='checked'[% END %]/>
-                    </td>
-                    <td>
-                        <input type='checkbox' id='passhash_must_change-id[% row.id %]' [% IF row.passhash_must_change %]checked='checked'[% END %]/>
-                    </td>
+                    <td id='td_username-id[% row.id %]'>[% row.username %]</td>
+                    <td>[% row.name %]</td>
                     <td>
                         <button class='listrooms' id='listrooms-id[% row.id %]'>Rooms</button>
                     </td>
@@ -83,7 +52,7 @@
                         <button class='change_password' id='change_password-id[% row.id %]'>Password</button>
                     </td>
                     <td>
-                        <button class='edit' id='edit-id[% row.id %]'>Edit</button>
+                        <button class='update' id='update-id[% row.id %]'>Update</button>
                     </td>
                     <td>
                         <button class='delete' id='delete-id[% row.id %]'>Delete</button>
