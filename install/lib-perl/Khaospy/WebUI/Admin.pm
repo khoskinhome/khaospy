@@ -18,8 +18,11 @@ use Khaospy::Utils qw(
 use Khaospy::DBH::Users qw(
     get_users
     get_user_by_id
+
     update_user_by_id
+
     insert_user
+    delete_user
 
     password_valid
     password_desc
@@ -43,7 +46,6 @@ use Khaospy::DBH::Rooms qw(
 
     rooms_field_valid
     rooms_field_desc
-
 );
 
 use Khaospy::DBH::Controls qw(
@@ -63,12 +65,10 @@ get '/admin' => needs login => sub {
         user            => session('user'),
     } if ! session->read('user_is_admin');
 
-#    redirect '/' if session('user');
     return template 'admin' => {
         page_title      => 'Admin',
         user            => session('user'),
     };
-
 };
 
 ################
@@ -205,7 +205,7 @@ post '/api/v1/admin/list_user/update_password/:user_id'  => needs login => sub {
     return to_json $ret;
 };
 
-post '/api/v1/admin/delete_user/:user_id'  => needs login => sub {
+post '/admin/delete_user/:user_id'  => needs login => sub {
 
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
@@ -215,11 +215,28 @@ post '/api/v1/admin/delete_user/:user_id'  => needs login => sub {
         return "user is not an admin";
     }
 
-    my $user_id      = params->{user_id};
+    my $user_id = trim(params->{user_id});
 
-    # for admin users to delete
-    # TODO
+    if ( $user_id == session->read('user_id') ){
+        status 'bad_request';
+        return "admin user cannot delete their own account";
+    }
 
+    my $error_msg;
+
+    try {
+        delete_user($user_id);
+    } catch {
+        $error_msg = "DB Error : $_";
+    };
+
+    if ($error_msg){
+        status 'bad_request';
+        return $error_msg;
+    }
+
+    status 'no_content';
+    return;
 };
 
 get '/admin/add_user'  => needs login => sub {
@@ -231,7 +248,6 @@ get '/admin/add_user'  => needs login => sub {
         user        => session('user'),
         error_msg   => pop_error_msg(),
     };
-
 };
 
 post '/admin/add_user'  => needs login => sub {
@@ -290,9 +306,8 @@ get '/admin/update_user/:user_id'  => needs login => sub {
     my $user_record = get_user_by_id($user_id);
     if ( ! $user_record ){
         status 'bad_request';
-        redirect uri_for('/admin/list_users', {
-#TODO fix the error message : update_output =>"can't get the user record $user_id",
-        });
+        session 'error_msg' => "can't get the user record $user_id";
+        redirect uri_for('/admin/list_users', {});
     }
 
     return template 'admin_update_user' => {
@@ -314,14 +329,15 @@ post '/admin/update_user'  => needs login => sub {
 
     my $user_record = get_user_by_id($user_id);
     if ( ! $user_record ){
-        status 'bad_request';
-        redirect uri_for('/admin/list_users', {
-#TODO fix the error message : update_output =>"can't get the user record $user_id",
-        });
+        status  'bad_request';
+        session 'error_msg' => "can't get the user record $user_id";
+        redirect uri_for('/admin/list_users', {});
     }
 
     if ( $user_id == session->read('user_id') ){
-        #this is the current admin user. make sure they don't disable themself.
+        # this is the current admin user.
+        # make sure they don't disable themself.
+
         for my $fld (qw(is_admin is_enabled)){
             my $val = trim(param($fld)) eq 'on' ? 1 : 0 ;
 

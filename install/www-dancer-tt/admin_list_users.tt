@@ -17,6 +17,10 @@
                 </td></tr>
             </table>
 
+            <div id="dialog-confirm" title="Delete the User ?">
+              <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>This User will be permanently deleted. Are you sure?</p>
+            </div>
+
             <div id="dialog-password" title="Change Password">
 
                 <form>

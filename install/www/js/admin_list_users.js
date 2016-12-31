@@ -1,11 +1,12 @@
 // FIXME TODO dancer base could change
 var dancer_base_url = '/dancer';
+var delete_user_id;
+var change_password_user_id;
+var change_password_username;
 
 $(document).ready(function(){
 
 //    var old_values = [];
-//    var change_password_user_id;
-//    var change_password_username;
 //
 //    $("input[type=text]").focusin( function() {
 //        var id = $(this).attr('id');
@@ -121,11 +122,41 @@ $(document).ready(function(){
       });
     });
 
-    $("button.delete").click( function() {
-      run_func_on_db_id($(this), function(jThis, h_id, db_id){
-          console.log(h_id + " delete was clicked . db_id = "+db_id );
-          update_output(h_id + "delete. Not yet implemented . db_id = " + db_id );
-      });
+
+    var dialog_confirm_user_delete = $( "#dialog-confirm" ).dialog({
+        resizable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        buttons: {
+          "Delete User": function() {
+              $.post(dancer_base_url + "/admin/delete_user/"+delete_user_id,
+                  {},
+                  function(data){
+                      var str = JSON.stringify(data);
+                      update_output("Success : " + str );
+                  }
+              )
+              .fail(
+                  function(data){
+                      update_output("FAIL : " + data.responseText );
+                  }
+              );
+              $( this ).dialog( "close" );
+          },
+          Cancel: function() {
+            $( this ).dialog( "close" );
+          }
+        }
     });
 
+    dialog_confirm_user_delete.dialog("close");
+
+    $("button.delete").click( function() {
+        run_func_on_db_id($(this), function(jThis, h_id, db_id){
+            console.log(h_id + " delete was clicked . db_id = "+db_id );
+            delete_user_id = db_id;
+            dialog_confirm_user_delete.dialog( "open" );
+        });
+    });
 });

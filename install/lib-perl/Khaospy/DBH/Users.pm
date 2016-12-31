@@ -5,7 +5,22 @@ use Exporter qw/import/;
 
 use Email::Valid;
 
-use Khaospy::DBH qw(dbh);
+use Khaospy::DBH qw(
+    dbh
+
+    gen_field_valid_sub
+    gen_field_desc_sub
+
+    anything_valid
+    anything_desc_sub
+
+    boolean_valid
+    boolean_desc_sub
+
+    timestamp_with_tz_valid
+    timestamp_with_tz_desc_sub
+);
+
 use Khaospy::Constants qw(
     true false
 );
@@ -38,12 +53,6 @@ our @EXPORT_OK = qw(
 
     password_valid
     password_desc
-
-    email_address_valid
-    email_address_desc
-
-    mobile_phone_valid
-    mobile_phone_desc
 
     users_field_valid
     users_field_desc
@@ -187,7 +196,10 @@ sub _trunc_password {
 }
 
 sub delete_user {
-    die "TODO . delete_user not yet implemented";
+    my ( $user_id ) = @_;
+    my $sql =" DELETE FROM users WHERE id = ?";
+    my $sth = dbh->prepare($sql);
+    $sth->execute($user_id);
 }
 
 sub insert_user {
@@ -289,106 +301,38 @@ sub mobile_phone_desc {
     return 'The mobile phone number can only have an optional prefixed-plus-sign, digits, (minus-sign), (underscore) or (space) characters. The mobile phone can be left blank. ';
 }
 
-sub anything_valid {
-    return true;
-}
+my $fv_sub = gen_field_valid_sub( 'user_rooms', {
+    username                => \&username_valid,
+    name                    => \&name_valid,
+    password                => \&password_valid,
+    email                   => \&email_address_valid,
+    mobile_phone            => \&mobile_phone_valid,
+    is_enabled              => \&boolean_valid,
+    is_api_user             => \&boolean_valid,
+    is_admin                => \&boolean_valid,
+    can_remote              => \&boolean_valid,
+    passhash_must_change    => \&boolean_valid,
+    passhash_expire         => \&timestamp_with_tz_valid,
+    email_confirm_hash      => \&anything_valid,
+});
 
-sub anything_desc_sub {
-    my ($field) = @_;
-    $field = lc($field);
+sub users_field_valid { return $fv_sub->(@_) }
 
-    return sub {
-        return "$field is allowed to be anything";
-    }
-}
+my $fd_sub = gen_field_desc_sub( 'users', {
+    username                => \&username_desc,
+    name                    => \&name_desc,
+    password                => \&password_desc,
+    email                   => \&email_address_desc,
+    mobile_phone            => \&mobile_phone_desc,
+    is_enabled              => boolean_desc_sub('is_enabled'),
+    is_api_user             => boolean_desc_sub('is_api_user'),
+    is_admin                => boolean_desc_sub('is_admin'),
+    can_remote              => boolean_desc_sub('can_remote'),
+    passhash_must_change    => boolean_desc_sub('passhash_must_change'),
+    passhash_expire         => timestamp_with_tz_desc_sub('passhash_expire'),
+    email_confirm_hash      => anything_desc_sub('email_confirm_hash'),
+});
 
-sub boolean_valid {
-    # TODO maybe some boolean checking here.
-    return 1;
-}
-
-sub boolean_desc_sub {
-    my ($field) = @_;
-    $field = lc($field);
-
-    return sub {
-        return "$field is not a boolean. ";
-    }
-}
-
-sub timestamp_with_tz_valid {
-    # TODO maybe some timestamp tz checking here.
-    # 2016-12-14 00:36:17.35655+00
-    return 1;
-}
-
-sub timestamp_with_tz_desc_sub {
-    my ($field) = @_;
-    $field = lc($field);
-
-    return sub {
-        return "$field is not a boolean. ";
-    }
-}
-
-
-sub users_field_valid {
-    my ($field, $value) = @_;
-    $field = lc($field);
-
-    # The fields must never be added to validation here :
-    #    passhash
-    #    id
-
-    my $valid_field_sub = {
-        username                => \&username_valid,
-        name                    => \&name_valid,
-        password                => \&password_valid,
-        email                   => \&email_address_valid,
-        mobile_phone            => \&mobile_phone_valid,
-        is_enabled              => \&boolean_valid,
-        is_api_user             => \&boolean_valid,
-        is_admin                => \&boolean_valid,
-        can_remote              => \&boolean_valid,
-        passhash_must_change    => \&boolean_valid,
-        passhash_expire         => \&timestamp_with_tz_valid,
-        email_confirm_hash      => \&anything_valid,
-    };
-
-    KhaospyExcept::InvalidFieldName->throw(
-        error => "users_field_valid() : Invalid field '$field'"
-    ) if ! exists $valid_field_sub->{$field};
-
-    return true if $valid_field_sub->{$field}->($value);
-
-    return false;
-}
-
-sub users_field_desc {
-    my ($field) = @_;
-    $field = lc($field);
-
-    my $desc_field_sub = {
-        username                => \&username_desc,
-        name                    => \&name_desc,
-        password                => \&password_desc,
-        email                   => \&email_address_desc,
-        mobile_phone            => \&mobile_phone_desc,
-        is_enabled              => boolean_desc_sub('is_enabled'),
-        is_api_user             => boolean_desc_sub('is_api_user'),
-        is_admin                => boolean_desc_sub('is_admin'),
-        can_remote              => boolean_desc_sub('can_remote'),
-        passhash_must_change    => boolean_desc_sub('passhash_must_change'),
-        passhash_expire         => timestamp_with_tz_desc_sub('passhash_expire'),
-        email_confirm_hash      => anything_desc_sub('email_confirm_hash'),
-
-   };
-
-    KhaospyExcept::InvalidFieldName->throw(
-        error => "users_field_desc() : Invalid field '$field'"
-    ) if ! exists $desc_field_sub->{$field};
-
-    return $desc_field_sub->{$field}->();
-}
+sub users_field_desc { return $fd_sub->(@_) }
 
 1;
