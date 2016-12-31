@@ -105,8 +105,6 @@ crapnew
 ./install/lib-perl/Khaospy/StatusD.pm
 ./install/bin/khaospy-status-d.pl
 
-./install/lib-perl/Khaospy/DBH.pm
-
 ./install/lib-perl/Khaospy/ZMQAnyEvent.pm
 
 ./install/lib-perl/zhelpers.pm
@@ -322,9 +320,11 @@ crap.diff.pl
 ./install/lib-perl/Khaospy/WebUI/Constants.pm
 ./install/lib-perl/Khaospy/WebUI/DB.pm
 
+./install/lib-perl/Khaospy/DBH.pm
 ./install/lib-perl/Khaospy/DBH/Controls.pm
 ./install/lib-perl/Khaospy/DBH/Users.pm
 ./install/lib-perl/Khaospy/DBH/Rooms.pm
+./install/lib-perl/Khaospy/DBH/UserRooms.pm
 
 ./install/www-bin/dancer.pl
 ./install/lib-perl/Khaospy/WebUI.pm
@@ -360,6 +360,8 @@ crap.diff.pl
 
 ./install/www-dancer-tt/admin.tt
 
+
+crapy
 # admin users
 ./install/www-dancer-tt/admin_list_users.tt
 ./install/www-dancer-tt/admin_list_users-OLD.tt
@@ -422,26 +424,6 @@ crap.diff.pl
 ##############################
 
 # greping crap
-
-
-# ~/github.com/khaospy$ g.grep title_linkbar.tt
-.videkah/filelist/master:338:./install/www-dancer-tt/title_linkbar.tt
-.videkah/filelist/pi-mcp23017:331:./install/www-dancer-tt/title_linkbar.tt
-install/www-dancer-tt/cctv.tt:12:            [% INCLUDE title_linkbar.tt %]
-install/www-dancer-tt/index.tt:11:            [% INCLUDE title_linkbar.tt %]
-install/www-dancer-tt/permission_denied.tt:10:        [% INCLUDE title_linkbar.tt %]
-install/www-dancer-tt/status.tt:13:        [% INCLUDE title_linkbar.tt %]
-install/www-dancer-tt/title_linkbar_admin.tt:6:        [% INCLUDE title_linkbar.tt %]
-install/www-dancer-tt/title_linkbar_user.tt:4:            [% INCLUDE title_linkbar.tt %]
-
-
-
-
-
-
-
-
-
 
 
 
