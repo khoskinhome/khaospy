@@ -17,19 +17,22 @@
                     <tr>
                         <td>Name</td>
                         <td>
-                            <input type='text' name='name' value='[% name %]' />
+                            <input type='text' name='name' value='[% data.name %]' />
                         </td>
+                        <td>[% error.name %]</td>
                     </tr>
 
                     <tr>
                         <td>Email</td>
-                        <td><input type='text' name='email' value='[% email %]' /></td>
+                        <td><input type='text' name='email' value='[% data.email %]' /></td>
+                        <td>[% error.email %]</td>
                     </tr>
                     <tr>
                         <td>Mobile Phone </td>
                         <td>
-                            <input type='text' name='mobile_phone' value='[% mobile_phone %]' />
+                            <input type='text' name='mobile_phone' value='[% data.mobile_phone %]' />
                         </td>
+                        <td>[% error.mobile_phone %]</td>
                     </tr>
                     <tr>
                         <td></td>

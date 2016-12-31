@@ -18,7 +18,7 @@ use Khaospy::Utils qw(
 use Khaospy::DBH::Users qw(
     get_user
     get_user_password
-    update_user_password
+    update_user_by_id
 );
 
 use Khaospy::WebUI::Constants qw(
@@ -158,6 +158,8 @@ post '/reset_password' => sub { # don't need login for this root.
         return;
     }
 
+    my $user_id = get_hashval($user_record,'id');
+
     if ( ! get_hashval($user_record,'is_enabled') ){
 
         session 'error_msg'
@@ -191,12 +193,12 @@ EOBODY
 
 
     eval {
-        update_user_password(
-            $user,
-            $new_password,
-            true,
-            get_iso8601_utc_from_epoch(time+$PASSWORD_RESET_TIMEOUT),
-        );
+        update_user_by_id($user_id,{
+            password => $new_password,
+            passhash_must_change => true,
+            passhash_expire =>
+                get_iso8601_utc_from_epoch(time+$PASSWORD_RESET_TIMEOUT),
+        });
     };
     if( $@ ){
         warn "Issue reseting password for $user. $@";

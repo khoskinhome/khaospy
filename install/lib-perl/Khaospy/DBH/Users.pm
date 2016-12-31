@@ -31,12 +31,10 @@ our @EXPORT_OK = qw(
     get_user_by_id
     get_users
     get_user_password
-    update_user_password
-    update_user_id_password
-    update_field_by_user_id
-    update_user_name_email_phone
+    update_user_by_id
 
     insert_user
+    delete_user
 
     password_valid
     password_desc
@@ -142,88 +140,38 @@ sub get_users {
     return $results;
 }
 
-sub update_user_id_password {
-    my ($user_id, $password, $must_change, $expire_time) = @_;
+sub update_user_by_id {
+    my ( $user_id, $data ) = @_;
 
-    $password = _trunc_password($password);
-    # could raise an exception ...
-    die "password doesn't meet restrictions"
-        if ! password_valid($password);
+    my $errors = {};
+    my (@fields, @values);
 
-    if ( $must_change ) { $must_change = 'true' }
-    else { $must_change = 'false' }
+    for my $fld (keys %$data){
+        next if $fld eq 'id';
+        my $val = trim(get_hashval($data,$fld,true));
 
-    my $sql =<<"    EOSQL";
-        update users
-        set passhash             = crypt( ? ,gen_salt('bf',8)) ,
-            passhash_must_change = ? ,
-            passhash_expire      = ?
-        where id  = ?
-    EOSQL
-
-    my $sth = dbh->prepare($sql);
-    $sth->execute($password, $must_change, $expire_time, $user_id );
-
-}
-
-sub update_user_name_email_phone {
-    my ($user, $name, $email, $mobile_phone) = @_;
-
-    my $sql =<<"    EOSQL";
-        update users
-        set name         = ? ,
-            email        = ? ,
-            mobile_phone = ?
-        where username  = ?
-    EOSQL
-
-    my $sth = dbh->prepare($sql);
-    $sth->execute($name, $email, $mobile_phone, $user);
-}
-
-sub update_user_password {
-    my ($user,$password, $must_change, $expire_time) = @_;
-
-    $password = _trunc_password($password);
-    # could raise an exception ...
-    die "password doesn't meet restrictions"
-        if ! password_valid($password);
-
-    if ( $must_change ) { $must_change = 'true' }
-    else { $must_change = 'false' }
-
-    my $sql =<<"    EOSQL";
-        update users
-        set passhash             = crypt( ? ,gen_salt('bf',8)) ,
-            passhash_must_change = ? ,
-            passhash_expire      = ?
-        where username  = ?
-    EOSQL
-
-    my $sth = dbh->prepare($sql);
-    $sth->execute($password, $must_change, $expire_time ,lc($user));
-}
-
-sub update_field_by_user_id {
-    my ($user_id, $field, $value ) = @_;
-    $field = lc($field);
-
-    KhaospyExcept::InvalidFieldName->throw( error =>
-        "password field cannot be updated by update_field_by_user_id()"
-    ) if $field eq 'password';
+        if ( ! users_field_valid($fld, $data->{$fld}) ){
+            $errors->{$fld} = users_field_desc($fld);
+        } else {
+            if ( $fld eq 'password'){
+                push @fields, " passhash = crypt( ? ,gen_salt('bf',8)) ";
+                $val = _trunc_password($val);
+            } else {
+                push @fields, " $fld = ? ";
+            }
+            push @values , $val;
+        }
+    }
 
     KhaospyExcept::InvalidFieldName->throw(
-        error => users_field_desc($field)
-    ) if !  users_field_valid($field,$value);
+        error => Dumper($errors)
+    ) if keys %$errors;
 
-    my $sql =<<"    EOSQL";
-        update users
-        set $field = ?
-        where id = ?
-    EOSQL
+    my $sql =
+        " UPDATE users SET ".join( ", ",@fields)." WHERE id = ? ";
 
     my $sth = dbh->prepare($sql);
-    $sth->execute($value, $user_id);
+    $sth->execute( @values, $user_id );
 }
 
 sub _trunc_password {
@@ -238,6 +186,10 @@ sub _trunc_password {
     return $password;
 }
 
+sub delete_user {
+    die "TODO . delete_user not yet implemented";
+}
+
 sub insert_user {
     my ( $add ) = @_;
 
@@ -250,8 +202,9 @@ sub insert_user {
 
         if ( $fld eq 'password' ) {
             push @fields, "passhash";
-            push @values, "crypt( ? ,gen_salt('bf',8))";
-            push @placeholders, '?';
+            push @placeholders, "crypt( "
+                .dbh->quote($add->{$fld})
+                ." ,gen_salt('bf',8))";
         } else {
             push @fields, $fld;
             push @values, $add->{$fld};
@@ -336,8 +289,21 @@ sub mobile_phone_desc {
     return 'The mobile phone number can only have an optional prefixed-plus-sign, digits, (minus-sign), (underscore) or (space) characters. The mobile phone can be left blank. ';
 }
 
+sub anything_valid {
+    return true;
+}
+
+sub anything_desc_sub {
+    my ($field) = @_;
+    $field = lc($field);
+
+    return sub {
+        return "$field is allowed to be anything";
+    }
+}
+
 sub boolean_valid {
-    # TODO maybe some checking here.
+    # TODO maybe some boolean checking here.
     return 1;
 }
 
@@ -350,9 +316,29 @@ sub boolean_desc_sub {
     }
 }
 
+sub timestamp_with_tz_valid {
+    # TODO maybe some timestamp tz checking here.
+    # 2016-12-14 00:36:17.35655+00
+    return 1;
+}
+
+sub timestamp_with_tz_desc_sub {
+    my ($field) = @_;
+    $field = lc($field);
+
+    return sub {
+        return "$field is not a boolean. ";
+    }
+}
+
+
 sub users_field_valid {
     my ($field, $value) = @_;
     $field = lc($field);
+
+    # The fields must never be added to validation here :
+    #    passhash
+    #    id
 
     my $valid_field_sub = {
         username                => \&username_valid,
@@ -365,6 +351,8 @@ sub users_field_valid {
         is_admin                => \&boolean_valid,
         can_remote              => \&boolean_valid,
         passhash_must_change    => \&boolean_valid,
+        passhash_expire         => \&timestamp_with_tz_valid,
+        email_confirm_hash      => \&anything_valid,
     };
 
     KhaospyExcept::InvalidFieldName->throw(
@@ -391,6 +379,9 @@ sub users_field_desc {
         is_admin                => boolean_desc_sub('is_admin'),
         can_remote              => boolean_desc_sub('can_remote'),
         passhash_must_change    => boolean_desc_sub('passhash_must_change'),
+        passhash_expire         => timestamp_with_tz_desc_sub('passhash_expire'),
+        email_confirm_hash      => anything_desc_sub('email_confirm_hash'),
+
    };
 
     KhaospyExcept::InvalidFieldName->throw(

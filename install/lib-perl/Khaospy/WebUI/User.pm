@@ -18,17 +18,13 @@ use Khaospy::Utils qw(
 use Khaospy::DBH::Users qw(
     get_user
     get_user_password
-    update_user_password
-    update_user_name_email_phone
+    update_user_by_id
+
+    users_field_valid
+    users_field_desc
 
     password_valid
     password_desc
-
-    email_address_valid
-    email_address_desc
-
-    mobile_phone_valid
-    mobile_phone_desc
 
 );
 
@@ -87,6 +83,8 @@ post '/user/change_password' => sub { # don't need login for this root.
         return;
     }
 
+    my $user_id = get_hashval($user_record,'id');
+
     if ( ! get_hashval($user_record,'is_enabled') ){
 
         session 'error_msg'
@@ -129,7 +127,11 @@ post '/user/change_password' => sub { # don't need login for this root.
 
     my $error_msg;
     try {
-        update_user_password($user,$new_password,false);
+        update_user_by_id($user_id,{
+            password => $new_password,
+            passhash_expire => undef,
+            passhash_must_change => false,
+        });
     } catch {
         $error_msg = $_;
     };
@@ -177,9 +179,7 @@ get '/user/update'  => needs login => sub {
     return template 'user_update' => {
         page_title   => 'User : Update',
         user         => $user,
-        name         => get_hashval($user_record,'name'),
-        email        => get_hashval($user_record,'email'),
-        mobile_phone => get_hashval($user_record,'mobile_phone'),
+        data         => $user_record,
 #        return_url  => params->{return_url},
         error_msg   => pop_error_msg(),
     };
@@ -190,36 +190,45 @@ post '/user/update'  => needs login => sub {
     # name, email, mobile_phone
 
     my $user         = session->read('user');
-    my $name         = trim(param('name'));
-    my $email        = trim(param('email'));
-    my $mobile_phone = trim(param('mobile_phone'));
-    my $error_msg;
+
+    my $data      = {};
+    my $error     = {};
+    my $error_msg = '';
 
     # TODO filter name, email for xss things ?
 
-    $error_msg .= email_address_desc()
-        if ! email_address_valid($email);
+    for my $fld (qw( name email mobile_phone)){
+        my $val = trim(param($fld));
+        next if ! defined $val;
 
-    $error_msg .= mobile_phone_desc()
-        if ! mobile_phone_valid($mobile_phone);
+        $data->{$fld} = $val;
+        if ( ! users_field_valid($fld, $data->{$fld}) ){
+            $error->{$fld} = users_field_desc($fld);
+            $error_msg     = "field errors";
+        }
+    };
 
-    if ( $error_msg ){
-        session 'error_msg' => $error_msg;
-    } else {
+    if ( ! $error_msg ) {
         try {
-            update_user_name_email_phone(
-                $user,
-                $name,
-                $email,
-                $mobile_phone,
-            );
+            update_user_by_id(session->read('user_id'), $data);
         } catch {
-            $error_msg = $_;
+            $error_msg = "DB Error: $_";
         };
-        session 'error_msg' => $error_msg || 'Updated';
     }
 
-    redirect uri_for('/user/update', { });
+    if ( $error_msg ){
+        return template 'user_update' => {
+            page_title  => 'User : Update',
+            user        => session('user'),
+            error_msg   => $error_msg,
+            data        => $data,
+            error       => $error,
+        };
+    }
+
+    session 'error_msg' => "updated";
+    redirect uri_for("/user/update", {});
+    return;
 };
 
 1;

@@ -18,18 +18,11 @@ use Khaospy::Utils qw(
 use Khaospy::DBH::Users qw(
     get_users
     get_user_by_id
-    update_field_by_user_id
-    update_user_id_password
+    update_user_by_id
     insert_user
 
     password_valid
     password_desc
-
-    email_address_valid
-    email_address_desc
-
-    mobile_phone_valid
-    mobile_phone_desc
 
     users_field_valid
     users_field_desc
@@ -84,80 +77,85 @@ get '/admin/list_users'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');
 
     return template 'admin_list_users' => {
-        page_title      => 'Admin : List Users',
-        user            => session('user'),
-        list_users      => get_users(),
+        page_title  => 'Admin : List Users',
+        user        => session('user'),
+        list_users  => get_users(),
+        error_msg   => pop_error_msg(),
     };
 };
 
-post '/api/v1/admin/list_user/update/:user_id/:field'  => needs login => sub {
-
-    header( 'Content-Type'  => 'application/json' );
-    header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
-
-    if ( ! session->read('user_is_admin')){
-        status 'bad_request';
-        return "user is not an admin";
-    }
-
-    my $user_id = params->{user_id};
-    my $field   = params->{field};
-    my $value   = params->{value};
-
-    if ( $user_id == session->read('user_id') &&
-        ( $field eq 'is_admin' || $field eq 'is_enabled' || $field eq 'username' )
-    ){
-        status 'bad_request';
-        return "current admin user is not allowed to disable themself or change their username";
-    }
-
-    my $ret = {};
-
-    my $user_record = get_user_by_id($user_id);
-    if ( ! $user_record ){
-        status 'bad_request';
-        return "can't get the user record";
-    }
-
-    if ( ! users_field_valid($field,$value) ){
-        status 'bad_request';
-        return users_field_desc($field);
-    }
-
-    my $email_body ;
-    if ( $field eq 'is_enabled' ) {
-        my $disabled_enabled = lc($value) eq 'true' ? "enabled" : "disabled";
-        $email_body = "The administrator has $disabled_enabled your account";
-    }
-
-    if ( $field eq 'email' || $field eq 'mobile_phone' ){
-        my $disabled_enabled = $value ? "enabled" : "disabled";
-        $email_body = "The administrator has changed your $field to $value";
-    }
-
-    send_email({
-        to      => get_hashval($user_record,'email'),
-        subject => "Khaospy. Adminstrator has changed your account",
-        body    => $email_body,
-    }) if $email_body;
-
-    try {
-        update_field_by_user_id($user_id, $field,$value);
-        $ret = {
-            msg     => 'Success',
-            user_id => $user_id,
-            field   => $field,
-            value   => $value
-        };
-    } catch {
-        # TODO could get the Exception and give a better error message.
-        status 'bad_request';
-        $ret = "Error updating DB";
-    };
-
-    return $ret if ref $ret ne 'HASH';
-    return to_json $ret;
-};
+####################################
+# The list-users form isn't doing direct user updating now.
+# There is some stuff in here , like emailing that needs to go into the update_user root.
+#
+#post '/api/v1/admin/list_user/update/:user_id/:field'  => needs login => sub {
+#
+#    header( 'Content-Type'  => 'application/json' );
+#    header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
+#
+#    if ( ! session->read('user_is_admin')){
+#        status 'bad_request';
+#        return "user is not an admin";
+#    }
+#
+#    my $user_id = params->{user_id};
+#    my $field   = params->{field};
+#    my $value   = params->{value};
+#
+#    if ( $user_id == session->read('user_id') &&
+#        ( $field eq 'is_admin' || $field eq 'is_enabled' || $field eq 'username' )
+#    ){
+#        status 'bad_request';
+#        return "current admin user is not allowed to disable themself or change their username";
+#    }
+#
+#    my $ret = {};
+#
+#    my $user_record = get_user_by_id($user_id);
+#    if ( ! $user_record ){
+#        status 'bad_request';
+#        return "can't get the user record";
+#    }
+#
+#    if ( ! users_field_valid($field,$value) ){
+#        status 'bad_request';
+#        return users_field_desc($field);
+#    }
+#
+#    my $email_body ;
+#    if ( $field eq 'is_enabled' ) {
+#        my $disabled_enabled = lc($value) eq 'true' ? "enabled" : "disabled";
+#        $email_body = "The administrator has $disabled_enabled your account";
+#    }
+#
+#    if ( $field eq 'email' || $field eq 'mobile_phone' ){
+#        my $disabled_enabled = $value ? "enabled" : "disabled";
+#        $email_body = "The administrator has changed your $field to $value";
+#    }
+#
+#    send_email({
+#        to      => get_hashval($user_record,'email'),
+#        subject => "Khaospy. Adminstrator has changed your account",
+#        body    => $email_body,
+#    }) if $email_body;
+#
+#    try {
+#        update_user_by_id($user_id, { $field => $value });
+#        $ret = {
+#            msg     => 'Success',
+#            user_id => $user_id,
+#            field   => $field,
+#            value   => $value
+#        };
+#    } catch {
+#        # TODO could get the Exception and give a better error message.
+#        status 'bad_request';
+#        $ret = "Error updating DB";
+#    };
+#
+#    return $ret if ref $ret ne 'HASH';
+#    return to_json $ret;
+#};
 
 post '/api/v1/admin/list_user/update_password/:user_id'  => needs login => sub {
 
@@ -191,11 +189,12 @@ post '/api/v1/admin/list_user/update_password/:user_id'  => needs login => sub {
 
     my $ret = {};
     try {
-        update_user_id_password($user_id,$new_password);
+        update_user_by_id($user_id,{ password => $new_password });
         $ret = {
             msg     => 'Success',
             user_id => $user_id,
         };
+
     } catch {
         # TODO could get the Exception and give a better error message.
         status 'bad_request';
@@ -257,11 +256,10 @@ post '/admin/add_user'  => needs login => sub {
     };
 
     if ( $error_msg ){
-        session 'error_msg' => $error_msg;
         return template 'admin_add_user' => {
             page_title  => 'Admin : Add User',
             user        => session('user'),
-            error_msg   => pop_error_msg(),
+            error_msg   => $error_msg,
             add         => $add,
             error       => $error,
         };
@@ -334,7 +332,7 @@ warn ( "update user : $fld new val == $val. old_val == $user_record->{$fld}\n");
             }
         }
     }
-#HERE
+
     for my $fld (qw(
         username name email mobile_phone
         is_enabled is_api_user is_admin can_remote
@@ -349,31 +347,25 @@ warn ( "update user : $fld new val == $val. old_val == $user_record->{$fld}\n");
         }
     };
 
+    if ( ! $error_msg ) {
+        try {
+            update_user_by_id($user_id, $data);
+        } catch {
+            $error_msg = "Error inserting into DB. $_";
+        };
+    }
+
     if ( $error_msg ){
-        session 'error_msg' => $error_msg;
         return template 'admin_update_user' => {
-            page_title  => 'Admin : Add User',
+            page_title  => 'Admin : Update User',
             user        => session('user'),
-            error_msg   => pop_error_msg(),
+            error_msg   => $error_msg,
             data        => $data,
             error       => $error,
         };
     }
 
-#    try {
-#        # update_user($data);
-#    } catch {
-#        $error_msg = "Error inserting into DB. $_";
-#    };
-#
-#    return template 'admin_add_user' => {
-#        page_title  => 'Admin : Add User',
-#        user        => session('user'),
-#        error_msg   => $error_msg,
-#        data        => $data,
-#    } if $error_msg;
-#
-#    session 'error_msg' => "user '$data->{username}' added";
+    session 'error_msg' => "user '$data->{username}' update";
     redirect uri_for("/admin/list_users", {});
     return;
 };
@@ -387,6 +379,7 @@ get '/admin/list_rooms'  => needs login => sub {
         page_title      => 'Admin : List Rooms',
         user            => session('user'),
         list_rooms      => get_rooms(),
+        error_msg       => pop_error_msg(),
     };
 };
 
@@ -419,28 +412,20 @@ post '/admin/add_room'  => needs login => sub {
         }
     };
 
-    if ( $error_msg ){
-        session 'error_msg' => $error_msg;
-        return template 'admin_add_room' => {
-            page_title  => 'Admin : Add Room',
-            user        => session('user'),
-            error_msg   => pop_error_msg(),
-            add         => $add,
-            error       => $error,
+    if ( ! $error_msg ){
+        try {
+            insert_room($add);
+        } catch {
+            $error_msg = "Error inserting into DB. $_";
         };
     }
-
-    try {
-        insert_room($add);
-    } catch {
-        $error_msg = "Error inserting into DB. $_";
-    };
 
     return template 'admin_add_room' => {
         page_title  => 'Admin : Add Room',
         user        => session('user'),
         error_msg   => $error_msg,
         add         => $add,
+        error       => $error,
     } if $error_msg;
 
     session 'error_msg' => "room '$add->{name}' added";
@@ -457,6 +442,7 @@ get '/admin/list_controls'  => needs login => sub {
         page_title      => 'Admin : List Controls',
         user            => session('user'),
         list_controls   => get_controls(),
+        error_msg       => pop_error_msg(),
     };
 };
 
@@ -464,8 +450,9 @@ get '/admin/add_control'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');
 
     return template 'not_implemented' => {
-        page_title  => 'Admin : Add Control',
-        user        => session('user'),
+        page_title      => 'Admin : Add Control',
+        user            => session('user'),
+        error_msg       => pop_error_msg(),
     };
 
 #    return template 'admin_add_control' => {

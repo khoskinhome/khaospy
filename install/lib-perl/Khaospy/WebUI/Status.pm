@@ -25,6 +25,12 @@ use Khaospy::Constants qw(
     true false
 );
 
+use Khaospy::WebUI::Util qw(
+    pop_error_msg
+);
+
+sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
+
 post '/api/v1/operate/:control/:action'  => needs login => sub {
 
     header( 'Content-Type'  => 'application/json' );
@@ -80,6 +86,7 @@ get '/status'  => needs login => sub {
         user            => session('user'),
 #        DANCER_BASE_URL => $DANCER_BASE_URL,
         entries         => get_controls_from_db(),
+        error_msg       => pop_error_msg(),
     };
 };
 
@@ -89,6 +96,7 @@ get '/cctv'  => needs login => sub {
         user            => session('user'),
 #        DANCER_BASE_URL => $DANCER_BASE_URL,
         entries         => get_controls_from_db(),
+        error_msg       => pop_error_msg(),
     };
 };
 
