@@ -362,12 +362,18 @@ crap.diff.pl
 
 # admin users
 ./install/www-dancer-tt/admin_list_users.tt
+./install/www-dancer-tt/admin_list_users-OLD.tt
 ./install/www/js/admin_list_users.js
+./install/www/js/admin_list_users-OLD.js
 ./install/www/css/admin_list_users.css
 
 ./install/www-dancer-tt/admin_add_user.tt
 ./install/www/js/admin_add_user.js
 ./install/www/css/admin_add_user.css
+
+./install/www-dancer-tt/admin_update_user.tt
+./install/www/js/admin_update_user.js
+./install/www/css/admin_update_user.css
 
 
 # admin rooms
