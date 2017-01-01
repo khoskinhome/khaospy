@@ -340,6 +340,9 @@ crap.diff.pl
 ./install/www-dancer-tt/title.tt
 ./install/www-dancer-tt/title_linkbar.tt
 ./install/www-dancer-tt/title_linkbar_admin.tt
+./install/www-dancer-tt/title_linkbar_admin_users.tt
+./install/www-dancer-tt/title_linkbar_admin_rooms.tt
+./install/www-dancer-tt/title_linkbar_admin_controls.tt
 ./install/www-dancer-tt/title_linkbar_user.tt
 
 ./install/www-dancer-tt/login.tt
@@ -361,7 +364,6 @@ crap.diff.pl
 ./install/www-dancer-tt/admin.tt
 
 
-crapy
 # admin users
 ./install/www-dancer-tt/admin_list_users.tt
 ./install/www-dancer-tt/admin_list_users-OLD.tt
@@ -424,7 +426,5 @@ crapy
 ##############################
 
 # greping crap
-
-
 
 
