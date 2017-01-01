@@ -18,7 +18,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS CITEXT;
 
 CREATE TABLE control_types (
-    control_type TEXT PRIMARY KEY NOT NULL
+    control_type CITEXT PRIMARY KEY NOT NULL
 );
 GRANT SELECT ON control_types TO khaospy_read;
 GRANT ALL    ON control_types TO khaospy_write;
@@ -63,7 +63,7 @@ CREATE TABLE controls (
     id INTEGER UNIQUE DEFAULT nextval('controls_seq') NOT NULL,
     control_name             CITEXT PRIMARY KEY NOT NULL,
     alias                    TEXT,
-    control_type             TEXT REFERENCES control_types,
+    control_type             CITEXT REFERENCES control_types,
     current_state            TEXT,
     current_value            REAL,
     last_change_state_time   TIMESTAMP WITH TIME ZONE,
