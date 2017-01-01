@@ -1,13 +1,9 @@
-.page_title {
-    font-size: 28px;
-    background-color : lightblue;
-    color : white ;
-}
-
 div.main
 {
     margin: auto;
     width: 1000px;
+/*    background-color: #ebf5f9; */
+
 }
 
 div.center
@@ -56,12 +52,52 @@ div.title_n_links {
 
 }
 
-ul.title_main {
+/* title bar */
+
+ul.title_bar {
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
+    font-size: 32px;
+    background-color : #add8e6;
+    color : darkblue ;
 }
+
+li.title_name {
+    float: left;
+}
+
+li.title_logout {
+    float: right;
+}
+
+li.title_logout a {
+    font-size: 20px;
+    display: block;
+    text-decoration: none;
+    padding: 8px;
+
+    color: darkblue;
+    background-color: #76bdd5;
+
+    border-right: 1px solid #bbb;
+    border-left: 1px solid #bbb;
+    border-top: 1px solid #bbb;
+    border-bottom: 1px solid #bbb;
+}
+
+li.title_logout a:hover {
+    background-color: darkblue;
+    color: white;
+}
+
+li.title_logout:last-child {
+    border-right: none;
+}
+
+
+/* link bar */
 
 ul.link_bar {
     list-style-type: none;

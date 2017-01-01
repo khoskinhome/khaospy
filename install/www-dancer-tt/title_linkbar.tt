@@ -6,6 +6,5 @@
             <li class='nav_link'><a href='/dancer/cctv'>CCTV</a></li>
             <li class='nav_link'><a href='/dancer/admin'>Admin</a></li>
             <li class='nav_link'><a href='/dancer/user'>User</a></li>
-            <li class='nav_link'><a href='/dancer/logout'>Logout [% user %]</a></li>
     </ul>
 
