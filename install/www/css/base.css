@@ -62,11 +62,17 @@ div.title_n_links {
 ul.title_bar {
     list-style-type: none;
     margin: 0;
-    padding: 0;
+    padding: 1px;
     overflow: hidden;
     font-size: 32px;
     background-color : #add8e6;
     color : darkblue ;
+
+    border-right: 1px solid darkblue;
+    border-left: 1px solid darkblue;
+    border-top: 1px solid darkblue;
+    border-bottom: 1px solid darkblue;
+
 }
 
 li.title_name {
