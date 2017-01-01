@@ -24,11 +24,11 @@ $(document).ready(function(){
         });
     });
 
-    $("button.edit").click( function() {
+    $("button.update").click( function() {
         run_func_on_db_id($(this), function(jThis, h_id, db_id){
 
-            console.log(h_id + " edit was clicked . db_id = "+db_id );
-            update_output(h_id + "edit. Not yet implemented . db_id = " + db_id );
+            console.log(h_id + " update was clicked . db_id = "+db_id );
+            update_output(h_id + "update. Not yet implemented . db_id = " + db_id );
 
 
         });

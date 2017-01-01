@@ -31,7 +31,7 @@
                     <button class='listcontrols' id='listcontrols-id[% row.id %]'>Controls</button>
                 </td>
                 <td>
-                    <button class='edit' id='edit-id[% row.id %]'>Edit</button>
+                    <button class='update' id='update-id[% row.id %]'>Update</button>
                 </td>
                 <td>
                     <button class='delete' id='delete-id[% row.id %]'>Delete</button>

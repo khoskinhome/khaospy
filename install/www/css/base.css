@@ -115,16 +115,16 @@ li.nav_link a {
     display: block;
     text-decoration: none;
     padding: 8px;
-    color: black;
-    background-color: #dddddd;
-    border-right: 1px solid #bbb;
-    border-left: 1px solid #bbb;
-    border-top: 1px solid #bbb;
-    border-bottom: 1px solid #bbb;
+    color: #122e3b;
+    background-color: #4fabc9;
+    border-right: 1px solid #3691b0;
+    border-left: 1px solid #3691b0;
+    border-top: 1px solid #3691b0;
+    border-bottom: 1px solid #3691b0;
 }
 
 li.nav_link a:hover {
-    background-color: #555;
+    background-color: #122e3b;
     color: white;
 }
 

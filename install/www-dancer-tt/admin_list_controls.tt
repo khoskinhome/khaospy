@@ -8,7 +8,7 @@
 <body>
     <div class='main'>
         <div class='title_n_links'>[% INCLUDE title_linkbar_admin_controls.tt %]</div>
-        <div class='center' id='update-output'>[% update_output %]</div>
+        <div class='error_msg' id='update-output'>[% update_output %]</div>
         <div class='error_msg'>[% error_msg %]</div>
         <table>
             <tr>
@@ -37,7 +37,7 @@
                 </td>
 
                 <td>
-                    <button class='edit' id='edit-id[% row.id %]'>Edit</button>
+                    <button class='update' id='update-id[% row.id %]'>Update</button>
                 </td>
                 <td>
                     <button class='delete' id='delete-id[% row.id %]'>Delete</button>
