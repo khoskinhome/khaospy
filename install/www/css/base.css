@@ -147,7 +147,7 @@ td, button, input {
 .td_error {
     font-size: 16px;
     color : red;
-    max-width: 100px;
+    max-width: 300px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

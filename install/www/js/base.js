@@ -1,23 +1,16 @@
 
-/*
+
 $(document).ready(function(){
+    $('.error_msg, .td_error').bind('mouseenter', function(){
+        var $this = $(this);
 
-    $(window).resize(function(){
-
-    $('.center').css({
-        position:'absolute',
-        left: ($(window).width() - $('.className').outerWidth())/2,
-        top: ($(window).height() - $('.className').outerHeight())/2
+        if(this.offsetWidth < this.scrollWidth && !$this.attr('title')){
+            $this.attr('title', $this.text());
+        }
     });
-
- });
-
- // To initially run the function:
- $(window).resize();
-
 });
 
-*/
+
 
 function run_func_on_db_id ( jThis, func ){
     // extracts the field and the db_id number
