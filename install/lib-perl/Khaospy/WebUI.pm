@@ -10,6 +10,11 @@ use Khaospy::WebUI::Status;
 use Khaospy::WebUI::UserLogin;
 use Khaospy::WebUI::User;
 use Khaospy::WebUI::Admin;
+use Khaospy::WebUI::Admin::Users;
+use Khaospy::WebUI::Admin::UserRooms;
+use Khaospy::WebUI::Admin::Rooms;
+use Khaospy::WebUI::Admin::Controls;
+use Khaospy::WebUI::Admin::ControlRooms;
 
 
 1;

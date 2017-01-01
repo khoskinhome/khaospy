@@ -131,8 +131,8 @@ GRANT ALL    ON rooms TO khaospy_write;
 
 CREATE TABLE control_rooms (
     room_id       INTEGER NOT NULL REFERENCES rooms,
-    control_name  CITEXT NOT NULL REFERENCES controls,
-    CONSTRAINT    u_control_rooms UNIQUE ( control_name, room_id )
+    control_id    INTEGER NOT NULL REFERENCES controls (id),
+    CONSTRAINT    u_control_rooms UNIQUE ( control_id, room_id )
 );
 
 GRANT SELECT ON control_rooms TO khaospy_read;

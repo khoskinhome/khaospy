@@ -10,11 +10,7 @@
 
         [% INCLUDE title_linkbar.tt %]
 
-    </div>
-    <div class='center'>
-
-        Not Yet Implemented
-
+        <div class='perm_denied'> Not Yet Implemented </div>
     </div>
 </body>
 </html>
