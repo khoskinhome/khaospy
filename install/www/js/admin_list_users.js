@@ -37,7 +37,7 @@ $(document).ready(function(){
 //            {"value" : value },
 //            function(data){
 //                var str = JSON.stringify(data);
-//                update_output("Success : " + str );
+//                set_error_msg("Success : " + str );
 //            }
 //        )
 //        .fail(
@@ -47,7 +47,7 @@ $(document).ready(function(){
 //                } else { // all the rest are textboxes :
 //                    jThis.val( old_values[h_id] );
 //                }
-//                update_output("FAIL " + data.responseText + "\n\n old val = " + old_values[h_id] );
+//                set_error_msg("FAIL " + data.responseText + "\n\n old val = " + old_values[h_id] );
 //            }
 //        );
 //      });
@@ -61,8 +61,7 @@ $(document).ready(function(){
             {"password" : new_password },
             function(data){
 //                var str = JSON.stringify(data);
-//                update_output("Success : " + str );
-                update_output("changed password : " + dialog_username );
+                set_error_msg("changed password : " + dialog_username );
                 $('div#dialog-password-error').text('');
                 dialog_password.dialog( "close" );
             }
@@ -108,7 +107,7 @@ $(document).ready(function(){
     $("button.listrooms").click( function() {
       run_func_on_db_id($(this), function(jThis, h_id, db_id){
           console.log(h_id + " listrooms was clicked . db_id = "+db_id );
-          update_output(h_id + "listrooms. Not yet implemented . db_id = " + db_id );
+          set_error_msg(h_id + "listrooms. Not yet implemented . db_id = " + db_id );
 
 
       });
@@ -117,7 +116,6 @@ $(document).ready(function(){
     $("button.update").click( function() {
       run_func_on_db_id($(this), function(jThis, h_id, db_id){
           console.log(h_id + " update was clicked . db_id = "+db_id );
-          //update_output(h_id + "update. Not yet implemented . db_id = " + db_id );
           $(location).attr('href',dancer_base_url+'/admin/update_user/'+db_id);
       });
     });
@@ -134,13 +132,13 @@ $(document).ready(function(){
                   {},
                   function(data){
                       var str = JSON.stringify(data);
-                      update_output("Success : " + str );
+                      set_error_msg("Deleted User : " + dialog_username );
                       $('#tr_user-id'+delete_user_id).remove();
                   }
               )
               .fail(
                   function(data){
-                      update_output("FAIL : " + data.responseText );
+                      set_error_msg("FAIL : " + data.responseText );
                   }
               );
               $( this ).dialog( "close" );

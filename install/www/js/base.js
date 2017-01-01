@@ -1,5 +1,4 @@
 
-
 $(document).ready(function(){
     $('.error_msg, .td_error').bind('mouseenter', function(){
         var $this = $(this);
@@ -9,8 +8,6 @@ $(document).ready(function(){
         }
     });
 });
-
-
 
 function run_func_on_db_id ( jThis, func ){
     // extracts the field and the db_id number
@@ -29,4 +26,4 @@ function run_func_on_db_id ( jThis, func ){
     func(jThis, h_id, db_id, field);
 };
 
-function update_output(msg){ $('#update-output').text(msg); };
+function set_error_msg(msg){ $('.error_msg').text(msg); };

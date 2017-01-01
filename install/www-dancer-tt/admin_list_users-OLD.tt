@@ -29,7 +29,7 @@
 
             </div>
 
-            <div class='center' id='update-output'></div>
+            <div class='error_msg'>[% error_msg %]</div>
 
             <table>
                 <tr>

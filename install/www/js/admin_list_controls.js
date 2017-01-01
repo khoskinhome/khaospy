@@ -7,7 +7,7 @@ $(document).ready(function(){
         run_func_on_db_id($(this), function(jThis, h_id, db_id){
 
             console.log(h_id + " listrooms was clicked . db_id = "+db_id );
-            update_output(h_id + "listrooms. Not yet implemented . db_id = " + db_id );
+            set_error_msg(h_id + "listrooms. Not yet implemented . db_id = " + db_id );
 
 
         });
@@ -18,7 +18,7 @@ $(document).ready(function(){
         run_func_on_db_id($(this), function(jThis, h_id, db_id){
 
             console.log(h_id + " configure was clicked . db_id = "+db_id );
-            update_output(h_id + "configure. Not yet implemented . db_id = " + db_id );
+            set_error_msg(h_id + "configure. Not yet implemented . db_id = " + db_id );
 
 
         });
@@ -28,7 +28,7 @@ $(document).ready(function(){
         run_func_on_db_id($(this), function(jThis, h_id, db_id){
 
             console.log(h_id + " update was clicked . db_id = "+db_id );
-            update_output(h_id + "update. Not yet implemented . db_id = " + db_id );
+            set_error_msg(h_id + "update. Not yet implemented . db_id = " + db_id );
 
 
         });
@@ -38,7 +38,7 @@ $(document).ready(function(){
         run_func_on_db_id($(this), function(jThis, h_id, db_id){
 
             console.log(h_id + " delete was clicked . db_id = "+db_id );
-            update_output(h_id + "delete. Not yet implemented . db_id = " + db_id );
+            set_error_msg(h_id + "delete. Not yet implemented . db_id = " + db_id );
 
 
         });
@@ -81,7 +81,7 @@ $(document).ready(function(){
 //            {"value" : value },
 //            function(data){
 //                var str = JSON.stringify(data);
-//                update_output("Success : " + str );
+//                set_error_msg("Success : " + str );
 //            }
 //        )
 //        .fail(
@@ -91,7 +91,7 @@ $(document).ready(function(){
 //                } else { // all the rest are textboxes :
 //                    $( "#"+ id ).val( old_values[id] );
 //                }
-//                update_output("FAIL " + data.responseText + "\n\n old val = " + old_values[id] );
+//                set_error_msg("FAIL " + data.responseText + "\n\n old val = " + old_values[id] );
 //            }
 //        );
 //    });
@@ -104,8 +104,7 @@ $(document).ready(function(){
 //            {"password" : new_password },
 //            function(data){
 ////                var str = JSON.stringify(data);
-////                update_output("Success : " + str );
-//                update_output("changed password : " + change_password_username );
+//                set_error_msg("changed password : " + change_password_username );
 //                $('div#dialog-password-error').text('');
 //                dialog_password.dialog( "close" );
 //            }

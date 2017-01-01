@@ -26,7 +26,6 @@
             </div>
 
             <div class='title_n_links'>[% INCLUDE title_linkbar_admin_users.tt %]</div>
-            <div class='error_msg' id='update-output'>[% update_output %]</div>
             <div class='error_msg'>[% error_msg %]</div>
 
             <table>
