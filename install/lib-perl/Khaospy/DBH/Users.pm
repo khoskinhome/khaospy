@@ -5,6 +5,8 @@ use Exporter qw/import/;
 
 use Email::Valid;
 
+use Data::Dumper;
+
 use Khaospy::DBH qw(
     dbh
 

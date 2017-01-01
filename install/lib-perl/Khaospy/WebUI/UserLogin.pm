@@ -19,6 +19,9 @@ use Khaospy::DBH::Users qw(
     get_user
     get_user_password
     update_user_by_id
+
+    password_valid
+
 );
 
 use Khaospy::WebUI::Constants qw(
@@ -174,7 +177,24 @@ post '/reset_password' => sub { # don't need login for this root.
     }
 
     # reset the password, and email it .
-    my $new_password = rand_password();
+    my $new_password;
+
+    my $new_pass_error_msg;
+    try {
+        $new_password = rand_password();
+    } catch {
+        $new_pass_error_msg = $_;
+    };
+
+    if ( $new_pass_error_msg ){
+        session 'error_msg' => ( $new_pass_error_msg. ". You could try again." );
+
+        redirect uri_for('/reset_password', {
+            user         => $user,
+            redirect_url => $redir_url,
+        });
+        return;
+    }
 
     my $exp_mins = $PASSWORD_RESET_TIMEOUT / 60 ;
 
@@ -202,6 +222,7 @@ EOBODY
     };
     if( $@ ){
         warn "Issue reseting password for $user. $@";
+        warn "Tried to reset with password '$new_password'";
         session 'error_msg' => "Error reseting password. Admin needs to look at logs";
         redirect uri_for('/reset_password', {
             user         => $user,
@@ -216,6 +237,7 @@ EOBODY
         body    => $body,
     });
 
+    session 'error_msg' => 'Email with new password has been sent. This password will expire.<F9>';
     redirect uri_for('/login', {
         user         => $user,
         redirect_url => $redir_url,
@@ -226,8 +248,18 @@ sub rand_password {
     my @alphanum = qw(
         a b c d e f g h i j k m n p r s t u v w x y z
         A B C D E F G H J K L M N P R S T U V W X Y Z
-        0 1 2 3 4 5 6 7 8 9);
-    return join( "", map { $alphanum[rand(int(@alphanum))] } 1 .. 10 );
+        0 1 2 3 4 5 6 7 8 9 _ - );
+
+    my $rand_password ;
+
+    for ( 1..20 ) {
+        $rand_password = join( "", map { $alphanum[rand(int(@alphanum))] } 1 .. 16 );
+
+        return $rand_password if password_valid($rand_password);
+    }
+
+    die "Cannot generate a password that satifises password restrictions";
+
 }
 
 

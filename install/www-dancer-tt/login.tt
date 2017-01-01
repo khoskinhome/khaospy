@@ -10,6 +10,7 @@
             <div class='title_n_links'> [% INCLUDE title.tt %]</div>
             <div class='error_msg'>[% error_msg %]</div>
 
+            <div class='center'>
             <table>
                 <form method='post' action='/dancer/login'>
                     <tr>
@@ -37,6 +38,7 @@
                     </tr>
                 </form>
             </table>
+            </div>
 
         </div>
     </body>
