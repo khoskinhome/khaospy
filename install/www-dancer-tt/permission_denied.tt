@@ -9,11 +9,7 @@
     <div class='main'>
 
         [% INCLUDE title_linkbar.tt %]
-
-    </div>
-    <div class='center'>
-
-        Permission Denied
+        <div class='perm_denied'> Permission Denied </div>
 
     </div>
 </body>

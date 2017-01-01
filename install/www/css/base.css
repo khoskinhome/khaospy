@@ -11,6 +11,11 @@ div.center
     /*text-align: center;*/
 }
 
+.perm_denied {
+    font-size: 30px;
+    color : red;
+}
+
 div.left
 {
     width: 100%;
