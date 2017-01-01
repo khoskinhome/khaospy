@@ -152,7 +152,7 @@ CREATE TABLE users (
     passhash                        TEXT NOT NULL,
     is_api_user                     BOOLEAN NOT NULL DEFAULT FALSE,
     is_admin                        BOOLEAN NOT NULL DEFAULT FALSE,
-    mobile_phone                    CITEXT NOT NULL UNIQUE,
+    mobile_phone                    CITEXT UNIQUE,
     can_remote                      BOOLEAN NOT NULL DEFAULT FALSE,
     passhash_expire                 TIMESTAMP WITH TIME ZONE,
     passhash_must_change            BOOLEAN,
