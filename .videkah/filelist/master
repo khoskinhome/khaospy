@@ -325,12 +325,20 @@ crap.diff.pl
 ./install/lib-perl/Khaospy/DBH/Users.pm
 ./install/lib-perl/Khaospy/DBH/Rooms.pm
 ./install/lib-perl/Khaospy/DBH/UserRooms.pm
+./install/lib-perl/Khaospy/DBH/ControlRooms.pm
 
 ./install/www-bin/dancer.pl
 ./install/lib-perl/Khaospy/WebUI.pm
 ./install/lib-perl/Khaospy/WebUI/UserLogin.pm
 ./install/lib-perl/Khaospy/WebUI/User.pm
+
 ./install/lib-perl/Khaospy/WebUI/Admin.pm
+./install/lib-perl/Khaospy/WebUI/Admin/Users.pm
+./install/lib-perl/Khaospy/WebUI/Admin/UserRooms.pm
+./install/lib-perl/Khaospy/WebUI/Admin/Rooms.pm
+./install/lib-perl/Khaospy/WebUI/Admin/Controls.pm
+./install/lib-perl/Khaospy/WebUI/Admin/ControlRooms.pm
+
 ./install/lib-perl/Khaospy/WebUI/Status.pm
 ./install/lib-perl/Khaospy/WebUI/Util.pm
 
@@ -427,4 +435,5 @@ crap.diff.pl
 
 # greping crap
 
+install/lib-perl/Khaospy/WebUI/UserLogin.pm:204:        warn "Issue reseting password for $user. $@";
 
