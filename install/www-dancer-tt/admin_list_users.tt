@@ -8,14 +8,6 @@
 </head>
 <body>
     <div class='main'>
-            <table>
-                <tr><td>
-                    [% INCLUDE title_linkbar_admin.tt %]
-                    <ul class='link_bar'>
-                        <li class='nav_link'><a href='/dancer/admin/add_user'>Add User</a></li>
-                    </ul>
-                </td></tr>
-            </table>
 
             <div id="dialog-confirm" title="Delete the User ?">
               <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>This User will be permanently deleted. Are you sure?</p>
@@ -33,7 +25,9 @@
 
             </div>
 
-            <div class='center' id='update-output'>[% update_output %]</div>
+            <div class='title_n_links'>[% INCLUDE title_linkbar_admin_users.tt %]</div>
+            <div class='error_msg' id='update-output'>[% update_output %]</div>
+            <div class='error_msg'>[% error_msg %]</div>
 
             <table>
                 <tr>
@@ -46,7 +40,7 @@
                 </tr>
 
               [% FOREACH row IN list_users %]
-                <tr>
+                <tr id='tr_user-id[% row.id %]'>
                     <td id='td_username-id[% row.id %]'>[% row.username %]</td>
                     <td>[% row.name %]</td>
                     <td>

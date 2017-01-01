@@ -8,10 +8,14 @@ BEGIN;
 
 -- sql command inside of psql enable the crypto:
 -- create extension pgcrypto
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 ---------------------
 -- control_types
 ---------------------
+
+-- CITEXT for case-insensitive UNIQUE constraints on TEXT fields.
+CREATE EXTENSION IF NOT EXISTS CITEXT;
 
 CREATE TABLE control_types (
     control_type TEXT PRIMARY KEY NOT NULL
@@ -57,8 +61,8 @@ GRANT ALL    ON controls_seq TO khaospy_write;
 
 CREATE TABLE controls (
     id INTEGER UNIQUE DEFAULT nextval('controls_seq') NOT NULL,
-    control_name  TEXT PRIMARY KEY NOT NULL,
-    alias         TEXT,
+    control_name             CITEXT PRIMARY KEY NOT NULL,
+    alias                    TEXT,
     control_type             TEXT REFERENCES control_types,
     current_state            TEXT,
     current_value            REAL,
@@ -80,7 +84,7 @@ GRANT SELECT ON control_status_seq TO khaospy_read;
 GRANT ALL ON control_status_seq TO khaospy_write;
 create table control_status (
     id INTEGER PRIMARY KEY DEFAULT nextval('control_status_seq') NOT NULL,
-    control_name             TEXT NOT NULL REFERENCES controls,
+    control_name             CITEXT NOT NULL REFERENCES controls,
     current_state            TEXT,
     current_value            REAL,
     last_change_state_time   TIMESTAMP WITH TIME ZONE,
@@ -90,9 +94,11 @@ create table control_status (
     db_update_time           TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
-
 create index control_status_control_name_idx on control_status (control_name);
 
+--ALTER TABLE control_status
+--  ADD CONSTRAINT control_status_control_name_fkey FOREIGN KEY (control_name)
+--      REFERENCES controls (control_name);
 
 
 ALTER TABLE control_status SET (autovacuum_vacuum_scale_factor = 0.0);
@@ -113,8 +119,8 @@ GRANT SELECT ON rooms_seq TO khaospy_read;
 GRANT ALL ON rooms_seq TO khaospy_write;
 create table rooms (
     id INTEGER PRIMARY KEY DEFAULT nextval('rooms_seq') NOT NULL,
-    name    TEXT NOT NULL UNIQUE,
-    tag     TEXT NOT NULL UNIQUE
+    name    CITEXT NOT NULL UNIQUE,
+    tag     CITEXT NOT NULL UNIQUE
 );
 GRANT SELECT ON rooms TO khaospy_read;
 GRANT ALL    ON rooms TO khaospy_write;
@@ -125,7 +131,7 @@ GRANT ALL    ON rooms TO khaospy_write;
 
 CREATE TABLE control_rooms (
     room_id       INTEGER NOT NULL REFERENCES rooms,
-    control_name  TEXT NOT NULL REFERENCES controls,
+    control_name  CITEXT NOT NULL REFERENCES controls,
     CONSTRAINT    u_control_rooms UNIQUE ( control_name, room_id )
 );
 
@@ -140,13 +146,13 @@ GRANT SELECT ON users_seq TO khaospy_read;
 GRANT ALL ON users_seq TO khaospy_write;
 CREATE TABLE users (
     id INTEGER PRIMARY KEY DEFAULT nextval('users_seq') NOT NULL,
-    username                        TEXT NOT NULL UNIQUE,
-    name                            TEXT NOT NULL UNIQUE,
-    email                           TEXT NOT NULL UNIQUE,
+    username                        CITEXT NOT NULL UNIQUE,
+    name                            CITEXT NOT NULL UNIQUE,
+    email                           CITEXT NOT NULL UNIQUE,
     passhash                        TEXT NOT NULL,
     is_api_user                     BOOLEAN NOT NULL DEFAULT FALSE,
     is_admin                        BOOLEAN NOT NULL DEFAULT FALSE,
-    mobile_phone                    TEXT NOT NULL UNIQUE,
+    mobile_phone                    CITEXT NOT NULL UNIQUE,
     can_remote                      BOOLEAN NOT NULL DEFAULT FALSE,
     passhash_expire                 TIMESTAMP WITH TIME ZONE,
     passhash_must_change            BOOLEAN,

@@ -7,9 +7,8 @@
 </head>
 <body>
     <div class='main'>
-        <table>
-            <tr><td>[% INCLUDE title_linkbar_user.tt %]</td></tr>
-        </table>
+        <div class='title_n_links'>[% INCLUDE title_linkbar_user.tt %]</div>
+        <div class='error_msg'>[% error_msg %]</div>
     </div>
 </body>
 </html>

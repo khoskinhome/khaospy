@@ -7,65 +7,63 @@
 </head>
 <body>
     <div class='main'>
-            <table>
-                <tr><td>[% INCLUDE title_linkbar_admin.tt %]</td></tr>
-            </table>
+            <div class='title_n_links'>[% INCLUDE title_linkbar_admin_users.tt %]</div>
+            <div class='error_msg'>[% error_msg %]</div>
 
             <form method='post' action='/dancer/admin/add_user'>
                 <table>
                     <tr>
                         <td>Username</td>
                         <td><input type='text' name='username' value='[% add.username %]'/></td>
-                        <td>[% error.username %]</td>
+                        <td class='td_error'>[% error.username %]</td>
                     </tr>
                     <tr>
                         <td>Name</td>
                         <td><input type='text' name='name' value='[% add.name %]'/></td>
-                        <td>[% error.name %]</td>
+                        <td class='td_error'>[% error.name %]</td>
                     </tr>
                     <tr>
                         <td>Password</td>
                         <td><input type="password" name="password" value='[% add.password %]'/></td>
-                        <td>[% error.password %]</td>
+                        <td class='td_error'>[% error.password %]</td>
                     </tr>
                     <tr>
                         <td>Email</td>
                         <td><input type='text' name='email' value='[% add.email %]'/></td>
-                        <td>[% error.email %]</td>
+                        <td class='td_error'>[% error.email %]</td>
                     </tr>
                     <tr>
                         <td>Mobile</td>
                         <td><input type='text' name='mobile_phone' value='[% add.mobile_phone %]'/></td>
-                        <td>[% error.mobile_phone %]</td>
+                        <td class='td_error'>[% error.mobile_phone %]</td>
                     </tr>
                     <tr>
                         <td>Enabled</td>
                         <td><input type='checkbox' name='is_enabled' [% IF add.is_enabled %]checked='checked'[% END %]/></td>
-                        <td>[% error.is_enabled %]</td>
+                        <td class='td_error'>[% error.is_enabled %]</td>
                     </tr>
                     <tr>
                         <td>API User</td>
                         <td><input type='checkbox' name='is_api_user' [% IF add.is_api_user %]checked='checked'[% END %]/></td>
-                        <td>[% error.is_api_user %]</td>
+                        <td class='td_error'>[% error.is_api_user %]</td>
                     </tr>
                     <tr>
                         <td>Admin</td>
                         <td><input type='checkbox' name='is_admin' [% IF add.is_admin %]checked='checked'[% END %]/></td>
-                        <td>[% error.is_admin %]</td>
+                        <td class='td_error'>[% error.is_admin %]</td>
                     </tr>
                     <tr>
                         <td>Remote</td>
                         <td><input type='checkbox' name='can_remote' [% IF add.can_remote %]checked='checked'[% END %]/></td>
-                        <td>[% error.can_remote %]</td>
+                        <td class='td_error'>[% error.can_remote %]</td>
                     </tr>
                     <tr>
                         <td></td>
                         <td>
-                            <input type='submit' name='Add User' value='add_user'/>
+                            <input type='submit' name='add_user' value='Add User'/>
                             <input type='hidden' name='return_url' value='[% return_url %]'/>
                         </td>
                     </tr>
-                    <tr><td colspan='2'>[% error_msg %]</td></tr>
                 </table>
             </form>
     </div>

@@ -10,10 +10,8 @@
 </head>
 <body>
     <div class='main'>
-
-        <table>
-            <tr><td>[% INCLUDE title_linkbar.tt %]</td></tr>
-        </table>
+        <div class='title_n_links'>[% INCLUDE title_linkbar.tt %]</div>
+        <div class='error_msg'>[% error_msg %]</div>
 
         <table>
             <tr>

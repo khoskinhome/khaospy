@@ -7,9 +7,8 @@
 </head>
 <body>
     <div class='main'>
-        <table>
-            <tr><td>[% INCLUDE title_linkbar_admin.tt %]</td></tr>
-        </table>
+        <div class='title_n_links'>[% INCLUDE title_linkbar_admin_users.tt %]</div>
+        <div class='error_msg'>[% error_msg %]</div>
 
         <form method='post' action='/dancer/admin/update_user'>
             <table>
@@ -62,7 +61,6 @@
                         <input type='hidden' name='user_id' value='[% data.id %]'/>
                     </td>
                 </tr>
-                <tr><td colspan='2'>[% error_msg %]</td></tr>
             </table>
         </form>
     </div>

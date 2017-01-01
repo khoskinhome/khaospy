@@ -7,16 +7,9 @@
 </head>
 <body>
     <div class='main'>
-        <table>
-            <tr><td>
-                [% INCLUDE title_linkbar_admin.tt %]
-                <ul class='link_bar'>
-                    <li class='nav_link'><a href='/dancer/admin/add_control'>Add Control</a></li>
-                </ul>
-            </td></tr>
-        </table>
-
-        <div class='center' id='update-output'></div>
+        <div class='title_n_links'>[% INCLUDE title_linkbar_admin_controls.tt %]</div>
+        <div class='center' id='update-output'>[% update_output %]</div>
+        <div class='error_msg'>[% error_msg %]</div>
         <table>
             <tr>
                 <th>Control</th>

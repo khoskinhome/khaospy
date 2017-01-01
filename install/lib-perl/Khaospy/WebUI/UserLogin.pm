@@ -42,8 +42,8 @@ get '/' => needs login => sub {
 
     return template index => {
         page_title => "Home",
-        user      => session->read('user'),
-        error_msg => $error_msg,
+        user       => session->read('user'),
+        error_msg  => $error_msg,
     };
 };
 
@@ -55,9 +55,9 @@ get '/logout' => sub {
 };
 
 get '/login' => sub {
-
     redirect '/' if session('user');
     return template 'login' => {
+        page_title => "Login",
         error_msg  => pop_error_msg(),
         return_url => params->{return_url},
         user       => params->{user},
@@ -130,12 +130,12 @@ post '/login' => sub {
 
 get '/reset_password' => sub { # don't need login for this root.
 
-    return template 'reset_password'
-        => {
-            user       => params->{user} || session->read('user'),
-            return_url => params->{return_url},
-            error_msg  => pop_error_msg(),
-        };
+    return template 'reset_password' => {
+        page_title => "Reset Password",
+        user       => params->{user} || session->read('user'),
+        return_url => params->{return_url},
+        error_msg  => pop_error_msg(),
+    };
 };
 
 post '/reset_password' => sub { # don't need login for this root.

@@ -2,7 +2,7 @@
 var dancer_base_url = '/dancer';
 var delete_user_id;
 var change_password_user_id;
-var change_password_username;
+var dialog_username;
 
 $(document).ready(function(){
 
@@ -62,7 +62,7 @@ $(document).ready(function(){
             function(data){
 //                var str = JSON.stringify(data);
 //                update_output("Success : " + str );
-                update_output("changed password : " + change_password_username );
+                update_output("changed password : " + dialog_username );
                 $('div#dialog-password-error').text('');
                 dialog_password.dialog( "close" );
             }
@@ -98,10 +98,10 @@ $(document).ready(function(){
     $("button.change_password").click( function() {
       run_func_on_db_id($(this), function(jThis, h_id, db_id){
         change_password_user_id  = db_id;
-        change_password_username = $('#td_username-id'+change_password_user_id).text();
+        dialog_username = $('#td_username-id'+change_password_user_id).text();
         $('div#dialog-password-error').text('');
         dialog_password.dialog( "open" );
-        $("span.ui-dialog-title").text("Change Password : "+change_password_username);
+        $("span.ui-dialog-title").text("Change Password : "+dialog_username);
       })
     });
 
@@ -135,6 +135,7 @@ $(document).ready(function(){
                   function(data){
                       var str = JSON.stringify(data);
                       update_output("Success : " + str );
+                      $('#tr_user-id'+delete_user_id).remove();
                   }
               )
               .fail(
@@ -156,7 +157,9 @@ $(document).ready(function(){
         run_func_on_db_id($(this), function(jThis, h_id, db_id){
             console.log(h_id + " delete was clicked . db_id = "+db_id );
             delete_user_id = db_id;
+            dialog_username = $('#td_username-id'+delete_user_id).text();
             dialog_confirm_user_delete.dialog( "open" );
+            $("span.ui-dialog-title").text("Delete User : "+dialog_username);
         });
     });
 });

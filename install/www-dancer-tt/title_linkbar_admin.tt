@@ -1,6 +1,4 @@
-
-
-
+    <!--TODO /dancer root could change -->
     [% INCLUDE title_linkbar.tt %]
 
     <ul class='link_bar'>

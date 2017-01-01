@@ -1,7 +1,7 @@
 
 <ul class='title_main'>
     <li>
-        <h2>Khaospy : [% page_title %]</h2>
+        <p class='page_title'>Khaospy : [% page_title %]</p>
     </li>
 </ul>
 

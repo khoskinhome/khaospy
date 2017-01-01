@@ -1,3 +1,4 @@
+<!--TODO /dancer root could change -->
 [% IF user %]
    [% INCLUDE title_linkbar.tt %]
     <ul class='link_bar'>

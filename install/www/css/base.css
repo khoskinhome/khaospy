@@ -1,7 +1,13 @@
+.page_title {
+    font-size: 28px;
+    background-color : lightblue;
+    color : white ;
+}
+
 div.main
 {
     margin: auto;
-    width: 95%;
+    width: 1000px;
 }
 
 div.center
@@ -19,23 +25,6 @@ div.center table
     margin: 0 auto;
     text-align: left;
 }
-
-
-
-/*
-.center {
-    margin-left: auto;
-    margin-right: auto;
-}
-
-
-
- .centre , .center {
-    margin-left: auto;
-    margin-right: auto;
-}
-
-*/
 
 .newcenter {
     width:270px;
@@ -63,7 +52,9 @@ div.center table
     background-color: green;
 }
 
+div.title_n_links {
 
+}
 
 ul.title_main {
     list-style-type: none;
@@ -108,4 +99,22 @@ li.nav_link:last-child {
 td, button, input {
     font-size: 25px;
 }
+
+.error_msg {
+    font-size: 18px;
+    color : red;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.td_error {
+    font-size: 16px;
+    color : red;
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 
