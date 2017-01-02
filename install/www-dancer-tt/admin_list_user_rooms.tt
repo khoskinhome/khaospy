@@ -13,21 +13,25 @@
 
         <table>
             <tr>
-                <select id='add_user_room-user_id'>
-                  [% FOREACH row IN list_users %]
-                    <option value="[% row.id %]">[% row.username %]</option>
-                  [% END %]
-                </select>
-
-                <select id='add_user_room-room_id'>
-                  [% FOREACH row IN list_rooms %]
-                    <option value="[% row.id %]">[% row.tag %]</option>
-                  [% END %]
-                </select>
-
+                <th>User</th>
+                <th>Room</th>
+            </tr>
+            <tr>
                 <td>
-                    <button class='add_user_room' >Add User Room</button>
+                    <select id='add_user_room-user_id'>
+                      [% FOREACH row IN list_users %]
+                        <option value="[% row.id %]">[% row.username %]</option>
+                      [% END %]
+                    </select>
                 </td>
+                <td>
+                    <select id='add_user_room-room_id'>
+                      [% FOREACH row IN list_rooms %]
+                        <option value="[% row.id %]">[% row.tag %]</option>
+                      [% END %]
+                    </select>
+                </td>
+                <td><button class='add_user_room' >Add User Room</button></td>
             </tr>
         </table>
 
