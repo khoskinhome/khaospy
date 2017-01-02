@@ -42,13 +42,24 @@ our @EXPORT_OK = qw(
 );
 
 sub get_rooms {
+    my ( $p ) = @_;
+    $p = {} if ! $p;
+
+    my $where;
+    my @bind;
+
+    if ($p->{id}){
+        $where = " WHERE id = ? ";
+        push @bind, $p->{id};
+    }
 
     my $sql =<<"    EOSQL";
-    SELECT * FROM rooms order by name
+    SELECT * FROM rooms
+    $where ORDER BY name
     EOSQL
 
     my $sth = dbh->prepare($sql);
-    $sth->execute();
+    $sth->execute(@bind);
 
     my $results = [];
     while ( my $row = $sth->fetchrow_hashref ){

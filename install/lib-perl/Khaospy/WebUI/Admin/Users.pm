@@ -172,7 +172,7 @@ post '/api/v1/admin/list_user/update_password/:user_id'  => needs login => sub {
     return to_json $ret;
 };
 
-post '/admin/delete_user/:user_id'  => needs login => sub {
+post '/admin/delete_user'  => needs login => sub {
 
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );

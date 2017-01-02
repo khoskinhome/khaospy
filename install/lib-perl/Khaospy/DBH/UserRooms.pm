@@ -39,7 +39,7 @@ our @EXPORT_OK = qw(
     insert_user_room
     update_user_room
     delete_user_room
-    update_user_room_by_id
+    update_user_room
 
     user_rooms_field_valid
     user_rooms_field_desc
@@ -80,7 +80,7 @@ sub get_user_rooms {
 
     $where
 
-    ORDER BY user_id
+    ORDER BY username, room_tag
     EOSQL
 
     warn "user_rooms sql = $sql";
@@ -96,7 +96,7 @@ sub get_user_rooms {
     return $results;
 }
 
-sub update_user_room_by_id {
+sub update_user_room {
     my ($ur_id, $update) = @_;
 
     my ( @fields, @values, @placeholders );
@@ -118,30 +118,15 @@ sub update_user_room_by_id {
     $sth->execute(@values,$ur_id);
 }
 
-sub update_user_room {
-#    my ($room_id, $update) = @_;
-#
-#    my ( @fields, @values, @placeholders );
-#
-#    for my $fld ( keys %$update ){
-#        KhaospyExcept::InvalidFieldName->throw(
-#            error => rooms_field_desc($fld)
-#        ) if ! rooms_field_valid($fld,$update->{$fld});
-#
-#        push @fields, " $fld = ? ";
-#        push @values, $update->{$fld};
-#    }
-#
-#    my $sql = " UPDATE rooms set"
-#        .join( ", ",@fields)
-#        ." WHERE id  = ?";
-#
-#    my $sth = dbh->prepare($sql);
-#    $sth->execute(@values,$room_id);
-}
-
 sub insert_user_room {
     my ( $user_id, $room_id ) = @_;
+
+    my $sql_sel ="SELECT * FROM user_rooms where user_id = ? and room_id = ?";
+    my $sth = dbh->prepare($sql_sel);
+    $sth->execute($user_id, $room_id);
+    while ( my $row = $sth->fetchrow_hashref ){
+        die "There is already a record for user_id=$user_id, room_id=$room_id";
+    }
 
     my $sql = "INSERT INTO user_rooms (user_id, room_id) VALUES( ?, ?)";
     my $sth = dbh->prepare($sql);
@@ -151,8 +136,10 @@ sub insert_user_room {
 }
 
 sub delete_user_room {
-    my ( $del ) = @_;
-    die "TODO delete_room() not yet implemented"; # TODO
+    my ( $user_room_id ) = @_;
+    my $sql =" DELETE FROM user_rooms WHERE id = ?";
+    my $sth = dbh->prepare($sql);
+    $sth->execute($user_room_id);
 }
 
 ####

@@ -63,6 +63,8 @@ our @EXPORT_OK = qw(
 sub get_user_password {
     my ($user, $password) = @_;
 
+    # only returns users where the passhash_expire is still valid .
+
     $password = _trunc_password($password);
 
     my $sql = <<"    EOSQL";
@@ -92,6 +94,7 @@ sub get_user_password {
 
 sub get_user { # get user by username
     my ($user) = @_;
+    # only returns users where the passhash_expire is still valid .
 
     my $sql =<<"    EOSQL";
     SELECT *,
@@ -114,6 +117,7 @@ sub get_user { # get user by username
 
 sub get_user_by_id {
     my ($user_id) = @_;
+    # only returns users where the passhash_expire is still valid .
 
     my $sql =<<"    EOSQL";
     SELECT *,
@@ -135,13 +139,25 @@ sub get_user_by_id {
 }
 
 sub get_users {
+    my ( $p ) = @_;
+    # doesn't checkthe passhash_expire.
+    $p = {} if ! $p;
+
+    my $where;
+    my @bind;
+
+    if ($p->{id}){
+        $where = " WHERE id = ? ";
+        push @bind, $p->{id};
+    }
 
     my $sql =<<"    EOSQL";
-    SELECT * FROM users order by username
+    SELECT * FROM users
+    $where ORDER BY username
     EOSQL
 
     my $sth = dbh->prepare($sql);
-    $sth->execute();
+    $sth->execute(@bind);
 
     my $results = [];
     while ( my $row = $sth->fetchrow_hashref ){

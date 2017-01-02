@@ -128,8 +128,12 @@ GRANT ALL    ON rooms TO khaospy_write;
 ---------------------
 -- control_rooms
 ---------------------
+CREATE SEQUENCE control_rooms_seq;
+GRANT SELECT ON control_rooms_seq TO khaospy_read;
+GRANT ALL ON control_rooms_seq TO khaospy_write;
 
 CREATE TABLE control_rooms (
+    id INTEGER PRIMARY KEY DEFAULT nextval('control_rooms_seq') NOT NULL,
     room_id       INTEGER NOT NULL REFERENCES rooms,
     control_id    INTEGER NOT NULL REFERENCES controls (id),
     CONSTRAINT    u_control_rooms UNIQUE ( control_id, room_id )
@@ -175,7 +179,7 @@ CREATE TABLE user_rooms (
 
     user_id         INTEGER NOT NULL REFERENCES users,
     room_id         INTEGER NOT NULL REFERENCES rooms,
-    can_view        BOOLEAN NOT NULL DEFAULT FALSE,
+    can_view        BOOLEAN NOT NULL DEFAULT TRUE,
     can_operate     BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT      u_user_rooms UNIQUE ( user_id, room_id )
 );

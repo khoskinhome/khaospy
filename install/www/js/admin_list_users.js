@@ -128,8 +128,8 @@ $(document).ready(function(){
         modal: true,
         buttons: {
           "Delete User": function() {
-              $.post(dancer_base_url + "/admin/delete_user/"+delete_user_id,
-                  {},
+              $.post(dancer_base_url + "/admin/delete_user",
+                  {"user_id" : delete_user_id},
                   function(data){
                       var str = JSON.stringify(data);
                       set_error_msg("Deleted User : " + dialog_username );
