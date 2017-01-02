@@ -141,25 +141,13 @@ sub update_user_room {
 }
 
 sub insert_user_room {
-#    my ( $add ) = @_;
-#    my ( @fields, @values, @placeholders );
-#
-#    for my $fld ( keys %$add ){
-#        KhaospyExcept::InvalidFieldName->throw(
-#            error => rooms_field_desc($fld)
-#        ) if ! rooms_field_valid($fld,$add->{$fld});
-#
-#        push @fields, $fld;
-#        push @values, $add->{$fld};
-#        push @placeholders, '?';
-#    }
-#
-#    my $sql = " INSERT INTO rooms "
-#        ."(".join( ", ",@fields).")"
-#        ." VALUES (".join( ", ", @placeholders).")";
-#
-#    my $sth = dbh->prepare($sql);
-#    $sth->execute(@values);
+    my ( $user_id, $room_id ) = @_;
+
+    my $sql = "INSERT INTO user_rooms (user_id, room_id) VALUES( ?, ?)";
+    my $sth = dbh->prepare($sql);
+    $sth->execute($user_id, $room_id);
+
+    # TODO return the id of the new record.
 }
 
 sub delete_user_room {

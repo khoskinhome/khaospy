@@ -47,6 +47,27 @@ $(document).ready(function(){
     $("button.add_user_room").click( function() {
         console.log("add user room was clicked." );
         set_error_msg("add user room. Not yet implemented." );
+
+        var user_id = $("#add_user_room-user_id").val();
+        var room_id = $("#add_user_room-room_id").val();
+
+        $.post(dancer_base_url + "/admin/add_user_room",
+            {"room_id" : room_id,
+             "user_id" : user_id
+            },
+            function(data){
+                var str = JSON.stringify(data);
+                set_error_msg("Success : Added " );
+                location.reload();
+            }
+        )
+        .fail(
+            function(data){
+                set_error_msg("FAIL " + data.responseText );
+            }
+        );
+
+
     });
 
     $("button.delete").click( function() {

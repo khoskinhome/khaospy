@@ -72,10 +72,7 @@ post '/admin/update_user_room'  => needs login => sub {
     my $can_operate = params->{can_operate};
     my $can_view    = params->{can_view};
 
-warn "update ur_id=$ur_id operate=$can_operate view=$can_view    ";
-
     my $ret;
-
     try {
         update_user_room_by_id($ur_id,
             { can_operate  => $can_operate,
@@ -98,28 +95,32 @@ warn "update ur_id=$ur_id operate=$can_operate view=$can_view    ";
     return to_json $ret;
 };
 
+post '/admin/add_user_room'  => needs login => sub {
+    header( 'Content-Type'  => 'application/json' );
+    header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
 
-post '/admin/add_user_room/:user_id/:room_id'  => needs login => sub {
-    redirect '/admin' if ! session->read('user_is_admin');
+    if ( ! session->read('user_is_admin')){
+        status 'bad_request';
+        return "user is not an admin";
+    }
 
-};
+    my $room_id = params->{room_id};
+    my $user_id = params->{user_id};
 
-get '/admin/add_user_room'  => needs login => sub {
-    redirect '/admin' if ! session->read('user_is_admin');
-
-    return template 'not_implemented' => {
-        page_title      => 'Admin : Add User',
-        user            => session('user'),
-        error_msg       => pop_error_msg(),
+    my $ret;
+    try {
+        insert_user_room($user_id, $room_id);
+        $ret = {
+            msg     => 'Success',
+        };
+    } catch {
+        # TODO could get the Exception and give a better error message.
+        status 'bad_request';
+        $ret = "DB Error: $_";
     };
 
-#    return template 'admin_add_user_room' => {
-#        page_title  => 'Admin : Add User Room',
-#        user        => session('user'),
-#        error_msg   => pop_error_msg(),
-#    };
-
+    return $ret if ref $ret ne 'HASH';
+    return to_json $ret;
 };
-
 
 1;
