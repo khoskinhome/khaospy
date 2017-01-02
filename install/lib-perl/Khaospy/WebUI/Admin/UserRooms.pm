@@ -51,8 +51,12 @@ get '/admin/list_user_rooms'  => needs login => sub {
         user            => session('user'),
         error_msg       => pop_error_msg(),
 
-        list_users      => get_users({id=>$select{select_user_id} }),
-        list_rooms      => get_rooms({id=>$select{select_room_id} }),
+        list_users      => get_users({
+            #    id=>$select{select_user_id}
+            }),
+        list_rooms      => get_rooms({
+            #   id=>$select{select_room_id}
+            }),
         %select,
 
         list_user_rooms => get_user_rooms({

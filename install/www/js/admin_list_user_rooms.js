@@ -61,6 +61,12 @@ $(document).ready(function(){
             });
         });
 
+        if ($.isEmptyObject(add_array)){
+            set_error_msg("Nothing selected to add" );
+            return;
+        }
+
+
         $.post(dancer_base_url + "/admin/add_user_room",
             { "add_array" : JSON.stringify(add_array) } ,
             function(data){
@@ -74,21 +80,6 @@ $(document).ready(function(){
                 set_error_msg("FAIL " + data.responseText );
             }
         );
-
-//                $.post(dancer_base_url + "/admin/add_user_room",
-//                    {"room_id" : room_id,
-//                     "user_id" : user_id
-//                    },
-//                    function(data){
-//                        var str = JSON.stringify(data);
-//                        set_error_msg("Success : Added " );
-//                    }
-//                )
-//                .fail(
-//                    function(data){
-//                        set_error_msg("FAIL " + data.responseText );
-//                    }
-//                );
 
     });
 

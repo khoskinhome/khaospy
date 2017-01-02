@@ -134,8 +134,8 @@ GRANT ALL ON control_rooms_seq TO khaospy_write;
 
 CREATE TABLE control_rooms (
     id INTEGER PRIMARY KEY DEFAULT nextval('control_rooms_seq') NOT NULL,
-    room_id       INTEGER NOT NULL REFERENCES rooms,
-    control_id    INTEGER NOT NULL REFERENCES controls (id),
+    room_id       INTEGER NOT NULL REFERENCES rooms ON DELETE CASCADE,
+    control_id    INTEGER NOT NULL REFERENCES controls (id) ON DELETE CASCADE,
     CONSTRAINT    u_control_rooms UNIQUE ( control_id, room_id )
 );
 
@@ -177,8 +177,8 @@ CREATE TABLE user_rooms (
 
     id INTEGER PRIMARY KEY DEFAULT nextval('user_rooms_seq') NOT NULL,
 
-    user_id         INTEGER NOT NULL REFERENCES users,
-    room_id         INTEGER NOT NULL REFERENCES rooms,
+    user_id         INTEGER NOT NULL REFERENCES users ON DELETE CASCADE,
+    room_id         INTEGER NOT NULL REFERENCES rooms ON DELETE CASCADE,
     can_view        BOOLEAN NOT NULL DEFAULT TRUE,
     can_operate     BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT      u_user_rooms UNIQUE ( user_id, room_id )
