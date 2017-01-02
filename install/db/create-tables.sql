@@ -165,7 +165,14 @@ GRANT ALL ON users TO khaospy_write;
 ---------------------
 -- user_rooms
 ---------------------
+CREATE SEQUENCE user_rooms_seq;
+GRANT SELECT ON user_rooms_seq TO khaospy_read;
+GRANT ALL ON user_rooms_seq TO khaospy_write;
+
 CREATE TABLE user_rooms (
+
+    id INTEGER PRIMARY KEY DEFAULT nextval('user_rooms_seq') NOT NULL,
+
     user_id         INTEGER NOT NULL REFERENCES users,
     room_id         INTEGER NOT NULL REFERENCES rooms,
     can_view        BOOLEAN NOT NULL DEFAULT FALSE,

@@ -35,23 +35,57 @@ use Khaospy::Exception qw(
 );
 
 our @EXPORT_OK = qw(
-    get_userrooms
-    insert_userroom
-    update_userroom
-    delete_userroom
+    get_user_rooms
+    insert_user_room
+    update_user_room
+    delete_user_room
 
     userrooms_field_valid
     userrooms_field_desc
 );
 
-sub get_userrooms {
+sub get_user_rooms {
+    my ( $p ) = @_;
+
+    my @where_ar;
+    my @bind;
+
+    for my $pfld (qw(user_id room_id)){
+        if ( $p->{$pfld} ){
+            push @where_ar, " $pfld = ? ";
+            push @bind , $p->{$pfld};
+        }
+    }
+
+    my $where = join ( ' AND ', @where_ar );
+    $where = "WHERE $where" if $where;
 
     my $sql =<<"    EOSQL";
-    SELECT * FROM user_rooms order by user_id
+    SELECT
+        ur.id,
+        user_id,
+        room_id,
+        can_operate,
+        can_view,
+        username,
+        u.name as userfullname,
+        r.name as room_name,
+        r.tag  as room_tag
+
+    FROM user_rooms as ur
+
+    LEFT JOIN users as u on (u.id = ur.user_id)
+    LEFT JOIN rooms as r on (r.id = ur.room_id)
+
+    $where
+
+    ORDER BY user_id
     EOSQL
 
+    warn "user_rooms sql = $sql";
+
     my $sth = dbh->prepare($sql);
-    $sth->execute();
+    $sth->execute(@bind);
 
     my $results = [];
     while ( my $row = $sth->fetchrow_hashref ){
@@ -61,7 +95,7 @@ sub get_userrooms {
     return $results;
 }
 
-sub update_userroom {
+sub update_user_room {
 #    my ($room_id, $update) = @_;
 #
 #    my ( @fields, @values, @placeholders );
@@ -83,7 +117,7 @@ sub update_userroom {
 #    $sth->execute(@values,$room_id);
 }
 
-sub insert_userroom {
+sub insert_user_room {
 #    my ( $add ) = @_;
 #    my ( @fields, @values, @placeholders );
 #
@@ -105,7 +139,7 @@ sub insert_userroom {
 #    $sth->execute(@values);
 }
 
-sub delete_userroom {
+sub delete_user_room {
     my ( $del ) = @_;
     die "TODO delete_room() not yet implemented"; # TODO
 }

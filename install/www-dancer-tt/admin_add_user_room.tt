@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    [% INCLUDE header_jquery.tt %]
+    <script src="/js/admin_add_user_room.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/admin_add_user_room.css">
+</head>
+<body>
+    <div class='main'>
+        <div class='title_n_links'>[% INCLUDE title_linkbar_admin_user_rooms.tt %]</div>
+        <div class='error_msg'>[% error_msg %]</div>
+
+        <form method='post' action='/dancer/admin/add_user_room'>
+            <table>
+
+<!-- TODO 
+                <tr>
+                    <td>Room Name</td>
+                    <td><input type='text' name='name' value='[% add.name %]'/></td>
+                    <td class='td_error'>[% error.name %]</td>
+                </tr>
+                <tr>
+                    <td>Tag</td>
+                    <td><input type='text' name='tag' value='[% add.tag %]'/></td>
+                    <td class='td_error'>[% error.tag %]</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type='submit' name='add_room' value='Add Room'/>
+                        <input type='hidden' name='return_url' value='[% return_url %]'/>
+                    </td>
+                </tr>
+-->
+
+            </table>
+        </form>
+    </div>
+</body>
+</html>

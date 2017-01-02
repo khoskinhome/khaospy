@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    [% INCLUDE header_jquery.tt %]
+    <script src="/js/admin_list_user_rooms.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/admin_list_user_rooms.css">
+</head>
+<body>
+    <div class='main'>
+
+        <div class='title_n_links'>[% INCLUDE title_linkbar_admin_user_rooms.tt %]</div>
+        <div class='error_msg'>[% error_msg %]</div>
+
+        <table>
+            <tr>
+                <select id='add_user_room-user_id'>
+                  [% FOREACH row IN list_users %]
+                    <option value="[% row.id %]">[% row.username %]</option>
+                  [% END %]
+                </select>
+
+                <select id='add_user_room-room_id'>
+                  [% FOREACH row IN list_rooms %]
+                    <option value="[% row.id %]">[% row.tag %]</option>
+                  [% END %]
+                </select>
+
+                <td>
+                    <button class='add_user_room' >Add User Room</button>
+                </td>
+            </tr>
+        </table>
+
+
+        <table>
+            <tr>
+                <th>User</th>
+                <th>Room</th>
+                <th>View</th>
+                <th>Operate</th>
+            </tr>
+
+          [% FOREACH row IN list_user_rooms %]
+            <tr>
+                <td>
+                    [% row.username %]
+                </td>
+                <td>
+                    [% row.room_name %]
+                </td>
+                <td>
+                    <input type='checkbox' id='can_view-id[% row.id %]' [% IF row.can_view %]checked='checked'[% END %]/>
+                </td>
+                <td>
+                    <input type='checkbox' id='can_operate-id[% row.id %]' [% IF row.can_operate %]checked='checked'[% END %]/>
+                </td>
+
+                <td>
+                    <button class='delete' id='delete-id[% row.id %]'>Delete</button>
+                </td>
+            </tr>
+          [% END %]
+        </table>
+    </div>
+</body>
+</html>
