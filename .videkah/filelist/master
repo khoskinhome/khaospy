@@ -448,5 +448,22 @@ crap.diff.pl
 ##############################
 
 # greping crap
+install/www/js/admin_list_users-OLD.js:16:    $("input[type=checkbox]").focusin( function() {
+
+
+g.grep.nH add_user_room
+install/lib-perl/Khaospy/WebUI/Admin/UserRooms.pm:102:post '/admin/add_user_room/:user_id/:room_id'  => needs login => sub {
+install/lib-perl/Khaospy/WebUI/Admin/UserRooms.pm:107:get '/admin/add_user_room'  => needs login => sub {
+install/lib-perl/Khaospy/WebUI/Admin/UserRooms.pm:116:#    return template 'admin_add_user_room' => {
+install/www-dancer-tt/admin_add_user_room.tt:5:    <script src="/js/admin_add_user_room.js"></script>
+install/www-dancer-tt/admin_add_user_room.tt:6:    <link rel="stylesheet" type="text/css" href="/css/admin_add_user_room.css">
+install/www-dancer-tt/admin_add_user_room.tt:13:        <form method='post' action='/dancer/admin/add_user_room'>
+install/www-dancer-tt/admin_list_user_rooms.tt:21:                    <select id='add_user_room-user_id'>
+install/www-dancer-tt/admin_list_user_rooms.tt:28:                    <select id='add_user_room-room_id'>
+install/www-dancer-tt/admin_list_user_rooms.tt:34:                <td><button class='add_user_room' >Add User Room</button></td>
+install/www-dancer-tt/title_linkbar_admin_user_rooms.tt:6:                    <li class='nav_link'><a href='/dancer/admin/add_user_room'>Add User Room</a></li>
+install/www/js/admin_list_user_rooms.js:47:    $("button.add_user_room").click( function() {
+
+
 
 
