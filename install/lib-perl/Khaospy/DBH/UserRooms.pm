@@ -39,9 +39,10 @@ our @EXPORT_OK = qw(
     insert_user_room
     update_user_room
     delete_user_room
+    update_user_room_by_id
 
-    userrooms_field_valid
-    userrooms_field_desc
+    user_rooms_field_valid
+    user_rooms_field_desc
 );
 
 sub get_user_rooms {
@@ -93,6 +94,28 @@ sub get_user_rooms {
     }
 
     return $results;
+}
+
+sub update_user_room_by_id {
+    my ($ur_id, $update) = @_;
+
+    my ( @fields, @values, @placeholders );
+
+    for my $fld ( keys %$update ){
+        KhaospyExcept::InvalidFieldName->throw(
+            error => user_rooms_field_desc($fld)
+        ) if ! user_rooms_field_valid($fld,$update->{$fld});
+
+        push @fields, " $fld = ? ";
+        push @values, $update->{$fld};
+    }
+
+    my $sql = " UPDATE user_rooms set"
+        .join( ", ",@fields)
+        ." WHERE id  = ?";
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute(@values,$ur_id);
 }
 
 sub update_user_room {
@@ -151,13 +174,13 @@ my $fv_sub = gen_field_valid_sub( 'user_rooms', {
     can_operate => \&boolean_valid,
     can_view    => \&boolean_valid,
 });
-sub userrooms_field_valid { return $fv_sub->(@_) }
+sub user_rooms_field_valid { return $fv_sub->(@_) }
 
 
 my $fd_sub = gen_field_desc_sub( 'user_rooms', {
     can_operate => boolean_desc_sub('can_operate'),
     can_view    => boolean_desc_sub('can_view'),
 });
-sub userrooms_field_desc { return $fd_sub->(@_) }
+sub user_rooms_field_desc { return $fd_sub->(@_) }
 
 1;

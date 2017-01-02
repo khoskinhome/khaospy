@@ -22,11 +22,8 @@ use Khaospy::DBH::Rooms qw(get_rooms);
 use Khaospy::DBH::UserRooms qw(
     get_user_rooms
     insert_user_room
-    update_user_room
+    update_user_room_by_id
     delete_user_room
-
-    userrooms_field_valid
-    userrooms_field_desc
 );
 
 
@@ -41,16 +38,19 @@ sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
 get '/admin/list_user_rooms'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');
 
+
+    my %select = ();
+    $select{select_user_id} = params->{user_id} if params->{user_id};
+    $select{select_room_id} = params->{room_id} if params->{room_id};
+
     return template 'admin_list_user_rooms' => {
         page_title      => 'Admin : List User Rooms',
         user            => session('user'),
         error_msg       => pop_error_msg(),
 
         list_users      => get_users(),
-        select_user_id  => params->{user_id},
-
         list_rooms      => get_rooms(),
-        select_room_id  => params->{room_id},
+        %select,
 
         list_user_rooms => get_user_rooms({
             user_id => params->{user_id},
@@ -58,6 +58,46 @@ get '/admin/list_user_rooms'  => needs login => sub {
         }),
     };
 };
+
+post '/admin/update_user_room'  => needs login => sub {
+    header( 'Content-Type'  => 'application/json' );
+    header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
+
+    if ( ! session->read('user_is_admin')){
+        status 'bad_request';
+        return "user is not an admin";
+    }
+
+    my $ur_id       = params->{user_room_id};
+    my $can_operate = params->{can_operate};
+    my $can_view    = params->{can_view};
+
+warn "update ur_id=$ur_id operate=$can_operate view=$can_view    ";
+
+    my $ret;
+
+    try {
+        update_user_room_by_id($ur_id,
+            { can_operate  => $can_operate,
+              can_view     => $can_view,
+            }
+        );
+        $ret = {
+            msg     => 'Success',
+            ur_id => $ur_id,
+            can_operate  => $can_operate,
+            can_view     => $can_view,
+        };
+    } catch {
+        # TODO could get the Exception and give a better error message.
+        status 'bad_request';
+        $ret = "Error updating DB. $_";
+    };
+
+    return $ret if ref $ret ne 'HASH';
+    return to_json $ret;
+};
+
 
 post '/admin/add_user_room/:user_id/:room_id'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');

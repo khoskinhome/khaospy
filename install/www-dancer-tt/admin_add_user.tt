@@ -39,22 +39,22 @@
                     </tr>
                     <tr>
                         <td>Enabled</td>
-                        <td><input type='checkbox' name='is_enabled' [% IF add.is_enabled %]checked='checked'[% END %]/></td>
+                        <td><input class='big_checkbox' type='checkbox' name='is_enabled' [% IF add.is_enabled %]checked='checked'[% END %]/></td>
                         <td class='td_error'>[% error.is_enabled %]</td>
                     </tr>
                     <tr>
                         <td>API User</td>
-                        <td><input type='checkbox' name='is_api_user' [% IF add.is_api_user %]checked='checked'[% END %]/></td>
+                        <td><input class='big_checkbox' type='checkbox' name='is_api_user' [% IF add.is_api_user %]checked='checked'[% END %]/></td>
                         <td class='td_error'>[% error.is_api_user %]</td>
                     </tr>
                     <tr>
                         <td>Admin</td>
-                        <td><input type='checkbox' name='is_admin' [% IF add.is_admin %]checked='checked'[% END %]/></td>
+                        <td><input class='big_checkbox' type='checkbox' name='is_admin' [% IF add.is_admin %]checked='checked'[% END %]/></td>
                         <td class='td_error'>[% error.is_admin %]</td>
                     </tr>
                     <tr>
                         <td>Remote</td>
-                        <td><input type='checkbox' name='can_remote' [% IF add.can_remote %]checked='checked'[% END %]/></td>
+                        <td><input class='big_checkbox' type='checkbox' name='can_remote' [% IF add.can_remote %]checked='checked'[% END %]/></td>
                         <td class='td_error'>[% error.can_remote %]</td>
                     </tr>
                     <tr>

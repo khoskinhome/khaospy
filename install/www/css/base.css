@@ -143,8 +143,17 @@ li.nav_link:last-child {
     border-right: none;
 }
 
-td, button, input {
+th, td, button, input, select {
     font-size: 25px;
+}
+
+th, td {
+    text-align: left;
+}
+
+.big_checkbox {
+    width: 30px;
+    height: 30px;
 }
 
 .error_msg {
@@ -163,5 +172,6 @@ td, button, input {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 
 

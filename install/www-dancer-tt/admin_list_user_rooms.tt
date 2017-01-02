@@ -20,14 +20,14 @@
                 <td>
                     <select id='add_user_room-user_id'>
                       [% FOREACH row IN list_users %]
-                        <option value="[% row.id %]">[% row.username %]</option>
+                        <option value="[% row.id %]" [%IF row.id == select_user_id %] selected="selected" [% END %]>[% row.username %]</option>
                       [% END %]
                     </select>
                 </td>
                 <td>
                     <select id='add_user_room-room_id'>
                       [% FOREACH row IN list_rooms %]
-                        <option value="[% row.id %]">[% row.tag %]</option>
+                        <option value="[% row.id %]" [%IF row.id == select_room_id %] selected="selected" [% END %]>[% row.tag %]</option>
                       [% END %]
                     </select>
                 </td>
@@ -46,17 +46,17 @@
 
           [% FOREACH row IN list_user_rooms %]
             <tr>
-                <td>
+                <td title='[% row.userfullname %]'>
                     [% row.username %]
                 </td>
-                <td>
-                    [% row.room_name %]
+                <td title='[% row.room_name %]'>
+                    [% row.room_tag %]
                 </td>
                 <td>
-                    <input type='checkbox' id='can_view-id[% row.id %]' [% IF row.can_view %]checked='checked'[% END %]/>
+                    <input class='big_checkbox' type='checkbox' id='can_view-id[% row.id %]' [% IF row.can_view %]checked='checked'[% END %]/>
                 </td>
                 <td>
-                    <input type='checkbox' id='can_operate-id[% row.id %]' [% IF row.can_operate %]checked='checked'[% END %]/>
+                    <input class='big_checkbox' type='checkbox' id='can_operate-id[% row.id %]' [% IF row.can_operate %]checked='checked'[% END %]/>
                 </td>
 
                 <td>
