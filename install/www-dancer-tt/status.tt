@@ -13,38 +13,43 @@
         <div class='title_n_links'>[% INCLUDE title_linkbar.tt %]</div>
         <div class='error_msg'>[% error_msg %]</div>
 
-        <table>
-            <tr>
-                <th>Control</th>
-                <th>On</th>
-                <th>Off</th>
-                <th>Status</th>
-                <th>Last Update time</th>
-                <th>Changed</th>
-            </tr>
+        <div class='main_content'>
+            <table>
+                <thead>
+                <tr>
+                    <th>Control</th>
+                    <th>On</th>
+                    <th>Off</th>
+                    <th>Status</th>
+                    <th>Last Update time</th>
+                    <th>Changed</th>
+                </tr>
+                </thead>
 
-          [% FOREACH row IN entries %]
-            <tr>
-                <td class='controlname' >[% row.control_name %]</td>
+                <tbody>
+                    [% FOREACH row IN entries %]
+                    <tr>
+                        <td class='controlname' >[% row.control_name %]</td>
 
-                    [% IF row.can_operate %]
-                        <td>
-                            <button id='[% row.control_name %]' value='on'>On</button>
-                        </td>
-                        <td>
-                            <button id='[% row.control_name %]' value='off'>Off</button>
-                        </td>
-                    [% ELSE %]
-                        <td></td><td></td>
+                            [% IF row.can_operate %]
+                                <td>
+                                    <button id='[% row.control_name %]' value='on'>On</button>
+                                </td>
+                                <td>
+                                    <button id='[% row.control_name %]' value='off'>Off</button>
+                                </td>
+                            [% ELSE %]
+                                <td></td><td></td>
+                            [% END %]
+
+                        <td align='center' id='[% row.control_name %]-state_alias'>[% row.current_state_value %]</td>
+                        <td class='controlname' id='[% row.control_name %]-request_time'>[% row.request_time %]</td>
+                        <td id='[% row.control_name %]-info'></td>
+                    </tr>
                     [% END %]
-
-                <td align='center' id='[% row.control_name %]-state_alias'>[% row.current_state_value %]</td>
-                <td class='controlname' id='[% row.control_name %]-request_time'>[% row.request_time %]</td>
-                <td id='[% row.control_name %]-info'></td>
-            </tr>
-          [% END %]
-        </table>
-
+                <tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>

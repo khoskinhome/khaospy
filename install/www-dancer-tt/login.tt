@@ -8,10 +8,11 @@
     <body>
         <div class='main'>
             <div class='title_n_links'> [% INCLUDE title.tt %]</div>
-            <div class='error_msg'>[% error_msg %]</div>
-
             <div class='center'>
-            <table>
+            <div class='padline'></div>
+            <div class='error_msg'>[% error_msg %]</div>
+            <div class='padline'></div>
+            <table class='main_content'>
                 <form method='post' action='/dancer/login'>
                     <tr>
                         <td>User name</td>

@@ -9,35 +9,46 @@
     <div class='main'>
         <div class='title_n_links'>[% INCLUDE title_linkbar_admin_rooms.tt %]</div>
         <div class='error_msg'>[% error_msg %]</div>
-        <table>
-            <tr>
-                <th>Room</th>
-                <th>Tag</th>
-            </tr>
+        <div class='main_content'>
+            <table>
 
-          [% FOREACH row IN list_rooms %]
-            <tr>
-                <td>
-                    [% row.name %]
-                </td>
-                <td>
-                    [% row.tag %]
-                </td>
-                <td>
-                    <button class='listusers' id='listusers-id[% row.id %]'>Users</button>
-                </td>
-                <td>
-                    <button class='listcontrols' id='listcontrols-id[% row.id %]'>Controls</button>
-                </td>
-                <td>
-                    <button class='update' id='update-id[% row.id %]'>Update</button>
-                </td>
-                <td>
-                    <button class='delete' id='delete-id[% row.id %]'>Delete</button>
-                </td>
-            </tr>
-          [% END %]
-        </table>
+                <thead>
+                    <tr>
+                        <th>Room</th>
+                        <th>Tag</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    [% FOREACH row IN list_rooms %]
+                    <tr>
+                        <td>
+                            [% row.name %]
+                        </td>
+                        <td>
+                            [% row.tag %]
+                        </td>
+                        <td>
+                            <button class='listusers' id='listusers-id[% row.id %]'>Users</button>
+                        </td>
+                        <td>
+                            <button class='listcontrols' id='listcontrols-id[% row.id %]'>Controls</button>
+                        </td>
+                        <td>
+                            <button class='update' id='update-id[% row.id %]'>Update</button>
+                        </td>
+                        <td>
+                            <button class='delete' id='delete-id[% row.id %]'>Delete</button>
+                        </td>
+                    </tr>
+                    [% END %]
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>

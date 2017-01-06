@@ -10,61 +10,73 @@
 
         <div class='title_n_links'>[% INCLUDE title_linkbar_admin_user_rooms.tt %]</div>
         <div class='error_msg'>[% error_msg %]</div>
+        <div class='main_content'>
 
-        <table>
-            <tr>
-                <th>User</th>
-                <th>Room</th>
-            </tr>
-            <tr>
-                <td>
-                    <select id='add_user_room-user_id' multiple>
-                      [% FOREACH row IN list_users %]
-                        <option value="[% row.id %]" [%IF row.id == select_user_id %] selected="selected" [% END %]>[% row.username %]</option>
-                      [% END %]
-                    </select>
-                </td>
-                <td>
-                    <select id='add_user_room-room_id' multiple>
-                      [% FOREACH row IN list_rooms %]
-                        <option value="[% row.id %]" [%IF row.id == select_room_id %] selected="selected" [% END %]>[% row.tag %]</option>
-                      [% END %]
-                    </select>
-                </td>
-                <td><button class='add_user_room' >Add User Room</button></td>
-            </tr>
-        </table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Room</th>
+                        <th></th>
+                    </tr>
+                </thead>
 
+                <tbody>
+                    <tr>
+                        <td>
+                            <select id='add_user_room-user_id' multiple>
+                              [% FOREACH row IN list_users %]
+                                <option value="[% row.id %]" [%IF row.id == select_user_id %] selected="selected" [% END %]>[% row.username %]</option>
+                              [% END %]
+                            </select>
+                        </td>
+                        <td>
+                            <select id='add_user_room-room_id' multiple>
+                              [% FOREACH row IN list_rooms %]
+                                <option value="[% row.id %]" [%IF row.id == select_room_id %] selected="selected" [% END %]>[% row.tag %]</option>
+                              [% END %]
+                            </select>
+                        </td>
+                        <td><button class='add_user_room' >Add User Room</button></td>
+                    </tr>
+                </tbody>
+            </table>
 
-        <table>
-            <tr>
-                <th>User</th>
-                <th>Room</th>
-                <th>View</th>
-                <th>Operate</th>
-            </tr>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Room</th>
+                        <th>View</th>
+                        <th>Operate</th>
+                        <th></th>
+                    </tr>
+                </thead>
 
-          [% FOREACH row IN list_user_rooms %]
-            <tr>
-                <td title='[% row.userfullname %]'>
-                    [% row.username %]
-                </td>
-                <td title='[% row.room_name %]'>
-                    [% row.room_tag %]
-                </td>
-                <td>
-                    <input class='big_checkbox' type='checkbox' id='can_view-id[% row.id %]' [% IF row.can_view %]checked='checked'[% END %]/>
-                </td>
-                <td>
-                    <input class='big_checkbox' type='checkbox' id='can_operate-id[% row.id %]' [% IF row.can_operate %]checked='checked'[% END %]/>
-                </td>
+                <tbody>
+                    [% FOREACH row IN list_user_rooms %]
+                    <tr>
+                        <td title='[% row.userfullname %]'>
+                            [% row.username %]
+                        </td>
+                        <td title='[% row.room_name %]'>
+                            [% row.room_tag %]
+                        </td>
+                        <td>
+                            <input class='big_checkbox' type='checkbox' id='can_view-id[% row.id %]' [% IF row.can_view %]checked='checked'[% END %]/>
+                        </td>
+                        <td>
+                            <input class='big_checkbox' type='checkbox' id='can_operate-id[% row.id %]' [% IF row.can_operate %]checked='checked'[% END %]/>
+                        </td>
 
-                <td>
-                    <button class='delete' id='delete-id[% row.id %]'>Delete</button>
-                </td>
-            </tr>
-          [% END %]
-        </table>
+                        <td>
+                            <button class='delete' id='delete-id[% row.id %]'>Delete</button>
+                        </td>
+                    </tr>
+                    [% END %]
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>

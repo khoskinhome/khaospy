@@ -7,9 +7,9 @@
 </head>
 <body>
     <div class='main'>
-            <div class='title_n_links'>[% INCLUDE title_linkbar_admin_users.tt %]</div>
-            <div class='error_msg'>[% error_msg %]</div>
-
+        <div class='title_n_links'>[% INCLUDE title_linkbar_admin_users.tt %]</div>
+        <div class='error_msg'>[% error_msg %]</div>
+        <div class='main_content'>
             <form method='post' action='/dancer/admin/add_user'>
                 <table>
                     <tr>
@@ -66,6 +66,7 @@
                     </tr>
                 </table>
             </form>
+        </div>
     </div>
 </body>
 </html>

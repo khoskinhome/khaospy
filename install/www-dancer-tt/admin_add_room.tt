@@ -9,28 +9,29 @@
     <div class='main'>
         <div class='title_n_links'>[% INCLUDE title_linkbar_admin_rooms.tt %]</div>
         <div class='error_msg'>[% error_msg %]</div>
-
-        <form method='post' action='/dancer/admin/add_room'>
-            <table>
-                <tr>
-                    <td>Room Name</td>
-                    <td><input type='text' name='name' value='[% add.name %]'/></td>
-                    <td class='td_error'>[% error.name %]</td>
-                </tr>
-                <tr>
-                    <td>Tag</td>
-                    <td><input type='text' name='tag' value='[% add.tag %]'/></td>
-                    <td class='td_error'>[% error.tag %]</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <input type='submit' name='add_room' value='Add Room'/>
-                        <input type='hidden' name='return_url' value='[% return_url %]'/>
-                    </td>
-                </tr>
-            </table>
-        </form>
+        <div class='main_content'>
+            <form method='post' action='/dancer/admin/add_room'>
+                <table>
+                    <tr>
+                        <td>Room Name</td>
+                        <td><input type='text' name='name' value='[% add.name %]'/></td>
+                        <td class='td_error'>[% error.name %]</td>
+                    </tr>
+                    <tr>
+                        <td>Tag</td>
+                        <td><input type='text' name='tag' value='[% add.tag %]'/></td>
+                        <td class='td_error'>[% error.tag %]</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input type='submit' name='add_room' value='Add Room'/>
+                            <input type='hidden' name='return_url' value='[% return_url %]'/>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
     </div>
 </body>
 </html>

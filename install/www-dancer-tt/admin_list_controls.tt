@@ -9,41 +9,51 @@
     <div class='main'>
         <div class='title_n_links'>[% INCLUDE title_linkbar_admin_controls.tt %]</div>
         <div class='error_msg'>[% error_msg %]</div>
-        <table>
-            <tr>
-                <th>Control</th>
-                <th>Alias</th>
-                <th>Type</th>
-            </tr>
+        <div class='main_content'>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Control</th>
+                        <th>Alias</th>
+                        <th>Type</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
 
-          [% FOREACH row IN list_controls %]
-            <tr>
-                <td>
-                    [% row.control_name %]
-                </td>
-                <td>
-                    [% row.alias %]
-                </td>
-                <td>
-                    [% row.type %]
-                </td>
+                <tbody>
+                    [% FOREACH row IN list_controls %]
+                    <tr>
+                        <td>
+                            [% row.control_name %]
+                        </td>
+                        <td>
+                            [% row.alias %]
+                        </td>
+                        <td>
+                            [% row.type %]
+                        </td>
 
-                <td>
-                    <button class='listrooms' id='listrooms-id[% row.id %]'>Rooms</button>
-                </td>
-                <td>
-                    <button class='configure' id='configure-id[% row.id %]'>Configure</button>
-                </td>
+                        <td>
+                            <button class='listrooms' id='listrooms-id[% row.id %]'>Rooms</button>
+                        </td>
+                        <td>
+                            <button class='configure' id='configure-id[% row.id %]'>Configure</button>
+                        </td>
 
-                <td>
-                    <button class='update' id='update-id[% row.id %]'>Update</button>
-                </td>
-                <td>
-                    <button class='delete' id='delete-id[% row.id %]'>Delete</button>
-                </td>
-            </tr>
-          [% END %]
-        </table>
+                        <td>
+                            <button class='update' id='update-id[% row.id %]'>Update</button>
+                        </td>
+                        <td>
+                            <button class='delete' id='delete-id[% row.id %]'>Delete</button>
+                        </td>
+                    </tr>
+                    [% END %]
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>

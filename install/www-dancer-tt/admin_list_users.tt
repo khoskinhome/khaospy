@@ -9,54 +9,58 @@
 <body>
     <div class='main'>
 
-            <div id="dialog-confirm" title="Delete the User ?">
-              <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>This User will be permanently deleted. Are you sure?</p>
-            </div>
+        <div id="dialog-confirm" title="Delete the User ?">
+          <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>This User will be permanently deleted. Are you sure?</p>
+        </div>
 
-            <div id="dialog-password" title="Change Password">
+        <div id="dialog-password" title="Change Password">
 
-                <form>
-                    <input type="password" name="password" id="new_password" value="xxxxxxx" class="text ui-widget-content ui-corner-all" size='30'>
+            <form>
+                <input type="password" name="password" id="new_password" value="xxxxxxx" class="text ui-widget-content ui-corner-all" size='30'>
 
-                    <!-- Allow form submission with keyboard without duplicating the dialog button -->
-                    <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-                </form>
-                <div id="dialog-password-error"></div>
+                <!-- Allow form submission with keyboard without duplicating the dialog button -->
+                <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            </form>
+            <div id="dialog-password-error"></div>
 
-            </div>
+        </div>
 
-            <div class='title_n_links'>[% INCLUDE title_linkbar_admin_users.tt %]</div>
-            <div class='error_msg'>[% error_msg %]</div>
-
+        <div class='title_n_links'>[% INCLUDE title_linkbar_admin_users.tt %]</div>
+        <div class='error_msg'>[% error_msg %]</div>
+        <div class='main_content'>
             <table>
-                <tr>
-                    <th>User</th>
-                    <th>Name</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-
-              [% FOREACH row IN list_users %]
-                <tr id='tr_user-id[% row.id %]'>
-                    <td id='td_username-id[% row.id %]'>[% row.username %]</td>
-                    <td>[% row.name %]</td>
-                    <td>
-                        <button class='listrooms' id='listrooms-id[% row.id %]'>Rooms</button>
-                    </td>
-                    <td>
-                        <button class='change_password' id='change_password-id[% row.id %]'>Password</button>
-                    </td>
-                    <td>
-                        <button class='update' id='update-id[% row.id %]'>Update</button>
-                    </td>
-                    <td>
-                        <button class='delete' id='delete-id[% row.id %]'>Delete</button>
-                    </td>
-                </tr>
-              [% END %]
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Name</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    [% FOREACH row IN list_users %]
+                    <tr id='tr_user-id[% row.id %]'>
+                        <td id='td_username-id[% row.id %]'>[% row.username %]</td>
+                        <td>[% row.name %]</td>
+                        <td>
+                            <button class='listrooms' id='listrooms-id[% row.id %]'>Rooms</button>
+                        </td>
+                        <td>
+                            <button class='change_password' id='change_password-id[% row.id %]'>Password</button>
+                        </td>
+                        <td>
+                            <button class='update' id='update-id[% row.id %]'>Update</button>
+                        </td>
+                        <td>
+                            <button class='delete' id='delete-id[% row.id %]'>Delete</button>
+                        </td>
+                    </tr>
+                    [% END %]
+                <tbody>
             </table>
+        </div>
     </div>
 </body>
 </html>

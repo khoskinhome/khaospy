@@ -112,8 +112,8 @@ li.title_logout:last-child {
 
 ul.link_bar {
     list-style-type: none;
-    margin: 0;
-    padding: 0;
+    margin: 1px;
+    padding: 1px;
     overflow: hidden;
 }
 
@@ -128,10 +128,19 @@ li.nav_link a {
     padding: 8px;
     color: #122e3b;
     background-color: #4fabc9;
+    border-radius: 6px;
+    border: 1px solid #3691b0;
+    margin-top: 2px;
+    margin-right: 2px;
+    padding: 3px;
+
+/*
     border-right: 1px solid #3691b0;
     border-left: 1px solid #3691b0;
     border-top: 1px solid #3691b0;
     border-bottom: 1px solid #3691b0;
+*/
+
 }
 
 li.nav_link a:hover {
@@ -157,6 +166,13 @@ th, td {
 }
 
 .error_msg {
+    border: 1px solid red;
+    border-radius: 6px;
+    padding: 2px ;
+    margin-top: 2px ;
+    margin-bottom: 2px ;
+    margin-left: 1px ;
+    margin-right: 1px ;
     font-size: 18px;
     color : red;
     white-space: nowrap;
@@ -164,14 +180,45 @@ th, td {
     text-overflow: ellipsis;
 }
 
+
+.error_msg:empty {
+    display: none
+}
+
 .td_error {
+/*    display:inline-block;
+    float:left; */
     font-size: 16px;
     color : red;
-    max-width: 300px;
+    max-width: 400px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+.main_content {
+
+    border: 1px solid #3691b0;
+    border-radius: 6px;
+    margin: 1px ;
+    padding: 1px ;
+
+}
+
+div.padline {
+    height:2px;
+}
+
+/*
+td {
+    border-bottom: 1px solid #d8ecf3;
+}*/
+
+tr:nth-child(even) {background: white}
+tr:nth-child(odd) {background: #d8ebf3}
+
+th {
+    background-color:#b1d7e7;
+}
 
 
