@@ -147,11 +147,18 @@ post '/reset_password' => sub { # don't need login for this root.
     my $redir_url   = param('redir_url');
     my $user_record = get_user($user);
 
+    if (param('redir_login')){
+        return redirect uri_for('/login', {
+            user         => $user,
+            redirect_url => $redir_url,
+        });
+    }
+
     if ( ! defined $user_record
         || get_hashval($user_record,'email') ne $email){
 
         session 'error_msg'
-            => "username and email combination don't match any known users";
+            => "Can't find a user with that email";
 
         redirect uri_for('/reset_password', {
             user         => $user,

@@ -68,10 +68,8 @@ ul.title_bar {
     background-color : #add8e6;
     color : darkblue ;
 
-    border-right: 1px solid darkblue;
-    border-left: 1px solid darkblue;
-    border-top: 1px solid darkblue;
-    border-bottom: 1px solid darkblue;
+    border: 1px solid darkblue;
+    border-radius: 6px;
 
 }
 
@@ -92,10 +90,8 @@ li.title_logout a {
     color: darkblue;
     background-color: #76bdd5;
 
-    border-right: 1px solid #bbb;
-    border-left: 1px solid #bbb;
-    border-top: 1px solid #bbb;
-    border-bottom: 1px solid #bbb;
+    border: 1px solid #bbb;
+    border-radius: 6px;
 }
 
 li.title_logout a:hover {
@@ -156,6 +152,10 @@ th, td, button, input, select {
     font-size: 25px;
 }
 
+input[type="text"], input[type="password"]{
+    width:350px;
+}
+
 th, td {
     text-align: left;
 }
@@ -214,8 +214,8 @@ td {
     border-bottom: 1px solid #d8ecf3;
 }*/
 
-tr:nth-child(even) {background: white}
-tr:nth-child(odd) {background: #d8ebf3}
+tr.list:nth-child(even) {background: white}
+tr.list:nth-child(odd) {background: #d8ebf3}
 
 th {
     background-color:#b1d7e7;

@@ -71,6 +71,13 @@ post '/user/change_password' => sub { # don't need login for this root.
     my $new_password2 = trim(param('new_password2'));
     my $redir_url     = param('redir_url');
 
+    if (param('redir_login')){
+        return redirect uri_for('/login', {
+            user         => $user,
+            redirect_url => $redir_url,
+        });
+    }
+
     my $user_record = get_user_password($user,$old_password);
     if ( ! $user_record ){
         session 'error_msg'

@@ -12,7 +12,7 @@
         <div class='main_content'>
             <table>
                 <thead>
-                    <tr>
+                    <tr class='listhead'>
                         <th>Control</th>
                         <th>Alias</th>
                         <th>Type</th>
@@ -25,7 +25,7 @@
 
                 <tbody>
                     [% FOREACH row IN list_controls %]
-                    <tr>
+                    <tr class='list'>
                         <td>
                             [% row.control_name %]
                         </td>

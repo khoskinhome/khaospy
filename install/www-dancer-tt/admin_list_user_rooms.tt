@@ -44,7 +44,7 @@
 
             <table>
                 <thead>
-                    <tr>
+                    <tr class='listhead'>
                         <th>User</th>
                         <th>Room</th>
                         <th>View</th>
@@ -55,7 +55,7 @@
 
                 <tbody>
                     [% FOREACH row IN list_user_rooms %]
-                    <tr>
+                    <tr class='list'>
                         <td title='[% row.userfullname %]'>
                             [% row.username %]
                         </td>

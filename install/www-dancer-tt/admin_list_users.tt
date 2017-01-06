@@ -30,7 +30,7 @@
         <div class='main_content'>
             <table>
                 <thead>
-                    <tr>
+                    <tr class='listhead'>
                         <th>User</th>
                         <th>Name</th>
                         <th></th>
@@ -41,7 +41,7 @@
                 </thead>
                 <tbody>
                     [% FOREACH row IN list_users %]
-                    <tr id='tr_user-id[% row.id %]'>
+                    <tr class='list' id='tr_user-id[% row.id %]'>
                         <td id='td_username-id[% row.id %]'>[% row.username %]</td>
                         <td>[% row.name %]</td>
                         <td>

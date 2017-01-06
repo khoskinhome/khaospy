@@ -13,7 +13,7 @@
             <table>
 
                 <thead>
-                    <tr>
+                    <tr class='listhead'>
                         <th>Room</th>
                         <th>Tag</th>
                         <th></th>
@@ -25,7 +25,7 @@
 
                 <tbody>
                     [% FOREACH row IN list_rooms %]
-                    <tr>
+                    <tr class='list'>
                         <td>
                             [% row.name %]
                         </td>

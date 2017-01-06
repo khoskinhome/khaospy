@@ -1,47 +1,44 @@
 <!DOCTYPE html>
 <html>
-    <head>
-
-        [% INCLUDE header_jquery.tt %]
-
-    </head>
-    <body>
-        <div class='main'>
-            <div class='title_n_links'> [% INCLUDE title.tt %]</div>
-            <div class='center'>
-            <div class='padline'></div>
-            <div class='error_msg'>[% error_msg %]</div>
-            <div class='padline'></div>
-            <table class='main_content'>
-                <form method='post' action='/dancer/login'>
-                    <tr>
-                        <td>User name</td>
-                        <td><input type='text' name='user' value='[% user %]' /></td>
-                    </tr>
-                    <tr>
-                        <td>Password</td>
-                        <td><input type='password' name='password' value='' /></td>
-                    </tr>
-                    <tr>
-                        <td>
-                        </td>
-                        <td align='right'>
-                            <input type='submit' name='submit' value='Submit'/>
-                            <input type='hidden' name='return_url' value='[% return_url %]'/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                        </td>
-                        <td align='right'>
-                            <input type='submit' name='reset_password' value='Reset Password'/>
-                        </td>
-                    </tr>
-                </form>
-            </table>
-            </div>
-
+<head>
+    [% INCLUDE header_jquery.tt %]
+</head>
+<body>
+    <div class='main'>
+        <div class='title_n_links'> [% INCLUDE title.tt %]</div>
+        <div class='center'>
+        <div class='padline'></div>
+        <table class='main_content'>
+            <form method='post' action='/dancer/login'>
+                <tr><td class='error_msg' colspan='2'>[% error_msg %]</td></tr>
+                <tr>
+                    <td>User name</td>
+                    <td><input type='text' name='user' value='[% user %]' /></td>
+                </tr>
+                <tr>
+                    <td>Password</td>
+                    <td><input type='password' name='password' value='' /></td>
+                </tr>
+                <tr>
+                    <td>
+                    </td>
+                    <td align='right'>
+                        <input type='submit' name='login' value='Login'/>
+                        <input type='hidden' name='return_url' value='[% return_url %]'/>
+                        <input type='submit' name='reset_password' value='Reset Password'/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    </td>
+                    <td align='right'>
+                    </td>
+                </tr>
+            </form>
+        </table>
         </div>
-    </body>
+
+    </div>
+</body>
 </html>
 

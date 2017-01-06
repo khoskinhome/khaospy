@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
-    <head>
+<head>
 
-        [% INCLUDE header_jquery.tt %]
+    [% INCLUDE header_jquery.tt %]
 
-    </head>
-    <body>
-        <div class='main'>
-            <div class='title_n_links'>[% INCLUDE title_linkbar_user.tt %]</div>
-            <div class='error_msg'>[% error_msg %]</div>
+</head>
+<body>
+    <div class='main'>
+        <div class='title_n_links'>[% INCLUDE title_linkbar_user.tt %]</div>
+        <div class='error_msg'>[% error_msg %]</div>
 
+        <div class='main_content'>
             <table>
                 <form method='post' action='/dancer/user/update'>
                     <tr>
@@ -17,20 +18,20 @@
                         <td>
                             <input type='text' name='name' value='[% data.name %]' />
                         </td>
-                        <td>[% error.name %]</td>
+                        <td class='td_error'>[% error.name %]</td>
                     </tr>
 
                     <tr>
                         <td>Email</td>
                         <td><input type='text' name='email' value='[% data.email %]' /></td>
-                        <td>[% error.email %]</td>
+                        <td class='td_error'>[% error.email %]</td>
                     </tr>
                     <tr>
                         <td>Mobile Phone </td>
                         <td>
                             <input type='text' name='mobile_phone' value='[% data.mobile_phone %]' />
                         </td>
-                        <td>[% error.mobile_phone %]</td>
+                        <td class='td_error'>[% error.mobile_phone %]</td>
                     </tr>
                     <tr>
                         <td></td>
@@ -42,6 +43,7 @@
                 </form>
             </table>
         </div>
-    </body>
+    </div>
+</body>
 </html>
 

@@ -16,7 +16,7 @@
         <div class='main_content'>
             <table>
                 <thead>
-                <tr>
+                <tr class='listhead'>
                     <th>Control</th>
                     <th>On</th>
                     <th>Off</th>
@@ -28,8 +28,8 @@
 
                 <tbody>
                     [% FOREACH row IN entries %]
-                    <tr>
-                        <td class='controlname' >[% row.control_name %]</td>
+                    <tr class='list'>
+                        <td >[% row.control_name %]</td>
 
                             [% IF row.can_operate %]
                                 <td>
@@ -43,7 +43,7 @@
                             [% END %]
 
                         <td align='center' id='[% row.control_name %]-state_alias'>[% row.current_state_value %]</td>
-                        <td class='controlname' id='[% row.control_name %]-request_time'>[% row.request_time %]</td>
+                        <td id='[% row.control_name %]-request_time'>[% row.request_time %]</td>
                         <td id='[% row.control_name %]-info'></td>
                     </tr>
                     [% END %]
