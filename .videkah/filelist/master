@@ -356,6 +356,7 @@ crap.diff.pl
 
 ./install/www-dancer-tt/login.tt
 ./install/www-dancer-tt/reset_password.tt
+./install/www/js/reset_password.js
 ./install/www-dancer-tt/change_password.tt
 ./install/www-dancer-tt/user_update.tt
 
@@ -444,4 +445,4 @@ crap.diff.pl
 ##############################
 
 # greping crap
-
+install/lib-perl/Khaospy/WebUI/UserLogin.pm:154:            => "username and email combination don't match any known users";
