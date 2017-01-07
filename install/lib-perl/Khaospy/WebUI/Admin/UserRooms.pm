@@ -10,9 +10,7 @@ use Dancer2::Plugin::Auth::Tiny;
 use Dancer2::Session::Memcached;
 
 use Khaospy::Email qw(send_email);
-use Khaospy::Constants qw(
-    $JSON
-);
+use Khaospy::Constants qw($JSON);
 use Khaospy::Utils qw(
     trim
     get_hashval

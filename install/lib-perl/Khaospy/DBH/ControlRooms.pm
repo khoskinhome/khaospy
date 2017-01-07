@@ -5,25 +5,9 @@ use Exporter qw/import/;
 
 use Email::Valid;
 
-use Khaospy::DBH qw(
-    dbh
+use Khaospy::DBH qw(dbh);
 
-    gen_field_valid_sub
-    gen_field_desc_sub
-
-    boolean_valid
-    boolean_desc_sub
-);
-
-use Khaospy::Constants qw(
-    true false
-);
-
-use Khaospy::Log qw(
-    klogstart klogfatal klogerror
-    klogwarn  kloginfo  klogdebug
-    DEBUG
-);
+use Khaospy::Constants qw( true false );
 
 use Khaospy::Utils qw(
     trim
@@ -35,23 +19,51 @@ use Khaospy::Exception qw(
 );
 
 our @EXPORT_OK = qw(
-    get_controlrooms
-    insert_controlroom
-    update_controlroom
-    delete_controlroom
-
-    controlrooms_field_valid
-    controlrooms_field_desc
+    get_control_rooms
+    insert_control_room
+    delete_control_room
 );
 
-sub get_controlrooms {
+sub get_control_rooms {
+    my ( $p ) = @_;
+
+    my @where_ar;
+    my @bind;
+
+    for my $pfld (qw(control_id room_id)){
+        if ( $p->{$pfld} ){
+            push @where_ar, " $pfld = ? ";
+            push @bind , $p->{$pfld};
+        }
+    }
+
+    my $where = join ( ' AND ', @where_ar );
+    $where = "WHERE $where" if $where;
 
     my $sql =<<"    EOSQL";
-    SELECT * FROM control_rooms order by user_id
+    SELECT
+        cr.id,
+        control_id,
+        room_id,
+        control_name,
+        alias as control_alias,
+        r.name as room_name,
+        r.tag  as room_tag
+
+    FROM control_rooms as cr
+
+    LEFT JOIN controls as ctrl on (ctrl.id = cr.control_id)
+    LEFT JOIN rooms as r on (r.id = cr.room_id)
+
+    $where
+
+    ORDER BY room_tag, control_name
     EOSQL
 
+    warn "control_rooms sql = $sql";
+
     my $sth = dbh->prepare($sql);
-    $sth->execute();
+    $sth->execute(@bind);
 
     my $results = [];
     while ( my $row = $sth->fetchrow_hashref ){
@@ -61,67 +73,35 @@ sub get_controlrooms {
     return $results;
 }
 
-sub update_controlroom {
-#    my ($room_id, $update) = @_;
-#
-#    my ( @fields, @values, @placeholders );
-#
-#    for my $fld ( keys %$update ){
-#        KhaospyExcept::InvalidFieldName->throw(
-#            error => rooms_field_desc($fld)
-#        ) if ! rooms_field_valid($fld,$update->{$fld});
-#
-#        push @fields, " $fld = ? ";
-#        push @values, $update->{$fld};
-#    }
-#
-#    my $sql = " UPDATE rooms set"
-#        .join( ", ",@fields)
-#        ." WHERE id  = ?";
-#
-#    my $sth = dbh->prepare($sql);
-#    $sth->execute(@values,$room_id);
+sub insert_control_room {
+    my ( $control_id, $room_id ) = @_;
+
+    die "There is already a record for control_id=$control_id, room_id=$room_id"
+        if _get_id($control_id, $room_id);
+
+    my $sql = "INSERT INTO control_rooms (control_id, room_id) VALUES( ?, ?)";
+    my $sth = dbh->prepare($sql);
+    $sth->execute($control_id, $room_id);
+
+    return _get_id($control_id, $room_id);
 }
 
-sub insert_controlroom {
-#    my ( $add ) = @_;
-#    my ( @fields, @values, @placeholders );
-#
-#    for my $fld ( keys %$add ){
-#        KhaospyExcept::InvalidFieldName->throw(
-#            error => rooms_field_desc($fld)
-#        ) if ! rooms_field_valid($fld,$add->{$fld});
-#
-#        push @fields, $fld;
-#        push @values, $add->{$fld};
-#        push @placeholders, '?';
-#    }
-#
-#    my $sql = " INSERT INTO rooms "
-#        ."(".join( ", ",@fields).")"
-#        ." VALUES (".join( ", ", @placeholders).")";
-#
-#    my $sth = dbh->prepare($sql);
-#    $sth->execute(@values);
+sub _get_id {
+    my ( $control_id, $room_id ) = @_;
+    my $sql_sel ="SELECT * FROM control_rooms where control_id = ? and room_id = ?";
+    my $sth = dbh->prepare($sql_sel);
+    $sth->execute($control_id, $room_id);
+    while ( my $row = $sth->fetchrow_hashref ){
+        return get_hashval($row,'id');
+    }
+    return;
 }
 
-sub delete_controlroom {
-    my ( $del ) = @_;
-    die "TODO delete_controlroom() not yet implemented"; # TODO
+sub delete_control_room {
+    my ( $control_room_id ) = @_;
+    my $sql =" DELETE FROM control_rooms WHERE id = ?";
+    my $sth = dbh->prepare($sql);
+    $sth->execute($control_room_id);
 }
-
-####
-# User field validation
-
-my $fv_sub = gen_field_valid_sub( 'control_rooms', {
-
-});
-sub controlrooms_field_valid { return $fv_sub->(@_) }
-
-
-my $fd_sub = gen_field_desc_sub( 'control_rooms', {
-
-});
-sub controlrooms_field_desc { return $fd_sub->(@_) }
 
 1;

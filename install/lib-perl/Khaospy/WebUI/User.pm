@@ -45,15 +45,13 @@ use Khaospy::WebUI::Util qw(
 sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
 
 get '/user' => needs login => sub {
-
-#    redirect '/' if session('user');
     return template 'user' => {
         page_title      => 'User',
         user            => session('user'),
     };
 };
 
-get '/user/change_password' => sub { # don't need login for this root.
+get '/user/change_password' => sub { # don't need login for this path
 
     return template 'change_password' => {
         page_title  => 'User : Change Password',
@@ -64,7 +62,7 @@ get '/user/change_password' => sub { # don't need login for this root.
     };
 };
 
-post '/user/change_password' => sub { # don't need login for this root.
+post '/user/change_password' => sub { # don't need login for this path
     my $user          = trim(param('user'));
     my $old_password  = trim(param('old_password'));
     my $new_password  = trim(param('new_password'));
@@ -166,10 +164,12 @@ EOBODY
         body    => $body,
     });
 
-    session 'user' => undef;
-    session 'error_msg' => "You need to login with the new password";
-    redirect uri_for('/login', {
-        user         => $user,
+    session 'user'          => $user;
+    session 'user_id'       => get_hashval($user_record,'id');
+    session 'user_is_admin' => get_hashval($user_record,'is_admin');
+    session 'error_msg'     => "Password Changed";
+
+    redirect uri_for('/', {
         redirect_url => $redir_url,
     });
 };
@@ -193,18 +193,14 @@ get '/user/update'  => needs login => sub {
 };
 
 post '/user/update'  => needs login => sub {
-    # for non-admin users to update details
-    # name, email, mobile_phone
 
-    my $user         = session->read('user');
+    my $user      = session->read('user');
 
     my $data      = {};
     my $error     = {};
     my $error_msg = '';
 
-    # TODO filter name, email for xss things ?
-
-    for my $fld (qw( name email mobile_phone)){
+    for my $fld (qw(name email mobile_phone)){
         my $val = trim(param($fld));
         next if ! defined $val;
 

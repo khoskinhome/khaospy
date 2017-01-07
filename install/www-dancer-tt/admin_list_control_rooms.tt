@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    [% INCLUDE header_jquery.tt %]
+    <script src="/js/admin_list_control_rooms.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/admin_list_control_rooms.css">
+</head>
+<body>
+    <div class='main'>
+
+        <div class='title_n_links'>[% INCLUDE title_linkbar_admin_control_rooms.tt %]</div>
+        <div class='error_msg'>[% error_msg %]</div>
+        <div class='main_content'>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>control</th>
+                        <th>Room</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>
+                            <select id='add_control_room-control_id' multiple>
+                              [% FOREACH row IN list_controls %]
+                                <option class='control_type-[% row.control_type %]' value="[% row.id %]" [%IF row.id == select_control_id %] selected="selected" [% END %]>[% row.control_name %]</option>
+                              [% END %]
+                            </select>
+                        </td>
+                        <td>
+                            <select id='add_control_room-room_id' multiple>
+                              [% FOREACH row IN list_rooms %]
+                                <option value="[% row.id %]" [%IF row.id == select_room_id %] selected="selected" [% END %]>[% row.tag %]</option>
+                              [% END %]
+                            </select>
+                        </td>
+                        <td><button class='add_control_room' >Add Control Room</button></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table>
+                <thead>
+                    <tr class='listhead'>
+                        <th>control</th>
+                        <th>Room</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    [% FOREACH row IN list_control_rooms %]
+                    <tr class='list'>
+                        <td title='[% row.control_alias %]'>
+                            [% row.control_name %]
+                        </td>
+                        <td title='[% row.room_name %]'>
+                            [% row.room_tag %]
+                        </td>
+                        <td>
+                            <button class='delete' id='delete-id[% row.id %]'>Delete</button>
+                        </td>
+                    </tr>
+                    [% END %]
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

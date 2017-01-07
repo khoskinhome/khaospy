@@ -1,3 +1,5 @@
+// dancer base could change, depending on the Apache Conf.
+var dancer_base_url = '/dancer';
 
 $(document).ready(function(){
     $('.error_msg, .td_error').bind('mouseenter', function(){

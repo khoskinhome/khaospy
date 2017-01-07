@@ -121,18 +121,24 @@ sub update_user_room {
 sub insert_user_room {
     my ( $user_id, $room_id ) = @_;
 
-    my $sql_sel ="SELECT * FROM user_rooms where user_id = ? and room_id = ?";
-    my $sth = dbh->prepare($sql_sel);
-    $sth->execute($user_id, $room_id);
-    while ( my $row = $sth->fetchrow_hashref ){
-        die "There is already a record for user_id=$user_id, room_id=$room_id";
-    }
+    die "There is already a record for user_id=$user_id, room_id=$room_id"
+        if _get_id($user_id, $room_id);
 
     my $sql = "INSERT INTO user_rooms (user_id, room_id) VALUES( ?, ?)";
     my $sth = dbh->prepare($sql);
     $sth->execute($user_id, $room_id);
+    return _get_id($user_id, $room_id);
+}
 
-    # TODO return the id of the new record.
+sub _get_id {
+    my ( $user_id, $room_id ) = @_;
+    my $sql_sel ="SELECT * FROM user_rooms where user_id = ? and room_id = ?";
+    my $sth = dbh->prepare($sql_sel);
+    $sth->execute($user_id, $room_id);
+    while ( my $row = $sth->fetchrow_hashref ){
+        return get_hashval($row,'id');
+    }
+    return;
 }
 
 sub delete_user_room {

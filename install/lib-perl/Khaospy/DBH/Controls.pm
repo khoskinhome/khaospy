@@ -139,14 +139,25 @@ sub control_status_insert {
 
 sub get_controls {
     # This version just gets db fields
+    my ( $p ) = @_;
+    $p = {} if ! $p;
+
+    my $where;
+    my @bind;
+
+    if ($p->{id}){
+        $where = " WHERE id = ? ";
+        push @bind, $p->{id};
+    }
 
     my $sql = <<"    EOSQL";
     select * from controls
+    $where
     order by control_name
     EOSQL
 
     my $sth = dbh->prepare($sql);
-    $sth->execute();
+    $sth->execute(@bind);
     my $results = [];
     while ( my $row = $sth->fetchrow_hashref ){
         push @$results, $row;
