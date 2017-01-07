@@ -5,13 +5,9 @@ $(document).ready(function(){
 
     $("button.listrooms").click( function() {
         run_func_on_db_id($(this), function(jThis, h_id, db_id){
-
             console.log(h_id + " listrooms was clicked . db_id = "+db_id );
-            set_error_msg(h_id + "listrooms. Not yet implemented . db_id = " + db_id );
-
-
+            $(location).attr('href',dancer_base_url+'/admin/list_control_rooms?control_id='+db_id);
         });
-
     });
 
     $("button.configure").click( function() {

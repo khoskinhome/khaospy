@@ -14,7 +14,6 @@
                 <thead>
                     <tr class='listhead'>
                         <th>Control</th>
-                        <th>Alias</th>
                         <th>Type</th>
                         <th></th>
                         <th></th>
@@ -26,11 +25,8 @@
                 <tbody>
                     [% FOREACH row IN list_controls %]
                     <tr class='list'>
-                        <td>
+                        <td title='[% row.alias %]'>
                             [% row.control_name %]
-                        </td>
-                        <td>
-                            [% row.alias %]
                         </td>
                         <td>
                             [% row.type %]
