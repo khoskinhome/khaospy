@@ -36,7 +36,6 @@ use Khaospy::Conf::Controls qw(
 );
 
 use Khaospy::Message qw(
-    validate_action
     validate_control_msg_fields
 );
 
@@ -73,6 +72,12 @@ sub queue_command {
     my ( $control_name, $action ) = @_;
 
     my $control = get_control_config($control_name);
+
+    # $action is a dynamic type. it can be :
+    # ON / OFF
+    # a numeric value
+    # a string
+    # a data structure.
 
     my $msg = {
         request_epoch_time  => time,

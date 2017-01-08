@@ -34,6 +34,7 @@ our @EXPORT_OK = qw(
     get_pi_hosts_conf
     get_this_pi_host_config
     get_pi_hosts_running_daemon
+    get_webui_hosts
 );
 
 my $pi_hosts_conf;
@@ -79,7 +80,7 @@ sub get_pi_hosts_running_daemon {
 
     my $pi_hosts_run_d = [];
 
-    for my $host ( keys %$pi_hosts_conf ){
+    for my $host ( sort keys %$pi_hosts_conf ){
         for my $daemon ( @{$pi_hosts_conf->{$host}{daemons}} ){
             my $script = $daemon->{script};
             push @$pi_hosts_run_d, $host
@@ -88,6 +89,19 @@ sub get_pi_hosts_running_daemon {
     }
 
     return $pi_hosts_run_d;
+}
+
+sub get_webui_hosts {
+
+    get_pi_hosts_conf();
+
+    my $pi_hosts_run_webui = [];
+    for my $host ( sort keys %$pi_hosts_conf ){
+        push @$pi_hosts_run_webui, $host
+            if $host->{runs_webui};
+    }
+
+    return $pi_hosts_run_webui;
 }
 
 sub _validate_pi_hosts_conf {
@@ -120,7 +134,7 @@ sub _validate_pi_hosts_conf {
 #
 # So a config option something like :
 # { hostname => {
-#        valid_i2c_bus => [0,1,2,3,4,5,6,7,8,9,10,11,12]
+#        valid_i2c_bus => [0,1,2,]
 # }
 
 1;

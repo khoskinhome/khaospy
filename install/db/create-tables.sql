@@ -48,6 +48,9 @@ INSERT INTO control_types VALUES
     ('pi-mcp23017-relay'),
     ('pi-mcp23017-switch'),
 
+    ('webui-var-float'),
+    ('webui-var-integer'),
+    ('webui-var-string'),
     ('mac-switch')
 ;
 

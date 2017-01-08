@@ -22,6 +22,7 @@ use Khaospy::Utils qw(
 );
 
 use Khaospy::Conf::Controls qw(
+    get_control_config
     control_exists
     get_status_alias
     can_operate
@@ -41,8 +42,17 @@ our @EXPORT_OK = qw(
 
 sub control_status_insert {
     my ( $values ) = @_;
+
+    my $control_name = get_hashval($values,'control_name');
+    my $control      = get_control_config($control_name);
+
     my $curr_rec =
-        get_controls_from_db($values->{control_name});
+        get_controls_from_db($control_name);
+
+    # TODO before inserting or updating the controls, needs to check the existing
+    # current_state and/or current_value.
+    #
+    # The control_status (which is really control_logs should always have the insertion.
 
     if ( scalar @$curr_rec ) {
         # update
@@ -64,14 +74,14 @@ sub control_status_insert {
         my $sth = dbh->prepare( $sql );
         eval {
             $sth->execute(
-                'TODO fix in Khaopsy::WebUI::DB',
+                $control->{alias},
                 $values->{current_state} || undef,
                 $values->{current_value} || undef,
                 $values->{last_change_state_time} || undef,
                 $values->{last_change_state_by} || undef,
                 $values->{manual_auto_timeout_left} || undef,
                 $values->{request_time},
-                $values->{control_name},
+                $control_name,
             );
         };
         klogerror "$@ \n".Dumper($values) if $@;
@@ -92,8 +102,8 @@ sub control_status_insert {
         my $sth = dbh->prepare( $sql );
         eval {
             $sth->execute(
-                $values->{control_name},
-                'TODO fix in Khaopsy::WebUI::DB',
+                $control_name,
+                $control->{alias},
                 $values->{current_state} || undef,
                 $values->{current_value} || undef,
                 $values->{last_change_state_time} || undef,
@@ -124,7 +134,7 @@ sub control_status_insert {
 
     eval {
         $sth->execute(
-            $values->{control_name},
+            $control_name,
             $values->{current_state} || undef,
             $values->{current_value} || undef,
             $values->{last_change_state_time} || undef,

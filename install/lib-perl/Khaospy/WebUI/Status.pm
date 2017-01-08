@@ -11,6 +11,7 @@ use Dancer2::Session::Memcached;
 
 
 use Khaospy::QueueCommand qw/ queue_command /;
+use Khaospy::WebUI::SendMessage qw/ webui_send_message /;
 
 
 use Khaospy::DBH::Controls qw(
@@ -98,6 +99,10 @@ get '/cctv'  => needs login => sub {
         entries         => get_controls_from_db(),
         error_msg       => pop_error_msg(),
     };
+};
+
+get '/hacktest'  => needs login => sub {
+    return "sent hack text message " . webui_send_message ('var-karl-room-temp',17) ."\n\n  ".time;
 };
 
 1;

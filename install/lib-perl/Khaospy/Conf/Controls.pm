@@ -8,6 +8,8 @@ use Carp qw/confess croak/;
 use Data::Dumper;
 use Exporter qw/import/;
 
+use Scalar::Util qw(looks_like_number);
+
 use Sys::Hostname;
 
 use List::Compare;
@@ -58,6 +60,9 @@ use Khaospy::Constants qw(
     $PI_MCP23017_SWITCH_CONTROL_TYPE
     $MAC_SWITCH_CONTROL_TYPE
     $MAC_SWITCH_CONTROL_SUB_TYPE_ALL
+    $WEBUI_VAR_FLOAT_CONTROL_TYPE
+    $WEBUI_VAR_INTEGER_CONTROL_TYPE
+    $WEBUI_VAR_STRING_CONTROL_TYPE
 
 );
 
@@ -94,15 +99,20 @@ my $check_mac = check_regex(
 my $check_boolean = check_regex(qr/^[01]$/);
 my $check_optional_boolean
     = check_optional_regex(qr/^[01]$/);
+my $check_integer
+    = check_regex(qr/^\d+$/);
 my $check_optional_integer
     = check_optional_regex(qr/^\d+$/);
 
 my $can_operate = {
-    $ORVIBOS20_CONTROL_TYPE => true,
-    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE => true,
-    $PI_GPIO_RELAY_CONTROL_TYPE => true,
+    $ORVIBOS20_CONTROL_TYPE                => true,
+    $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE     => true,
+    $PI_GPIO_RELAY_CONTROL_TYPE            => true,
     $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE => true,
-    $PI_MCP23017_RELAY_CONTROL_TYPE => true,
+    $PI_MCP23017_RELAY_CONTROL_TYPE        => true,
+    $WEBUI_VAR_FLOAT_CONTROL_TYPE          => true,
+    $WEBUI_VAR_INTEGER_CONTROL_TYPE        => true,
+    $WEBUI_VAR_STRING_CONTROL_TYPE         => true,
 };
 
 my $check_types = {
@@ -111,7 +121,6 @@ my $check_types = {
         on_alias     => \&check_optional,
         off_alias    => \&check_optional,
         rrd_graph    => $check_optional_boolean,
-        db_log       => $check_optional_boolean,
         poll_timeout => $check_optional_integer,
         poll_host    =>
             check_host_runs($OTHER_CONTROLS_DAEMON_SCRIPT),
@@ -122,7 +131,6 @@ my $check_types = {
     $ONEWIRE_THERM_CONTROL_TYPE => {
         alias         => \&check_optional,
         rrd_graph     => $check_optional_boolean,
-        db_log        => $check_optional_boolean,
         onewire_addr  => check_regex(
             qr/^[0-9A-Fa-f]{2}-[0-9A-Fa-f]{12}$/
         ),
@@ -132,7 +140,6 @@ my $check_types = {
         on_alias        => \&check_optional,
         off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
-        db_log          => $check_optional_boolean,
         host            =>
             check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
         ex_or_for_state => $check_boolean,
@@ -146,7 +153,6 @@ my $check_types = {
         on_alias        => \&check_optional,
         off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
-        db_log          => $check_optional_boolean,
         host            =>
             check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
@@ -157,7 +163,6 @@ my $check_types = {
         on_alias        => \&check_optional,
         off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
-        db_log          => $check_optional_boolean,
         host            =>
             check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
@@ -168,7 +173,6 @@ my $check_types = {
         on_alias        => \&check_optional,
         off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
-        db_log          => $check_optional_boolean,
         host            =>
             check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
         ex_or_for_state => $check_boolean,
@@ -182,7 +186,6 @@ my $check_types = {
         on_alias        => \&check_optional,
         off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
-        db_log          => $check_optional_boolean,
         host            =>
             check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
@@ -193,7 +196,6 @@ my $check_types = {
         on_alias        => \&check_optional,
         off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
-        db_log          => $check_optional_boolean,
         host            =>
             check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
@@ -204,10 +206,28 @@ my $check_types = {
         on_alias        => \&check_optional,
         off_alias       => \&check_optional,
         rrd_graph       => $check_optional_boolean,
-        db_log          => $check_optional_boolean,
         mac             => $check_mac,
         sub_type        => \&check_mac_sub_type,
     },
+    $WEBUI_VAR_FLOAT_CONTROL_TYPE => {
+        alias           => \&check_optional,
+        rrd_graph       => $check_optional_boolean,
+        value           => \&check_number,
+        upper_limit     => \&check_optional_number,
+        lower_limit     => \&check_optional_number,
+    },
+    $WEBUI_VAR_INTEGER_CONTROL_TYPE => {
+        alias           => \&check_optional,
+        rrd_graph       => $check_optional_boolean,
+        value           => $check_integer,
+        upper_limit     => $check_optional_integer,
+        lower_limit     => $check_optional_integer,
+    },
+#    $WEBUI_VAR_STRING_CONTROL_TYPE  => {
+#        alias           => \&check_optional,
+#        value           => ,
+#        valid_regex     => ,
+#    },
 };
 
 my $rrd_create_thermometer = [qw(
@@ -240,6 +260,10 @@ my $rrd_create_params = {
     $PI_MCP23017_RELAY_CONTROL_TYPE         => $rrd_create_switch,
     $PI_MCP23017_SWITCH_CONTROL_TYPE        => $rrd_create_switch,
     $MAC_SWITCH_CONTROL_TYPE                => $rrd_create_switch,
+#    $WEBUI_VAR_FLOAT_CONTROL_TYPE                 => ?, TODO
+#    $WEBUI_VAR_INTEGER_CONTROL_TYPE               => ?, TODO
+#    $WEBUI_VAR_STRING_CONTROL_TYPE                => ?, TODO
+
 };
 
 # TODO need a better way of forcing the loading of the control config
@@ -386,7 +410,7 @@ sub _validate_controls_conf {
     $pi_gpio_unique     = {};
     my $collate_errors = '';
 
-    for my $control_name ( keys %$controls_conf ){
+    for my $control_name ( sort keys %$controls_conf ){
         try {
             check_config($control_name)
         } catch {
@@ -458,6 +482,24 @@ sub check_exists {
         error => "Control '$control_name' doesn't have a '$chk' configured. $extra"
     )
         if ! exists $control->{$chk};
+}
+
+sub check_number {
+    my ($control_name, $control, $chk) = @_;
+    check_exists(@_);
+    my $val = $control->{$chk};
+
+    KhaospyExcept::ControlsConfigKeysInvalidValue->throw(
+        error => "Control '$control_name' has an invalid '$chk' "
+            ."($val) configured (not a number)"
+    )
+        if ! looks_like_number($val);
+}
+
+sub check_optional_number {
+    my ($control_name, $control, $chk) = @_;
+    return if ! exists $control->{$chk} || ! defined $control->{$chk};
+    return check_number(@_);
 }
 
 sub check_regex {
@@ -582,7 +624,7 @@ sub check_pi_mcp23017 {
 
     # check the rest of the sub-keys :
     check_regex(qr/^0x2[0-7]$/)->( $control_name , $val, "i2c_addr", "(on $chk)");
-    check_regex(qr/^[abAB]$/)->(   $control_name , $val, "portname", "(on $chk)");
+    check_regex(qr/^[AB]$/i)->(    $control_name , $val, "portname", "(on $chk)");
     check_regex(qr/^[0-7]$/)->(    $control_name , $val, "portnum",  "(on $chk)");
 
     # Need to keep track of what mcp23017 gpios have been used on a host basis.

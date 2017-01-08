@@ -105,7 +105,7 @@ sub get_iso8601_utc_from_epoch {
 sub trans_ON_to_value_or_return_val { # and OFF to false
     my ($ONOFF) = @_;
 
-    return $ONOFF if $ONOFF !~ /^[a-z]+$/i;
+    return $ONOFF if $ONOFF !~ /^(ON|OFF)$/i;
 
     return true  if $ONOFF eq ON;
     return false if $ONOFF eq OFF;

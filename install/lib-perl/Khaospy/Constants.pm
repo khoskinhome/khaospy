@@ -190,6 +190,7 @@ our $OTHER_CONTROLS_DAEMON_SEND_PORT      = 5065;
 our $MAC_SWITCH_DAEMON_SEND_PORT          = 5005;
 
 our $ERROR_LOG_DAEMON_SEND_PORT           = 5066;
+our $WEBUI_SEND_PORT                      = 5067;
 
 our $MESSAGES_OVER_SECS_INVALID = 3600;
 our $MESSAGE_TIMEOUT            = 10; # seconds.
@@ -213,6 +214,30 @@ our $PI_GPIO_SWITCH_CONTROL_TYPE            = "pi-gpio-switch";
 our $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE  = "pi-mcp23017-relay-manual";
 our $PI_MCP23017_RELAY_CONTROL_TYPE         = "pi-mcp23017-relay";
 our $PI_MCP23017_SWITCH_CONTROL_TYPE        = "pi-mcp23017-switch";
+
+our $WEBUI_VAR_FLOAT_CONTROL_TYPE           = "webui-var-float",
+our $WEBUI_VAR_INTEGER_CONTROL_TYPE         = "webui-var-integer",
+our $WEBUI_VAR_STRING_CONTROL_TYPE          = "webui-var-string",
+#our $WEBUI_VAR_DATETIME_TZ_CONTROL_TYPE     = "webui-var-datetime-tz",
+#our $WEBUI_VAR_DATE_CONTROL_TYPE            = "webui-var-date",
+#our $WEBUI_VAR_TIME_TZ_CONTROL_TYPE         = "webui-var-time-tz",
+#our $WEBUI_VAR_TIME_CONTROL_TYPE            = "webui-var-time",
+#our $WEBUI_VAR_INTERVAL_CONTROL_TYPE        = "webui-var-interval",
+#our $WEBUI_VAR_HOURS_CONTROL_TYPE           = "webui-var-hours",
+#our $WEBUI_VAR_MINS_CONTROL_TYPE            = "webui-var-mins",
+
+our $WEBUI_ALL_CONTROL_TYPES = {
+    $WEBUI_VAR_FLOAT_CONTROL_TYPE           => true,
+    $WEBUI_VAR_INTEGER_CONTROL_TYPE         => true,
+    $WEBUI_VAR_STRING_CONTROL_TYPE          => true,
+    #our $WEBUI_VAR_DATETIME_TZ_CONTROL_TYPE     => true,
+    #our $WEBUI_VAR_DATE_CONTROL_TYPE            => true,
+    #our $WEBUI_VAR_TIME_TZ_CONTROL_TYPE         => true,
+    #our $WEBUI_VAR_TIME_CONTROL_TYPE            => true,
+    #our $WEBUI_VAR_INTERVAL_CONTROL_TYPE        => true,
+    #our $WEBUI_VAR_HOURS_CONTROL_TYPE           => true,
+    #our $WEBUI_VAR_MINS_CONTROL_TYPE            => true,
+};
 
 our $MAC_SWITCH_CONTROL_TYPE                = "mac-switch";
 our $MAC_SWITCH_CONTROL_SUB_TYPE_PHONE      = "phone";     # mobile phones
@@ -382,6 +407,12 @@ our @EXPORT_OK = qw(
     $PI_MCP23017_SWITCH_CONTROL_TYPE
     $MAC_SWITCH_CONTROL_TYPE
 
+    $WEBUI_ALL_CONTROL_TYPES
+    $WEBUI_VAR_FLOAT_CONTROL_TYPE
+    $WEBUI_VAR_INTEGER_CONTROL_TYPE
+    $WEBUI_VAR_STRING_CONTROL_TYPE
+
+
     $MAC_SWITCH_CONTROL_SUB_TYPE_PHONE
     $MAC_SWITCH_CONTROL_SUB_TYPE_SERVER
     $MAC_SWITCH_CONTROL_SUB_TYPE_PC
@@ -402,6 +433,8 @@ our @EXPORT_OK = qw(
     $ERROR_LOG_DAEMON_SCRIPT
     $ERROR_LOG_DAEMON_SEND_PORT
     $ERROR_LOG_DAEMON_TIMER
+
+    $WEBUI_SEND_PORT
 );
 
 1;

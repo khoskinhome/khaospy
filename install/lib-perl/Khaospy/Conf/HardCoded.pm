@@ -56,6 +56,10 @@ use Khaospy::Constants qw(
     $MAC_SWITCH_CONTROL_SUB_TYPE_PRINTER
     $MAC_SWITCH_CONTROL_SUB_TYPE_CCTV
 
+    $WEBUI_VAR_FLOAT_CONTROL_TYPE
+    $WEBUI_VAR_INTEGER_CONTROL_TYPE
+    $WEBUI_VAR_STRING_CONTROL_TYPE
+
 );
 
 use Khaospy::Utils qw/burp/;
@@ -253,6 +257,12 @@ sub test_heating_thermometer_config {
 sub live_controls_conf {
     ## TODO find a way of using the host name from /etc/hosts to get the ip and mac.
     return {
+        'var-karl-room-temp' => {
+            type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
+            value         => 19,
+            upper_limit   => 22,
+            lower_limit   => 5,
+        },
         'therm-karl' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Karl thermometer',
@@ -1190,6 +1200,7 @@ sub live_pi_host_conf {
             log_level         => 'info',
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 0, 1 ],
+            runs_webui        => true,
             daemons => [
                 { script  => $PI_STATUS_DAEMON_SCRIPT,
                   options => {
@@ -1213,6 +1224,7 @@ sub live_pi_host_conf {
             log_level         => 'info',
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 1 ],
+            runs_webui        => false,
             daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
@@ -1235,6 +1247,7 @@ sub live_pi_host_conf {
             log_level         => 'info',
             valid_gpios       => [ 0..7 ],
             valid_i2c_buses   => [ 1 ],
+            runs_webui        => false,
             daemons => [
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
                 { script  => $HEATING_DAEMON_SCRIPT,        options => { }, },

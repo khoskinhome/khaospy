@@ -38,6 +38,7 @@ my %opts = (
     "o|other-control" => \my $other_control,
     "s|status"        => \my $status,
     "m|mac"           => \my $mac,
+    "u|ui|webui"        => \my $webui,
     "f|filter-control=s"=> \my $filter_control,
     "h|help"        => \my $help,
 );
@@ -47,6 +48,7 @@ GetOptions (%opts);
 if ( $help ) {
     print "CLI params :\n";
     print join "\n", keys %opts;
+    print "\n\n";
     exit 0 ;
 }
 
@@ -59,6 +61,7 @@ run_subscribe_all( {
     "other-control" => $other_control,
     "status"        => $status,
     "mac"           => $mac,
+    "webui"         => $webui,
     "filter-control"=> $filter_control,
 } );
 
