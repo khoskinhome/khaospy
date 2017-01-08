@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # Used for sending a messages for a control to the CommandQueueDaemon.
-
+use Try::Tiny;
 use Sys::Hostname;
 use Exporter qw/import/;
 use Data::Dumper;
@@ -89,12 +89,14 @@ sub queue_command {
         control_type        => get_hashval($control, "type"),
     };
 
-    eval { validate_control_msg_fields($msg); };
-    if ($@){
-        my $errmsg = "ERROR: validating msg before sending. $@";
+    my $errmsg;
+    try {
+        validate_control_msg_fields($msg);
+    } catch {
+        $errmsg = "ERROR: validating msg before sending. $_";
         klogerror $errmsg;
-        return $errmsg;
     }
+    return $errmsg if $errmsg;
 
     my $json_msg = $JSON->encode($msg);
 

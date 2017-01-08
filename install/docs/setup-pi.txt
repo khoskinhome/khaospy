@@ -37,6 +37,7 @@ still to do :
 
     add a USB flash mem stick. (small one form factor ) 16 GB.
     get the USB mounting in /etc/fstab.
+    mount /opt/khaospy/log on the usb flash mem stick.
 
 
 once fully setup "dd" the micro-sd card and get an image

@@ -13,19 +13,15 @@ use Test::Deep;
 use Khaospy::Constants qw(
     $JSON
     ON OFF STATUS
+    true false
+    IN OUT
     $MESSAGES_OVER_SECS_INVALID
 );
 
 use Sub::Override;
 use Data::Dumper;
 
-sub true  { 1 };
-sub false { 0 };
-
-sub IN  {"in"};
-sub OUT {"out"};
-
-use_ok  ( "Khaospy::Message");
+use_ok( "Khaospy::Message");
 
 my $tests_live_ok = [
     ON,
