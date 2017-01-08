@@ -258,9 +258,38 @@ sub live_controls_conf {
     ## TODO find a way of using the host name from /etc/hosts to get the ip and mac.
     return {
         'var-karl-room-temp' => {
+            alias         =>"Karl room temp",
             type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
             value         => 19,
-            upper_limit   => 22,
+            upper_limit   => 23,
+            lower_limit   => 5,
+        },
+        'var-alison-room-temp' => {
+            type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
+            alias         =>"Alison Room temp",
+            value         => 19,
+            upper_limit   => 23,
+            lower_limit   => 5,
+        },
+        'var-amelia-room-temp' => {
+            type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
+            alias         =>"Amelia Room temp",
+            value         => 19,
+            upper_limit   => 23,
+            lower_limit   => 5,
+        },
+        'var-front-room-temp' => {
+            type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
+            alias         =>"Front Room temp",
+            value         => 19,
+            upper_limit   => 23,
+            lower_limit   => 5,
+        },
+        'var-dining-room-temp' => {
+            type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
+            alias         =>"Dining Room temp",
+            value         => 19,
+            upper_limit   => 23,
             lower_limit   => 5,
         },
         'therm-karl' => {
@@ -767,6 +796,10 @@ sub live_controls_conf {
         },
         'mac-amelia-iphone-6s-plus' => {
             type => $MAC_SWITCH_CONTROL_TYPE, mac => '0C:D7:46:35:D3:EB',
+            sub_type => $MAC_SWITCH_CONTROL_SUB_TYPE_PHONE,
+        },
+        'mac-apple-probably-callum' => {
+            type => $MAC_SWITCH_CONTROL_TYPE, mac => '4C:57:CA:0C:01:CF',
             sub_type => $MAC_SWITCH_CONTROL_SUB_TYPE_PHONE,
         },
         'mac-apple-iphone-probably-rob' => {

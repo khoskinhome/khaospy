@@ -26,6 +26,8 @@ use Khaospy::Conf::Controls qw(
     control_exists
     get_status_alias
     can_operate
+    can_set_value
+    can_set_string
 );
 
 use Khaospy::Constants qw(
@@ -155,9 +157,12 @@ sub get_controls {
     my $where;
     my @bind;
 
-    if ($p->{id}){
+    if ( $p->{id} ){
         $where = " WHERE id = ? ";
         push @bind, $p->{id};
+    } elsif ( $p->{control_name} ){
+        $where = " WHERE control_name = ? ";
+        push @bind, $p->{control_name};
     }
 
     my $sql = <<"    EOSQL";
@@ -222,7 +227,9 @@ sub get_controls_from_db {
                 );
         }
 
-        $row->{can_operate} = can_operate($control_name);
+        $row->{can_operate}    = can_operate($control_name);
+        $row->{can_set_value}  = can_set_value($control_name);
+        $row->{can_set_string} = can_set_string($control_name);
 
 # TODO. therm sensors have a range. These need CONSTANTS and the therm-config to support-range.
 #        $row->{in_range} = "too-low","correct","too-high"

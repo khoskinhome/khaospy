@@ -24,14 +24,14 @@
                 <tbody>
                     <tr>
                         <td>
-                            <select id='add_control_room-control_id' multiple>
+                            <select id='add_control_room-control_id' multiple size='8'>
                               [% FOREACH row IN list_controls %]
                                 <option class='control_type-[% row.control_type %]' value="[% row.id %]" [%IF row.id == select_control_id %] selected="selected" [% END %]>[% row.control_name %]</option>
                               [% END %]
                             </select>
                         </td>
                         <td>
-                            <select id='add_control_room-room_id' multiple>
+                            <select id='add_control_room-room_id' multiple size='8'>
                               [% FOREACH row IN list_rooms %]
                                 <option value="[% row.id %]" [%IF row.id == select_room_id %] selected="selected" [% END %]>[% row.tag %]</option>
                               [% END %]

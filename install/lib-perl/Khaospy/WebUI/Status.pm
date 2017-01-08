@@ -9,10 +9,7 @@ use Dancer2::Core::Request;
 use Dancer2::Plugin::Auth::Tiny;
 use Dancer2::Session::Memcached;
 
-
-use Khaospy::QueueCommand qw/ queue_command /;
 use Khaospy::WebUI::SendMessage qw/ webui_send_message /;
-
 
 use Khaospy::DBH::Controls qw(
     get_controls_from_db
@@ -24,6 +21,10 @@ use Khaospy::WebUI::Constants qw(
 
 use Khaospy::Constants qw(
     true false
+     INC_VALUE_ONE  DEC_VALUE_ONE
+    $INC_VALUE_ONE $DEC_VALUE_ONE
+
+
 );
 
 use Khaospy::WebUI::Util qw(
@@ -37,6 +38,10 @@ post '/api/v1/operate/:control/:action'  => needs login => sub {
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
 
+    # TODO check permissions that the user can operate the control
+    # via users -> rooms -> controls.
+    # admin users can operate everything, even if they don't have explicit permissions.
+
     my $control_name = params->{control};
     my $action       = params->{action};
 
@@ -44,8 +49,9 @@ post '/api/v1/operate/:control/:action'  => needs login => sub {
 
     try {
         # TODO this needs to have a timeout :
-        $ret = { msg => queue_command($control_name,$action) };
+        $ret = { msg => webui_send_message($control_name,$action) };
     } catch {
+        warn "ERROR in /api/v1/operate/:control/:action $_";
         status 'bad_request';
         $ret = "Couldn't operate $control_name with action '$action'";
     };
@@ -101,8 +107,18 @@ get '/cctv'  => needs login => sub {
     };
 };
 
-get '/hacktest'  => needs login => sub {
-    return "sent hack text message " . webui_send_message ('var-karl-room-temp',17) ."\n\n  ".time;
-};
+##TODO remove this path
+#get '/hacktest'  => needs login => sub {
+#    return template 'permission_denied.tt' => {
+#        page_title      => 'Admin',
+#        user            => session('user'),
+#    } if ! session->read('user_is_admin');
+#
+#    webui_send_message ('var-karl-room-temp',20) ."\n\n  ".time;
+#    webui_send_message ('var-alison-room-temp',20) ."\n\n  ".time;
+#    webui_send_message ('var-amelia-room-temp',20) ."\n\n  ".time;
+#    webui_send_message ('var-front-room-temp',20) ."\n\n  ".time;
+#    return "sent hack text message " . webui_send_message ('var-dining-room-temp',20) ."\n\n  ".time;
+#};
 
 1;

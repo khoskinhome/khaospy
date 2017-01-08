@@ -17,6 +17,7 @@ our $JSON = JSON->new->allow_nonref;
 sub true  { 1 };
 sub false { 0 };
 
+# actions
 sub ON      { "on"  };
 our $ON     = ON();
 
@@ -32,8 +33,26 @@ our $OUT = OUT();
 sub STATUS  { "status" };
 our $STATUS = STATUS();
 
+sub  INC_VALUE_ONE { "inc-value-one" };
+our $INC_VALUE_ONE = INC_VALUE_ONE;
+
+sub  DEC_VALUE_ONE { "dec-value-one" };
+our $DEC_VALUE_ONE = DEC_VALUE_ONE;
+
+# last_change_state_by is one of these :
 sub AUTO   {"auto"};
-sub MANUAL {"manual"};
+our $AUTO  = AUTO;
+
+sub MANUAL  {"manual"};
+our $MANUAL = MANUAL;
+
+sub WEBUI  {"webui"};
+our $WEBUI = WEBUI;
+
+sub RULESD  {"rulesd"};
+our $RULESD = RULESD;
+
+#####
 
 our $CODE_VERSION="0.01.001";
 
@@ -296,7 +315,11 @@ our @EXPORT_OK = qw(
      ON  OFF  STATUS
     $ON $OFF $STATUS
 
-    AUTO MANUAL
+     INC_VALUE_ONE  DEC_VALUE_ONE
+    $INC_VALUE_ONE $DEC_VALUE_ONE
+
+     AUTO  MANUAL  WEBUI  RULESD
+    $AUTO $MANUAL $WEBUI $RULESD
 
     $PI_CONTROL_MCP23017_PINS_TIMEOUT
 

@@ -24,14 +24,14 @@
                 <tbody>
                     <tr>
                         <td>
-                            <select id='add_user_room-user_id' multiple>
+                            <select id='add_user_room-user_id' multiple size='8'>
                               [% FOREACH row IN list_users %]
                                 <option value="[% row.id %]" [%IF row.id == select_user_id %] selected="selected" [% END %]>[% row.username %]</option>
                               [% END %]
                             </select>
                         </td>
                         <td>
-                            <select id='add_user_room-room_id' multiple>
+                            <select id='add_user_room-room_id' multiple size='8'>
                               [% FOREACH row IN list_rooms %]
                                 <option value="[% row.id %]" [%IF row.id == select_room_id %] selected="selected" [% END %]>[% row.tag %]</option>
                               [% END %]

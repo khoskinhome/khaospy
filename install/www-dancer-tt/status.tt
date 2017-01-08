@@ -30,6 +30,12 @@
                     [% FOREACH row IN entries %]
                     <tr class='list'>
                         <td >[% row.control_name %]</td>
+<!--
+too high . red #ff0000
+
+just right . green .
+
+too low .  yellow #ffff99 -->
 
                             [% IF row.can_operate %]
                                 <td>
@@ -37,6 +43,13 @@
                                 </td>
                                 <td>
                                     <button id='[% row.control_name %]' value='off'>Off</button>
+                                </td>
+                            [% ELSIF row.can_set_value %]
+                                <td>
+                                    <button id='[% row.control_name %]' value='dec-value-one'>- 1</button>
+                                </td>
+                                <td>
+                                    <button id='[% row.control_name %]' value='inc-value-one'>+ 1</button>
                                 </td>
                             [% ELSE %]
                                 <td></td><td></td>

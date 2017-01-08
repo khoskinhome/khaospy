@@ -90,6 +90,8 @@ our @EXPORT_OK = qw(
     get_rrd_create_params_for_control
     get_status_alias
     can_operate
+    can_set_value
+    can_set_string
 );
 
 my $check_mac = check_regex(
@@ -110,8 +112,14 @@ my $can_operate = {
     $PI_GPIO_RELAY_CONTROL_TYPE            => true,
     $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE => true,
     $PI_MCP23017_RELAY_CONTROL_TYPE        => true,
+};
+
+my $can_set_value = {
     $WEBUI_VAR_FLOAT_CONTROL_TYPE          => true,
     $WEBUI_VAR_INTEGER_CONTROL_TYPE        => true,
+};
+
+my $can_set_string = {
     $WEBUI_VAR_STRING_CONTROL_TYPE         => true,
 };
 
@@ -230,6 +238,8 @@ my $check_types = {
 #    },
 };
 
+# TODO WEBUI_VARs with upper and lower limits need to be checked that upper>lower where defined.
+
 my $rrd_create_thermometer = [qw(
     --start  now  --step 60
     DS:a:GAUGE:120:-40:90
@@ -319,6 +329,24 @@ sub can_operate {
     my $control = get_hashval($controls_conf, $control_name);
 
     return true if exists $can_operate->{get_hashval($control,'type')};
+    return false;
+}
+
+sub can_set_value {
+    my ($control_name) = @_;
+    get_controls_conf();
+    my $control = get_hashval($controls_conf, $control_name);
+
+    return true if exists $can_set_value->{get_hashval($control,'type')};
+    return false;
+}
+
+sub can_set_string {
+    my ($control_name) = @_;
+    get_controls_conf();
+    my $control = get_hashval($controls_conf, $control_name);
+
+    return true if exists $can_set_string->{get_hashval($control,'type')};
     return false;
 }
 
