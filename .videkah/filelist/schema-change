@@ -15,10 +15,10 @@ install/www-bin/lightba.pl
 
 #######################################################
 crap
-crapnew
 
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
+
 
 ./install/lib-perl/Khaospy/Conf.pm
 ./install/lib-perl/Khaospy/Conf/Controls.pm
@@ -69,10 +69,6 @@ crapnew
 ./install/lib-perl/Khaospy/Log.pm
 
 ./install/lib-perl/Khaospy/Message.pm
-install/lib-perl-t/KhaospyMessage.t
-
-./install/lib-perl/Khaospy/MACSwitchDaemon.pm
-./install/bin/khaospy-mac-switch-d.pl
 
 ./install/lib-perl/Khaospy/OneWireThermometer.pm
 ./install/bin/khaospy-one-wire-daemon.pl
@@ -106,6 +102,8 @@ install/lib-perl-t/KhaospyMessage.t
 ./install/lib-perl/Khaospy/StatusD.pm
 ./install/bin/khaospy-status-d.pl
 
+./install/lib-perl/Khaospy/DBH.pm
+
 ./install/lib-perl/Khaospy/ZMQAnyEvent.pm
 
 ./install/lib-perl/zhelpers.pm
@@ -117,7 +115,6 @@ install/lib-perl-t/KhaospyMessage.t
 ./install/lib-perl/t/test-picontrollerdaemon-listen.pl
 
 ./install/lib-perl-t/alltests.t
-./install/lib-perl-t/
 
 ######################################################
 # cctv record
@@ -206,8 +203,6 @@ install/bin/khaospy-generate-rrd-graphs.pl
 
 ##############################################################################
 # ./install/conf
-./install/conf/etc_logrotate.d_khaospy
-
 
 ##############################################################################
 # ./install/www-bin
@@ -286,7 +281,6 @@ install/bin/khaospy-generate-rrd-graphs.pl
 
 ###################################################################
 
-install-to-pi.bash
 install-to-pi-pi.bash
 install-reload-apache.bash
 #install-to-pi-khoskin.bash
@@ -315,52 +309,29 @@ install-run-live-conf-kill-and-restart-daemons-all.bash
 crap
 crap.pl
 
-crap.diff.pl
-
 ./install/lib-perl/Khaospy/Constants.pm
 
 ./install/lib-perl/Khaospy/WebUI/Constants.pm
+./install/lib-perl/Khaospy/WebUI/UserLogin.pm
 ./install/lib-perl/Khaospy/WebUI/DB.pm
+./install/lib-perl/Khaospy/WebUI/Util.pm
 
-./install/lib-perl/Khaospy/DBH.pm
 ./install/lib-perl/Khaospy/DBH/Controls.pm
 ./install/lib-perl/Khaospy/DBH/Users.pm
 ./install/lib-perl/Khaospy/DBH/Rooms.pm
-./install/lib-perl/Khaospy/DBH/UserRooms.pm
-./install/lib-perl/Khaospy/DBH/ControlRooms.pm
+
+
+
 
 ./install/www-bin/dancer.pl
-./install/lib-perl/Khaospy/WebUI.pm
-./install/lib-perl/Khaospy/WebUI/UserLogin.pm
-./install/lib-perl/Khaospy/WebUI/User.pm
-
-./install/lib-perl/Khaospy/WebUI/SendMessage.pm
-./install/lib-perl/Khaospy/WebUI/Admin.pm
-./install/lib-perl/Khaospy/WebUI/Admin/Users.pm
-./install/lib-perl/Khaospy/WebUI/Admin/UserRooms.pm
-./install/lib-perl/Khaospy/WebUI/Admin/Rooms.pm
-./install/lib-perl/Khaospy/WebUI/Admin/Controls.pm
-./install/lib-perl/Khaospy/WebUI/Admin/ControlRooms.pm
-
-./install/lib-perl/Khaospy/WebUI/Status.pm
-./install/lib-perl/Khaospy/WebUI/Util.pm
 
 ./install/www-dancer-tt/header.tt
 ./install/www-dancer-tt/header_jquery.tt
 
-./install/www-dancer-tt/title.tt
 ./install/www-dancer-tt/title_linkbar.tt
-./install/www-dancer-tt/title_linkbar_admin.tt
-./install/www-dancer-tt/title_linkbar_admin_users.tt
-./install/www-dancer-tt/title_linkbar_admin_user_rooms.tt
-./install/www-dancer-tt/title_linkbar_admin_rooms.tt
-./install/www-dancer-tt/title_linkbar_admin_controls.tt
-./install/www-dancer-tt/title_linkbar_admin_control_rooms.tt
-./install/www-dancer-tt/title_linkbar_user.tt
 
 ./install/www-dancer-tt/login.tt
 ./install/www-dancer-tt/reset_password.tt
-./install/www/js/reset_password.js
 ./install/www-dancer-tt/change_password.tt
 ./install/www-dancer-tt/user_update.tt
 
@@ -368,67 +339,9 @@ crap.diff.pl
 
 ./install/www-dancer-tt/cctv.tt
 
-# status
 ./install/www-dancer-tt/status.tt
 ./install/www/css/status.css
 ./install/www/js/status.js
-
-./install/www-dancer-tt/user.tt
-
-./install/www-dancer-tt/admin.tt
-
-
-# admin users
-./install/www-dancer-tt/admin_list_users.tt
-./install/www-dancer-tt/admin_list_users-OLD.tt
-./install/www/js/admin_list_users.js
-./install/www/js/admin_list_users-OLD.js
-./install/www/css/admin_list_users.css
-
-./install/www-dancer-tt/admin_add_user.tt
-./install/www/js/admin_add_user.js
-./install/www/css/admin_add_user.css
-
-./install/www-dancer-tt/admin_update_user.tt
-./install/www/js/admin_update_user.js
-./install/www/css/admin_update_user.css
-
-
-# admin user_rooms
-./install/www-dancer-tt/admin_list_user_rooms.tt
-./install/www/js/admin_list_user_rooms.js
-./install/www/css/admin_list_user_rooms.css
-
-
-# admin rooms
-./install/www-dancer-tt/admin_list_rooms.tt
-./install/www/js/admin_list_rooms.js
-./install/www/css/admin_list_rooms.css
-
-./install/www-dancer-tt/admin_add_room.tt
-./install/www/js/admin_add_room.js
-./install/www/css/admin_add_room.css
-
-
-# admin control_rooms
-./install/www-dancer-tt/admin_list_control_rooms.tt
-./install/www/js/admin_list_control_rooms.js
-./install/www/css/admin_list_control_rooms.css
-
-
-# admin controls
-./install/www-dancer-tt/admin_list_controls.tt
-./install/www/js/admin_list_controls.js
-./install/www/css/admin_list_controls.css
-
-./install/www-dancer-tt/admin_add_control.tt
-./install/www/js/admin_add_control.js
-./install/www/css/admin_add_control.css
-
-
-# miscellaneous :
-./install/www-dancer-tt/permission_denied.tt
-./install/www-dancer-tt/not_implemented.tt
 
 ./install/www/js/base.js
 ./install/www/css/base.css
@@ -445,13 +358,10 @@ crap.diff.pl
 ./install/db/create-tables.sql
 ./install/db/drop-tables.sql
 
-./install/db/amelia-heating.sql
-./install/db/melissa-heating.sql
-./install/db/alison-heating.sql
-
 
 ./install/apache/default-ssl.conf
 ##############################
 
 # greping crap
-install/lib-perl/Khaospy/WebUI/UserLogin.pm:154:            => "username and email combination don't match any known users";
+
+

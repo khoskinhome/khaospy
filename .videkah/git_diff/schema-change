@@ -1,0 +1,231 @@
+diff --git a/.videkah/filelist/master b/.videkah/filelist/master
+index a5eefc2..ae384eb 100644
+--- a/.videkah/filelist/master
++++ b/.videkah/filelist/master
+@@ -356,6 +356,7 @@ crap.pl
+ ./install/db/create-db.sql
+ ./install/db/grant-db.sql
+ ./install/db/create-tables.sql
++./install/db/drop-tables.sql
+ 
+ 
+ ./install/apache/default-ssl.conf
+@@ -365,44 +366,4 @@ crap.pl
+ 
+ 
+ 
+-#g.grep init_mcp23017
+-install/lib-perl-t/KhaospyControlPiMCP23017.t:80:Khaospy::ControlPiMCP23017::init_mcp23017();
+-install/lib-perl/Khaospy/ControlPi.pm:37:    init_mcp23017
+-install/lib-perl/Khaospy/ControlPi.pm:58:    init_mcp23017();
+-install/lib-perl/Khaospy/ControlPiMCP23017.pm:32:    init_mcp23017
+-install/lib-perl/Khaospy/ControlPiMCP23017.pm:132:sub init_mcp23017 {
+-
+-
+-
+-#g.grep write_gpio
+-install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl:216:sub write_gpio_conf_to_fs{
+-install/bin/testrig-lighting-on-off-2relay-automated-with-detect.pl:376:        write_gpio_conf_to_fs();
+-install/lib-perl-t/KhaospyControlPiMCP23017.t:85:Khaospy::ControlPiMCP23017->write_gpio($gpio, true);
+-install/lib-perl/Khaospy/ControlPi.pm:272:        write_gpio(
+-install/lib-perl/Khaospy/ControlPi.pm:453:        write_gpio(
+-install/lib-perl/Khaospy/ControlPi.pm:516:sub write_gpio{
+-install/lib-perl/Khaospy/ControlPi.pm:519:        return $pin_class->write_gpio( $gpio, $new_state );
+-install/lib-perl/Khaospy/ControlPiGPIO.pm:25:    write_gpio
+-install/lib-perl/Khaospy/ControlPiGPIO.pm:56:sub write_gpio {
+-install/lib-perl/Khaospy/ControlPiMCP23017.pm:35:    write_gpio
+-install/lib-perl/Khaospy/ControlPiMCP23017.pm:277:sub write_gpio {
+-
+-
+-# g.grep init_gpio
+-install/lib-perl-t/KhaospyControlPiMCP23017.t:23:            "init_gpio"
+-install/lib-perl-t/KhaospyControlPiMCP23017.t:53:init_gpio(undef,$gpio,OUT);
+-install/lib-perl-t/KhaospyControlPiMCP23017.t:62:init_gpio(undef,$gpio_in,IN);
+-install/lib-perl/Khaospy/ControlPi.pm:188:        init_gpio($pin_class,$gpio_num, IN);
+-install/lib-perl/Khaospy/ControlPi.pm:253:        init_gpio($pin_class,$gpio_num, OUT);
+-install/lib-perl/Khaospy/ControlPi.pm:315:        init_gpio($pin_class,$gpio_relay_num, OUT);
+-install/lib-perl/Khaospy/ControlPi.pm:318:        init_gpio($pin_class,$gpio_detect_num, IN);
+-install/lib-perl/Khaospy/ControlPi.pm:498:sub init_gpio{
+-install/lib-perl/Khaospy/ControlPi.pm:501:        return $pin_class->init_gpio($gpio, $iodir);
+-install/lib-perl/Khaospy/ControlPiGPIO.pm:23:    init_gpio
+-install/lib-perl/Khaospy/ControlPiGPIO.pm:40:sub init_gpio {
+-install/lib-perl/Khaospy/ControlPiMCP23017.pm:33:    init_gpio
+-install/lib-perl/Khaospy/ControlPiMCP23017.pm:88:sub init_gpio {
+-install/lib-perl/Khaospy/ControlPiMCP23017.pm:133:    # needs to be called once all the pins are init-ed by init_gpio()
+-
+-
+ 
+diff --git a/install/db/create-tables.sql b/install/db/create-tables.sql
+index 4ecff9c..808db6e 100644
+--- a/install/db/create-tables.sql
++++ b/install/db/create-tables.sql
+@@ -13,7 +13,7 @@ BEGIN;
+ -- controls
+ ---------------------
+ CREATE TABLE controls (
+-    control_name  TEXT PRIMARY KEY,
++    control_name  TEXT PRIMARY KEY NOT NULL,
+     alias         TEXT,
+     current_state            TEXT,
+     current_value            REAL,
+@@ -21,16 +21,16 @@ CREATE TABLE controls (
+     last_change_state_by     TEXT,
+     manual_auto_timeout_left REAL,
+     request_time             TIMESTAMP WITH TIME ZONE,
+-    db_update_time           TIMESTAMP WITH TIME ZONE,
+-    room                     INTEGER REFERENCES rooms
++    db_update_time           TIMESTAMP WITH TIME ZONE
+ );
+ 
++
+ GRANT SELECT ON controls TO khaospy_read;
+ GRANT ALL    ON controls TO khaospy_write;
+ 
+----------------------
+--- control_status . should be renamed "control_logs"
+----------------------
++----------------
++-- control_status
++----------------
+ CREATE SEQUENCE control_status_seq;
+ GRANT SELECT ON control_status_seq TO khaospy_read;
+ GRANT ALL ON control_status_seq TO khaospy_write;
+@@ -46,8 +46,11 @@ create table control_status (
+     db_update_time           TIMESTAMP WITH TIME ZONE NOT NULL
+ );
+ 
++
+ create index control_status_control_name_idx on control_status (control_name);
+ 
++
++
+ ALTER TABLE control_status SET (autovacuum_vacuum_scale_factor = 0.0);
+ ALTER TABLE control_status SET (autovacuum_vacuum_threshold = 5000);
+ ALTER TABLE control_status SET (autovacuum_analyze_scale_factor = 0.0);
+@@ -67,13 +70,30 @@ GRANT ALL ON rooms_seq TO khaospy_write;
+ create table rooms (
+     id INTEGER PRIMARY KEY DEFAULT nextval('rooms_seq') NOT NULL,
+     name    TEXT NOT NULL UNIQUE,
+-    tag     TEXT NOT NULL UNIQUE,
+-    parent_id INTEGER REFERENCES rooms
++    tag     TEXT NOT NULL UNIQUE
+ );
+ GRANT SELECT ON rooms TO khaospy_read;
+ GRANT ALL    ON rooms TO khaospy_write;
+ 
+ ---------------------
++-- control_rooms
++---------------------
++CREATE SEQUENCE control_rooms_seq;
++GRANT SELECT ON control_rooms_seq TO khaospy_read;
++GRANT ALL    ON control_rooms_seq TO khaospy_write;
++
++CREATE TABLE control_rooms (
++    id            INTEGER PRIMARY KEY DEFAULT nextval('control_rooms_seq') NOT NULL,
++    room_id       INTEGER NOT NULL REFERENCES rooms,
++    control_name  TEXT NOT NULL REFERENCES controls,
++    name          TEXT NOT NULL UNIQUE,
++    tag           TEXT NOT NULL UNIQUE
++);
++
++GRANT SELECT ON control_rooms TO khaospy_read;
++GRANT ALL    ON control_rooms TO khaospy_write;
++
++---------------------
+ -- users
+ ---------------------
+ CREATE SEQUENCE users_seq;
+@@ -84,58 +104,33 @@ CREATE TABLE users (
+     username                        TEXT NOT NULL UNIQUE,
+     name                            TEXT NOT NULL UNIQUE,
+     email                           TEXT NOT NULL UNIQUE,
+-    email_confirm_hash              TEXT,
+     passhash                        TEXT NOT NULL,
+-    passhash_expire                 TIMESTAMP WITH TIME ZONE,
+-    passhash_must_change            BOOLEAN,
+     is_api_user                     BOOLEAN NOT NULL DEFAULT FALSE,
+     is_admin                        BOOLEAN NOT NULL DEFAULT FALSE,
++    mobile_phone                    TEXT NOT NULL UNIQUE,
+     can_remote                      BOOLEAN NOT NULL DEFAULT FALSE,
+-    mobile_phone                    TEXT NOT NULL UNIQUE
++    passhash_expire                 TIMESTAMP WITH TIME ZONE,
++    passhash_must_change            BOOLEAN,
++    email_confirm_hash              TEXT
+ );
+ GRANT SELECT ON users TO khaospy_read;
+ GRANT ALL ON users TO khaospy_write;
+ 
+ ---------------------
+--- user_rooms
++-- user_control_rooms
+ ---------------------
+-CREATE TABLE user_rooms (
++CREATE TABLE user_control_rooms (
+     user_id         INTEGER NOT NULL REFERENCES users,
+-    room_id         INTEGER NOT NULL REFERENCES rooms,
++    control_room_id INTEGER NOT NULL REFERENCES control_rooms,
+     can_view        BOOLEAN NOT NULL DEFAULT FALSE,
+     can_operate     BOOLEAN NOT NULL DEFAULT FALSE,
+-    CONSTRAINT u_user_rooms_user_room UNIQUE ( user_id, room_id )
++    CONSTRAINT u_user_control_rooms_user_control_room UNIQUE ( user_id, control_room_id )
+ );
+ 
+--- unique index on user_id and room_id
+-
+-GRANT SELECT ON user_rooms TO khaospy_read;
+-GRANT ALL    ON user_rooms TO khaospy_write;
+-
+----------------------
+--- user_controls
+----------------------
+-CREATE TABLE user_controls (
+-    user_id         INTEGER NOT NULL REFERENCES users,
+-    control_name    TEXT    NOT NULL REFERENCES controls,
+-    can_view        BOOLEAN NOT NULL DEFAULT FALSE,
+-    can_operate     BOOLEAN NOT NULL DEFAULT FALSE,
+-    CONSTRAINT u_user_controls_user_control_name UNIQUE ( user_id, control_name )
+-);
+-
+--- unique index on user_id and control_name
+-
+-GRANT SELECT ON user_controls TO khaospy_read;
+-GRANT ALL    ON user_controls TO khaospy_write;
+-
+---INSERT INTO users (name, name ) VALUES( 'blah', 'uk-gpms');
+-
+---UPDATE blahtable
+---    SET afield = ( SELECT id FROM users WHERE tag = 'blah' ),
+---        name = 'dosumin'
+---    WHERE id = 1;
++GRANT SELECT ON user_control_rooms TO khaospy_read;
++GRANT ALL    ON user_control_rooms TO khaospy_write;
+ 
+--- ROLLBACK
++--ROLLBACK;
+ 
+ COMMIT;
+ 
+diff --git a/install/db/drop-tables.sql b/install/db/drop-tables.sql
+new file mode 100644
+index 0000000..9fdf8c6
+--- /dev/null
++++ b/install/db/drop-tables.sql
+@@ -0,0 +1,18 @@
++drop table user_control_rooms;
++
++drop table users;
++drop sequence  users_seq;
++
++
++drop TABLE control_rooms ;
++drop sequence control_rooms_seq;
++
++drop table rooms;
++drop sequence rooms_seq;
++
++drop table control_status;
++drop sequence control_status_seq;
++
++drop TABLE controls;
++
++
