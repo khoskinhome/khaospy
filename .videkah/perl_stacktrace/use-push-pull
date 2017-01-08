@@ -1,6 +1,0 @@
-
-    my ($truefalse) = @_;
-    return ON  if $truefalse == true;
-    return OFF if $truefalse == false;
-    klogfatal "can't translate a non true or false value to ON or OFF";
-}

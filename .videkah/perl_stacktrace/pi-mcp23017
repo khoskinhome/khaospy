@@ -1,9 +1,0 @@
-
-GOTO_LINE 2
-GOTO_SUB 
-GOTO_PERLSTACKTRACE_LOC 0
-
-PROCESSED 0 FILE=/home/khoskin/.vim/videkah/bin/videkah_perlstacktrace.pl line 45, <> LINE=2 PACKAGE= SUB=
-
-IGNORE ERROR . the libpath './lib/' either doesn't exist or isn't a directory  at /home/khoskin/.vim/videkah/bin/videkah_perlstacktrace.pl line 45, <> line 2.
-
