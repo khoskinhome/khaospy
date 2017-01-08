@@ -455,3 +455,6 @@ crap.diff.pl
 
 # greping crap
 install/lib-perl/Khaospy/WebUI/UserLogin.pm:154:            => "username and email combination don't match any known users";
+
+
+install/lib-perl/Khaospy/DBH/Controls.pm:228:        $row->{can_operate} = can_operate($control_name);
