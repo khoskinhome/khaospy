@@ -332,6 +332,7 @@ crap.diff.pl
 ./install/lib-perl/Khaospy/WebUI/UserLogin.pm
 ./install/lib-perl/Khaospy/WebUI/User.pm
 
+./install/lib-perl/Khaospy/WebUI/SendMessage.pm
 ./install/lib-perl/Khaospy/WebUI/Admin.pm
 ./install/lib-perl/Khaospy/WebUI/Admin/Users.pm
 ./install/lib-perl/Khaospy/WebUI/Admin/UserRooms.pm
