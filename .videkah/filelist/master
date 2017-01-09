@@ -343,6 +343,7 @@ crap.diff.pl
 ./install/lib-perl/Khaospy/WebUI/Admin/ControlRooms.pm
 
 ./install/lib-perl/Khaospy/WebUI/Status.pm
+./install/lib-perl/Khaospy/WebUI/Rooms.pm
 ./install/lib-perl/Khaospy/WebUI/Util.pm
 
 ./install/www-dancer-tt/header.tt
@@ -350,6 +351,7 @@ crap.diff.pl
 
 ./install/www-dancer-tt/title.tt
 ./install/www-dancer-tt/title_linkbar.tt
+./install/www-dancer-tt/title_linkbar_rooms.tt
 ./install/www-dancer-tt/title_linkbar_admin.tt
 ./install/www-dancer-tt/title_linkbar_admin_users.tt
 ./install/www-dancer-tt/title_linkbar_admin_user_rooms.tt
@@ -364,20 +366,37 @@ crap.diff.pl
 ./install/www-dancer-tt/change_password.tt
 ./install/www-dancer-tt/user_update.tt
 
+##############
+# home / index
+
 ./install/www-dancer-tt/index.tt
+
+######
+# cctv
 
 ./install/www-dancer-tt/cctv.tt
 
+########
 # status
 ./install/www-dancer-tt/status.tt
-./install/www/css/status.css
 ./install/www/js/status.js
+./install/www/css/status.css
 
 ./install/www-dancer-tt/user.tt
 
+#######
+# rooms
+
+./install/www-dancer-tt/rooms.tt
+./install/www/js/rooms.js
+./install/www/css/rooms.css
+
+#######
+# admin
+
 ./install/www-dancer-tt/admin.tt
 
-
+#############
 # admin users
 ./install/www-dancer-tt/admin_list_users.tt
 ./install/www-dancer-tt/admin_list_users-OLD.tt
@@ -393,13 +412,13 @@ crap.diff.pl
 ./install/www/js/admin_update_user.js
 ./install/www/css/admin_update_user.css
 
-
+##################
 # admin user_rooms
 ./install/www-dancer-tt/admin_list_user_rooms.tt
 ./install/www/js/admin_list_user_rooms.js
 ./install/www/css/admin_list_user_rooms.css
 
-
+#############
 # admin rooms
 ./install/www-dancer-tt/admin_list_rooms.tt
 ./install/www/js/admin_list_rooms.js
@@ -409,13 +428,13 @@ crap.diff.pl
 ./install/www/js/admin_add_room.js
 ./install/www/css/admin_add_room.css
 
-
+#####################
 # admin control_rooms
 ./install/www-dancer-tt/admin_list_control_rooms.tt
 ./install/www/js/admin_list_control_rooms.js
 ./install/www/css/admin_list_control_rooms.css
 
-
+################
 # admin controls
 ./install/www-dancer-tt/admin_list_controls.tt
 ./install/www/js/admin_list_controls.js
@@ -425,8 +444,8 @@ crap.diff.pl
 ./install/www/js/admin_add_control.js
 ./install/www/css/admin_add_control.css
 
-
-# miscellaneous :
+###############
+# miscellaneous
 ./install/www-dancer-tt/permission_denied.tt
 ./install/www-dancer-tt/not_implemented.tt
 
