@@ -991,7 +991,7 @@ commit_gpio_output();
                 $gpio_inputs{$port_name} = 1;
 
                 # there seems to be rounding and losing precision issue on time hires. have to do a full second at present .hmmmm.
-                next if ( $gpio->{last_change_time} + 1 >= Time::HiRes::time() );
+                next if ( $gpio->{last_change_time} && $gpio->{last_change_time} + 1 >= Time::HiRes::time() );
 
                 my $port_signature = $gpio->{y}."_${i2cAddr}_${port_register_hexcode}";
 

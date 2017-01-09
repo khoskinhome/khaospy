@@ -1,0 +1,4 @@
+    <!--TODO /dancer root could change -->
+    [% INCLUDE title_linkbar.tt %]
+
+    <!-- no rooms buttons yet -->

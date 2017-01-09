@@ -166,6 +166,13 @@ CREATE TABLE users (
     email_confirm_hash              TEXT,
     is_enabled                      BOOLEAN NOT NULL DEFAULT TRUE
 );
+
+--TODO user to have the control_id of their phone-mac address
+--    This will only be settable by the administrator.
+
+--TODO user to have a "home" room_id
+--    this will be settable by the user or the administrator.
+
 GRANT SELECT ON users TO khaospy_read;
 GRANT ALL ON users TO khaospy_write;
 

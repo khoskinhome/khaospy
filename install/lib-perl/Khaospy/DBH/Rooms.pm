@@ -31,6 +31,8 @@ our @EXPORT_OK = qw(
     update_room
     delete_room
 
+    get_rooms_user_can_view
+
     room_name_valid
     room_name_desc
 
@@ -117,6 +119,34 @@ sub delete_room {
     my ( $del ) = @_;
     die "TODO delete_room() not yet implemented"; # TODO
 }
+
+sub get_rooms_user_can_view {
+    my ($user_id) = @_;
+
+    my $sql =<<"    EOSQL";
+    SELECT
+        rm.id,
+        rm.name,
+        rm.tag
+    FROM user_rooms as usrm
+    LEFT JOIN rooms as rm on (rm.id = usrm.room_id)
+
+    WHERE usrm.user_id = ? and usrm.can_view
+
+    ORDER BY rm.name
+    EOSQL
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute($user_id);
+
+    my $results = [];
+    while ( my $row = $sth->fetchrow_hashref ){
+        push @$results, $row;
+    }
+
+    return $results;
+}
+
 
 ####
 # User field validation

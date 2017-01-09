@@ -2,7 +2,7 @@ package Khaospy::DBH::Controls;
 use strict; use warnings;
 
 use Exporter qw/import/;
-
+use Carp qw(confess);
 use Try::Tiny;
 use Khaospy::DBH qw(dbh);
 use Khaospy::Constants qw(
@@ -40,6 +40,8 @@ our @EXPORT_OK = qw(
     control_status_insert
     get_last_control_state
     init_last_control_state
+    get_controls_in_room_for_user
+    user_can_operate_control
 );
 
 sub control_status_insert {
@@ -243,6 +245,102 @@ sub get_controls_from_db {
 
     return $results;
 
+}
+
+sub get_controls_in_room_for_user {
+    my ($user_id, $room_id) = @_;
+
+    my $sql = <<"    EOSQL";
+    select
+        ct.control_name,
+        ct.control_type,
+        ct.request_time,
+        ct.current_state,
+        ct.current_value,
+        usrm.can_operate
+
+    FROM user_rooms as usrm
+       JOIN control_rooms as ctrm on (usrm.room_id = ctrm.room_id)
+       JOIN controls as ct on (ct.id = ctrm.control_id)
+
+    WHERE
+        usrm.user_id = ? and usrm.room_id = ?
+    order by control_name
+    EOSQL
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute($user_id,$room_id);
+
+    my $results = [];
+    while ( my $row = $sth->fetchrow_hashref ){
+
+        my $control_name = $row->{'control_name'};
+        next if ! $control_name; # This happens if no controls have been added to the room.
+
+        if ( ! control_exists($control_name)){
+            warn "looks like control '$control_name' has been changed."
+                ." DB has stale data. $@";
+            next;
+        }
+
+        if ( defined $row->{current_value}){
+            $row->{current_value}
+                = sprintf('%+0.1f', $row->{current_value});
+        }
+
+        if ( defined $row->{current_state} ){
+            $row->{status_alias} =
+                get_status_alias(
+                    $control_name, get_hashval($row, 'current_state')
+                );
+        }
+
+        my $c_op = $row->{can_operate};
+        $row->{can_operate}    = $c_op && can_operate($control_name);
+        $row->{can_set_value}  = $c_op && can_set_value($control_name);
+        $row->{can_set_string} = $c_op && can_set_string($control_name);
+
+
+        $row->{current_state_value}
+            = $row->{status_alias} || $row->{current_value} || '' ;
+
+        push @$results, $row;
+    }
+
+    return $results;
+}
+
+sub user_can_operate_control {
+    my ($p) = @_;
+
+    my $where ;
+    my @bind;
+    if ($p->{control_name}){
+        $where = "WHERE ct.control_name = ? AND usrm.user_id = ? AND usrm.can_operate";
+        push @bind, $p->{control_name};
+        push @bind, $p->{user_id};
+    } elsif ($p->{control_id} ){
+        $where = "WHERE ct.id = ? AND usrm.user_id = ? AND usrm.can_operate";
+        push @bind, $p->{control_id};
+        push @bind, $p->{user_id};
+    } else {
+        confess "need to supply either control_id or control_name";
+    }
+
+    my $sql = <<"    EOSQL";
+    select ct.id, usrm.can_operate
+    FROM user_rooms as usrm
+      JOIN control_rooms as ctrm on (usrm.room_id = ctrm.room_id)
+      JOIN controls as ct on (ct.id = ctrm.control_id)
+    $where
+    EOSQL
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute(@bind);
+    while ( my $row = $sth->fetchrow_hashref ){
+        return true;
+    }
+    return false;
 }
 
 sub get_last_control_state {

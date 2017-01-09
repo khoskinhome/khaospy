@@ -3,7 +3,8 @@
     [% INCLUDE title.tt %]
     <ul class='link_bar'>
             <li class='nav_link'><a href='/dancer/'>Home</a></li>
-            <li class='nav_link'><a href='/dancer/status'>Status</a></li>
+<!--            <li class='nav_link'><a href='/dancer/status'>Status</a></li> -->
+            <li class='nav_link'><a href='/dancer/rooms'>Rooms</a></li>
             <li class='nav_link'><a href='/dancer/cctv'>CCTV</a></li>
             <li class='nav_link'><a href='/dancer/admin'>Admin</a></li>
             <li class='nav_link'><a href='/dancer/user'>User</a></li>
