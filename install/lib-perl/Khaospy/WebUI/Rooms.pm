@@ -49,7 +49,7 @@ get '/rooms'  => needs login => sub {
     $room_id = $list_rooms->[0]{id} if ! $room_id && scalar @$list_rooms;
 
     return template 'rooms.tt', {
-        page_title      => 'Rooms',
+        page_title      => 'Rooms Status',
         user            => session('user'),
         list_rooms      => $list_rooms,
         select_room_id  => $room_id,
