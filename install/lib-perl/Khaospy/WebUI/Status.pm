@@ -27,11 +27,7 @@ use Khaospy::Constants qw(
 
 );
 
-use Khaospy::WebUI::Util qw(
-    pop_error_msg
-);
-
-sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
-
+use Khaospy::WebUI::Util; # can't import.
+sub user_template_flds { Khaospy::WebUI::Util::user_template_flds(@_) };
 
 1;

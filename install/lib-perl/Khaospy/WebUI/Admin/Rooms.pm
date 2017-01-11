@@ -31,11 +31,8 @@ use Khaospy::DBH::Rooms qw(
     rooms_field_desc
 );
 
-use Khaospy::WebUI::Util qw(
-    pop_error_msg
-);
-
-sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
+use Khaospy::WebUI::Util; # can't import.
+sub user_template_flds { Khaospy::WebUI::Util::user_template_flds(@_) };
 
 ###############
 # admin rooms :
@@ -43,10 +40,8 @@ get '/admin/list_rooms'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');
 
     return template 'admin_list_rooms' => {
-        page_title      => 'Admin : List Rooms',
-        user            => session('user'),
-        list_rooms      => get_rooms(),
-        error_msg       => pop_error_msg(),
+        user_template_flds('Admin : List Rooms'),
+        list_rooms => get_rooms(),
     };
 };
 
@@ -54,9 +49,7 @@ get '/admin/add_room'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');
 
     return template 'admin_add_room' => {
-        page_title  => 'Admin : Add Room',
-        user        => session('user'),
-        error_msg   => pop_error_msg(),
+        user_template_flds('Admin : Add Room'),
     };
 
 };

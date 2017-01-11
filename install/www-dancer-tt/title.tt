@@ -1,8 +1,8 @@
 
 <ul class='title_bar'>
     <li class='title_name'>Khaospy : [% page_title %] </li>
-    [%IF user %]
-        <li class='title_logout' title='Logout'><a href='/dancer/logout'>[% user %]</a></li>
+    [%IF logged_in_user_id %]
+        <li class='title_logout' title='Logout [% user %]'><a href='/dancer/logout'>[% user_fullname %]</a></li>
     [% END %]
 </ul>
 

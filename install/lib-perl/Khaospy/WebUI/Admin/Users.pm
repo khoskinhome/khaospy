@@ -32,11 +32,8 @@ use Khaospy::DBH::Users qw(
 
 );
 
-use Khaospy::WebUI::Util qw(
-    pop_error_msg
-);
-
-sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
+use Khaospy::WebUI::Util; # can't import.
+sub user_template_flds { Khaospy::WebUI::Util::user_template_flds(@_) };
 
 ################
 # admin users :
@@ -44,10 +41,8 @@ get '/admin/list_users'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');
 
     return template 'admin_list_users' => {
-        page_title  => 'Admin : List Users',
-        user        => session('user'),
+        user_template_flds('Admin : List Users'),
         list_users  => get_users(),
-        error_msg   => pop_error_msg(),
     };
 };
 
@@ -210,10 +205,8 @@ get '/admin/add_user'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');
 
     return template 'admin_add_user' => {
-        page_title  => 'Admin : Add User',
+        user_template_flds('Admin : Add User'),
         add         => {is_enabled => true },
-        user        => session('user'),
-        error_msg   => pop_error_msg(),
     };
 };
 
@@ -281,10 +274,8 @@ get '/admin/update_user/:user_id'  => needs login => sub {
     }
 
     return template 'admin_update_user' => {
-        page_title  => 'Admin : Update User',
+        user_template_flds('Admin : Update User'),
         data        => $user_record,
-        user        => session('user'),
-        error_msg   => pop_error_msg(),
     };
 };
 

@@ -26,11 +26,8 @@ use Khaospy::DBH::ControlRooms qw(
     delete_control_room
 );
 
-use Khaospy::WebUI::Util qw(
-    pop_error_msg
-);
-
-sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
+use Khaospy::WebUI::Util; # can't import.
+sub user_template_flds { Khaospy::WebUI::Util::user_template_flds(@_) };
 
 ###############
 # admin rooms :
@@ -42,11 +39,7 @@ get '/admin/list_control_rooms'  => needs login => sub {
     $select{select_room_id}    = params->{room_id}    if params->{room_id};
 
     return template 'admin_list_control_rooms' => {
-        page_title      => 'Admin : List Control Rooms',
-        user            => session('user'),
-#        userfullname    => session('userfullname'), # TODO
-        error_msg       => pop_error_msg(),
-
+        user_template_flds('Admin : List Control Rooms'),
         list_controls   => get_controls({
                 id=>$select{select_control_id}
             }),

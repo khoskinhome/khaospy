@@ -9,6 +9,7 @@ use Dancer2::Core::Request;
 use Dancer2::Plugin::Auth::Tiny;
 use Dancer2::Session::Memcached;
 
+
 use Khaospy::WebUI::SendMessage qw/ webui_send_message /;
 
 use Khaospy::DBH::Controls qw(
@@ -34,11 +35,8 @@ use Khaospy::Constants qw(
 
 );
 
-use Khaospy::WebUI::Util qw(
-    pop_error_msg
-);
-
-sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
+use Khaospy::WebUI::Util; # can't import.
+sub user_template_flds { Khaospy::WebUI::Util::user_template_flds(@_) };
 
 get '/rooms'  => needs login => sub {
 
@@ -49,13 +47,10 @@ get '/rooms'  => needs login => sub {
     $room_id = $list_rooms->[0]{id} if ! $room_id && scalar @$list_rooms;
 
     return template 'rooms.tt', {
-        page_title      => 'Rooms Status',
-        user            => session('user'),
+        user_template_flds('Room Status'),
         list_rooms      => $list_rooms,
         select_room_id  => $room_id,
         entries         => get_controls_in_room_for_user($user_id, $room_id),
-        error_msg       => pop_error_msg(),
-        is_admin        => session('user_is_admin'),
     };
 };
 
@@ -128,20 +123,14 @@ get '/api/v1/statusall' => needs login => sub {
 
 #get '/status'  => needs login => sub {
 #    return template 'status.tt', {
-#        page_title      => 'Status',
-#        user            => session('user'),
-##        DANCER_BASE_URL => $DANCER_BASE_URL,
+#        user_template_flds('Status'),
 #        entries         => get_controls_from_db(),
-#        error_msg       => pop_error_msg(),
 #    };
 #};
 
 get '/cctv'  => needs login => sub {
     return template 'cctv.tt', {
-        page_title      => 'CCTV',
-        user            => session('user'),
-#        DANCER_BASE_URL => $DANCER_BASE_URL,
-        error_msg       => pop_error_msg(),
+        user_template_flds('CCTV'),
     };
 };
 

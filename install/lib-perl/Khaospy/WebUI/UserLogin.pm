@@ -33,37 +33,27 @@ use Khaospy::Constants qw(
     true false
 );
 
-use Khaospy::WebUI::Util qw(
-    pop_error_msg
-);
-
-# for some reason the use statement doesn't seem to import pop_error_msg ...
-sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
+use Khaospy::WebUI::Util;
+sub user_template_flds { Khaospy::WebUI::Util::user_template_flds(@_) };
 
 get '/' => needs login => sub {
-    my $error_msg = pop_error_msg();
-
     return template index => {
-        page_title => "Home",
-        user       => session->read('user'),
-        error_msg  => $error_msg,
+        user_template_flds('Home'),
     };
 };
 
 get '/logout' => sub {
     session 'user'          => undef;
-    session 'user_is_admin' => undef;
     session 'user_id'       => undef;
+    session 'user_is_admin' => undef;
+    session 'user_fullname' => undef;
     redirect '/';
 };
 
 get '/login' => sub {
     redirect '/' if session('user');
     return template 'login' => {
-        page_title => "Login",
-        error_msg  => pop_error_msg(),
-        return_url => params->{return_url},
-        user       => params->{user},
+        user_template_flds('Login'),
     };
 };
 
@@ -127,6 +117,7 @@ post '/login' => sub {
     session 'user'          => $user;
     session 'user_id'       => get_hashval($user_record,'id');
     session 'user_is_admin' => get_hashval($user_record,'is_admin');
+    session 'user_fullname' => get_hashval($user_record,'name');
 
     redirect $redir_url;
 };
@@ -134,10 +125,7 @@ post '/login' => sub {
 get '/reset_password' => sub { # don't need login for this root.
 
     return template 'reset_password' => {
-        page_title => "Reset Password",
-        user       => params->{user} || session->read('user'),
-        return_url => params->{return_url},
-        error_msg  => pop_error_msg(),
+        user_template_flds('Reset Password'),
     };
 };
 

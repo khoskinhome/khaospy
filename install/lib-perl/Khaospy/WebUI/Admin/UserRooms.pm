@@ -27,12 +27,8 @@ use Khaospy::DBH::UserRooms qw(
     delete_user_room
 );
 
-
-use Khaospy::WebUI::Util qw(
-    pop_error_msg
-);
-
-sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
+use Khaospy::WebUI::Util; # can't import.
+sub user_template_flds { Khaospy::WebUI::Util::user_template_flds(@_) };
 
 ###############
 # admin rooms :
@@ -45,10 +41,7 @@ get '/admin/list_user_rooms'  => needs login => sub {
     $select{select_room_id} = params->{room_id} if params->{room_id};
 
     return template 'admin_list_user_rooms' => {
-        page_title      => 'Admin : List User Rooms',
-        user            => session('user'),
-        error_msg       => pop_error_msg(),
-
+        user_template_flds('Admin : List User Rooms'),
         list_users      => get_users({
             #    id=>$select{select_user_id}
             }),
@@ -56,7 +49,6 @@ get '/admin/list_user_rooms'  => needs login => sub {
             #   id=>$select{select_room_id}
             }),
         %select,
-
         list_user_rooms => get_user_rooms({
             user_id => params->{user_id},
             room_id => params->{room_id},

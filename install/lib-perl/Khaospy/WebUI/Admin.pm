@@ -15,22 +15,17 @@ use Khaospy::Utils qw(
     get_hashval
 );
 
-use Khaospy::WebUI::Util qw(
-    pop_error_msg
-);
-
-sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
+use Khaospy::WebUI::Util; # can't import.
+sub user_template_flds { Khaospy::WebUI::Util::user_template_flds(@_) };
 
 get '/admin' => needs login => sub {
 
     return template 'permission_denied.tt' => {
-        page_title      => 'Admin',
-        user            => session('user'),
+        user_template_flds('Admin'),
     } if ! session->read('user_is_admin');
 
     return template 'admin' => {
-        page_title      => 'Admin',
-        user            => session('user'),
+        user_template_flds('Admin'),
     };
 };
 

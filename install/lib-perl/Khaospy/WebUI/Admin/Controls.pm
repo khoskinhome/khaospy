@@ -19,11 +19,8 @@ use Khaospy::DBH::Controls qw(
     get_controls
 );
 
-use Khaospy::WebUI::Util qw(
-    pop_error_msg
-);
-
-sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
+use Khaospy::WebUI::Util; # can't import.
+sub user_template_flds { Khaospy::WebUI::Util::user_template_flds(@_) };
 
 ##################
 # admin controls :
@@ -31,28 +28,18 @@ get '/admin/list_controls'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');
 
     return template 'admin_list_controls' => {
-        page_title      => 'Admin : List Controls',
-        user            => session('user'),
+        user_template_flds('Admin : List Controls'),
         list_controls   => get_controls(),
-        error_msg       => pop_error_msg(),
     };
 };
 
 get '/admin/add_control'  => needs login => sub {
     redirect '/admin' if ! session->read('user_is_admin');
 
+    #return template 'admin_add_control' => {
     return template 'not_implemented' => {
-        page_title      => 'Admin : Add Control',
-        user            => session('user'),
-        error_msg       => pop_error_msg(),
+        user_template_flds('Admin : Add Control'),
     };
-
-#    return template 'admin_add_control' => {
-#        page_title  => 'Admin : Add Control',
-#        user        => session('user'),
-#        error_msg   => pop_error_msg(),
-#    };
-
 };
 
 post '/admin/add_control'  => needs login => sub {
@@ -76,9 +63,7 @@ post '/admin/add_control'  => needs login => sub {
 #    if ( $error_msg ){
 #        session 'error_msg' => $error_msg;
 #        return template 'admin_add_control' => {
-#            page_title  => 'Admin : Add Control',
-#            user        => session('user'),
-#            error_msg   => pop_error_msg(),
+            #user_template_flds('Admin : Add Control'),
 #            add         => $add,
 #            error       => $error,
 #        };

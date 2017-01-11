@@ -37,28 +37,19 @@ use Khaospy::Constants qw(
     true false
 );
 
-use Khaospy::WebUI::Util qw(
-    pop_error_msg
-);
-
-# for some reason the use statement doesn't seem to import pop_error_msg ...
-sub pop_error_msg  { Khaospy::WebUI::Util::pop_error_msg() };
+use Khaospy::WebUI::Util;
+sub user_template_flds { Khaospy::WebUI::Util::user_template_flds(@_) };
 
 get '/user' => needs login => sub {
     return template 'user' => {
-        page_title      => 'User',
-        user            => session('user'),
+        user_template_flds('User'),
     };
 };
 
 get '/user/change_password' => sub { # don't need login for this path
-
     return template 'change_password' => {
-        page_title  => 'User : Change Password',
-        user        => session->read('user'),
+        user_template_flds('User : Change Password'),
         change_user => session->read('user') || params->{user} ,
-        return_url  => params->{return_url},
-        error_msg   => pop_error_msg(),
     };
 };
 
@@ -184,11 +175,8 @@ get '/user/update'  => needs login => sub {
     my $user_record = get_user($user);
 
     return template 'user_update' => {
-        page_title   => 'User : Update',
-        user         => $user,
+        user_template_flds('User : Update'),
         data         => $user_record,
-#        return_url  => params->{return_url},
-        error_msg   => pop_error_msg(),
     };
 };
 
