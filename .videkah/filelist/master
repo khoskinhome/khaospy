@@ -378,10 +378,10 @@ crap.diff.pl
 ./install/www-dancer-tt/cctv.tt
 
 ########
-# status
-./install/www-dancer-tt/status.tt
-./install/www/js/status.js
-./install/www/css/status.css
+# status .TO BE DEPRECATED
+#./install/www-dancer-tt/status.tt
+#./install/www/js/status.js
+#./install/www/css/status.css
 
 ./install/www-dancer-tt/user.tt
 
@@ -457,7 +457,6 @@ crap.diff.pl
 
 ./install/www-bin/test-cgi.pl
 ./install/www-bin/graphs.pl
-./install/www-dancer-tt/status-new.tt
 ###################################################################
 
 ./install/db/create-db.sql
