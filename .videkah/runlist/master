@@ -1,4 +1,5 @@
 ./install-reload-apache.bash piserver
+./reload-apache.bash piserver
 
 ./install-to-pi-pi.bash piserver
 
