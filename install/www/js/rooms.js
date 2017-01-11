@@ -85,24 +85,10 @@ $(document).ready(function(){
         selector.addClass(to_class);
     }
 
-//    $("button").click(function(){
-//        var control_name = $(this).attr('id');
-//        var action       = $(this).attr('value');
-//        console.log("pressed " + control_name + " " + action );
-//
-//        $.post(dancer_base_url + "/api/v1/operate/"+control_name+"/"+action,
-//            { },
-//            function(data, http_status){
-//                // alert("Data: " + data + "\nStatus: " + status);
-//                // TODO handle http_status errors.
-//            }
-//        );
-//    });
-
-    $("button").click(function(){
+    $("button.operate-control").click(function(){
         var control_name = $(this).attr('id');
         var action       = $(this).attr('value');
-        console.log("pressed " + control_name + " " + action );
+        //console.log("pressed " + control_name + " " + action );
 
         $.post(dancer_base_url + "/api/v1/operate/"+control_name+"/"+action,
             { },

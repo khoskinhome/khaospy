@@ -1,4 +1,3 @@
-var dancer_base_url = '/dancer';
 var delete_user_room_id;
 
 $(document).ready(function(){

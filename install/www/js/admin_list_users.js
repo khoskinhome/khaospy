@@ -1,57 +1,8 @@
-// FIXME TODO dancer base could change
-var dancer_base_url = '/dancer';
 var delete_user_id;
 var change_password_user_id;
 var dialog_username;
 
 $(document).ready(function(){
-
-//    var old_values = [];
-//
-//    $("input[type=text]").focusin( function() {
-//        var id = $(this).attr('id');
-//        old_values[id] = $(this).val();
-//        //console.log(id + " stored old text value " + old_values[id]);
-//    });
-//
-//    $("input[type=checkbox]").focusin( function() {
-//        var id = $(this).attr('id');
-//        old_values[id] = $(this).is(':checked');
-//        //console.log(id + " stored old checkbox value " + old_values[id]);
-//    });
-//
-//    $("input").change( function() {
-//      run_func_on_db_id($(this), function(jThis, h_id, db_id, field){
-//
-//        console.log(h_id + "change input. db_id = "+db_id );
-//
-//        if ( jThis.attr('type') == 'checkbox'){
-//            var value = jThis.is(':checked');
-//        } else { // all the rest are textboxes :
-//            var value = jThis.val();
-//        }
-//
-//        console.log( h_id + " input changed to " + value );
-//
-//        $.post(dancer_base_url + "/api/v1/admin/list_user/update/"+db_id+"/"+field,
-//            {"value" : value },
-//            function(data){
-//                var str = JSON.stringify(data);
-//                set_error_msg("Success : " + str );
-//            }
-//        )
-//        .fail(
-//            function(data){
-//                if ( jThis.attr('type') == 'checkbox'){
-//                    jThis.prop('checked', old_values[h_id] );
-//                } else { // all the rest are textboxes :
-//                    jThis.val( old_values[h_id] );
-//                }
-//                set_error_msg("FAIL " + data.responseText + "\n\n old val = " + old_values[h_id] );
-//            }
-//        );
-//      });
-//    });
 
     function changePassword() {
 
@@ -60,7 +11,6 @@ $(document).ready(function(){
         $.post(dancer_base_url + "/api/v1/admin/list_user/update_password/"+change_password_user_id,
             {"password" : new_password },
             function(data){
-//                var str = JSON.stringify(data);
                 set_error_msg("changed password : " + dialog_username );
                 $('div#dialog-password-error').text('');
                 dialog_password.dialog( "close" );
@@ -107,8 +57,6 @@ $(document).ready(function(){
     $("button.listrooms").click( function() {
       run_func_on_db_id($(this), function(jThis, h_id, db_id){
           console.log(h_id + " listrooms was clicked . db_id = "+db_id );
-          //set_error_msg(h_id + "listrooms. Not yet implemented . db_id = " + db_id );
-
           $(location).attr('href',dancer_base_url+'/admin/list_user_rooms?user_id='+db_id);
       });
     });

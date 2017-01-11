@@ -22,9 +22,9 @@ sub user_template_flds {
     session 'error_msg' => "";
     return (
         user                    => session('user') || param('user'),
-        logged_in_user_id       => session('user_id'),
-        is_admin                => session('user_is_admin'),
-        user_fullname           => session('user_fullname'),
+        tt_user_id_logged_in    => session('user_id'),
+        tt_user_is_admin        => session('user_is_admin'),
+        tt_user_fullname        => session('user_fullname'),
         error_msg               => $error_msg,
         page_title              => $page_title,
         dancer_base_url         => $DANCER_BASE_URL,

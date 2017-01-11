@@ -7,9 +7,6 @@ var animate_time        = 2400;
 
 // TODO dynamically change the refresh screen to slightly longer than the last get status request took.
 
-// FIXME TODO dancer base could change
-var dancer_base_url = '/dancer';
-
 $(document).ready(function(){
 
     function refresh_data(){

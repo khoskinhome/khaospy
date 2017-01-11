@@ -26,7 +26,7 @@
                               [% END %]
                             </select>
                         </td>
-                        [% IF is_admin %]
+                        [% IF tt_user_is_admin %]
                         <td>
                             <button id='listcontrols'>Edit Controls</button>
                         </td>
@@ -55,17 +55,17 @@
 
                             [% IF row.can_operate %]
                                 <td>
-                                    <button id='[% row.control_name %]' value='on'>On</button>
+                                    <button class='operate-control' id='[% row.control_name %]' value='on'>On</button>
                                 </td>
                                 <td>
-                                    <button id='[% row.control_name %]' value='off'>Off</button>
+                                    <button class='operate-control' id='[% row.control_name %]' value='off'>Off</button>
                                 </td>
                             [% ELSIF row.can_set_value %]
                                 <td>
-                                    <button id='[% row.control_name %]' value='dec-value-one'>- 1</button>
+                                    <button class='operate-control' id='[% row.control_name %]' value='dec-value-one'>- 1</button>
                                 </td>
                                 <td>
-                                    <button id='[% row.control_name %]' value='inc-value-one'>+ 1</button>
+                                    <button class='operate-control' id='[% row.control_name %]' value='inc-value-one'>+ 1</button>
                                 </td>
                             [% ELSE %]
                                 <td></td><td></td>

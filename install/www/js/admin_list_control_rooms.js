@@ -57,9 +57,6 @@ $(document).ready(function(){
                     set_error_msg("FAIL " + data.responseText );
                 }
             );
-
         });
     });
-
-
 });

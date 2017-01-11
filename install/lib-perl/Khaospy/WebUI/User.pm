@@ -158,6 +158,7 @@ EOBODY
     session 'user'          => $user;
     session 'user_id'       => get_hashval($user_record,'id');
     session 'user_is_admin' => get_hashval($user_record,'is_admin');
+    session 'user_fullname' => get_hashval($user_record,'name');
     session 'error_msg'     => "Password Changed";
 
     redirect uri_for('/', {
