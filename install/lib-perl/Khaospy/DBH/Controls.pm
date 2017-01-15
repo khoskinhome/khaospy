@@ -32,6 +32,7 @@ use Khaospy::Conf::Controls qw(
 
 use Khaospy::Constants qw(
     $PI_STATUS_RRD_UPDATE_TIMEOUT
+    $WEBUI_ALL_CONTROL_TYPES
 );
 
 our @EXPORT_OK = qw(
@@ -42,6 +43,7 @@ our @EXPORT_OK = qw(
     init_last_control_state
     get_controls_in_room_for_user
     user_can_operate_control
+    get_controls_webui_var_type
 );
 
 sub control_status_insert {
@@ -49,6 +51,7 @@ sub control_status_insert {
 
     my $control_name = get_hashval($values,'control_name');
     my $control      = get_control_config($control_name);
+    my $control_type = get_hashval($control,'type');
 
     my $curr_rec =
         get_controls_from_db($control_name);
@@ -69,7 +72,8 @@ sub control_status_insert {
           last_change_state_by = ? ,
           manual_auto_timeout_left = ?,
           request_time = ?,
-          db_update_time = NOW()
+          db_update_time = NOW(),
+          control_type = ?
         WHERE
             control_name = ?
         ;
@@ -85,6 +89,7 @@ sub control_status_insert {
                 $values->{last_change_state_by} || undef,
                 $values->{manual_auto_timeout_left} || undef,
                 $values->{request_time},
+                $control_type,
                 $control_name,
             );
         };
@@ -97,10 +102,10 @@ sub control_status_insert {
         ( control_name, alias, current_state, current_value,
           last_change_state_time, last_change_state_by,
           manual_auto_timeout_left,
-          request_time, db_update_time
+          request_time, db_update_time, control_type
         )
         VALUES
-        ( ?,?,?,?,?,?,?,?,NOW() );
+        ( ?,?,?,?,?,?,?,?,NOW(), ? );
         EOSQL
 
         my $sth = dbh->prepare( $sql );
@@ -114,6 +119,7 @@ sub control_status_insert {
                 $values->{last_change_state_by} || undef,
                 $values->{manual_auto_timeout_left} || undef,
                 $values->{request_time},
+                $control_type,
             );
         };
         klogerror "$@ \n".Dumper($values) if $@;
@@ -343,17 +349,36 @@ sub user_can_operate_control {
     return false;
 }
 
+sub get_controls_webui_var_type {
+
+    my $control_types =
+        join(', ',
+            map { dbh->quote($_) }
+            keys %$WEBUI_ALL_CONTROL_TYPES);
+
+    my $sql = <<"    EOSQL";
+        select * from controls
+        where control_type in ( $control_types )
+        order by control_name
+    EOSQL
+
+    my $sth = dbh->prepare($sql);
+    $sth->execute();
+    my $results = [];
+    while ( my $row = $sth->fetchrow_hashref ){
+        push @$results, $row;
+    }
+    return $results;
+}
+
 sub get_last_control_state {
     # should be refactored with other methods in this module.
-    # TODO this should use the "controls" table now.
 
     my $last_control_state = {};
 
     my $sql = <<"    EOSQL";
-        select control_name, request_time, current_state, current_value
-        from control_status
-        where id in (
-            select max(id) from control_status group by control_name )
+        select *
+        from controls
         order by control_name
     EOSQL
 
@@ -390,7 +415,7 @@ sub init_last_control_state {
         $last_control_state->{$control_name}={};
         $last_control_state->{$control_name}{last_value} = undef;
         $last_control_state->{$control_name}{last_rrd_update_time} = undef;
-        $last_control_state->{$control_name}{statusd_updated} = undef;
+        #$last_control_state->{$control_name}{statusd_updated} = undef;
     }
 }
 

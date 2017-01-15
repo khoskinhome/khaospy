@@ -14,9 +14,7 @@ use POSIX qw/strftime/;
 
 use AnyEvent;
 use ZMQ::LibZMQ3;
-use ZMQ::Constants qw(
-    ZMQ_SUB
-);
+use ZMQ::Constants qw(ZMQ_SUB ZMQ_PUB);
 
 use Khaospy::DBH qw( dbh );
 
@@ -24,6 +22,7 @@ use Khaospy::DBH::Controls qw(
     control_status_insert
     get_last_control_state
     init_last_control_state
+    get_controls_webui_var_type
 );
 
 use zhelpers;
@@ -34,6 +33,7 @@ use Khaospy::Constants qw(
     true false
     ON OFF STATUS
 
+
     $LOCALHOST
 
     $RRD_DIR
@@ -43,6 +43,9 @@ use Khaospy::Constants qw(
 
     $TIMER_AFTER_COMMON
     $PI_STATUS_DAEMON_TIMER
+    $PI_STATUS_DAEMON_WEBUI_VAR_TIMER
+    $PI_STATUS_DAEMON_WEBUI_VAR_PUB_COUNT
+    $PI_STATUS_DAEMON_SEND_PORT
 
     $ONE_WIRE_DAEMON_PERL_PORT
     $ONE_WIRE_SENDER_PERL_SCRIPT
@@ -90,10 +93,12 @@ our @EXPORT_OK = qw( run_status_d );
 our $LOGLEVEL;
 
 my $last_db_control_status_purge;
-my $last_control_state;
+my $lcs; # last_control_state
 
 my $days_to_keep;
 my $purge_secs;
+
+my $zmq_publisher;
 
 sub run_status_d {
     my ( $opts ) = @_;
@@ -117,14 +122,22 @@ sub run_status_d {
     klogfatal "CLI : purge_secs is not a positive integer"
         if defined $purge_secs && $purge_secs !~ /^\d+$/;
 
-    $last_control_state = get_last_control_state();
+    $lcs = get_last_control_state();
 
     $last_db_control_status_purge = time;
+
+    $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
+    my $pub_to_port = "tcp://*:$PI_STATUS_DAEMON_SEND_PORT";
+    zmq_bind( $zmq_publisher, $pub_to_port );
 
     my @w;
 
     for my $script ( keys %$SCRIPT_TO_PORT ){
         my $port = get_hashval($SCRIPT_TO_PORT, $script);
+
+        # Don't want to subscribe to "self" :
+        next if $port eq $PI_STATUS_DAEMON_SEND_PORT;
+
         for my $sub_host (
             @{get_pi_hosts_running_daemon($script)}
         ){
@@ -144,16 +157,22 @@ sub run_status_d {
     push @w, AnyEvent->timer(
         after    => $TIMER_AFTER_COMMON,
         interval => $PI_STATUS_DAEMON_TIMER,
-        cb       => \&timer_cb
+        cb       => \&timer_rrd_update
+    );
+
+    push @w, AnyEvent->timer(
+        after    => $TIMER_AFTER_COMMON,
+        interval => $PI_STATUS_DAEMON_WEBUI_VAR_TIMER,
+        cb       => \&timer_publish_webui_var_changes,
     );
 
     my $quit_program = AnyEvent->condvar;
     $quit_program->recv;
 }
 
-sub timer_cb {
+sub timer_rrd_update {
 
-    for my $control_name ( keys %$last_control_state ) {
+    for my $control_name ( keys %$lcs ) {
         # One wire thermometers will get a regular update,
         # so these can be ignored :
         my $control_conf = get_control_config($control_name);
@@ -162,14 +181,14 @@ sub timer_cb {
 
         if ( is_control_rrd_graphed($control_name) ){
 
-            if ( $last_control_state->{$control_name}{last_rrd_update_time}
+            if ( $lcs->{$control_name}{last_rrd_update_time}
                 + $PI_STATUS_RRD_UPDATE_TIMEOUT
                     < time
             ){
                 klogextra "Update RRD for $control_name with last_value (timeout)";
                 update_rrd( $control_name, time,
                     get_hashval(
-                        get_hashval($last_control_state, $control_name),
+                        get_hashval($lcs, $control_name),
                         'last_value',
                         true
                     )
@@ -183,6 +202,47 @@ sub timer_cb {
         if ( $purge_secs
              && time > $last_db_control_status_purge + $purge_secs
         );
+}
+
+sub timer_publish_webui_var_changes {
+    # webui directly updates the DB with these.
+    #kloginfo 'Dump of webvar controls',  get_controls_webui_var_type();
+
+    my $webui_control_rows = get_controls_webui_var_type();
+
+    for my $row (@$webui_control_rows){
+        # check existing record , if changed then publish.
+        # keys %$lcs
+        my $control_name = get_hashval($row,'control_name');
+        if ( ! exists $lcs->{$control_name}
+            || $lcs->{$control_name}{current_value}
+               ne get_hashval($row,'current_value')
+        ){
+            $lcs->{$control_name} = $row;
+            $lcs->{$control_name}{publish_count} =
+                $PI_STATUS_DAEMON_WEBUI_VAR_PUB_COUNT - 1;
+
+            publish_webui_control($row);
+        } elsif ($lcs->{$control_name}{publish_count}){
+            $lcs->{$control_name}{publish_count}--;
+            publish_webui_control($row);
+        }
+    }
+}
+
+sub publish_webui_control {
+    my ($row) = @_;
+
+    kloginfo 'Dump of webvar controls new',  $row;
+    my $send_msg = {
+        control_name => get_hashval($row,'control_name'),
+        request_host => hostname,
+        request_epoch_time => time, # TODO decode the iso8601 from the $row
+        current_value => get_hashval($row,'current_value'),
+    };
+
+    my $json_msg = $JSON->encode($send_msg);
+    zmq_sendmsg( $zmq_publisher, "$json_msg" );
 }
 
 sub output_msg {
@@ -220,29 +280,29 @@ sub output_msg {
         );
 
     if ( ! defined $curr_state_or_value ){
-        if ( exists $last_control_state->{$control_name} ){
+        if ( exists $lcs->{$control_name} ){
             $curr_state_or_value
-                = $last_control_state->{$control_name}{last_value};
+                = $lcs->{$control_name}{last_value};
 
             klogwarn "$control_name is undefined. Using last value for update ($curr_state_or_value)";
         }
     }
 
-    if ( exists $last_control_state->{$control_name}
-        && $last_control_state->{$control_name}{last_value} == $curr_state_or_value
-        && $last_control_state->{$control_name}{statusd_updated}
+    if ( exists $lcs->{$control_name}
+        && $lcs->{$control_name}{last_value} == $curr_state_or_value
+        # && $lcs->{$control_name}{statusd_updated}
     ){
         klogdebug "Do NOT update DB with $control_name : $curr_state_or_value";
     } else {
 
-        init_last_control_state($last_control_state, $control_name);
+        init_last_control_state($lcs, $control_name);
 
-        $last_control_state->{$control_name}{last_value} = $curr_state_or_value;
+        $lcs->{$control_name}{last_value} = $curr_state_or_value;
         klogextra "Update DB with $control_name : $curr_state_or_value";
 
         # TODO capture any exceptions from the following and log an error :
         control_status_insert( $record );
-        $last_control_state->{$control_name}{statusd_updated} = true;
+        # $lcs->{$control_name}{statusd_updated} = true;
     }
 
     update_rrd( $control_name, $request_epoch_time, $curr_state_or_value);
@@ -255,7 +315,7 @@ sub update_rrd {
 
     return if ! is_control_rrd_graphed($control_name);
 
-    init_last_control_state($last_control_state, $control_name);
+    init_last_control_state($lcs, $control_name);
 
     # Does an rrd exist ? If not then create it.
     my $rrd_filename = "$RRD_DIR/$control_name";
@@ -274,9 +334,9 @@ sub update_rrd {
     my $cmd = "rrdtool update $rrd_filename $request_epoch_time:$curr_state_or_value";
     system($cmd); #TODO ERROR CHECKING.
 
-    $last_control_state->{$control_name}{last_rrd_update_time}
+    $lcs->{$control_name}{last_rrd_update_time}
         = $request_epoch_time;
-    $last_control_state->{$control_name}{last_value}
+    $lcs->{$control_name}{last_value}
         = $curr_state_or_value;
 
 }

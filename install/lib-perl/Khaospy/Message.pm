@@ -95,6 +95,10 @@ sub _get_control_message_key {
     my $action             = $msg_rh->{action};
     my $request_host       = $msg_rh->{request_host} || "";
 
+    # TODO. Sometimes there isn't an "action", its just an update with
+    # a current_value. So when action is not available then
+    # maybe current_value should be used for the signature-key.
+
     return "$control_name|$action|$request_host|$request_epoch_time";
 }
 

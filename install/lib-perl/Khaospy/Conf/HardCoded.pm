@@ -147,6 +147,60 @@ sub write_out_conf {
 
 # The "name" and "one-wire-address" need to swap places. This config needs to be able to cope with more than just one-wire-attached thermometers. TODO at a very much later stage.
 # Doing this would mean the rrd-graph-creator and the heating-control scripts would need to be changed.
+
+=pod
+2017-01-15 New format for heating daemon conf.
+
+{
+    rule-name => {
+        control_name => 'a-control-name',
+        rules => [
+            {
+
+
+
+
+            },
+
+        ]
+    },
+    ...
+
+};
+
+    if control-a >= control-b then send-action-to-control-c
+
+
+therm-control
+
+rad-control
+
+window-control
+
+var-therm-level = 20 deg C
+
+var-therm-level-drop  = 1 deg C
+
+
+    if ( therm-control > var-therm-level
+        || window-control eq OPEN
+    ) { rad-control-OFF }
+    elsif ( therm-control < var-therm-level - var-therm-level-drop) {
+        rad-control-ON
+    } else {
+
+    }
+
+
+
+
+
+
+
+=cut
+
+
+
 sub live_heating_thermometer_config {
     return {
         '28-0000066ebc74' => {

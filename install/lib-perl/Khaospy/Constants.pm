@@ -109,9 +109,11 @@ our $COMMAND_QUEUE_DAEMON_BROADCAST_TIMER = 1.6;
 #our $STATUS_DAEMON_PUBLISH_EVERY_SECS               = 2;
 #our $RULES_DAEMON_RUN_EVERY_SECS                    = 0.5;
 
-our $PI_STATUS_DAEMON             = 'khaospy-status-d.pl';
-our $PI_STATUS_DAEMON_TIMER       = 60;
-our $PI_STATUS_RRD_UPDATE_TIMEOUT = 120;
+our $PI_STATUS_DAEMON                     = 'khaospy-status-d.pl';
+our $PI_STATUS_DAEMON_TIMER               = 120;
+our $PI_STATUS_DAEMON_WEBUI_VAR_TIMER     = 5;
+our $PI_STATUS_DAEMON_WEBUI_VAR_PUB_COUNT = 3;
+our $PI_STATUS_RRD_UPDATE_TIMEOUT         = 120;
 
 # MAC_SWITCH ARGS and TIMER can be overridden with
 # CLI options to the khaospy-mac-switch-d.pl script
@@ -202,14 +204,13 @@ our $ONE_WIRE_DAEMON_PERL_PORT            = 5002;
 our $QUEUE_COMMAND_PORT                   = 5063;
 our $COMMAND_QUEUE_DAEMON_SEND_PORT       = 5061;
 our $PI_CONTROLLER_DAEMON_SEND_PORT       = 5062;
-our $PI_STATUS_DAEMON_SEND_PORT           = 5064; # not currently used.
+our $PI_STATUS_DAEMON_SEND_PORT           = 5064;
 
 our $OTHER_CONTROLS_DAEMON_SEND_PORT      = 5065;
 
 our $MAC_SWITCH_DAEMON_SEND_PORT          = 5005;
 
 our $ERROR_LOG_DAEMON_SEND_PORT           = 5066;
-our $WEBUI_SEND_PORT                      = 5067;
 
 our $MESSAGES_OVER_SECS_INVALID = 3600;
 our $MESSAGE_TIMEOUT            = 10; # seconds.
@@ -292,6 +293,8 @@ our $SCRIPT_TO_PORT = {
     $MAC_SWITCH_DAEMON_SCRIPT
         => $MAC_SWITCH_DAEMON_SEND_PORT,
 
+    $PI_STATUS_DAEMON_SCRIPT
+        => $PI_STATUS_DAEMON_SEND_PORT,
 };
 
 # These are the DEFAULTS. Can be overridden in khaospy-status-d.pl
@@ -401,6 +404,8 @@ our @EXPORT_OK = qw(
 
     $PI_STATUS_DAEMON
     $PI_STATUS_DAEMON_TIMER
+    $PI_STATUS_DAEMON_WEBUI_VAR_TIMER
+    $PI_STATUS_DAEMON_WEBUI_VAR_PUB_COUNT
     $PI_STATUS_DAEMON_SCRIPT
     $PI_STATUS_DAEMON_SEND_PORT
     $PI_STATUS_RRD_UPDATE_TIMEOUT
@@ -457,7 +462,6 @@ our @EXPORT_OK = qw(
     $ERROR_LOG_DAEMON_SEND_PORT
     $ERROR_LOG_DAEMON_TIMER
 
-    $WEBUI_SEND_PORT
 );
 
 1;

@@ -23,7 +23,6 @@ use Khaospy::QueueCommand qw/ queue_command /;
 use Khaospy::Constants qw(
     $JSON
     $ZMQ_CONTEXT
-    $WEBUI_SEND_PORT
 
     $WEBUI_ALL_CONTROL_TYPES
 
@@ -53,18 +52,6 @@ our @EXPORT_OK = qw(
     webui_send_message
 );
 
-#my $zmq_publisher;
-#
-#sub _get_pub {
-#
-#    if ( $zmq_publisher ) {
-#        zmq_close( $zmq_publisher );
-#    };
-#    $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
-#    my $pub_to_port = "tcp://*:$WEBUI_SEND_PORT";
-#    zmq_bind( $zmq_publisher, $pub_to_port );
-#}
-
 sub webui_send_message { # TODO should be called webui_action
     my ( $control_name, $action_value ) = @_;
 
@@ -73,18 +60,6 @@ sub webui_send_message { # TODO should be called webui_action
     my $control_type = get_hashval($control,'type') ;
 
     if ( exists $WEBUI_ALL_CONTROL_TYPES->{$control_type} ){
-
-#        _get_pub();
-#        my $send_msg = {
-#            control_name => $control_name,
-#            request_epoch_time => time,
-#            current_value => $action_value,
-#        };
-#
-#        my $json_msg = $JSON->encode($send_msg);
-#        for ( 1..10 ){
-#            zmq_sendmsg( $zmq_publisher, "$json_msg" );
-#        }
 
         if (   $action_value eq INC_VALUE_ONE
             or $action_value eq DEC_VALUE_ONE ){
