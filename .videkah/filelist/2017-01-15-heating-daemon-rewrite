@@ -31,6 +31,7 @@ crapnew
 ./install/bin/test-dump-all-confs.pl
 
 ./install/lib-perl/Khaospy/Conf/HardCoded.pm
+./install/bin/khaospy-missing-controls-populate-db.pl
 
 ./install/lib-perl-t/crap.t
 ./install/bin/khaospy-test-conf-generate.pl
@@ -78,6 +79,12 @@ install/lib-perl-t/KhaospyMessage.t
 
 ./install/lib-perl/Khaospy/OneWireThermometer.pm
 ./install/bin/khaospy-one-wire-daemon.pl
+
+
+./install/docs/HeatingDaemon2017-01-15.txt
+./install/lib-perl/Khaospy/RulesD.pm
+./install/bin/khaospy-rules-d.pl
+./rules-d-test.pl
 
 ./install/lib-perl/Khaospy/HeatingDaemon.pm
 ./install/bin/khaospy-one-wire-heating-daemon.pl
@@ -473,7 +480,10 @@ crap.diff.pl
 
 ./install/apache/default-ssl.conf
 ##############################
-
+# making current_state and current_value just one field :
+g.grep.nH current_value | grep -v '^to-be-deleted' | grep -v 'testrig-lighting-on-off' | grep -v 'khaospy-amelia-hackit-daemon'
+##############################
+#
 # greping crap
 install/lib-perl/Khaospy/WebUI/UserLogin.pm:154:            => "username and email combination don't match any known users";
 
@@ -491,5 +501,20 @@ install/lib-perl/Khaospy/HeatingDaemon.pm:113:        my $port = get_hashval($SC
 install/lib-perl/Khaospy/StatusD.pm:62:    $SCRIPT_TO_PORT
 install/lib-perl/Khaospy/StatusD.pm:135:    for my $script ( keys %$SCRIPT_TO_PORT ){
 install/lib-perl/Khaospy/StatusD.pm:136:        my $port = get_hashval($SCRIPT_TO_PORT, $script);
+
+
+g.grep.nH  get_last_control_state
+install/lib-perl/Khaospy/DBH/Controls.pm:42:    get_last_control_state
+install/lib-perl/Khaospy/DBH/Controls.pm:374:sub get_last_control_state {
+
+install/lib-perl/Khaospy/HeatingDaemon.pm:59:    get_last_control_state
+install/lib-perl/Khaospy/HeatingDaemon.pm:83:    $last_control_state = get_last_control_state();
+install/lib-perl/Khaospy/RulesD.pm:55:    get_last_control_state
+install/lib-perl/Khaospy/RulesD.pm:77:    $last_control_state = get_last_control_state();
+install/lib-perl/Khaospy/StatusD.pm:23:    get_last_control_state
+install/lib-perl/Khaospy/StatusD.pm:125:    $lcs = get_last_control_state();
+
+
+
 
 
