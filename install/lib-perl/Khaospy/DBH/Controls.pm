@@ -18,6 +18,7 @@ use Khaospy::Log qw(
 use Khaospy::Utils qw(
     get_hashval
     get_iso8601_utc_from_epoch
+    iso8601_parse
     trans_ON_to_value_or_return_val
 );
 
@@ -162,7 +163,7 @@ sub get_controls {
     my ( $p ) = @_;
     $p = {} if ! $p;
 
-    my $where;
+    my $where = '';
     my @bind;
 
     if ( $p->{id} ){
@@ -377,7 +378,19 @@ sub get_last_control_state {
     my $last_control_state = {};
 
     my $sql = <<"    EOSQL";
-        select *
+        select
+            control_name,
+            alias,
+            current_state,
+            current_value,
+            coalesce(last_change_state_time,request_time)
+                as last_change_state_time,
+            last_change_state_by,
+            manual_auto_timeout_left,
+            request_time,
+            db_update_time,
+            id,
+            control_type
         from controls
         order by control_name
     EOSQL
@@ -393,6 +406,7 @@ sub get_last_control_state {
                 ." DB has stale data. $@";
             next;
         }
+        my $control      = get_control_config($control_name);
 
         init_last_control_state ($last_control_state, $control_name);
 
@@ -403,6 +417,24 @@ sub get_last_control_state {
 
         $last_control_state->{$control_name}{last_rrd_update_time}
             = time - $PI_STATUS_RRD_UPDATE_TIMEOUT;
+
+        # deprecating current_state, slowly ... ( just going with current_value )
+        for my $hrky ( keys %$hr){
+            $last_control_state->{$control_name}{$hrky} = $hr->{$hrky};
+        }
+
+        $last_control_state->{$control_name}{current_value} =
+            $last_control_state->{$control_name}{last_value};
+
+        delete $last_control_state->{$control_name}{current_state};
+
+        $last_control_state->{$control_name}{last_change_state_time_epoch} =
+            iso8601_parse($hr->{last_change_state_time});
+
+        # A hack to make sure the control_type is populated,
+        # will get removed once the control-conf is pushed to the DB by the webui :
+        $last_control_state->{$control_name}{control_type} =
+            get_hashval($control,'type') if ! $hr->{control_type};
     }
 
     return $last_control_state;

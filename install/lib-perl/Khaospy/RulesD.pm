@@ -133,6 +133,11 @@ sub rules_check {
 
 sub ctl {
     my ($control_name) = @_;
+    return get_hashval($last_control_state, $control_name)->{'current_value'};
+}
+
+sub ctl_val {
+    my ($control_name) = @_;
     return get_hashval( get_hashval($last_control_state, $control_name), 'current_value');
 }
 

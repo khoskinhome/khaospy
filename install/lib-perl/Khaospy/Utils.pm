@@ -8,6 +8,7 @@ use Data::Dumper;
 use Exporter qw/import/;
 use JSON;
 use DateTime;
+use Time::Local;
 
 my $json = JSON->new->allow_nonref;
 
@@ -32,6 +33,7 @@ our @EXPORT_OK = qw(
     get_hashval
     get_cmd
     get_iso8601_utc_from_epoch
+    iso8601_parse
     trans_ON_to_value_or_return_val
 );
 
@@ -102,6 +104,29 @@ sub get_iso8601_utc_from_epoch {
     return $dt->strftime('%F %T.%6Nz');
 }
 
+sub iso8601_parse {
+    my ($iso8601) = @_;
+    return if ! defined $iso8601;
+
+    my ($year, $month, $day, $hour, $min, $sec, $frac, $tz) = $iso8601 =~
+        /^(\d{4})-(\d\d)-(\d\d)(?:[ T-](\d\d):(\d\d)(?::(\d\d) (?: \. (\d+) )? )?
+           ([+-]\d\d (?: :? \d\d)? | [Zz] )? ) ?$/x;
+
+    confess("iso8601_parse(): Invalid timestamp '$iso8601'") if ! defined $day;
+
+    my $offsecs;
+    if (!defined $tz || uc($tz) eq 'Z') { $offsecs = 0 }
+    elsif ($tz =~ /^([+-])(\d\d):?(\d\d)$/) {
+        my $delta = $2 * 3600 + $3 * 60;
+        $offsecs = ($1 eq '+') ? $delta : $delta * -1;
+    }
+    else { $offsecs = $tz * 3600 }
+
+    my $epoch = timegm($sec||0, $min||0, $hour||0, $day, $month-1, $year)-$offsecs;
+    $epoch += "0.$frac" if defined $frac;
+    return $epoch;
+}
+
 sub trans_ON_to_value_or_return_val { # and OFF to false
     my ($ONOFF) = @_;
 
@@ -110,11 +135,9 @@ sub trans_ON_to_value_or_return_val { # and OFF to false
     return true  if $ONOFF eq ON;
     return false if $ONOFF eq OFF;
 
-    die "Can't translate a non ON or OFF value ($ONOFF) to value";
-
+    # should never reach this line :
+    confess "Can't translate a non ON or OFF value ($ONOFF) to value";
 }
-
-
 
 sub trim {
     my ($txt) = @_;
@@ -122,7 +145,5 @@ sub trim {
     $txt =~ s/\s+$//g;
     return $txt;
 }
-
-
 
 1;
