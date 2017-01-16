@@ -22,6 +22,9 @@ use Khaospy::Constants qw(
     $HEATING_DAEMON_CONF_FULLPATH
     $HEATING_DAEMON_CONF_RELOAD_SECS
 
+    $RULES_DAEMON_CONF_FULLPATH
+    $RULES_DAEMON_RELOAD_SECS
+
     $BOILERS_CONF_FULLPATH
     $GLOBAL_CONF_FULLPATH
     $DATABASE_CONF_FULLPATH
@@ -32,6 +35,7 @@ use Khaospy::Utils;
 
 our @EXPORT_OK = qw(
     get_one_wire_heating_control_conf
+    get_rulesd_conf
     get_boiler_conf
     get_global_conf
     get_database_conf
@@ -42,7 +46,7 @@ our @EXPORT_OK = qw(
 sub get_conf {
     my ($conf_rs, $conf_path, $force_reload, $validate_rc, $last_reload_rs, $reload_every ) = @_;
 
-    die "get_conf: force_reload can only be true, false or undefined and not '$force_reload'\n"
+    die "get_conf: force_reload can only be true (1), false (0) or undefined and not '$force_reload'\n"
         if defined $force_reload
             and $force_reload != true
             and $force_reload != false;
@@ -74,6 +78,20 @@ sub get_one_wire_heating_control_conf {
         undef,
         \$$heating_conf_last_loaded,
         $HEATING_DAEMON_CONF_RELOAD_SECS
+    )
+}
+
+my $rules_conf;
+my $rules_conf_last_loaded;
+sub get_rulesd_conf {
+    my ($force_reload) = @_;
+    get_conf(
+        \$rules_conf,
+        $RULES_DAEMON_CONF_FULLPATH,
+        $force_reload,
+        undef,
+        \$$rules_conf_last_loaded,
+        $RULES_DAEMON_RELOAD_SECS
     )
 }
 

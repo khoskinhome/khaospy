@@ -12,11 +12,14 @@ use Exporter qw/import/;
 use Khaospy::Constants qw(
     $JSON
 
+    ON OFF
+
     true false
 
     $CONF_DIR
 
     $HEATING_DAEMON_CONF
+    $RULES_DAEMON_CONF
     $CONTROLS_CONF
     $BOILERS_CONF
     $GLOBAL_CONF
@@ -34,6 +37,7 @@ use Khaospy::Constants qw(
 
     $OTHER_CONTROLS_DAEMON_SCRIPT
 
+    $RULES_DAEMON_SCRIPT
     $ERROR_LOG_DAEMON_SCRIPT
 
     $ORVIBOS20_CONTROL_TYPE
@@ -78,6 +82,8 @@ my $live_confs = {
 
     $HEATING_DAEMON_CONF
         => live_heating_thermometer_config(),
+    $RULES_DAEMON_CONF
+        => live_rules_conf(),
     $CONTROLS_CONF
         => live_controls_conf(),
     $BOILERS_CONF
@@ -92,6 +98,8 @@ my $live_confs = {
 my $test_confs = {
     $HEATING_DAEMON_CONF
         => test_heating_thermometer_config(),
+    $RULES_DAEMON_CONF
+        => test_rules_conf(),
     $CONTROLS_CONF
         => test_controls_conf(),
     $BOILERS_CONF
@@ -100,6 +108,7 @@ my $test_confs = {
         => test_global_conf(),
     $PI_HOSTS_CONF
         => test_pi_host_conf(),
+
 };
 
 sub write_out_conf {
@@ -114,7 +123,6 @@ sub write_out_conf {
         $use_conf = $test_confs;
     } else {
         die "didn't define live or test correctly to write out the hardcoded conf\n";
-
     }
 
     for my $conf_file ( keys %$use_conf ) {
@@ -132,6 +140,8 @@ sub write_out_conf {
 ###############################
 
 ##################################
+# When rulesd is finished, heating conf will be deprecated.
+
 #   Heating conf keys :
 #       COMPULSORY-KEYS :
 #           name               => 'Alison', COMPULSORY-KEY
@@ -147,59 +157,6 @@ sub write_out_conf {
 
 # The "name" and "one-wire-address" need to swap places. This config needs to be able to cope with more than just one-wire-attached thermometers. TODO at a very much later stage.
 # Doing this would mean the rrd-graph-creator and the heating-control scripts would need to be changed.
-
-=pod
-2017-01-15 New format for heating daemon conf.
-
-{
-    rule-name => {
-        control_name => 'a-control-name',
-        rules => [
-            {
-
-
-
-
-            },
-
-        ]
-    },
-    ...
-
-};
-
-    if control-a >= control-b then send-action-to-control-c
-
-
-therm-control
-
-rad-control
-
-window-control
-
-var-therm-level = 20 deg C
-
-var-therm-level-drop  = 1 deg C
-
-
-    if ( therm-control > var-therm-level
-        || window-control eq OPEN
-    ) { rad-control-OFF }
-    elsif ( therm-control < var-therm-level - var-therm-level-drop) {
-        rad-control-ON
-    } else {
-
-    }
-
-
-
-
-
-
-
-=cut
-
-
 
 sub live_heating_thermometer_config {
     return {
@@ -308,42 +265,89 @@ sub test_heating_thermometer_config {
     };
 }
 
+sub live_rules_conf {
+    return [
+         {
+            rule_name    => 'amelia-rad-control',
+            control_name => 'ameliarad',
+            ifs => [ # first "if" wins ...
+                {   action => OFF,
+                    if     => "ctl('var-amelia-room-temp') < ctl('therm-amelia-door')"
+                },
+                {   action => OFF,
+                    if     => "ctl('amelia_window') eq ON",
+                },
+                {   action => OFF,
+                    if     => "ctl('mac-amelia-iphone-6s-plus') eq OFF && ctl('var-minimum-room-temp') < ctl('therm-amelia-door')"
+                },
+                {   action => ON,
+                    if     => "ctl('var-amelia-room-temp') - ctl('var-allowed-temp-drop') > ctl('therm-amelia-door') &&  ctl('mac-amelia-iphone-6s-plus') eq ON"
+                },
+                {   action => ON,
+                    if     => "ctl('var-minimum-room-temp') - ctl('var-allowed-temp-drop') > ctl('therm-amelia-door') &&  ctl('mac-amelia-iphone-6s-plus') eq OFF"
+                },
+
+            ],
+        },
+    ];
+}
+
+sub test_rules_conf {
+    return {
+        @{live_rules_conf()},
+    };
+}
+
 sub live_controls_conf {
     ## TODO find a way of using the host name from /etc/hosts to get the ip and mac.
     return {
+        'var-minimum-room-temp' => {
+            alias         =>"Minimum room temp Setting",
+            type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
+            value         => 6,
+            upper_limit   => 10,
+            lower_limit   => 4,
+        },
+        'var-allowed-temp-drop' => {
+            alias         =>"Minimum room temp Setting",
+            type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
+            value         => 1,
+            upper_limit   => 2,
+            lower_limit   => 0.5,
+        },
         'var-karl-room-temp' => {
-            alias         =>"Karl room temp",
+            alias         =>"Karl room temp Setting",
             type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
             value         => 19,
-            upper_limit   => 23,
+            upper_limit   => 22,
             lower_limit   => 5,
         },
         'var-alison-room-temp' => {
             type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
-            alias         =>"Alison Room temp",
+            alias         =>"Alison Room temp Setting",
             value         => 19,
-            upper_limit   => 23,
+            upper_limit   => 22,
             lower_limit   => 5,
         },
         'var-amelia-room-temp' => {
             type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
-            alias         =>"Amelia Room temp",
+            alias         =>"Amelia Room temp Setting",
             value         => 19,
-            upper_limit   => 23,
+            upper_limit   => 22,
             lower_limit   => 5,
         },
         'var-front-room-temp' => {
             type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
-            alias         =>"Front Room temp",
+            alias         =>"Front Room temp Setting",
             value         => 19,
-            upper_limit   => 23,
+            upper_limit   => 22,
             lower_limit   => 5,
         },
         'var-dining-room-temp' => {
             type          => $WEBUI_VAR_FLOAT_CONTROL_TYPE,
-            alias         =>"Dining Room temp",
+            alias         =>"Dining Room temp Setting",
             value         => 19,
-            upper_limit   => 23,
+            upper_limit   => 21,
             lower_limit   => 5,
         },
         'therm-karl' => {
@@ -1296,11 +1300,12 @@ sub live_pi_host_conf {
                     '--purge-seconds'   => 86400,
                   },
                 },
-                { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
-                { script  => $PI_CONTROLLER_DAEMON_SCRIPT, options => { }, },
-                { script  => $COMMAND_QUEUE_DAEMON_SCRIPT, options => { }, },
+                { script  => $ONE_WIRE_SENDER_PERL_SCRIPT , options => { }, },
+                { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
+                { script  => $COMMAND_QUEUE_DAEMON_SCRIPT , options => { }, },
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $ERROR_LOG_DAEMON_SCRIPT, options => { }, },
+                { script  => $ERROR_LOG_DAEMON_SCRIPT     , options => { }, },
+                { script  => $RULES_DAEMON_SCRIPT         , options => { }, },
                 {
                     script  => $MAC_SWITCH_DAEMON_SCRIPT,
                     options => { '-i' => '192.168.1.0/24' }
@@ -1314,8 +1319,8 @@ sub live_pi_host_conf {
             runs_webui        => false,
             daemons => [
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $ONE_WIRE_SENDER_PERL_SCRIPT,  options => { }, },
-                { script  => $COMMAND_QUEUE_DAEMON_SCRIPT, options => { }, },
+                { script  => $ONE_WIRE_SENDER_PERL_SCRIPT , options => { }, },
+                { script  => $COMMAND_QUEUE_DAEMON_SCRIPT , options => { }, },
                 {
                     script  =>"/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
                     options => { },

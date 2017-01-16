@@ -1,0 +1,124 @@
+2017-01-15 New format for heating daemon conf.
+
+    if control-a >= control-b then send-action-to-control-c
+
+
+therm-control
+
+rad-control
+
+window-control
+mac-phone-control
+
+var-therm-level = 20 deg C
+
+var-therm-level-drop  = 1 deg C
+
+
+    if ( therm-control > var-therm-level
+        || window-control eq OPEN
+    ) { rad-control-OFF }
+    elsif ( therm-control < var-therm-level - var-therm-level-drop) {
+        rad-control-ON
+    } else {
+
+    }
+
+
+ if the window is open then the rad will always be off
+ if the mac-phone has not been on the network for 30mins then the lower-temp will be 5 deg C
+ 
+{
+    rule-name => {
+        control_name => 'a-control-name',
+        rules => [ # first rule match WINS !
+            {
+                action =>  "the action to send to control",
+                tests  => [   # AND between these tests.
+                    { val1         => hard-coded-val ,
+                      control1     => other-control-val,
+                      operator     => "eq" ,
+                      val2         => hard-coded-val,
+                      control2     => other-control-val,
+                    },
+                    { val1         => hard-coded-val or other-control-val,
+                      operator     => ">" ,
+                      val2         => hard-coded-val or other-control-val,
+                    },
+
+                ],
+            },
+            {
+                action =>  "the action to send to control",
+                tests  => [ # OR between these tests.
+                    { val1         => hard-coded-val or other-control-val,
+                      operator     => "eq" ,
+                      val2         => hard-coded-val or other-control-val,
+                    },
+                    { val1         => hard-coded-val or other-control-val,
+                      operator     => ">" ,
+                      val2         => hard-coded-val or other-control-val,
+                    },
+
+                ],
+            },
+        ]
+    },
+    ...
+
+};
+
+window = Open or Closed.
+mac-phone = ON or OFF
+var-webui-room-temp = 20
+var-webui-minimum-temp = 5
+var-webui-allowed-temp-drop
+therm-amelia-door
+
+    amelia-rad-control => {
+        control_name => 'ameliarad',
+        rules => [
+            {   action => OFF,
+                tests => [
+                    {
+                        val1     => 'C:amelia_window',
+                        operator => 'eq',
+                        val2     => 'open',
+                    },
+                ]
+            },
+            {   action => OFF,
+                tests => [
+                    {
+                        val1     => '$mac-phone',
+                        operator => 'eq',
+                        val2     => 'OFF',
+                    },  # AND ... :
+                    {
+                        val1     => 'var-webui-minimum-temp',
+                        operator => '<',
+                        val2     => 'var-webui-room-temp',
+                    },
+                ]
+            },
+            {   action => OFF,
+                tests => [
+                    {
+                        val1     => 'therm-amelia-door',
+                        operator => '>',
+                        val2     => 'var-webui-room-temp',
+                    },
+                ]
+            },
+            {   action => ON,
+                tests => [
+                    {
+                        val1     => 'therm-amelia-door',
+                        operator => '<',
+                        val2     => 'var-webui-room-temp' - 'var-webui-allowed-temp-drop',
+                    },
+                ]
+            },
+        ],
+
+    }

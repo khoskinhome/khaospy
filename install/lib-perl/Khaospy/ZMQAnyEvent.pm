@@ -2,6 +2,8 @@ package Khaospy::ZMQAnyEvent;
 use strict;
 use warnings;
 
+# http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
+
 use Exporter qw/import/;
 use Carp qw/croak/;
 

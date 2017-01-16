@@ -90,6 +90,9 @@ our $ONE_WIRE_SENDER_PERL_DAEMON = 'khaospy-one-wire-daemon.pl';
 our $ONE_WIRE_SENDER_PERL_TIMER  = 30; # this is how often one-wire-temperature sensors are polled in seconds.
 our $ONE_WIRE_SENSOR_DIR         = '/sys/bus/w1/devices/';
 
+our $RULES_DAEMON               = 'khaospy-rules-d.pl';
+our $RULES_DAEMON_TIMER         = 10; # how often the rules are checked in seconds.
+
 our $PI_CONTROLLER_DAEMON       = 'khaospy-pi-controls-d.pl';
 our $PI_CONTROLLER_DAEMON_TIMER = .2;
 
@@ -131,6 +134,9 @@ our $ALL_SCRIPTS = [
     our $ONE_WIRE_SENDER_PERL_SCRIPT
         = "$BIN_DIR/$ONE_WIRE_SENDER_PERL_DAEMON",
 
+    our $RULES_DAEMON_SCRIPT
+        = "$BIN_DIR/$RULES_DAEMON",
+
     our $HEATING_DAEMON_SCRIPT
         = "$BIN_DIR/khaospy-heating-daemon.pl",
 
@@ -159,7 +165,8 @@ our $ALL_SCRIPTS = [
 #############
 # json confs
 
-our $HEATING_DAEMON_CONF   = "heating_thermometer.json";
+our $HEATING_DAEMON_CONF            = "heating_thermometer.json";
+our $RULES_DAEMON_CONF              = "rules.json";
 our $CONTROLS_CONF                  = "controls.json";
 our $BOILERS_CONF                   = "boilers.json";
 
@@ -173,6 +180,11 @@ our $HEATING_DAEMON_CONF_FULLPATH
     = "$CONF_DIR/$HEATING_DAEMON_CONF";
 
 our $HEATING_DAEMON_CONF_RELOAD_SECS = 300;
+
+our $RULES_DAEMON_CONF_FULLPATH
+    = "$CONF_DIR/$RULES_DAEMON_CONF";
+
+our $RULES_DAEMON_RELOAD_SECS = 300;
 
 our $CONTROLS_CONF_FULLPATH
     = "$CONF_DIR/$CONTROLS_CONF";
@@ -238,6 +250,7 @@ our $PI_MCP23017_SWITCH_CONTROL_TYPE        = "pi-mcp23017-switch";
 our $WEBUI_VAR_FLOAT_CONTROL_TYPE           = "webui-var-float",
 our $WEBUI_VAR_INTEGER_CONTROL_TYPE         = "webui-var-integer",
 our $WEBUI_VAR_STRING_CONTROL_TYPE          = "webui-var-string",
+#our $WEBUI_VAR_ON_OFF_CONTROL_TYPE          = "webui-var-on-off",
 #our $WEBUI_VAR_DATETIME_TZ_CONTROL_TYPE     = "webui-var-datetime-tz",
 #our $WEBUI_VAR_DATE_CONTROL_TYPE            = "webui-var-date",
 #our $WEBUI_VAR_TIME_TZ_CONTROL_TYPE         = "webui-var-time-tz",
@@ -250,13 +263,14 @@ our $WEBUI_ALL_CONTROL_TYPES = {
     $WEBUI_VAR_FLOAT_CONTROL_TYPE           => true,
     $WEBUI_VAR_INTEGER_CONTROL_TYPE         => true,
     $WEBUI_VAR_STRING_CONTROL_TYPE          => true,
-    #our $WEBUI_VAR_DATETIME_TZ_CONTROL_TYPE     => true,
-    #our $WEBUI_VAR_DATE_CONTROL_TYPE            => true,
-    #our $WEBUI_VAR_TIME_TZ_CONTROL_TYPE         => true,
-    #our $WEBUI_VAR_TIME_CONTROL_TYPE            => true,
-    #our $WEBUI_VAR_INTERVAL_CONTROL_TYPE        => true,
-    #our $WEBUI_VAR_HOURS_CONTROL_TYPE           => true,
-    #our $WEBUI_VAR_MINS_CONTROL_TYPE            => true,
+    #$WEBUI_VAR_ON_OFF_CONTROL_TYPE          => true,
+    #$WEBUI_VAR_DATETIME_TZ_CONTROL_TYPE     => true,
+    #$WEBUI_VAR_DATE_CONTROL_TYPE            => true,
+    #$WEBUI_VAR_TIME_TZ_CONTROL_TYPE         => true,
+    #$WEBUI_VAR_TIME_CONTROL_TYPE            => true,
+    #$WEBUI_VAR_INTERVAL_CONTROL_TYPE        => true,
+    #$WEBUI_VAR_HOURS_CONTROL_TYPE           => true,
+    #$WEBUI_VAR_MINS_CONTROL_TYPE            => true,
 };
 
 our $MAC_SWITCH_CONTROL_TYPE                = "mac-switch";
@@ -339,6 +353,13 @@ our @EXPORT_OK = qw(
     $WWW_DIR
     $WWW_BIN_DIR
 
+
+    $RULES_DAEMON
+    $RULES_DAEMON_TIMER
+    $RULES_DAEMON_SCRIPT
+    $RULES_DAEMON_CONF
+    $RULES_DAEMON_CONF_FULLPATH
+    $RULES_DAEMON_RELOAD_SECS
 
     $HEATING_DAEMON_CONF
     $HEATING_DAEMON_CONF_FULLPATH
