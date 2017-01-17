@@ -22,6 +22,7 @@ crapnew
 
 ./install/lib-perl/Khaospy/Conf.pm
 ./install/lib-perl/Khaospy/Conf/Controls.pm
+./install/lib-perl/Khaospy/ControlsCurrentState.pm
 
 ./install/lib-perl-t/KhaospyConfControls.t
 
@@ -42,6 +43,7 @@ crapnew
 ./install/lib-perl/Khaospy/Constants.pm
 
 .crapsendport.pl
+crap-date-time-parse.pl
 
 ./install/lib-perl/Khaospy/ControlDispatch.pm
 
