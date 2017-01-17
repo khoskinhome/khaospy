@@ -1263,16 +1263,24 @@ sub test_boilers_conf {
     };
 }
 
-# TODO to be deprecated.
+
+# eventually the  log_level for the daemons will "cascade" / "inherit".
+# most specific wins.
+# i.e. The daemons log_level setting in the pihost-conf is the most important
+#      The pihost general setting is next most important.
+#      The global config is only used if the other two aren't set.
+# This isn't yet implemented. so TODO.
+
 sub live_global_conf {
     return {
+        timezone  => 'Europe/London',
         log_level => 'debug',
     };
 }
 
-# TODO to be deprecated.
 sub test_global_conf {
     return {
+        timezone  => 'Europe/London',
         log_level => 'debug',
     };
 }
@@ -1305,7 +1313,7 @@ sub live_pi_host_conf {
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT , options => { }, },
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $ERROR_LOG_DAEMON_SCRIPT     , options => { }, },
-                { script  => $RULES_DAEMON_SCRIPT         , options => { }, },
+#                { script  => $RULES_DAEMON_SCRIPT         , options => { }, },
                 {
                     script  => $MAC_SWITCH_DAEMON_SCRIPT,
                     options => { '-i' => '192.168.1.0/24' }

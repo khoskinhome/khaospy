@@ -106,6 +106,11 @@ my $check_integer
 my $check_optional_integer
     = check_optional_regex(qr/^\d+$/);
 
+##################
+# these are used by the webui to work out what type of control
+# interface to display.
+#
+# TODO : following needs renaming to can_on_off :
 my $can_operate = {
     $ORVIBOS20_CONTROL_TYPE                => true,
     $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE     => true,
@@ -113,6 +118,11 @@ my $can_operate = {
     $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE => true,
     $PI_MCP23017_RELAY_CONTROL_TYPE        => true,
 };
+
+# will need :
+#   can_set_multi_on_off
+#   can_set_dimmable  ( 0 to 1 float )
+#   can_set_multi_dimmable ( array of 0 to 1 floats )
 
 my $can_set_value = {
     $WEBUI_VAR_FLOAT_CONTROL_TYPE          => true,
@@ -122,6 +132,9 @@ my $can_set_value = {
 my $can_set_string = {
     $WEBUI_VAR_STRING_CONTROL_TYPE         => true,
 };
+
+# will probably need :
+# my $can_set_ datetime_tz date time hours mins interval etc ...
 
 my $check_types = {
     $ORVIBOS20_CONTROL_TYPE => {

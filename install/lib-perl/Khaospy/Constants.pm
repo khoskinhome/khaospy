@@ -17,12 +17,32 @@ our $JSON = JSON->new->allow_nonref;
 sub true  { 1 };
 sub false { 0 };
 
+our $true  = 1;
+our $false = 0;
+
+# All controls will obey this
+# (and may need their config's "invert-state" set to conform :
+# true  == open   == on  == pingable     == 1;
+# false == closed == off == not-pingable == 0;
+
 # actions
 sub ON      { "on"  };
 our $ON     = ON();
 
 sub OFF     { "off" };
 our $OFF    = OFF();
+
+sub OPEN    { "open"  };
+our $OPEN   = OPEN();
+
+sub CLOSED  { "closed" };
+our $CLOSED = CLOSED();
+
+sub PINGABLE { "pingable" }
+our $PINGABLE = PINGABLE();
+
+sub NOT_PINGABLE { "not-pingable" }
+our $NOT_PINGABLE = NOT_PINGABLE();
 
 sub IN {"in"};
 our $IN = IN();
@@ -250,10 +270,16 @@ our $PI_MCP23017_SWITCH_CONTROL_TYPE        = "pi-mcp23017-switch";
 our $WEBUI_VAR_FLOAT_CONTROL_TYPE           = "webui-var-float",
 our $WEBUI_VAR_INTEGER_CONTROL_TYPE         = "webui-var-integer",
 our $WEBUI_VAR_STRING_CONTROL_TYPE          = "webui-var-string",
+
 #our $WEBUI_VAR_ON_OFF_CONTROL_TYPE          = "webui-var-on-off",
+#our $WEBUI_VAR_MULTI_ON_OFF_CONTROL_TYPE    = "webui-var-multi-on-off",
+
+# VAR_DIMMABLE is a float between 0 and 1 ( for dimmable controls ).
+#our $WEBUI_VAR_DIMMABLE_CONTROL_TYPE        = "webui-var-dimmable",
+#our $WEBUI_VAR_MULTI_DIMMABLE_CONTROL_TYPE  = "webui-var-multi-dimmable",
+
 #our $WEBUI_VAR_DATETIME_TZ_CONTROL_TYPE     = "webui-var-datetime-tz",
 #our $WEBUI_VAR_DATE_CONTROL_TYPE            = "webui-var-date",
-#our $WEBUI_VAR_TIME_TZ_CONTROL_TYPE         = "webui-var-time-tz",
 #our $WEBUI_VAR_TIME_CONTROL_TYPE            = "webui-var-time",
 #our $WEBUI_VAR_INTERVAL_CONTROL_TYPE        = "webui-var-interval",
 #our $WEBUI_VAR_HOURS_CONTROL_TYPE           = "webui-var-hours",
@@ -263,10 +289,15 @@ our $WEBUI_ALL_CONTROL_TYPES = {
     $WEBUI_VAR_FLOAT_CONTROL_TYPE           => true,
     $WEBUI_VAR_INTEGER_CONTROL_TYPE         => true,
     $WEBUI_VAR_STRING_CONTROL_TYPE          => true,
+
     #$WEBUI_VAR_ON_OFF_CONTROL_TYPE          => true,
+    #$WEBUI_VAR_MULTI_ON_OFF_CONTROL_TYPE   => true,
+
+    #$WEBUI_VAR_DIMMABLE_CONTROL_TYPE       => true,
+    #$WEBUI_VAR_MULTI_DIMMABLE_CONTROL_TYPE => true,
+
     #$WEBUI_VAR_DATETIME_TZ_CONTROL_TYPE     => true,
     #$WEBUI_VAR_DATE_CONTROL_TYPE            => true,
-    #$WEBUI_VAR_TIME_TZ_CONTROL_TYPE         => true,
     #$WEBUI_VAR_TIME_CONTROL_TYPE            => true,
     #$WEBUI_VAR_INTERVAL_CONTROL_TYPE        => true,
     #$WEBUI_VAR_HOURS_CONTROL_TYPE           => true,
@@ -325,12 +356,12 @@ our @EXPORT_OK = qw(
     $ZMQ_CONTEXT
     $JSON
 
-    true false
-
     IN $IN OUT $OUT
 
-     ON  OFF  STATUS
-    $ON $OFF $STATUS
+    true  $true  OPEN   $OPEN   ON  $ON  PINGABLE     $PINGABLE
+    false $false CLOSED $CLOSED OFF $OFF NOT_PINGABLE $NOT_PINGABLE
+
+    STATUS $STATUS
 
      INC_VALUE_ONE  DEC_VALUE_ONE
     $INC_VALUE_ONE $DEC_VALUE_ONE

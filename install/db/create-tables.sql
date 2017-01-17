@@ -66,9 +66,12 @@ CREATE TABLE controls (
     id INTEGER UNIQUE DEFAULT nextval('controls_seq') NOT NULL,
     control_name             CITEXT PRIMARY KEY NOT NULL,
     alias                    TEXT,
+    -- control_type will eventually be NOT NULL
     control_type             CITEXT REFERENCES control_types,
     current_state            TEXT,
     current_value            REAL,
+    -- config_json will eventually be NOT NULL
+    config_json              CITEXT,
     last_change_state_time   TIMESTAMP WITH TIME ZONE,
     last_change_state_by     TEXT,
     manual_auto_timeout_left REAL,
