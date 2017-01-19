@@ -19,16 +19,16 @@ use Khaospy::Utils qw(
     get_hashval
     get_iso8601_utc_from_epoch
     iso8601_parse
-    trans_ON_to_value_or_return_val
 );
 
 use Khaospy::Conf::Controls qw(
     get_control_config
     control_exists
-    get_status_alias
     can_operate
     can_set_value
     can_set_string
+
+    state_to_binary
 );
 
 use Khaospy::Constants qw(
@@ -230,10 +230,7 @@ sub get_controls_from_db {
         }
 
         if ( defined $row->{current_state} ){
-            $row->{status_alias} =
-                get_status_alias(
-                    $control_name, get_hashval($row, 'current_state')
-                );
+            $row->{status_alias} = get_hashval($row, 'current_state');
         }
 
         $row->{can_operate}    = can_operate($control_name);
@@ -296,10 +293,7 @@ sub get_controls_in_room_for_user {
         }
 
         if ( defined $row->{current_state} ){
-            $row->{status_alias} =
-                get_status_alias(
-                    $control_name, get_hashval($row, 'current_state')
-                );
+            $row->{status_alias} = get_hashval($row, 'current_state');
         }
 
         my $c_op = $row->{can_operate};
@@ -411,7 +405,7 @@ sub get_last_control_state {
         init_last_control_state ($last_control_state, $control_name);
 
         $last_control_state->{$control_name}{last_value}
-            = trans_ON_to_value_or_return_val(
+            = state_to_binary(
                 $hr->{current_state} || $hr->{current_value}
             );
 

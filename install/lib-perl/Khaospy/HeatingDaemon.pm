@@ -20,7 +20,10 @@ use JSON;
 use Khaospy::Utils qw(
     timestamp
     get_hashval
-    trans_ON_to_value_or_return_val
+);
+
+use Khaospy::Conf::Controls qw(
+    state_to_binary
 );
 
 use Khaospy::Constants qw(
@@ -149,7 +152,7 @@ sub pi_n_other_control_msg {
     my $csorv = $msg_rh->{current_state} || $msg_rh->{current_value};
 
     if ( defined $csorv ){
-        my $curr_state_or_value = trans_ON_to_value_or_return_val($csorv);
+        my $curr_state_or_value = state_to_binary($csorv);
 
         init_last_control_state($last_control_state, $control_name);
         $last_control_state->{$control_name}{last_value} = $curr_state_or_value;

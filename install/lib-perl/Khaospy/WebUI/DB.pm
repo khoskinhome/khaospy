@@ -20,7 +20,6 @@ use Khaospy::Utils qw(
 );
 
 use Khaospy::Conf::Controls qw(
-    get_status_alias
     can_operate
 );
 

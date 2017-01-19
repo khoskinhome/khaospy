@@ -19,7 +19,6 @@ use Khaospy::Utils qw(
     timestamp
     burp
     get_iso8601_utc_from_epoch
-    trans_ON_to_value_or_return_val
 );
 
 use Khaospy::Conf::Controls qw(

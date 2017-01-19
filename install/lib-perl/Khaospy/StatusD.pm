@@ -67,6 +67,7 @@ use Khaospy::Conf::Controls qw(
     get_rrd_create_params_for_control
     is_control_rrd_graphed
     get_control_config
+    state_to_binary
 );
 
 use Khaospy::Log qw(
@@ -85,7 +86,6 @@ use Khaospy::Utils qw(
     timestamp
     burp
     get_iso8601_utc_from_epoch
-    trans_ON_to_value_or_return_val
 );
 
 our @EXPORT_OK = qw( run_status_d );
@@ -275,7 +275,7 @@ sub output_msg {
     };
 
     my $curr_state_or_value =
-        trans_ON_to_value_or_return_val(
+        state_to_binary(
             $dec->{current_state} || $dec->{current_value}
         );
 

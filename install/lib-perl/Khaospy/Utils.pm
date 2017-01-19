@@ -34,7 +34,6 @@ our @EXPORT_OK = qw(
     get_cmd
     get_iso8601_utc_from_epoch
     iso8601_parse
-    trans_ON_to_value_or_return_val
 );
 
 sub timestamp { return strftime("%F %T", gmtime( $_[0] || time) ); }
@@ -127,23 +126,12 @@ sub iso8601_parse {
     return $epoch;
 }
 
-sub trans_ON_to_value_or_return_val { # and OFF to false
-    my ($ONOFF) = @_;
-
-    return $ONOFF if $ONOFF !~ /^(ON|OFF)$/i;
-
-    return true  if $ONOFF eq ON;
-    return false if $ONOFF eq OFF;
-
-    # should never reach this line :
-    confess "Can't translate a non ON or OFF value ($ONOFF) to value";
-}
-
 sub trim {
     my ($txt) = @_;
     $txt =~ s/^\s+//g;
     $txt =~ s/\s+$//g;
     return $txt;
 }
+
 
 1;

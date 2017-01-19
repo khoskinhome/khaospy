@@ -18,14 +18,13 @@ use Khaospy::Constants qw(
 
 use Khaospy::Conf::Controls qw(
     get_control_config
+    is_state
 );
 
 our @EXPORT_OK = qw(
     validate_control_msg_json
     validate_control_msg_fields
 );
-    # _validate_action
-    # _get_control_message_key
 
 sub validate_control_msg_json {
     my ($msg) = @_;
@@ -102,13 +101,13 @@ sub _get_control_message_key {
     return "$control_name|$action|$request_host|$request_epoch_time";
 }
 
-sub _validate_action {
+sub _validate_action { # also validates "value". hmmm..
     my ($action) = @_;
 
     confess "The action is not defined" if ! defined $action;
 
     # $action can be :
-    #  ON or OFF
+    #  a valid state ( see is_state() ) or STATUS
     #  a numeric value
     #  an array-ref or hash-ref of :
     #       ON or OFF strings
@@ -123,11 +122,14 @@ sub _validate_action {
     my $valid = sub {
         my ( $act ) = @_;
 
-        return ON.OFF.STATUS if ( $act eq ON || $act eq OFF || $act eq STATUS);
+        # TODO. minor bug here, STATUS should only validate in the scalar context.
+        # i.e. no arrays or hashes are allowed to have status.
 
-        return "NUMBER" if ( looks_like_number($act) ) ;
+        return "IS-STATE" if is_state($act) || $act eq STATUS;
 
-        my $errmsg ="ERROR. The action '$act' can only be 'on', 'off', 'status' or a valid numeric\n";
+        return "NUMBER" if ( looks_like_number($act) );
+
+        my $errmsg ="ERROR. The action '$act' can only be a valid-state, 'status' or a numeric\n";
         $errmsg .= "In the structure :\n".Dumper($action)
             if (ref $action eq 'ARRAY' or ref $action eq 'HASH' );
         confess $errmsg;

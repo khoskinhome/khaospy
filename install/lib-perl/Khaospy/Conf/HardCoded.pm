@@ -12,9 +12,13 @@ use Exporter qw/import/;
 use Khaospy::Constants qw(
     $JSON
 
-    ON OFF
+    true  $true  OPEN   $OPEN   ON  $ON  PINGABLE     $PINGABLE     UNLOCKED $UNLOCKED
+    false $false CLOSED $CLOSED OFF $OFF NOT_PINGABLE $NOT_PINGABLE LOCKED   $LOCKED
 
-    true false
+    $STATE_TYPE_ON_OFF                STATE_TYPE_ON_OFF
+    $STATE_TYPE_OPEN_CLOSED           STATE_TYPE_OPEN_CLOSED
+    $STATE_TYPE_PINGABLE_NOT_PINGABLE STATE_TYPE_PINGABLE_NOT_PINGABLE
+    $STATE_TYPE_UNLOCKED_LOCKED       STATE_TYPE_UNLOCKED_LOCKED
 
     $CONF_DIR
 
@@ -293,10 +297,16 @@ sub live_rules_conf {
 }
 
 sub test_rules_conf {
-    return {
+    return [
         @{live_rules_conf()},
-    };
+    ];
 }
+=pod
+            state_type => STATE_TYPE_ON_OFF,
+            state_type => STATE_TYPE_OPEN_CLOSED,
+            state_type => STATE_TYPE_PINGABLE_NOT_PINGABLE,
+            state_type => STATE_TYPE_UNLOCKED_LOCKED,
+=cut
 
 sub live_controls_conf {
     ## TODO find a way of using the host name from /etc/hosts to get the ip and mac.
@@ -553,8 +563,7 @@ sub live_controls_conf {
         amelia_window => { # alarm 02
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 02",
-            on_alias => 'open',
-            off_alias => 'closed',
+            state_type => STATE_TYPE_OPEN_CLOSED,
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 1,
             },
@@ -571,8 +580,7 @@ sub live_controls_conf {
         alison_window => { # alarm 04
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 04",
-            on_alias => 'open',
-            off_alias => 'closed',
+            state_type => STATE_TYPE_OPEN_CLOSED,
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 3,
             },
@@ -589,8 +597,7 @@ sub live_controls_conf {
         dining_room_window => { # alarm 06
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 06",
-            on_alias => 'open',
-            off_alias => 'closed',
+            state_type => STATE_TYPE_OPEN_CLOSED,
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 5,
             },
@@ -607,8 +614,7 @@ sub live_controls_conf {
         front_room_window => { # alarm 08
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 08",
-            on_alias => 'open',
-            off_alias => 'closed',
+            state_type => STATE_TYPE_OPEN_CLOSED,
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'b', portnum  => 7,
             },
@@ -617,8 +623,7 @@ sub live_controls_conf {
         front_outside_door => { # alarm_09
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 09",
-            on_alias => 'open',
-            off_alias => 'closed',
+            state_type => STATE_TYPE_OPEN_CLOSED,
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 7,
             },
@@ -635,8 +640,7 @@ sub live_controls_conf {
         inner_front_door => { # alarm 11
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 11",
-            on_alias => 'open',
-            off_alias => 'closed',
+            state_type => STATE_TYPE_OPEN_CLOSED,
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 5,
             },
@@ -645,8 +649,7 @@ sub live_controls_conf {
         inner_front_door_deadlock => { # alarm 12
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 12",
-            on_alias => 'unlocked',
-            off_alias => 'locked',
+            state_type => STATE_TYPE_UNLOCKED_LOCKED,
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 4,
             },
@@ -655,8 +658,7 @@ sub live_controls_conf {
         front_room_door => { # alarm 13
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 13",
-            on_alias => 'open',
-            off_alias => 'closed',
+            state_type => STATE_TYPE_OPEN_CLOSED,
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 3,
             },

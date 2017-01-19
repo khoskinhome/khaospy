@@ -22,27 +22,50 @@ our $false = 0;
 
 # All controls will obey this
 # (and may need their config's "invert-state" set to conform :
-# true  == open   == on  == pingable     == 1;
-# false == closed == off == not-pingable == 0;
+# true  == open   == on  == pingable     == 1 == UNLOCKED;
+# false == closed == off == not-pingable == 0 == LOCKED;
 
-# actions
-sub ON      { "on"  };
+# actions / states
+
+# on, off
+sub ON      { "on"  }; #1
 our $ON     = ON();
 
-sub OFF     { "off" };
+sub OFF     { "off" }; #0
 our $OFF    = OFF();
 
-sub OPEN    { "open"  };
+sub  STATE_TYPE_ON_OFF { "$ON-$OFF" };
+our $STATE_TYPE_ON_OFF = STATE_TYPE_ON_OFF();
+
+# open, closed
+sub OPEN    { "open"  };  #1
 our $OPEN   = OPEN();
 
-sub CLOSED  { "closed" };
+sub CLOSED  { "closed" }; #0
 our $CLOSED = CLOSED();
 
-sub PINGABLE { "pingable" }
+sub  STATE_TYPE_OPEN_CLOSED { "$OPEN-$CLOSED" }
+our $STATE_TYPE_OPEN_CLOSED = STATE_TYPE_OPEN_CLOSED();
+
+# pingable, not-pingable
+sub  PINGABLE { "pingable" }         #1
 our $PINGABLE = PINGABLE();
 
-sub NOT_PINGABLE { "not-pingable" }
+sub  NOT_PINGABLE { "not-pingable" } #0
 our $NOT_PINGABLE = NOT_PINGABLE();
+
+sub  STATE_TYPE_PINGABLE_NOT_PINGABLE { "$PINGABLE-$NOT_PINGABLE" }
+our $STATE_TYPE_PINGABLE_NOT_PINGABLE = STATE_TYPE_PINGABLE_NOT_PINGABLE();
+
+# unlocked, locked
+sub  UNLOCKED {"unlocked"}  #1
+our $UNLOCKED = UNLOCKED();
+
+sub  LOCKED   {"locked"}    #0
+our $LOCKED   = LOCKED();
+
+sub  STATE_TYPE_UNLOCKED_LOCKED { "$UNLOCKED-$LOCKED" }
+our $STATE_TYPE_UNLOCKED_LOCKED = STATE_TYPE_UNLOCKED_LOCKED();
 
 sub IN {"in"};
 our $IN = IN();
@@ -358,8 +381,13 @@ our @EXPORT_OK = qw(
 
     IN $IN OUT $OUT
 
-    true  $true  OPEN   $OPEN   ON  $ON  PINGABLE     $PINGABLE
-    false $false CLOSED $CLOSED OFF $OFF NOT_PINGABLE $NOT_PINGABLE
+    true  $true  OPEN   $OPEN   ON  $ON  PINGABLE     $PINGABLE     UNLOCKED $UNLOCKED
+    false $false CLOSED $CLOSED OFF $OFF NOT_PINGABLE $NOT_PINGABLE LOCKED   $LOCKED
+
+    $STATE_TYPE_ON_OFF                STATE_TYPE_ON_OFF
+    $STATE_TYPE_OPEN_CLOSED           STATE_TYPE_OPEN_CLOSED
+    $STATE_TYPE_PINGABLE_NOT_PINGABLE STATE_TYPE_PINGABLE_NOT_PINGABLE
+    $STATE_TYPE_UNLOCKED_LOCKED       STATE_TYPE_UNLOCKED_LOCKED
 
     STATUS $STATUS
 

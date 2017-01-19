@@ -27,8 +27,8 @@ use Khaospy::DBH::Controls qw(
 use Khaospy::Constants qw(
     $JSON
 
-    true  $true  OPEN   $OPEN   ON  $ON  PINGABLE     $PINGABLE
-    false $false CLOSED $CLOSED OFF $OFF NOT_PINGABLE $NOT_PINGABLE
+    true  $true  OPEN   $OPEN   ON  $ON  PINGABLE     $PINGABLE     UNLOCKED $UNLOCKED
+    false $false CLOSED $CLOSED OFF $OFF NOT_PINGABLE $NOT_PINGABLE LOCKED   $LOCKED
 
     STATUS $STATUS
 );
@@ -96,6 +96,14 @@ sub ctl_value ($;$){
     my ($control_name, $set) = @_;
     die("TODO-not-yet-implemented");
     # TODO
+
+}
+
+sub ctl_value_bool ($){ # can't set
+    my ($control_name) = @_;
+    die("TODO-not-yet-implemented");
+    # TODO
+    # returns 1 or 0
 
 }
 
@@ -170,7 +178,7 @@ sub ctl_db_update_timestamp ($){ # can't set this ! that's for the DB to do.
 # is / comparision methods.
 
 # boolean control type comparators :
-sub is_ctl_on_true_open_pingable_1 ($) {
+sub is_ctl_on_true_open_pingable_unlocked_1 ($) {
     return is_ctl_on($_[0]);
 }
 
@@ -179,7 +187,7 @@ sub is_ctl_on ($){
     die("TODO-not-yet-implemented");
 }
 
-sub is_ctl_off_false_closed_not_pingable_0 ($){
+sub is_ctl_off_false_closed_not_pingable_locked_0 ($){
     return is_ctl_off($_[0]);
 }
 

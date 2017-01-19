@@ -40,9 +40,14 @@ use Khaospy::Exception qw(
 use Khaospy::Constants qw(
     $JSON
 
-    true false
+    true  $true  OPEN   $OPEN   ON  $ON  PINGABLE     $PINGABLE     UNLOCKED $UNLOCKED
+    false $false CLOSED $CLOSED OFF $OFF NOT_PINGABLE $NOT_PINGABLE LOCKED   $LOCKED
 
-    ON OFF STATUS
+    $STATE_TYPE_ON_OFF                STATE_TYPE_ON_OFF
+    $STATE_TYPE_OPEN_CLOSED           STATE_TYPE_OPEN_CLOSED
+    $STATE_TYPE_PINGABLE_NOT_PINGABLE STATE_TYPE_PINGABLE_NOT_PINGABLE
+    $STATE_TYPE_UNLOCKED_LOCKED       STATE_TYPE_UNLOCKED_LOCKED
+
     $CONTROLS_CONF_FULLPATH
     $PI_HOSTS_CONF_FULLPATH
 
@@ -88,23 +93,30 @@ our @EXPORT_OK = qw(
     get_control_name_for_one_wire
     is_control_rrd_graphed
     get_rrd_create_params_for_control
-    get_status_alias
+
     can_operate
     can_set_value
     can_set_string
+
+    state_trans_control
+    state_to_binary_die
+    state_to_binary
+    is_state
+    is_on_state
+    is_off_state
 );
 
-my $check_mac = check_regex(
+my $check_mac = check_regex_sub(
     qr/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/
 );
 
-my $check_boolean = check_regex(qr/^[01]$/);
+my $check_boolean = check_regex_sub(qr/^[01]$/);
 my $check_optional_boolean
-    = check_optional_regex(qr/^[01]$/);
+    = check_optional_regex_sub(qr/^[01]$/);
 my $check_integer
-    = check_regex(qr/^\d+$/);
+    = check_regex_sub(qr/^\d+$/);
 my $check_optional_integer
-    = check_optional_regex(qr/^\d+$/);
+    = check_optional_regex_sub(qr/^\d+$/);
 
 ##################
 # these are used by the webui to work out what type of control
@@ -136,15 +148,29 @@ my $can_set_string = {
 # will probably need :
 # my $can_set_ datetime_tz date time hours mins interval etc ...
 
+
+###########################
+# state type translations types :
+
+my $state_trans_type = {
+    STATE_TYPE_ON_OFF                => \&state_trans_on_off,
+    STATE_TYPE_OPEN_CLOSED           => \&state_trans_open_closed,
+    STATE_TYPE_PINGABLE_NOT_PINGABLE => \&state_trans_pingable_not_pingable,
+    STATE_TYPE_UNLOCKED_LOCKED       => \&state_trans_unlocked_locked,
+};
+
+
+###########################
+# control conf checking definition :
+
 my $check_types = {
     $ORVIBOS20_CONTROL_TYPE => {
         alias        => \&check_optional,
-        on_alias     => \&check_optional,
-        off_alias    => \&check_optional,
+        state_type   => \&check_optional_state_type,
         rrd_graph    => $check_optional_boolean,
         poll_timeout => $check_optional_integer,
         poll_host    =>
-            check_host_runs($OTHER_CONTROLS_DAEMON_SCRIPT),
+            check_host_runs_sub($OTHER_CONTROLS_DAEMON_SCRIPT),
         host         => \&check_host,
         mac          => $check_mac,
         manual_auto_timeout => $check_optional_integer,
@@ -152,17 +178,16 @@ my $check_types = {
     $ONEWIRE_THERM_CONTROL_TYPE => {
         alias         => \&check_optional,
         rrd_graph     => $check_optional_boolean,
-        onewire_addr  => check_regex(
+        onewire_addr  => check_regex_sub(
             qr/^[0-9A-Fa-f]{2}-[0-9A-Fa-f]{12}$/
         ),
     },
     $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE => {
         alias           => \&check_optional,
-        on_alias        => \&check_optional,
-        off_alias       => \&check_optional,
+        state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
         host            =>
-            check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
+            check_host_runs_sub($PI_CONTROLLER_DAEMON_SCRIPT),
         ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
         manual_auto_timeout => $check_optional_integer,
@@ -171,31 +196,28 @@ my $check_types = {
     },
     $PI_GPIO_RELAY_CONTROL_TYPE => {
         alias           => \&check_optional,
-        on_alias        => \&check_optional,
-        off_alias       => \&check_optional,
+        state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
         host            =>
-            check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
+            check_host_runs_sub($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
         gpio_relay      => \&check_pi_gpio,
     },
     $PI_GPIO_SWITCH_CONTROL_TYPE => {
         alias           => \&check_optional,
-        on_alias        => \&check_optional,
-        off_alias       => \&check_optional,
+        state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
         host            =>
-            check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
+            check_host_runs_sub($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
         gpio_switch     => \&check_pi_gpio,
     },
     $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE => {
         alias           => \&check_optional,
-        on_alias        => \&check_optional,
-        off_alias       => \&check_optional,
+        state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
         host            =>
-            check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
+            check_host_runs_sub($PI_CONTROLLER_DAEMON_SCRIPT),
         ex_or_for_state => $check_boolean,
         invert_state    => $check_boolean,
         manual_auto_timeout => $check_optional_integer,
@@ -204,28 +226,25 @@ my $check_types = {
     },
     $PI_MCP23017_RELAY_CONTROL_TYPE => {
         alias           => \&check_optional,
-        on_alias        => \&check_optional,
-        off_alias       => \&check_optional,
+        state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
         host            =>
-            check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
+            check_host_runs_sub($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
         gpio_relay      => \&check_pi_mcp23017,
     },
     $PI_MCP23017_SWITCH_CONTROL_TYPE => {
         alias           => \&check_optional,
-        on_alias        => \&check_optional,
-        off_alias       => \&check_optional,
+        state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
         host            =>
-            check_host_runs($PI_CONTROLLER_DAEMON_SCRIPT),
+            check_host_runs_sub($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
         gpio_switch     => \&check_pi_mcp23017,
     },
     $MAC_SWITCH_CONTROL_TYPE => {
         alias           => \&check_optional,
-        on_alias        => \&check_optional,
-        off_alias       => \&check_optional,
+        state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
         mac             => $check_mac,
         sub_type        => \&check_mac_sub_type,
@@ -317,23 +336,6 @@ sub is_control_rrd_graphed {
     my $control = get_hashval($controls_conf,$control_name);
 
     return get_hashval($control,'rrd_graph',false,false,false);
-}
-
-sub get_status_alias {
-    # get the on_alias or off_alias
-    # if there isn't an alias, just returns the $status.
-    my ($control_name, $status) = @_;
-    get_controls_conf();
-    my $control = get_hashval($controls_conf, $control_name);
-
-    my $status_str = "$status";
-
-    if ( $status_str eq ON and exists $control->{on_alias} ){
-        return $control->{on_alias};
-    } elsif ( $status_str eq OFF and exists $control->{off_alias} ){
-        return $control->{off_alias};
-    }
-    return $status;
 }
 
 sub can_operate {
@@ -543,7 +545,7 @@ sub check_optional_number {
     return check_number(@_);
 }
 
-sub check_regex {
+sub check_regex_sub {
     my ($regex) = @_;
     return sub {
         check_exists(@_);
@@ -551,7 +553,7 @@ sub check_regex {
     }
 }
 
-sub check_optional_regex {
+sub check_optional_regex_sub {
     my ($regex) = @_;
     return sub {
         my (undef, $control, $chk) = @_;
@@ -572,6 +574,19 @@ sub _regex_check {
         if ( $val !~ $regex );
 }
 
+sub check_optional_state_type {
+    my ($control_name, $control, $chk) = @_;
+
+    return if ! exists $control->{$chk};
+
+    my $val = $control->{$chk};
+
+    KhaospyExcept::ControlsConfigKeysInvalidValue->throw(
+        error => "Control '$control_name' has an invalid '$chk' "
+            ."($val) configured"
+    ) if ! exists $state_trans_type->{$val};
+}
+
 sub check_host {
     my ($control_name, $control, $chk) = @_;
     check_exists(@_);
@@ -579,7 +594,7 @@ sub check_host {
     _is_host_resolvable($val);
 }
 
-sub check_host_runs {
+sub check_host_runs_sub {
     my ($daemon_script_name) = @_;
     return sub {
         my ($control_name, $control, $chk) = @_;
@@ -664,9 +679,9 @@ sub check_pi_mcp23017 {
 
 
     # check the rest of the sub-keys :
-    check_regex(qr/^0x2[0-7]$/)->( $control_name , $val, "i2c_addr", "(on $chk)");
-    check_regex(qr/^[AB]$/i)->(    $control_name , $val, "portname", "(on $chk)");
-    check_regex(qr/^[0-7]$/)->(    $control_name , $val, "portnum",  "(on $chk)");
+    check_regex_sub(qr/^0x2[0-7]$/)->( $control_name , $val, "i2c_addr", "(on $chk)");
+    check_regex_sub(qr/^[AB]$/i)->(    $control_name , $val, "portname", "(on $chk)");
+    check_regex_sub(qr/^[0-7]$/)->(    $control_name , $val, "portnum",  "(on $chk)");
 
     # Need to keep track of what mcp23017 gpios have been used on a host basis.
     # The unique key is :
@@ -718,6 +733,102 @@ sub _is_host_resolvable {
 #        if host-is-not-resolvable;
 
     return;
+}
+
+####################
+# state_trans subs :
+sub state_trans_control {
+    my ($control_name, $value) = @_;
+    get_controls_conf();
+    my $control = get_hashval($controls_conf, $control_name);
+
+    my $control_type = get_hashval($control,'type');
+    my $state_type = $control->{state_type};
+
+    if (! $state_type ){
+        # some control-types are easy to work out a default state_type for :
+        if (   $control_type eq $ORVIBOS20_CONTROL_TYPE
+            || $control_type eq $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE
+            || $control_type eq $PI_GPIO_RELAY_CONTROL_TYPE
+            || $control_type eq $PI_GPIO_SWITCH_CONTROL_TYPE
+            || $control_type eq $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE
+            || $control_type eq $PI_MCP23017_RELAY_CONTROL_TYPE
+            || $control_type eq $PI_MCP23017_SWITCH_CONTROL_TYPE
+        ){
+            $state_type = STATE_TYPE_ON_OFF;
+        } elsif ($control_type eq $MAC_SWITCH_CONTROL_TYPE ){
+            $state_type = STATE_TYPE_PINGABLE_NOT_PINGABLE;
+        }
+        return if ! $state_type;
+    }
+    return $state_trans_type->{$state_type}->($value);
+}
+
+sub state_trans_on_off{
+    my ($value) = @_;
+    return $value if $value eq ON || $value eq OFF;
+    return ON  if $value == true;
+    return OFF if $value == false;
+    return state_to_binary_die($value) ? ON : OFF;
+}
+
+sub state_trans_open_closed{
+    my ($value) = @_;
+    return $value if $value eq OPEN || $value eq CLOSED;
+    return OPEN   if $value == true;
+    return CLOSED if $value == false;
+    return state_to_binary_die($value) ? OPEN : CLOSED;
+}
+
+sub state_trans_pingable_not_pingable{
+    my ($value) = @_;
+    return $value if $value eq PINGABLE || $value eq NOT_PINGABLE;
+    return PINGABLE     if $value == true;
+    return NOT_PINGABLE if $value == false;
+    return state_to_binary_die($value) ? PINGABLE : NOT_PINGABLE;
+}
+
+sub state_trans_unlocked_locked{
+    my ($value) = @_;
+    return $value if $value eq LOCKED || $value eq UNLOCKED;
+    return UNLOCKED if $value == true;
+    return LOCKED   if $value == false;
+    return state_to_binary_die($value) ? UNLOCKED : LOCKED;
+}
+
+sub state_to_binary_die {
+    return state_to_binary($_[0],true);
+}
+
+sub state_to_binary {
+    my ($value, $die_on_error) = @_;
+    return true  if is_on_state($value);
+    return false if is_off_state($value);
+
+    confess "Can't translate state '$value' to binary" if $die_on_error;
+    return $value;
+}
+
+sub is_state {
+    my ($value) = @_;
+    return true if is_on_state($value) || is_off_state($value);
+    return false;
+}
+
+sub is_on_state {
+    my ($value) = @_;
+    return true if $value == true
+        || $value eq ON       || $value eq OPEN
+        || $value eq PINGABLE || $value eq UNLOCKED;
+    return false;
+}
+
+sub is_off_state {
+    my ($value) = @_;
+    return true if $value == false
+        || $value eq OFF          || $value eq CLOSED
+        || $value eq NOT_PINGABLE || $value eq LOCKED;
+    return false;
 }
 
 1;
