@@ -366,6 +366,14 @@ sub get_controls_webui_var_type {
     $sth->execute();
     my $results = [];
     while ( my $row = $sth->fetchrow_hashref ){
+
+        my $control_name = $row->{'control_name'};
+        if ( ! control_exists($control_name)){
+            warn "looks like control '$control_name' has been changed."
+                ." DB has stale data. $@";
+            next;
+        }
+
         push @$results, $row;
     }
     return $results;
