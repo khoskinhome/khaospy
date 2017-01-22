@@ -107,7 +107,7 @@ sub timer_cb {
         my $send_msg = {
             control_name => $control_name,
             request_epoch_time => time,
-            current_value => $temp,
+            current_state => $temp,
             onewire_addr  => $onewire_addr,
         };
 

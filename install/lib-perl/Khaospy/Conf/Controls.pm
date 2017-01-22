@@ -3,15 +3,34 @@ use strict;
 use warnings;
 # by Karl Kount-Khaos Hoskin. 2015-2016
 
+use Exporter qw/import/;
+
+our @EXPORT_OK = qw(
+    get_control_config
+    control_exists
+    get_controls_conf
+    get_controls_conf_for_host
+    get_control_name_for_one_wire
+    is_control_rrd_graphed
+    get_rrd_create_params_for_control
+
+    can_operate
+    can_set_value
+    can_set_string
+
+    state_trans_control
+    state_to_binary_die
+    state_to_binary
+    is_state
+    is_on_state
+    is_off_state
+);
+
 use Try::Tiny;
 use Carp qw/confess croak/;
 use Data::Dumper;
-use Exporter qw/import/;
-
 use Scalar::Util qw(looks_like_number);
-
 use Sys::Hostname;
-
 use List::Compare;
 
 use Khaospy::Exception qw(
@@ -43,10 +62,10 @@ use Khaospy::Constants qw(
     true  $true  OPEN   $OPEN   ON  $ON  PINGABLE     $PINGABLE     UNLOCKED $UNLOCKED
     false $false CLOSED $CLOSED OFF $OFF NOT_PINGABLE $NOT_PINGABLE LOCKED   $LOCKED
 
-    $STATE_TYPE_ON_OFF                STATE_TYPE_ON_OFF
-    $STATE_TYPE_OPEN_CLOSED           STATE_TYPE_OPEN_CLOSED
-    $STATE_TYPE_PINGABLE_NOT_PINGABLE STATE_TYPE_PINGABLE_NOT_PINGABLE
-    $STATE_TYPE_UNLOCKED_LOCKED       STATE_TYPE_UNLOCKED_LOCKED
+    STATE_TYPE_ON_OFF
+    STATE_TYPE_OPEN_CLOSED
+    STATE_TYPE_PINGABLE_NOT_PINGABLE
+    STATE_TYPE_UNLOCKED_LOCKED
 
     $CONTROLS_CONF_FULLPATH
     $PI_HOSTS_CONF_FULLPATH
@@ -84,27 +103,6 @@ use Khaospy::Utils qw(
     get_hashval
 );
 
-
-our @EXPORT_OK = qw(
-    get_control_config
-    control_exists
-    get_controls_conf
-    get_controls_conf_for_host
-    get_control_name_for_one_wire
-    is_control_rrd_graphed
-    get_rrd_create_params_for_control
-
-    can_operate
-    can_set_value
-    can_set_string
-
-    state_trans_control
-    state_to_binary_die
-    state_to_binary
-    is_state
-    is_on_state
-    is_off_state
-);
 
 my $check_mac = check_regex_sub(
     qr/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/
@@ -153,10 +151,10 @@ my $can_set_string = {
 # state type translations types :
 
 my $state_trans_type = {
-    STATE_TYPE_ON_OFF                => \&state_trans_on_off,
-    STATE_TYPE_OPEN_CLOSED           => \&state_trans_open_closed,
-    STATE_TYPE_PINGABLE_NOT_PINGABLE => \&state_trans_pingable_not_pingable,
-    STATE_TYPE_UNLOCKED_LOCKED       => \&state_trans_unlocked_locked,
+    STATE_TYPE_ON_OFF()                => \&state_trans_on_off,
+    STATE_TYPE_OPEN_CLOSED()           => \&state_trans_open_closed,
+    STATE_TYPE_PINGABLE_NOT_PINGABLE() => \&state_trans_pingable_not_pingable,
+    STATE_TYPE_UNLOCKED_LOCKED()       => \&state_trans_unlocked_locked,
 };
 
 
@@ -583,7 +581,7 @@ sub check_optional_state_type {
 
     KhaospyExcept::ControlsConfigKeysInvalidValue->throw(
         error => "Control '$control_name' has an invalid '$chk' "
-            ."($val) configured"
+            ."($val) configured ".Dumper($state_trans_type)
     ) if ! exists $state_trans_type->{$val};
 }
 
@@ -737,8 +735,12 @@ sub _is_host_resolvable {
 
 ####################
 # state_trans subs :
+
 sub state_trans_control {
+    # used by Khaospy::DBH::Controls calls to make the current_state_trans field
+
     my ($control_name, $value) = @_;
+    return '' if ! defined $value;
     get_controls_conf();
     my $control = get_hashval($controls_conf, $control_name);
 
@@ -758,8 +760,10 @@ sub state_trans_control {
             $state_type = STATE_TYPE_ON_OFF;
         } elsif ($control_type eq $MAC_SWITCH_CONTROL_TYPE ){
             $state_type = STATE_TYPE_PINGABLE_NOT_PINGABLE;
+        } elsif ( $control_type eq $ONEWIRE_THERM_CONTROL_TYPE ) {
+            return sprintf('%+0.1f', $value);
         }
-        return if ! $state_type;
+        return $value if ! $state_type;
     }
     return $state_trans_type->{$state_type}->($value);
 }
@@ -767,32 +771,32 @@ sub state_trans_control {
 sub state_trans_on_off{
     my ($value) = @_;
     return $value if $value eq ON || $value eq OFF;
-    return ON  if $value == true;
-    return OFF if $value == false;
+    return ON  if $value =~ /^1$/;
+    return OFF if $value =~ /^0$/;
     return state_to_binary_die($value) ? ON : OFF;
 }
 
 sub state_trans_open_closed{
     my ($value) = @_;
     return $value if $value eq OPEN || $value eq CLOSED;
-    return OPEN   if $value == true;
-    return CLOSED if $value == false;
+    return OPEN   if $value =~ /^1$/;
+    return CLOSED if $value =~ /^0$/;
     return state_to_binary_die($value) ? OPEN : CLOSED;
 }
 
 sub state_trans_pingable_not_pingable{
     my ($value) = @_;
     return $value if $value eq PINGABLE || $value eq NOT_PINGABLE;
-    return PINGABLE     if $value == true;
-    return NOT_PINGABLE if $value == false;
+    return PINGABLE     if $value =~ /^1$/;
+    return NOT_PINGABLE if $value =~ /^0$/;
     return state_to_binary_die($value) ? PINGABLE : NOT_PINGABLE;
 }
 
 sub state_trans_unlocked_locked{
     my ($value) = @_;
     return $value if $value eq LOCKED || $value eq UNLOCKED;
-    return UNLOCKED if $value == true;
-    return LOCKED   if $value == false;
+    return UNLOCKED if $value =~ /^1$/;
+    return LOCKED   if $value =~ /^0$/;
     return state_to_binary_die($value) ? UNLOCKED : LOCKED;
 }
 
@@ -815,20 +819,29 @@ sub is_state {
     return false;
 }
 
-sub is_on_state {
+sub is_on_state { # what if say a temp-sensor ends up using this ? hmmm.
     my ($value) = @_;
-    return true if $value == true
+    return true if $value =~ /^1$/
         || $value eq ON       || $value eq OPEN
         || $value eq PINGABLE || $value eq UNLOCKED;
     return false;
 }
 
-sub is_off_state {
+sub is_off_state { # what if say a temp-sensor ends up using this ? hmmm.
     my ($value) = @_;
-    return true if $value == false
+    return true if $value =~ /^0$/
         || $value eq OFF          || $value eq CLOSED
         || $value eq NOT_PINGABLE || $value eq LOCKED;
     return false;
+}
+
+sub is_binary_control {
+    my ($control_name) = @_;
+    die "TODO not implemented";
+    # will return true for on/off, open/closed, unlocked/locked, pingable/not-pingable
+    # types of control
+    # will return false for everything else.
+
 }
 
 1;

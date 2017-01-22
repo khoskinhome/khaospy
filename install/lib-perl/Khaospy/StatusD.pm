@@ -214,9 +214,11 @@ sub timer_publish_webui_var_changes {
         # check existing record , if changed then publish.
         # keys %$lcs
         my $control_name = get_hashval($row,'control_name');
+
+        my $current_state = $lcs->{$control_name}{current_state} || '';
+
         if ( ! exists $lcs->{$control_name}
-            || $lcs->{$control_name}{current_value}
-               ne get_hashval($row,'current_value')
+            || $current_state ne ( get_hashval($row,'current_state',true) || '' )
         ){
             $lcs->{$control_name} = $row;
             $lcs->{$control_name}{publish_count} =
@@ -233,12 +235,12 @@ sub timer_publish_webui_var_changes {
 sub publish_webui_control {
     my ($row) = @_;
 
-    kloginfo 'Dump of webvar controls new',  $row;
+    klogdebug 'Dump of webvar controls new',  $row;
     my $send_msg = {
-        control_name => get_hashval($row,'control_name'),
-        request_host => hostname,
+        control_name       => get_hashval($row,'control_name'),
+        request_host       => hostname,
         request_epoch_time => time, # TODO decode the iso8601 from the $row
-        current_value => get_hashval($row,'current_value'),
+        current_state      => get_hashval($row,'current_state',true),
     };
 
     my $json_msg = $JSON->encode($send_msg);
@@ -255,9 +257,6 @@ sub output_msg {
         return;
     }
 
-    # current_state is either "on" or "off"
-    # current_value is for thermometer type values
-
     my $control_name = $dec->{control_name};
 
     my $request_epoch_time = $dec->{request_epoch_time};
@@ -265,7 +264,6 @@ sub output_msg {
     my $record = {
         control_name  => $control_name,
         current_state => $dec->{current_state} || "",
-        current_value => $dec->{current_value},
         last_change_state_time =>
             get_iso8601_utc_from_epoch($dec->{last_change_state_time}) || undef,
         last_change_state_by => $dec->{last_change_state_by} || undef,
@@ -274,44 +272,41 @@ sub output_msg {
             get_iso8601_utc_from_epoch($request_epoch_time),
     };
 
-    my $curr_state_or_value =
-        state_to_binary(
-            $dec->{current_state} || $dec->{current_value}
-        );
+    my $curr_state_bin = state_to_binary( $dec->{current_state} );
 
-    if ( ! defined $curr_state_or_value ){
+    if ( ! defined $curr_state_bin ){
         if ( exists $lcs->{$control_name} ){
-            $curr_state_or_value
+            $curr_state_bin
                 = $lcs->{$control_name}{last_value};
 
-            klogwarn "$control_name is undefined. Using last value for update ($curr_state_or_value)";
+            klogwarn "$control_name is undefined. Using last value for update ($curr_state_bin)";
         }
     }
 
     if ( exists $lcs->{$control_name}
-        && $lcs->{$control_name}{last_value} == $curr_state_or_value
+        && $lcs->{$control_name}{last_value} == $curr_state_bin
         # && $lcs->{$control_name}{statusd_updated}
     ){
-        klogdebug "Do NOT update DB with $control_name : $curr_state_or_value";
+        klogdebug "Do NOT update DB with $control_name : $curr_state_bin";
     } else {
 
         init_last_control_state($lcs, $control_name);
 
-        $lcs->{$control_name}{last_value} = $curr_state_or_value;
-        klogextra "Update DB with $control_name : $curr_state_or_value";
+        $lcs->{$control_name}{last_value} = $curr_state_bin;
+        klogextra "Update DB with $control_name : $curr_state_bin";
 
         # TODO capture any exceptions from the following and log an error :
         control_status_insert( $record );
         # $lcs->{$control_name}{statusd_updated} = true;
     }
 
-    update_rrd( $control_name, $request_epoch_time, $curr_state_or_value);
+    update_rrd( $control_name, $request_epoch_time, $curr_state_bin);
 
 }
 
 sub update_rrd {
 
-    my ($control_name,$request_epoch_time,$curr_state_or_value) = @_;
+    my ($control_name,$request_epoch_time,$curr_state_bin) = @_;
 
     return if ! is_control_rrd_graphed($control_name);
 
@@ -330,14 +325,12 @@ sub update_rrd {
         system ($cmd); # TODO error checking
     }
 
-    klogextra "Updating RRD file $rrd_filename $request_epoch_time:$curr_state_or_value";
-    my $cmd = "rrdtool update $rrd_filename $request_epoch_time:$curr_state_or_value";
+    klogextra "Updating RRD file $rrd_filename $request_epoch_time:$curr_state_bin";
+    my $cmd = "rrdtool update $rrd_filename $request_epoch_time:$curr_state_bin";
     system($cmd); #TODO ERROR CHECKING.
 
-    $lcs->{$control_name}{last_rrd_update_time}
-        = $request_epoch_time;
-    $lcs->{$control_name}{last_value}
-        = $curr_state_or_value;
+    $lcs->{$control_name}{last_rrd_update_time} = $request_epoch_time;
+    $lcs->{$control_name}{last_value}           = $curr_state_bin;
 
 }
 

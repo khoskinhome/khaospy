@@ -17,7 +17,7 @@ $(document).ready(function(){
                 var data_row = data[i];
                 for(var key in data_row){
                     var control_name    = data_row['control_name'].toString();
-                    var new_state_value = data_row['current_state_value'].toString();
+                    var new_state_value = data_row['current_state_trans'].toString();
                     var new_request_time = data_row['request_time'].toString();
 
                     var new_state = data_row['current_state'];

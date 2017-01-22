@@ -40,7 +40,7 @@ for my $control_name ( keys %$controls_conf ){
         my $record = {
             control_name  => $control_name,
             control_type  => $controls_conf->{$control_name}{type},
-            current_value => $controls_conf->{$control_name}{value} || 0,
+            current_state => 0; # TODO should really have an ON/OFF for that type of control.
             last_change_state_time => get_iso8601_utc_from_epoch(time) ,
             last_change_state_by => "insert-script",
             request_time => get_iso8601_utc_from_epoch(time),

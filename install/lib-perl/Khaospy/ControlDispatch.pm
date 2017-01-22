@@ -1,7 +1,7 @@
 package Khaospy::ControlDispatch;
 use strict;
 use warnings;
-# By Karl Kaiser-Kount-Kaptain-Khaos Hoskin. 2015-2016
+# By Karl Kaptain-Khaos Hoskin. 2015-2016
 
 use Try::Tiny;
 use Carp qw/confess croak/;

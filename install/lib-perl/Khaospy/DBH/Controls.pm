@@ -2,17 +2,12 @@ package Khaospy::DBH::Controls;
 use strict; use warnings;
 
 use Exporter qw/import/;
+use Data::Dumper;
 use Carp qw(confess);
 use Try::Tiny;
 use Khaospy::DBH qw(dbh);
 use Khaospy::Constants qw(
     true false
-);
-
-use Khaospy::Log qw(
-    klogstart klogfatal klogerror
-    klogwarn  kloginfo  klogdebug
-    DEBUG
 );
 
 use Khaospy::Utils qw(
@@ -28,6 +23,7 @@ use Khaospy::Conf::Controls qw(
     can_set_value
     can_set_string
 
+    state_trans_control
     state_to_binary
 );
 
@@ -54,12 +50,22 @@ sub control_status_insert {
     my $control      = get_control_config($control_name);
     my $control_type = get_hashval($control,'type');
 
+    confess "can't insert current_state_trans" if exists $values->{current_state_trans};
+
+    #eventually enable this line :
+    #confess "can't insert current_value" if exists $values->{current_value};
+
+    # and this should eventually be removed :
+    if ($values->{current_value} ){
+        warn "control_status_insert() received a 'current_value'\n";
+
+        $values->{current_state} = $values->{current_value}
+            if ! $values->{current_state};
+    }
+
     my $curr_rec =
         get_controls_from_db($control_name);
 
-    # TODO before inserting or updating the controls, needs to check the existing
-    # current_state and/or current_value.
-    #
     # The control_status (which is really control_logs should always have the insertion.
 
     if ( scalar @$curr_rec ) {
@@ -68,7 +74,6 @@ sub control_status_insert {
         UPDATE controls SET
           alias = ?,
           current_state = ?,
-          current_value = ?,
           last_change_state_time = ? ,
           last_change_state_by = ? ,
           manual_auto_timeout_left = ?,
@@ -85,7 +90,6 @@ sub control_status_insert {
             $sth->execute(
                 $control->{alias},
                 $values->{current_state} || undef,
-                $values->{current_value} || undef,
                 $values->{last_change_state_time} || undef,
                 $values->{last_change_state_by} || undef,
                 $values->{manual_auto_timeout_left} || undef,
@@ -94,19 +98,19 @@ sub control_status_insert {
                 $control_name,
             );
         };
-        klogerror "$@ \n".Dumper($values) if $@;
+        confess "$@ \n".Dumper($values) if $@;
 
     } else {
         # insert
         my $sql = <<"        EOSQL";
         INSERT INTO controls
-        ( control_name, alias, current_state, current_value,
+        ( control_name, alias, current_state,
           last_change_state_time, last_change_state_by,
           manual_auto_timeout_left,
           request_time, db_update_time, control_type
         )
         VALUES
-        ( ?,?,?,?,?,?,?,?,NOW(), ? );
+        ( ?,?,?,?,?,?,?,NOW(), ? );
         EOSQL
 
         my $sth = dbh->prepare( $sql );
@@ -115,7 +119,6 @@ sub control_status_insert {
                 $control_name,
                 $control->{alias},
                 $values->{current_state} || undef,
-                $values->{current_value} || undef,
                 $values->{last_change_state_time} || undef,
                 $values->{last_change_state_by} || undef,
                 $values->{manual_auto_timeout_left} || undef,
@@ -123,31 +126,26 @@ sub control_status_insert {
                 $control_type,
             );
         };
-        klogerror "$@ \n".Dumper($values) if $@;
+        confess "$@ \n".Dumper($values) if $@;
     }
 
     my $sql = <<"    EOSQL";
     INSERT INTO control_status
-    ( control_name, current_state, current_value,
+    ( control_name, current_state,
       last_change_state_time, last_change_state_by,
       manual_auto_timeout_left,
       request_time, db_update_time
     )
     VALUES
-    ( ?,?,?,?,?,?,?,NOW() );
+    ( ?,?,?,?,?,?,NOW() );
     EOSQL
 
     my $sth = dbh->prepare( $sql );
-
-    #    my $current_value = $values->{current_value};
-    #    $current_value = sprintf("%0.3f",$current_value)
-    #        if defined $current_value;
 
     eval {
         $sth->execute(
             $control_name,
             $values->{current_state} || undef,
-            $values->{current_value} || undef,
             $values->{last_change_state_time} || undef,
             $values->{last_change_state_by} || undef,
             $values->{manual_auto_timeout_left} || undef,
@@ -155,7 +153,7 @@ sub control_status_insert {
         );
     };
 
-    klogerror "$@ \n".Dumper($values) if $@;
+    confess "$@ \n".Dumper($values) if $@;
 }
 
 sub get_controls {
@@ -204,8 +202,7 @@ sub get_controls_from_db {
     my $sql = <<"    EOSQL";
     select control_name,
         request_time,
-        current_state,
-        current_value
+        current_state
     from controls
     $control_select
     order by control_name
@@ -224,25 +221,11 @@ sub get_controls_from_db {
             next;
         }
 
-        if ( defined $row->{current_value}){
-            $row->{current_value}
-                = sprintf('%+0.1f', $row->{current_value});
-        }
-
-        if ( defined $row->{current_state} ){
-            $row->{status_alias} = get_hashval($row, 'current_state');
-        }
-
         $row->{can_operate}    = can_operate($control_name);
         $row->{can_set_value}  = can_set_value($control_name);
         $row->{can_set_string} = can_set_string($control_name);
-
-# TODO. therm sensors have a range. These need CONSTANTS and the therm-config to support-range.
-#        $row->{in_range} = "too-low","correct","too-high"
-# colours will be blue==too-cold, green=correct, red=too-high.
-
-        $row->{current_state_value}
-            = $row->{status_alias} || $row->{current_value} || '' ;
+        $row->{current_state_trans} = state_trans_control(
+            $control_name, get_hashval($row,'current_state', true));
 
         push @$results, $row;
     }
@@ -260,7 +243,6 @@ sub get_controls_in_room_for_user {
         ct.control_type,
         ct.request_time,
         ct.current_state,
-        ct.current_value,
         usrm.can_operate
 
     FROM user_rooms as usrm
@@ -287,23 +269,13 @@ sub get_controls_in_room_for_user {
             next;
         }
 
-        if ( defined $row->{current_value}){
-            $row->{current_value}
-                = sprintf('%+0.1f', $row->{current_value});
-        }
-
-        if ( defined $row->{current_state} ){
-            $row->{status_alias} = get_hashval($row, 'current_state');
-        }
+        $row->{current_state_trans} = state_trans_control(
+            $control_name, get_hashval($row,'current_state', true));
 
         my $c_op = $row->{can_operate};
         $row->{can_operate}    = $c_op && can_operate($control_name);
         $row->{can_set_value}  = $c_op && can_set_value($control_name);
         $row->{can_set_string} = $c_op && can_set_string($control_name);
-
-
-        $row->{current_state_value}
-            = $row->{status_alias} || $row->{current_value} || '' ;
 
         push @$results, $row;
     }
@@ -377,14 +349,13 @@ sub get_controls_webui_var_type {
 sub get_last_control_state {
     # should be refactored with other methods in this module.
 
-    my $last_control_state = {};
+    my $lcs = {};
 
     my $sql = <<"    EOSQL";
         select
             control_name,
             alias,
             current_state,
-            current_value,
             coalesce(last_change_state_time,request_time)
                 as last_change_state_time,
             last_change_state_by,
@@ -400,9 +371,9 @@ sub get_last_control_state {
     my $sth = dbh->prepare( $sql );
     $sth->execute();
 
-    while ( my $hr = $sth->fetchrow_hashref ){
+    while ( my $row = $sth->fetchrow_hashref ){
 
-        my $control_name = get_hashval($hr,"control_name");
+        my $control_name = get_hashval($row,"control_name");
         if ( ! control_exists($control_name)){
             warn "looks like control '$control_name' has been changed."
                 ." DB has stale data. $@";
@@ -410,46 +381,41 @@ sub get_last_control_state {
         }
         my $control      = get_control_config($control_name);
 
-        init_last_control_state ($last_control_state, $control_name);
+        init_last_control_state ($lcs, $control_name);
 
-        $last_control_state->{$control_name}{last_value}
-            = state_to_binary(
-                $hr->{current_state} || $hr->{current_value}
-            );
+        $lcs->{$control_name}{current_state_trans} = state_trans_control(
+            $control_name, get_hashval($row,'current_state', true));
 
-        $last_control_state->{$control_name}{last_rrd_update_time}
+        $lcs->{$control_name}{last_value}
+            = state_to_binary( $row->{current_state} );
+
+        $lcs->{$control_name}{last_rrd_update_time}
             = time - $PI_STATUS_RRD_UPDATE_TIMEOUT;
 
-        # deprecating current_state, slowly ... ( just going with current_value )
-        for my $hrky ( keys %$hr){
-            $last_control_state->{$control_name}{$hrky} = $hr->{$hrky};
+        for my $mpf ( keys %$row){
+            $lcs->{$control_name}{$mpf} = $row->{$mpf};
         }
 
-        $last_control_state->{$control_name}{current_value} =
-            $last_control_state->{$control_name}{last_value};
-
-        delete $last_control_state->{$control_name}{current_state};
-
-        $last_control_state->{$control_name}{last_change_state_time_epoch} =
-            iso8601_parse($hr->{last_change_state_time});
+        $lcs->{$control_name}{last_change_state_time_epoch} =
+            iso8601_parse($row->{last_change_state_time});
 
         # A hack to make sure the control_type is populated,
         # will get removed once the control-conf is pushed to the DB by the webui :
-        $last_control_state->{$control_name}{control_type} =
-            get_hashval($control,'type') if ! $hr->{control_type};
+        $lcs->{$control_name}{control_type} =
+            get_hashval($control,'type') if ! $row->{control_type};
     }
 
-    return $last_control_state;
+    return $lcs;
 }
 
 sub init_last_control_state {
     # Only init if it doesn't already exist.
-    my ($last_control_state, $control_name) = @_;
-    if ( ! exists $last_control_state->{$control_name} ){
-        $last_control_state->{$control_name}={};
-        $last_control_state->{$control_name}{last_value} = undef;
-        $last_control_state->{$control_name}{last_rrd_update_time} = undef;
-        #$last_control_state->{$control_name}{statusd_updated} = undef;
+    my ($lcs, $control_name) = @_;
+    if ( ! exists $lcs->{$control_name} ){
+        $lcs->{$control_name}={};
+        $lcs->{$control_name}{last_value} = undef;
+        $lcs->{$control_name}{last_rrd_update_time} = undef;
+        #$lcs->{$control_name}{statusd_updated} = undef;
     }
 }
 

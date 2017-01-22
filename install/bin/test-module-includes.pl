@@ -7,6 +7,34 @@ use FindBin;
 FindBin::again();
 use lib "$FindBin::Bin/../lib-perl";
 
+use Khaospy::ControlUtils;
+use Khaospy::MACSwitchDaemon;
+use Khaospy::WebUI;
+use Khaospy::WebUI::Admin::Controls;
+use Khaospy::WebUI::Admin::UserRooms;
+use Khaospy::WebUI::Admin::ControlRooms;
+use Khaospy::WebUI::Admin::Users;
+use Khaospy::WebUI::Admin::Rooms;
+use Khaospy::WebUI::Admin;
+use Khaospy::WebUI::DB;
+use Khaospy::WebUI::User;
+use Khaospy::WebUI::Util;
+use Khaospy::WebUI::Constants;
+use Khaospy::WebUI::SendMessage;
+use Khaospy::WebUI::Status;
+use Khaospy::WebUI::UserLogin;
+use Khaospy::WebUI::Rooms;
+use Khaospy::ControlsCurrentState;
+use Khaospy::DBH::Controls;
+use Khaospy::DBH::UserRooms;
+use Khaospy::DBH::ControlRooms;
+use Khaospy::DBH::Users;
+use Khaospy::DBH::Rooms;
+use Khaospy::RulesD;
+use Khaospy::ErrorLogDaemon;
+use Khaospy::Email;
+
+
 use Khaospy::Conf;
 use Khaospy::Conf::Controls;
 use Khaospy::Conf::HardCoded;

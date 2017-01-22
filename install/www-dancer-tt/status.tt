@@ -55,7 +55,7 @@ too low .  yellow #ffff99 -->
                                 <td></td><td></td>
                             [% END %]
 
-                        <td align='center' id='[% row.control_name %]-state_alias'>[% row.current_state_value %]</td>
+                        <td align='center' id='[% row.control_name %]-state_alias'>[% row.current_state_trans %]</td>
                         <td id='[% row.control_name %]-request_time'>[% row.request_time %]</td>
                         <td id='[% row.control_name %]-info'></td>
                     </tr>

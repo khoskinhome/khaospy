@@ -32,11 +32,6 @@ use Khaospy::Conf         qw( get_boiler_conf );
 use Khaospy::Utils        qw( timestamp get_hashval );
 use Khaospy::ZMQAnyEvent  qw( subscribe_to_controller_daemons );
 
-use Khaospy::Conf::Controls qw(
-    is_on_state
-    is_off_state
-);
-
 our @EXPORT_OK = qw( run_boiler_daemon );
 
 my $BOILER_STATUS;
@@ -129,8 +124,8 @@ sub process_boiler_message {
             || $boiler_state->{current_status} ne $c_state
         ){
             $boiler_state->{current_status} = $c_state;
-            $boiler_state->{last_time_on}  = time if is_on_state($c_state);
-            $boiler_state->{last_time_off} = time if is_off_state($c_state);
+            $boiler_state->{last_time_on}  = time if $c_state eq ON;
+            $boiler_state->{last_time_off} = time if $c_state eq OFF;
         }
         kloginfo "Boiler control '$control_name' is $c_state";
         $boiler_state->{last_update} = time;
@@ -212,12 +207,12 @@ sub operate_boiler {
     klogdebug "Controls for Boiler '$boiler_name' are ", $boiler_state->{controls};
 
     # Is at least one of the boiler's controls on ? :
-    my @controls_now_on = grep { is_on_state($boiler_state->{controls}{$_}) }
+    my @controls_now_on = grep { $boiler_state->{controls}{$_} eq ON }
         keys %{$boiler_state->{controls}};
 
     if ( @controls_now_on ){
         kloginfo "Controls ON are : ".join( ", ", @controls_now_on)." ";
-        if ( is_off_state($boiler_state->{current_status})) {
+        if ( $boiler_state->{current_status} eq OFF){
             if ( ! exists $boiler_state->{boiler_next_on_at} ) {
                 $boiler_state->{boiler_next_on_at}
                     = $boiler_state->{on_delay_secs} + time ;

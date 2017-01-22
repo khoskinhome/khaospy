@@ -68,20 +68,20 @@ sub webui_send_message { # TODO should be called webui_action
             my $control_record = get_controls({control_name => $control_name});
 
             # TODO could do with error checking that we've got a control_record.
-            my $current_value  = $control_record->[0]{current_value};
+            my $current_state  = $control_record->[0]{current_state};
 
-            $current_value += 1 if $action_value eq INC_VALUE_ONE ;
-            $current_value -= 1 if $action_value eq DEC_VALUE_ONE ;
+            $current_state += 1 if $action_value eq INC_VALUE_ONE ;
+            $current_state -= 1 if $action_value eq DEC_VALUE_ONE ;
 
-            $current_value = $control->{upper_limit}
+            $current_state = $control->{upper_limit}
                 if defined $control->{upper_limit}
-                    and $current_value > $control->{upper_limit};
+                    and $current_state > $control->{upper_limit};
 
-            $current_value = $control->{lower_limit}
+            $current_state = $control->{lower_limit}
                 if defined $control->{lower_limit}
-                    and $current_value < $control->{lower_limit};
+                    and $current_state < $control->{lower_limit};
 
-            $action_value = $current_value;
+            $action_value = $current_state;
         }
 
         # TODO check the data-type of action_value , against
@@ -89,7 +89,7 @@ sub webui_send_message { # TODO should be called webui_action
 
         control_status_insert({
             control_name  => $control_name,
-            current_value => $action_value,
+            current_state => $action_value,
             last_change_state_time =>
                 get_iso8601_utc_from_epoch(time),
             last_change_state_by => WEBUI,

@@ -20,8 +20,7 @@ sub get_control_status {
     my $sql = <<"    EOSQL";
     select control_name,
         request_time,
-        current_state,
-        current_value
+        current_state
     from control_status
     where id in
         ( select max(id)

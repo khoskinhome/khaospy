@@ -69,7 +69,6 @@ CREATE TABLE controls (
     -- control_type will eventually be NOT NULL
     control_type             CITEXT REFERENCES control_types,
     current_state            TEXT,
-    current_value            REAL,
     -- config_json will eventually be NOT NULL
     config_json              CITEXT,
     last_change_state_time   TIMESTAMP WITH TIME ZONE,
@@ -92,7 +91,6 @@ create table control_status (
     id INTEGER PRIMARY KEY DEFAULT nextval('control_status_seq') NOT NULL,
     control_name             CITEXT NOT NULL REFERENCES controls,
     current_state            TEXT,
-    current_value            REAL,
     last_change_state_time   TIMESTAMP WITH TIME ZONE,
     last_change_state_by     TEXT,
     manual_auto_timeout_left REAL,
@@ -112,7 +110,7 @@ ALTER TABLE control_status SET (autovacuum_vacuum_threshold = 5000);
 ALTER TABLE control_status SET (autovacuum_analyze_scale_factor = 0.0);
 ALTER TABLE control_status SET (autovacuum_analyze_threshold = 5000);
 
--- select control_name, request_time, current_state, current_value from control_status where id in ( select max(id) from control_status group by control_name );
+-- select control_name, request_time, current_state from control_status where id in ( select max(id) from control_status group by control_name );
 
 GRANT SELECT ON control_status TO khaospy_read;
 GRANT ALL    ON control_status TO khaospy_write;

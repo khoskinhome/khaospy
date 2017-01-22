@@ -149,20 +149,20 @@ sub pi_n_other_control_msg {
 
     my $control_name = get_hashval($msg_rh, 'control_name');
 
-    my $csorv = $msg_rh->{current_state} || $msg_rh->{current_value};
+    my $cst = $msg_rh->{current_state};
 
-    if ( defined $csorv ){
-        my $curr_state_or_value = state_to_binary($csorv);
+    if ( defined $cst ){
+        my $curr_state_bin = state_to_binary($cst);
 
         init_last_control_state($last_control_state, $control_name);
-        $last_control_state->{$control_name}{last_value} = $curr_state_or_value;
+        $last_control_state->{$control_name}{last_value} = $curr_state_bin;
 
-        kloginfo ("Received $control_name == $curr_state_or_value");
+        kloginfo ("Received $control_name == $curr_state_bin");
 
         # TODO can't just assume the last_value == true means the window is open.
         # some sensors could be the other way around.
         if ( exists $window_sensor_to_control_name_map->{$control_name}
-            &&  $curr_state_or_value == true ) {
+            &&  $curr_state_bin == true ) {
             my $operate_control_name
                  = $window_sensor_to_control_name_map->{$control_name};
 
@@ -187,7 +187,7 @@ sub pi_n_other_control_msg {
         my $msg_rh = $json->decode( $msg );
 
         my $control_name       = get_hashval($msg_rh, 'control_name');
-        my $current_value_temp = get_hashval($msg_rh, 'current_value');
+        my $current_state      = get_hashval($msg_rh, 'current_state');
         my $request_epoch_time = get_hashval($msg_rh, 'request_epoch_time');
         my $owaddr             = get_hashval($msg_rh, 'onewire_addr');
 
@@ -216,7 +216,7 @@ sub pi_n_other_control_msg {
         my $upper_temp   = $tc->{upper_temp} || '';
 
         if ( ! $operate_control_name && ! $upper_temp ){
-            klogdebug "$name : $owaddr : $current_value_temp C";
+            klogdebug "$name : $owaddr : $current_state C";
             return ;
         }
 
@@ -240,7 +240,7 @@ sub pi_n_other_control_msg {
             return;
         }
 
-        kloginfo "$name : $owaddr : $current_value_temp C : lower = $lower_temp C : upper = $upper_temp C";
+        kloginfo "$name : $owaddr : $current_state C : lower = $lower_temp C : upper = $upper_temp C";
         klogdebug "msg", $msg_rh;
 
 #        my $send_cmd = sub {
@@ -262,10 +262,10 @@ sub pi_n_other_control_msg {
         }
 
 
-        if ( $current_value_temp > $upper_temp ){
+        if ( $current_state > $upper_temp ){
             send_cmd($operate_control_name, OFF);
         }
-        elsif ( $current_value_temp < $lower_temp ){
+        elsif ( $current_state < $lower_temp ){
 
             # TODO : This code is copied below. It's horrible. Needs re-writing.
             # switch off if the window is open :

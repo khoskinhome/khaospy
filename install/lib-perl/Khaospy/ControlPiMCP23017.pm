@@ -61,7 +61,7 @@ our @EXPORT_OK = qw(
 # };
 
 
-# IODIR, GPIO and OLAT are terms used on the Microchip's MCP23017 data-sheet
+# IODIR, GPIO and OLAT are terms used on Microchip's MCP23017 data-sheet
 
 # IODIR A/B are used to set the direction of the gpio pin
 # 0 for output, 1 for input. ( i.e. 0xFF is all input )

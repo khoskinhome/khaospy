@@ -20,8 +20,10 @@ sub false { 0 };
 our $true  = 1;
 our $false = 0;
 
-# All controls will obey this
-# (and may need their config's "invert-state" set to conform :
+# binary state controls use ON and OFF in the code.
+# the synonyms are translated into the field current_state_trans by DBH::Controls calls
+# this is primarily for display in the webui.
+# State synonyms are :
 # true  == open   == on  == pingable     == 1 == UNLOCKED;
 # false == closed == off == not-pingable == 0 == LOCKED;
 
