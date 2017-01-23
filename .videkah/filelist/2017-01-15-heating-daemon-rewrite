@@ -482,41 +482,7 @@ crap.diff.pl
 
 ./install/apache/default-ssl.conf
 ##############################
-# making current_state and current_value just one field :
-g.grep.nH current_value | grep -v '^to-be-deleted' | grep -v 'testrig-lighting-on-off' | grep -v 'khaospy-amelia-hackit-daemon'
-##############################
 #
 # greping crap
-install/lib-perl/Khaospy/WebUI/UserLogin.pm:154:            => "username and email combination don't match any known users";
-
-
-install/lib-perl/Khaospy/DBH/Controls.pm:228:        $row->{can_operate} = can_operate($control_name);
-
-
-
-g.grep.nH SCRIPT_TO_PORT
-install/lib-perl/Khaospy/Constants.pm:283:our $SCRIPT_TO_PORT = {
-install/lib-perl/Khaospy/Constants.pm:455:    $SCRIPT_TO_PORT
-install/lib-perl/Khaospy/HeatingDaemon.pm:35:    $SCRIPT_TO_PORT
-install/lib-perl/Khaospy/HeatingDaemon.pm:110:    for my $script ( keys %$SCRIPT_TO_PORT ){
-install/lib-perl/Khaospy/HeatingDaemon.pm:113:        my $port = get_hashval($SCRIPT_TO_PORT, $script);
-install/lib-perl/Khaospy/StatusD.pm:62:    $SCRIPT_TO_PORT
-install/lib-perl/Khaospy/StatusD.pm:135:    for my $script ( keys %$SCRIPT_TO_PORT ){
-install/lib-perl/Khaospy/StatusD.pm:136:        my $port = get_hashval($SCRIPT_TO_PORT, $script);
-
-
-g.grep.nH  get_last_control_state
-install/lib-perl/Khaospy/DBH/Controls.pm:42:    get_last_control_state
-install/lib-perl/Khaospy/DBH/Controls.pm:374:sub get_last_control_state {
-
-install/lib-perl/Khaospy/HeatingDaemon.pm:59:    get_last_control_state
-install/lib-perl/Khaospy/HeatingDaemon.pm:83:    $last_control_state = get_last_control_state();
-install/lib-perl/Khaospy/RulesD.pm:55:    get_last_control_state
-install/lib-perl/Khaospy/RulesD.pm:77:    $last_control_state = get_last_control_state();
-install/lib-perl/Khaospy/StatusD.pm:23:    get_last_control_state
-install/lib-perl/Khaospy/StatusD.pm:125:    $lcs = get_last_control_state();
-
-
-
 
 
