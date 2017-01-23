@@ -655,6 +655,7 @@ sub live_controls_conf {
             type => $PI_MCP23017_SWITCH_CONTROL_TYPE  , host => "piserver", invert_state => false,
             alias => "alarm 12",
             state_type => STATE_TYPE_UNLOCKED_LOCKED,
+            good_state => ON, # for testing . This should be removed. TODO.
             gpio_switch => {
                 i2c_bus  => 1 , i2c_addr => '0x20', portname =>'a', portnum  => 4,
             },

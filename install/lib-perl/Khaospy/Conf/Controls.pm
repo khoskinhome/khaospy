@@ -1,7 +1,7 @@
 package Khaospy::Conf::Controls;
 use strict;
 use warnings;
-# by Karl Kount-Khaos Hoskin. 2015-2016
+# by Karl Kount-Khaos Hoskin. 2015-2017
 
 use Exporter qw/import/;
 
@@ -24,6 +24,9 @@ our @EXPORT_OK = qw(
     is_state
     is_on_state
     is_off_state
+
+    control_good_state
+
     validate_control_state_action
 );
 
@@ -119,6 +122,9 @@ my $check_integer
 my $check_optional_integer
     = check_optional_regex_sub(qr/^\d+$/);
 
+my $check_optional_on_off
+    = check_optional_regex_sub(qr/^(on|off)$/);
+
 ##################
 # these are used by the webui to work out what type of control
 # interface to display.
@@ -169,6 +175,7 @@ my $check_types = {
         alias        => \&check_optional,
         state_type   => \&check_optional_state_type,
         rrd_graph    => $check_optional_boolean,
+        good_state   => $check_optional_on_off,
         poll_timeout => $check_optional_integer,
         poll_host    =>
             check_host_runs_sub($OTHER_CONTROLS_DAEMON_SCRIPT),
@@ -189,6 +196,7 @@ my $check_types = {
         alias           => \&check_optional,
         state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
+        good_state      => $check_optional_on_off,
         host            =>
             check_host_runs_sub($PI_CONTROLLER_DAEMON_SCRIPT),
         ex_or_for_state => $check_boolean,
@@ -201,6 +209,7 @@ my $check_types = {
         alias           => \&check_optional,
         state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
+        good_state      => $check_optional_on_off,
         host            =>
             check_host_runs_sub($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
@@ -210,6 +219,7 @@ my $check_types = {
         alias           => \&check_optional,
         state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
+        good_state      => $check_optional_on_off,
         host            =>
             check_host_runs_sub($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
@@ -219,6 +229,7 @@ my $check_types = {
         alias           => \&check_optional,
         state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
+        good_state      => $check_optional_on_off,
         host            =>
             check_host_runs_sub($PI_CONTROLLER_DAEMON_SCRIPT),
         ex_or_for_state => $check_boolean,
@@ -231,6 +242,7 @@ my $check_types = {
         alias           => \&check_optional,
         state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
+        good_state      => $check_optional_on_off,
         host            =>
             check_host_runs_sub($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
@@ -240,6 +252,7 @@ my $check_types = {
         alias           => \&check_optional,
         state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
+        good_state      => $check_optional_on_off,
         host            =>
             check_host_runs_sub($PI_CONTROLLER_DAEMON_SCRIPT),
         invert_state    => $check_boolean,
@@ -249,19 +262,20 @@ my $check_types = {
         alias           => \&check_optional,
         state_type      => \&check_optional_state_type,
         rrd_graph       => $check_optional_boolean,
+        good_state      => $check_optional_on_off,
         mac             => $check_mac,
         sub_type        => \&check_mac_sub_type,
     },
     $WEBUI_VAR_FLOAT_CONTROL_TYPE => {
         alias           => \&check_optional,
-        rrd_graph       => $check_optional_boolean,
+#        rrd_graph       => $check_optional_boolean,
         value           => \&check_number,
         upper_limit     => \&check_optional_number,
         lower_limit     => \&check_optional_number,
     },
     $WEBUI_VAR_INTEGER_CONTROL_TYPE => {
         alias           => \&check_optional,
-        rrd_graph       => $check_optional_boolean,
+#        rrd_graph       => $check_optional_boolean,
         value           => $check_integer,
         upper_limit     => $check_optional_integer,
         lower_limit     => $check_optional_integer,
@@ -560,6 +574,7 @@ sub check_optional_regex_sub {
     my ($regex) = @_;
     return sub {
         my (undef, $control, $chk) = @_;
+        # TODO , can this be simplified ? :
         return if ! exists $control->{$chk} || ! defined $control->{$chk};
         _regex_check($regex, @_);
     }
@@ -877,8 +892,41 @@ sub is_binary_control {
 
 }
 
+sub control_good_state {
+    # used by Khaospy::DBH::Controls calls to make the good_state field
+    my ($control_name) = @_;
+
+    my $control = get_control_config($control_name);
+
+    my $control_type = get_hashval($control,'type');
+    my $good_state = $control->{state_type};
+
+    return $good_state if $good_state;
+
+    # All binary on-off controls should have a default "good_state".
+    # Good is usually "off".
+    # Good will display "green" in the webui.
+    if (   $control_type eq $ORVIBOS20_CONTROL_TYPE
+        || $control_type eq $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE
+        || $control_type eq $PI_GPIO_RELAY_CONTROL_TYPE
+        || $control_type eq $PI_GPIO_SWITCH_CONTROL_TYPE
+        || $control_type eq $PI_MCP23017_RELAY_MANUAL_CONTROL_TYPE
+        || $control_type eq $PI_MCP23017_RELAY_CONTROL_TYPE
+        || $control_type eq $PI_MCP23017_SWITCH_CONTROL_TYPE
+    ){
+        return OFF;
+    } elsif ($control_type eq $MAC_SWITCH_CONTROL_TYPE ){
+        # Good for a mac address is "pingable" which is ON.
+        return ON;
+    }
+
+    # non binary controls don't have a good_state.
+    return '';
+}
+
 sub validate_control_state_action {
     my ($control_name, $action) = @_;
+    get_controls_conf();
 
     # $action is also really $state.
     #

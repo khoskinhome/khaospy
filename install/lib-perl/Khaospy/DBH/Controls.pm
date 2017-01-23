@@ -23,6 +23,8 @@ use Khaospy::Conf::Controls qw(
     can_set_value
     can_set_string
 
+    control_good_state
+
     state_trans_control
     state_to_binary
 );
@@ -189,6 +191,10 @@ sub get_controls {
 
 sub get_controls_from_db {
     # This version calcs things for display
+
+    # if the webui code is changed, this could get removed,
+    # and just get_controls_in_room_for_user() left remaining.
+
     my ($control_name) = @_;
 
     my $control_select = '';
@@ -226,6 +232,7 @@ sub get_controls_from_db {
         $row->{can_set_string} = can_set_string($control_name);
         $row->{current_state_trans} = state_trans_control(
             $control_name, get_hashval($row,'current_state', true));
+        $row->{good_state} = control_good_state($control_name);
 
         push @$results, $row;
     }
@@ -235,6 +242,9 @@ sub get_controls_from_db {
 }
 
 sub get_controls_in_room_for_user {
+    # This version calcs things for display
+    # if this is to replace get_controls_from_db(), then it will
+    # probably need an optional $control_name param ( like that sub does )
     my ($user_id, $room_id) = @_;
 
     my $sql = <<"    EOSQL";
@@ -276,6 +286,7 @@ sub get_controls_in_room_for_user {
         $row->{can_operate}    = $c_op && can_operate($control_name);
         $row->{can_set_value}  = $c_op && can_set_value($control_name);
         $row->{can_set_string} = $c_op && can_set_string($control_name);
+        $row->{good_state} = control_good_state($control_name);
 
         push @$results, $row;
     }

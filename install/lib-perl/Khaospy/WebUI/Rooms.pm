@@ -94,6 +94,7 @@ post '/api/v1/operate/:control/:action'  => needs login => sub {
 
 get '/api/v1/status/:control' => needs login => sub {
     my $stat = get_controls_from_db(params->{control});
+    # TODO Is this actually used by the webui JS code ?
 
     header( 'Content-Type'  => 'application/json' );
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
@@ -116,17 +117,12 @@ get '/api/v1/statusall' => needs login => sub {
     header( 'Cache-Control' => 'no-store, no-cache, must-revalidate' );
 
     # TODO needs to just get the controls for the room.
+    # so could maybe more efficient if the room_id is supplied,
+    # and the call is made to get_controls_in_room_for_user($user_id,$room_id)
 
     my $stat = get_controls_from_db();
     return to_json $stat;
 };
-
-#get '/status'  => needs login => sub {
-#    return template 'status.tt', {
-#        user_template_flds('Status'),
-#        entries         => get_controls_from_db(),
-#    };
-#};
 
 get '/cctv'  => needs login => sub {
     return template 'cctv.tt', {
