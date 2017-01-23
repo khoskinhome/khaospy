@@ -784,6 +784,10 @@ sub _is_host_resolvable {
 ####################
 # state_trans subs :
 
+# TODO some of the state_trans stuff really could be simplified.
+# the original idea was dropped.
+# Now this is just doing translations for the webui ...
+
 sub state_trans_control {
     # used by Khaospy::DBH::Controls calls to make the current_state_trans field
 
@@ -899,7 +903,7 @@ sub control_good_state {
     my $control = get_control_config($control_name);
 
     my $control_type = get_hashval($control,'type');
-    my $good_state = $control->{state_type};
+    my $good_state = $control->{good_state};
 
     return $good_state if $good_state;
 

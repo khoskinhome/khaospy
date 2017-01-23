@@ -1,5 +1,5 @@
-var control_state_value = [];
-var control_state_count = [];
+var control_state = [];
+var control_change_count = [];
 var control_request_time = [];
 var keep_change_count   = 45;
 var refresh_screen      = 333;
@@ -17,62 +17,77 @@ $(document).ready(function(){
                 var data_row = data[i];
                 for(var key in data_row){
                     var control_name    = data_row['control_name'].toString();
-                    var new_state_value = data_row['current_state_trans'].toString();
-                    var new_request_time = data_row['request_time'].toString();
 
-                    var new_state = data_row['current_state'];
-//                    if ( data_row['current_state'] !== null ){
-//                        new_state = data_row['current_state'].toString();
-//                    }
+// current_state_trans should only be used for display in the state-field
+// current_state should be used for working out the colour to assign to state-field
+// for both binary and value type controls.
+
+                    var current_state       = data_row['current_state']; // .toString();
+                    if (current_state == null ){ current_state = '' }
+
+                    var current_state_trans = data_row['current_state_trans'].toString();
+                    var good_state          = data_row['good_state'].toString();
+                    //console.log(control_name + " good-state = " + good_state);
+
+//if (control_name == 'dining_room_window' ||  control_name == 'dining_room_pir' ){
+//    console.log( control_name + " state = " + current_state  + " : state_trans = " + current_state_trans + " : good_state = " + good_state);
+//}
+                    var current_request_time = data_row['request_time'].toString();
 
                     var old_state_value;
                     var old_request_time;
 
-                    if(control_state_value[control_name] === undefined){
-                        control_state_count[control_name] = 0;
-                        control_state_value[control_name] = new_state_value;
-                        control_request_time[control_name] = new_request_time;
+                    if(control_state[control_name] === undefined){
+                        control_change_count[control_name] = 0;
+                        control_state[control_name] = current_state;
+                        control_request_time[control_name] = current_request_time;
                         old_state_value = "";
                         old_request_time = "";
                     } else {
-                        old_state_value  = control_state_value[control_name];
+                        old_state_value  = control_state[control_name];
                         old_request_time = control_request_time[control_name];
                     }
 
-                    $("#" + control_name + '-request_time' ).text(new_request_time);
-                    $("#" + control_name + '-state_alias' ).text(new_state_value);
+                    $("#" + control_name + '-request_time' ).text(current_request_time);
+                    $("#" + control_name + '-state_alias' ).text(current_state_trans);
 
+// could get rid of the change column and update the state or time field individually.
 
-                    if ( new_state_value != old_state_value || new_request_time != old_request_time){
+                    if ( current_state != old_state_value || current_request_time != old_request_time){
 
-                        if ( new_state != null ){
-                            // only on-off controls should have new_state defined.
-                            if (new_state == 'on'){
+                        if ( good_state == 'on' || good_state == 'off' ){
+                            // only on-off controls should have current_state defined.
+                            if ((current_state == 'off' && good_state == 'on')
+                                || (current_state == 'on' && good_state == 'off')
+                            ){
+                                // this is the bad state. bad being 'on'
                                 switch_class( $("#" + control_name + '-state_alias' ), "state_off","state_on");
                             }
-                            if (new_state == 'off'){
+                            if ((current_state == 'off' && good_state == 'off')
+                                || (current_state == 'on' && good_state == 'on')
+                            ){ // this is the good_state. good being 'off'
                                 switch_class( $("#" + control_name + '-state_alias' ), "state_on","state_off");
                             }
                         } else {
-                            console.log(control_name + ' undefined new_state');
+                            //console.log(control_name + ' undefined current_state');
                         }
 
                         $("#" + control_name + '-info' ).text("changed");
-                        control_state_count[control_name] = keep_change_count;
+                        control_change_count[control_name] = keep_change_count;
                         switch_class( $("#" + control_name + '-info' ), "no_change","change");
                     } else {
 
-                        if ( control_state_count[control_name] > 0 ){
-                            control_state_count[control_name] = control_state_count[control_name] - 1 ;
+                        if ( control_change_count[control_name] > 0 ){
+                            control_change_count[control_name] = control_change_count[control_name] - 1 ;
                         } else {
                             $("#" + control_name + '-info' ).text("");
                             switch_class( $("#" + control_name + '-info' ), "change","no_change");
                         }
                     }
 
-                    // console.log(control_name + ' old = ' + old_state_value + ' : new = ' + new_state_value + ' : count = ' + control_state_count[control_name] );
-                    control_state_value[control_name] = new_state_value;
-                    control_request_time[control_name] = new_request_time;
+                    // console.log(control_name + ' old = ' + old_state_value + ' : new = ' + current_state_trans + ' : count = ' + control_change_count[control_name] );
+                    control_state[control_name] = current_state;
+                    control_request_time[control_name] = current_request_time;
                 }
             }
         });
