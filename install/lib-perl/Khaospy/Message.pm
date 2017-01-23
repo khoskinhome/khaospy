@@ -1,7 +1,7 @@
 package Khaospy::Message;
 use strict;
 use warnings;
-
+# by Karl Kount-Khaos Hoskin 2015-2017
 
 use Try::Tiny;
 use Carp qw/confess/;
@@ -18,7 +18,7 @@ use Khaospy::Constants qw(
 
 use Khaospy::Conf::Controls qw(
     get_control_config
-    is_state
+    validate_control_state_action
 );
 
 our @EXPORT_OK = qw(
@@ -29,7 +29,6 @@ our @EXPORT_OK = qw(
 sub validate_control_msg_json {
     my ($msg) = @_;
     # Returns the "mkey" ( message-key ) , perl-hashref and original json .
-
 
     my $msg_rh;
     eval{$msg_rh = $JSON->decode( $msg );};
@@ -58,15 +57,8 @@ sub validate_control_msg_fields {
     my $request_epoch_time = $msg_rh->{request_epoch_time};
     my $control_name       = $msg_rh->{control_name};
     my $control_host       = $msg_rh->{control_host};
-    my $action             = $msg_rh->{action};
+    my $action             = $msg_rh->{action} || $msg_rh->{current_state};
     my $request_host       = $msg_rh->{request_host};
-
-#    try {
-#        my $control = get_control_config($control_name);
-#    } catch {
-#
-#
-#    }
 
     if ( ! $request_epoch_time ){
         confess "ERROR message has invalid request_epoch_time";
@@ -76,92 +68,24 @@ sub validate_control_msg_fields {
         confess "ERROR message is over $MESSAGES_OVER_SECS_INVALID seconds old";
     }
 
-    _validate_action($action);
+    validate_control_state_action($control_name, $action);
 
     # TODO check :
-    #   request_host is a valid host in the config.
+    #   maybe request_host is a valid host in the pi-host config.
 
     return _get_control_message_key($msg_rh);
 }
 
 sub _get_control_message_key {
-    # "signature" could be a better term rather than "key" . hmmm.
     # Calcs the key for use in queues etc..
     my ($msg_rh) = @_ ;
 
     my $request_epoch_time = $msg_rh->{request_epoch_time};
     my $control_name       = $msg_rh->{control_name};
-    my $action             = $msg_rh->{action};
+    my $action             = $msg_rh->{action} || $msg_rh->{current_state};
     my $request_host       = $msg_rh->{request_host} || "";
 
-    # TODO. Sometimes there isn't an "action", its just an update with
-    # a current_state. So when action is not available then
-    # maybe current_state should be used for the signature-key.
-
     return "$control_name|$action|$request_host|$request_epoch_time";
-}
-
-sub _validate_action { # also validates "value". hmmm..
-    my ($action) = @_;
-
-    confess "The action is not defined" if ! defined $action;
-
-    # $action can be :
-    #  a valid state ( see is_state() ) or STATUS
-    #  a numeric value
-    #  an array-ref or hash-ref of :
-    #       ON or OFF strings
-    #       numeric values
-    #  Also an array or hash ref all have to be of the same type.
-    #  That is they either have to all be ( ON, OFF or STATUS)
-    #   OR they can all be numerics.
-
-    # this sub serialises the arrays so that they can be used in _get_control_message_key()
-    # it is not designed for deserialisation. ( due to making sorted hashkeys turn into an array )
-
-    my $valid = sub {
-        my ( $act ) = @_;
-
-        # TODO. minor bug here, STATUS should only validate in the scalar context.
-        # i.e. no arrays or hashes are allowed to have status.
-
-        return "IS-STATE" if is_state($act) || $act eq STATUS;
-
-        return "NUMBER" if ( looks_like_number($act) );
-
-        my $errmsg ="ERROR. The action '$act' can only be a valid-state, 'status' or a numeric\n";
-        $errmsg .= "In the structure :\n".Dumper($action)
-            if (ref $action eq 'ARRAY' or ref $action eq 'HASH' );
-        confess $errmsg;
-    };
-
-    my $check_types_same = sub {
-        my ($ar) = @_;
-        confess "ERROR. The action has different types ( numerics mixed with ON, OFF,STATUS )\n"
-            ."In the structure :\n".Dumper($action)
-               if ! all {$ar->[0] eq $_} @$ar;
-    };
-
-    if ( ref $action eq 'HASH' ){
-        confess "The action 'hash' is empty"
-            if ! scalar keys %$action;
-
-        $check_types_same->([ map { $valid->($action->{$_}) } keys %$action ]);
-        return $JSON->encode([
-            map {$_ => $action->{$_}} sort keys %$action
-        ]);
-    }
-
-    if ( ref $action eq 'ARRAY' ){
-        confess "The action 'array' is empty"
-            if ! scalar @$action;
-
-        $check_types_same->([ map { $valid->($_) } @$action ]);
-        return $JSON->encode($action);
-    }
-
-    $valid->($action);
-    return $action;
 }
 
 1;

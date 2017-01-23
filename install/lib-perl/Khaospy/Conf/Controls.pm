@@ -24,6 +24,7 @@ our @EXPORT_OK = qw(
     is_state
     is_on_state
     is_off_state
+    validate_control_state_action
 );
 
 use Try::Tiny;
@@ -58,6 +59,8 @@ use Khaospy::Exception qw(
 
 use Khaospy::Constants qw(
     $JSON
+
+    STATUS
 
     true  $true  OPEN   $OPEN   ON  $ON  PINGABLE     $PINGABLE     UNLOCKED $UNLOCKED
     false $false CLOSED $CLOSED OFF $OFF NOT_PINGABLE $NOT_PINGABLE LOCKED   $LOCKED
@@ -179,6 +182,8 @@ my $check_types = {
         onewire_addr  => check_regex_sub(
             qr/^[0-9A-Fa-f]{2}-[0-9A-Fa-f]{12}$/
         ),
+        display_webui_float_control =>
+            \&check_optional_webui_float_control,
     },
     $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE => {
         alias           => \&check_optional,
@@ -572,6 +577,34 @@ sub _regex_check {
         if ( $val !~ $regex );
 }
 
+sub check_optional_webui_float_control {
+    my ($control_name, $control, $chk) = @_;
+
+    return if ! exists $control->{$chk};
+
+    # wvflt = webui-var-float
+    my $wvflt_control_name = $control->{$chk};
+
+    # the control doesn't exist error
+    KhaospyExcept::ControlsConfigKeysInvalidValue->throw(
+        error => "Control '$control_name' has an invalid '$chk' "
+            ."control ($wvflt_control_name) doesn't exist"
+    )
+        if ! exists $controls_conf->{$wvflt_control_name};
+
+    my $wvflt_control = $controls_conf->{$wvflt_control_name};
+    my $wvflt_control_type = get_hashval($wvflt_control,'type');
+
+    # wvflt control is of the wrong type.
+    KhaospyExcept::ControlsConfigKeysInvalidValue->throw(
+        error => "Control '$control_name' has an invalid '$chk' "
+            ."control ($wvflt_control_name) is not of type "
+            .$WEBUI_VAR_FLOAT_CONTROL_TYPE
+    )
+        if $wvflt_control_type ne $WEBUI_VAR_FLOAT_CONTROL_TYPE;
+
+}
+
 sub check_optional_state_type {
     my ($control_name, $control, $chk) = @_;
 
@@ -842,6 +875,73 @@ sub is_binary_control {
     # types of control
     # will return false for everything else.
 
+}
+
+sub validate_control_state_action {
+    my ($control_name, $action) = @_;
+
+    # $action is also really $state.
+    #
+    # TODO needs to validate what $action ( or $state) is valid for a control
+
+    confess "The state/action is not defined" if ! defined $action;
+
+    # $action can be :
+    #  a valid state ( see is_state() ) or STATUS
+    #  a numeric value
+    #  an array-ref or hash-ref of :
+    #       ON or OFF strings
+    #       numeric values
+    #  Also an array or hash ref all have to be of the same type.
+    #  That is they either have to all be ( ON, OFF or STATUS)
+    #   OR they can all be numerics.
+
+    # this sub serialises the arrays so that they can be used in _get_control_message_key()
+    # it is not designed for deserialisation. ( due to making sorted hashkeys turn into an array )
+
+    my $valid = sub {
+        my ( $act ) = @_;
+
+        # TODO. minor bug here, STATUS should only validate in the scalar context.
+        # i.e. no arrays or hashes are allowed to have status.
+
+        return "IS-STATE" if is_state($act) || $act eq STATUS;
+
+        return "NUMBER" if ( looks_like_number($act) );
+
+        my $errmsg ="ERROR. The action '$act' can only be a valid-state, 'status' or a numeric\n";
+        $errmsg .= "In the structure :\n".Dumper($action)
+            if (ref $action eq 'ARRAY' or ref $action eq 'HASH' );
+        confess $errmsg;
+    };
+
+    my $check_types_same = sub {
+        my ($ar) = @_;
+        confess "ERROR. The action has different types ( numerics mixed with ON, OFF,STATUS )\n"
+            ."In the structure :\n".Dumper($action)
+               if ! all {$ar->[0] eq $_} @$ar;
+    };
+
+    if ( ref $action eq 'HASH' ){
+        confess "The action 'hash' is empty"
+            if ! scalar keys %$action;
+
+        $check_types_same->([ map { $valid->($action->{$_}) } keys %$action ]);
+        return $JSON->encode([
+            map {$_ => $action->{$_}} sort keys %$action
+        ]);
+    }
+
+    if ( ref $action eq 'ARRAY' ){
+        confess "The action 'array' is empty"
+            if ! scalar @$action;
+
+        $check_types_same->([ map { $valid->($_) } @$action ]);
+        return $JSON->encode($action);
+    }
+
+    $valid->($action);
+    return $action;
 }
 
 1;

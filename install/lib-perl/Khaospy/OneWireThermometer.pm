@@ -27,6 +27,8 @@ use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     $JSON
 
+    $TIMER_AFTER_COMMON
+
     $ONE_WIRE_SENSOR_DIR
     $ONE_WIRE_DAEMON_PERL_PORT
     $ONE_WIRE_SENDER_PERL_TIMER
@@ -69,7 +71,7 @@ sub run_one_wire_thermometer_daemon {
     my @w;
 
     push @w, AnyEvent->timer(
-        after    => 0.1, # TODO. MAGIC NUMBER . should be in Constants.pm or a json-config. dunno. but not here.
+        after    => $TIMER_AFTER_COMMON,
         interval => $ONE_WIRE_SENDER_PERL_TIMER,
         cb       => \&timer_cb
     );
@@ -109,6 +111,7 @@ sub timer_cb {
             request_epoch_time => time,
             current_state => $temp,
             onewire_addr  => $onewire_addr,
+            request_host  => hostname,
         };
 
         my $json_msg = $JSON->encode($send_msg);
