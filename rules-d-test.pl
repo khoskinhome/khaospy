@@ -34,18 +34,18 @@ sub get_hashval {
 
 
 my $ctl = {
-    'ameliarad'                 => { current_value => OFF },
-    'amelia_window'             => { current_value => OFF },
-    'mac-amelia-iphone-6s-plus' => { current_value => OFF },
-    'therm-amelia-door'         => { current_value => 3.9 },
-    'var-amelia-room-temp'      => { current_value => 21 },
-    'var-minimum-room-temp'     => { current_value => 5 },
-    'var-allowed-temp-drop'     => { current_value => 1 },
+    'ameliarad'                 => { current_state => OFF },
+    'amelia_window'             => { current_state => OFF },
+    'mac-amelia-iphone-6s-plus' => { current_state => OFF },
+    'therm-amelia-door'         => { current_state => 3.9 },
+    'var-amelia-room-temp'      => { current_state => 21 },
+    'var-minimum-room-temp'     => { current_state => 5 },
+    'var-allowed-temp-drop'     => { current_state => 1 },
 
 };
 sub ctl {
     my ($control_name) = @_;
-    return get_hashval( get_hashval($ctl, $control_name), 'current_value');
+    return get_hashval( get_hashval($ctl, $control_name), 'current_state');
 }
 
 my $rules = [
