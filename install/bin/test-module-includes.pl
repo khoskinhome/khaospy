@@ -34,11 +34,11 @@ use Khaospy::RulesD;
 use Khaospy::ErrorLogDaemon;
 use Khaospy::Email;
 
-
 use Khaospy::Conf;
+use Khaospy::Conf::Global;
 use Khaospy::Conf::Controls;
-use Khaospy::Conf::HardCoded;
 use Khaospy::Conf::PiHosts;
+use Khaospy::Conf::HardCoded;
 
 use Khaospy::Exception;
 

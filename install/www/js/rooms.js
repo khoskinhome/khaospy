@@ -11,27 +11,18 @@ $(document).ready(function(){
 
     function refresh_data(){
         $.get(dancer_base_url + "/api/v1/statusall", function(data, http_status){
-            //TODO check the http_status
 
             for(var i=0;i<data.length;i++){
                 var data_row = data[i];
                 for(var key in data_row){
                     var control_name    = data_row['control_name'].toString();
 
-// current_state_trans should only be used for display in the state-field
-// current_state should be used for working out the colour to assign to state-field
-// for both binary and value type controls.
-
-                    var current_state       = data_row['current_state']; // .toString();
+                    var current_state       = data_row['current_state'];
                     if (current_state == null ){ current_state = '' }
 
                     var current_state_trans = data_row['current_state_trans'].toString();
                     var good_state          = data_row['good_state'].toString();
-                    //console.log(control_name + " good-state = " + good_state);
 
-//if (control_name == 'dining_room_window' ||  control_name == 'dining_room_pir' ){
-//    console.log( control_name + " state = " + current_state  + " : state_trans = " + current_state_trans + " : good_state = " + good_state);
-//}
                     var current_request_time = data_row['request_time'].toString();
 
                     var old_state_value;
@@ -51,75 +42,63 @@ $(document).ready(function(){
                     $("#" + control_name + '-request_time' ).text(current_request_time);
                     $("#" + control_name + '-state_trans' ).text(current_state_trans);
 
-// could get rid of the change column and update the state or time field individually.
-
                     if (data_row['therm_lower'] != null && data_row['therm_higher'] != null){
-                        // could have a one-wire therm control,
-                        // if we do then therm_higher and therm_lower could be set.
 
-// TODO put the upper and lower in a tooltip on the id-xxx-state_trans field.
-
+                        therm_sel = $("#" + control_name + '-state_trans' );
                         current_state_float = parseFloat(current_state);
                         therm_lower_float   = parseFloat(data_row['therm_lower']);
                         therm_higher_float  = parseFloat(data_row['therm_higher']);
 
+                        therm_sel.attr("title", "Lower = " + therm_lower_float + " : higher = " + therm_higher_float );
                         if (current_state_float < therm_lower_float ) {
-//console.log(control_name + ' Too cold');
-                            switch_class( $("#" + control_name + '-state_trans' ),
-                                "value_too_hot value_correct","value_too_cold");
+                            switch_class( therm_sel, "value_too_hot value_correct","value_too_cold");
                         } else if (current_state_float > therm_higher_float ) {
-//console.log(control_name + ' Too hot');
-                            switch_class( $("#" + control_name + '-state_trans' ),
-                                "value_too_cold value_correct","value_too_hot");
+                            switch_class( therm_sel, "value_too_cold value_correct","value_too_hot");
                         } else {
-//console.log(control_name + ' correct temp');
-                            switch_class( $("#" + control_name + '-state_trans' ),
-                                "value_too_cold value_too_hot","value_correct");
+                            switch_class( therm_sel, "value_too_cold value_too_hot","value_correct");
                         }
                     }
 
                     if ( current_state != old_state_value || current_request_time != old_request_time){
 
                         if ( good_state == 'on' || good_state == 'off' ){
-                            // only on-off controls should have current_state defined.
                             if ((current_state == 'off' && good_state == 'on')
                                 || (current_state == 'on' && good_state == 'off')
                             ){
-                                // this is the bad state. bad being 'on'
+                                // The bad (red) state is 'on'
                                 switch_class( $("#" + control_name + '-state_trans' ), "state_off","state_on");
                             }
                             if ((current_state == 'off' && good_state == 'off')
                                 || (current_state == 'on' && good_state == 'on')
-                            ){ // this is the good_state. good being 'off'
+                            ){ // The good (green) state is 'off'
                                 switch_class( $("#" + control_name + '-state_trans' ), "state_on","state_off");
                             }
                         } else {
 
                         }
-                        $("#" + control_name + '-info' ).text("changed");
                         control_change_count[control_name] = keep_change_count;
-                        switch_class( $("#" + control_name + '-info' ), "no_change","change");
+                        $("#" + control_name + '-name' ).addClass("change");
                     } else {
 
                         if ( control_change_count[control_name] > 0 ){
                             control_change_count[control_name] = control_change_count[control_name] - 1 ;
                         } else {
-                            $("#" + control_name + '-info' ).text("");
-                            switch_class( $("#" + control_name + '-info' ), "change","no_change");
+                            $("#" + control_name + '-name' ).removeClass("change");
                         }
                     }
 
-                    // console.log(control_name + ' old = ' + old_state_value + ' : new = ' + current_state_trans + ' : count = ' + control_change_count[control_name] );
                     control_state[control_name] = current_state;
                     control_request_time[control_name] = current_request_time;
                 }
             }
-        });
+        }).fail(
+            function(data){
+                // dunno, do something. TODO
+            }
+        );
     }
 
     function switch_class ( selector, from_class, to_class ){
-        // so I can switch on or off jQuery animations.
-        // selector.switchClass(from_class, to_class, animate_time); return;
         selector.removeClass(from_class);
         selector.addClass(to_class);
     }
@@ -133,7 +112,6 @@ $(document).ready(function(){
             { },
             function(data, http_status){
                 // alert("Data: " + data + "\nStatus: " + status);
-                // TODO handle http_status errors.
             }
         )
         .fail(

@@ -1283,7 +1283,7 @@ sub live_global_conf {
     return {
         timezone  => 'Europe/London',
         log_level => 'debug',
-        temp_range_deg_c => 1.5,
+#        temp_range_deg_c => 1.5,
     };
 }
 

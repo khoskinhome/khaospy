@@ -1,7 +1,7 @@
 package Khaospy::Conf;
 use strict;
 use warnings;
-# by Karl Kount-Khaos Hoskin. 2015-2016
+# by Karl Kount-Khaos Hoskin. 2015-2017
 
 # Reads in most of the confs once.
 #
@@ -10,9 +10,20 @@ use warnings;
 #
 # The rest of Khaospy should get to the confs from here.
 
+use Exporter qw/import/;
+our @EXPORT_OK = qw(
+    get_one_wire_heating_control_conf
+    get_rulesd_conf
+    get_boiler_conf
+    get_database_conf
+    get_email_conf
+    get_conf
+);
+
+
+
 use Carp qw/confess croak/;
 use Data::Dumper;
-use Exporter qw/import/;
 
 use Khaospy::Constants qw(
     $JSON
@@ -26,22 +37,11 @@ use Khaospy::Constants qw(
     $RULES_DAEMON_RELOAD_SECS
 
     $BOILERS_CONF_FULLPATH
-    $GLOBAL_CONF_FULLPATH
     $DATABASE_CONF_FULLPATH
     $EMAIL_CONF_FULLPATH
 );
 
 use Khaospy::Utils;
-
-our @EXPORT_OK = qw(
-    get_one_wire_heating_control_conf
-    get_rulesd_conf
-    get_boiler_conf
-    get_global_conf
-    get_database_conf
-    get_email_conf
-    get_conf
-);
 
 sub get_conf {
     my ($conf_rs, $conf_path, $force_reload, $validate_rc, $last_reload_rs, $reload_every ) = @_;
@@ -102,12 +102,6 @@ sub get_boiler_conf {
 
     # TODO validate that a rad-control can only be used by one boiler-control
 
-}
-
-my $global_conf;
-sub get_global_conf {
-    my ($force_reload) = @_;
-    get_conf( \$global_conf, $GLOBAL_CONF_FULLPATH, $force_reload);
 }
 
 my $database_conf;

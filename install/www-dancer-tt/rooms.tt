@@ -44,14 +44,13 @@
                     <th>Off</th>
                     <th>Status</th>
                     <th>Last Update time</th>
-                    <th>Changed</th>
                 </tr>
                 </thead>
 
                 <tbody>
                     [% FOREACH row IN entries %]
                     <tr class='list'>
-                        <td >[% row.control_name %]</td>
+                        <td id='[% row.control_name %]-name'>[% row.control_name %]</td>
 
                             [% IF row.can_set_on_off %]
                                 <td>
@@ -73,7 +72,6 @@
 
                         <td align='center' id='[% row.control_name %]-state_trans'>[% row.current_state_trans %]</td>
                         <td id='[% row.control_name %]-request_time'>[% row.request_time %]</td>
-                        <td id='[% row.control_name %]-info'></td>
                     </tr>
                     [% END %]
                 <tbody>

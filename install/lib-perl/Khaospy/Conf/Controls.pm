@@ -93,13 +93,15 @@ use Khaospy::Constants qw(
     $WEBUI_VAR_INTEGER_CONTROL_TYPE
     $WEBUI_VAR_STRING_CONTROL_TYPE
 
-    TEMP_RANGE_DEG_C_DEFAULT
 
 );
 
 use Khaospy::Conf qw(
     get_conf
-    get_global_conf
+);
+
+use Khaospy::Conf::Global qw(
+    gc_TEMP_RANGE_DEG_C
 );
 
 use Khaospy::Conf::PiHosts qw(
@@ -1028,12 +1030,7 @@ sub get_one_wire_therm_desired_range {
             _find_control_field_in_rows($rng_control_name, 'current_state', $db_rows);
     }
 
-    my $g_conf = get_global_conf();
-
-    $desired_range = $g_conf->{temp_range_deg_c}
-        if ! $desired_range && $g_conf->{temp_range_deg_c};
-
-    $desired_range = TEMP_RANGE_DEG_C_DEFAULT() if ! $desired_range;
+    $desired_range = gc_TEMP_RANGE_DEG_C() if ! $desired_range;
 
     my $lower  = $desired_value - ( abs($desired_range) / 2 );
     my $higher = $desired_value + ( abs($desired_range) / 2 );

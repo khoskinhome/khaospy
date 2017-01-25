@@ -1,9 +1,7 @@
-.no_change {
-    background-color: white;
-}
 
 .change {
     background-color: #ff8080;
+    color: white;
 }
 
 .state_on {
@@ -25,19 +23,4 @@
 .value_too_hot {
     background-color: #ff8080;
 }
-
-/*
-# TODO. therm sensors have a range. These need CONSTANTS and the therm-config to support-range.
-#        $row->{in_range} = "too-low","correct","too-high"
-# colours will be blue==too-cold, green=correct, red=too-high.
-
-
-too high . red #ff0000
-
-just right . green .
-
-too low .  yellow #ffff99
-
-
-*/
 

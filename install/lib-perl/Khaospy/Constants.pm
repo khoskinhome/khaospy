@@ -100,15 +100,6 @@ our $WEBUI = WEBUI;
 sub RULESD  {"rulesd"};
 our $RULESD = RULESD;
 
-################
-# This is the default range between the upper and lower temperatures
-# This is used in the webui for displaying too-cold, just-right and too-hot
-# It is also used by the rules for switching on and off heating devices.
-# There is also a global-conf setting that, if set, will override this.
-# Also one-wire-therm-controls can have this set on an individual basis.
-# ( and this will take precedence over the other two )
-sub  TEMP_RANGE_DEG_C_DEFAULT {1};
-our $TEMP_RANGE_DEG_C_DEFAULT = TEMP_RANGE_DEG_C_DEFAULT();
 
 #######################
 sub MTYPE_QUEUE_COMMAND           {"queue-command"};
@@ -553,9 +544,6 @@ our @EXPORT_OK = qw(
     $ERROR_LOG_DAEMON_SCRIPT
     $ERROR_LOG_DAEMON_SEND_PORT
     $ERROR_LOG_DAEMON_TIMER
-
-     TEMP_RANGE_DEG_C_DEFAULT
-    $TEMP_RANGE_DEG_C_DEFAULT
 
 );
 
