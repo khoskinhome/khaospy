@@ -389,10 +389,6 @@ crap.diff.pl
 ./install/www-dancer-tt/cctv.tt
 
 ########
-# status .TO BE DEPRECATED
-#./install/www-dancer-tt/status.tt
-#./install/www/js/status.js
-#./install/www/css/status.css
 
 ./install/www-dancer-tt/user.tt
 
@@ -484,5 +480,4 @@ crap.diff.pl
 ##############################
 #
 # greping crap
-
 
