@@ -21,6 +21,7 @@ crapnew
 ./install/bin/khaospy-boiler-daemon.pl:215:
 
 ./install/lib-perl/Khaospy/Conf.pm
+./install/lib-perl/Khaospy/Conf/Global.pm
 ./install/lib-perl/Khaospy/Conf/Controls.pm
 ./install/lib-perl/Khaospy/ControlsCurrentState.pm
 
@@ -480,4 +481,5 @@ crap.diff.pl
 ##############################
 #
 # greping crap
+
 
