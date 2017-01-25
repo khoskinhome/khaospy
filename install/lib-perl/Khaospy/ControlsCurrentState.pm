@@ -3,6 +3,12 @@ use strict;
 use warnings;
 # by Karl Kount-Khaos Hoskin. 2015-2017
 
+# WORK IN PROGRESS
+
+#TODO make this an object ? Maybe Moo or Mouse.
+# but how many cpan packages would that add to the dependency list ?
+# something to think about ...
+
 our @EXPORT_OK = qw(
 
 

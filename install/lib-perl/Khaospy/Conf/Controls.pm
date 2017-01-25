@@ -20,9 +20,6 @@ our @EXPORT_OK = qw(
     state_trans_control
     state_to_binary_die
     state_to_binary
-    is_state
-    is_on_state
-    is_off_state
 
     control_good_state
     get_one_wire_therm_desired_range
@@ -165,7 +162,7 @@ my $can_set_string = {
 my $state_trans_type = {
     STATE_TYPE_ON_OFF()                => \&state_trans_on_off,
     STATE_TYPE_OPEN_CLOSED()           => \&state_trans_open_closed,
-    STATE_TYPE_PINGABLE_NOT_PINGABLE() => \&state_trans_pingable_not_pingable,
+    STATE_TYPE_PINGABLE_NOT_PINGABLE() => \&state_trans_pingable_unpingable,
     STATE_TYPE_UNLOCKED_LOCKED()       => \&state_trans_unlocked_locked,
 };
 
@@ -826,34 +823,34 @@ sub state_trans_control {
 
 sub state_trans_on_off{
     my ($value) = @_;
-    return $value if $value eq ON || $value eq OFF;
-    return ON  if $value =~ /^1$/;
-    return OFF if $value =~ /^0$/;
-    return state_to_binary_die($value) ? ON : OFF;
+    return if ! defined $value;
+    return ON  if $value eq ON  || $value =~ /^1$/;
+    return OFF if $value eq OFF || $value =~ /^0$/;
+    confess "can't translate $value to ON or OFF";
 }
 
 sub state_trans_open_closed{
     my ($value) = @_;
-    return $value if $value eq OPEN || $value eq CLOSED;
-    return OPEN   if $value =~ /^1$/;
-    return CLOSED if $value =~ /^0$/;
-    return state_to_binary_die($value) ? OPEN : CLOSED;
+    return if ! defined $value;
+    return OPEN   if $value eq ON  || $value =~ /^1$/;
+    return CLOSED if $value eq OFF || $value =~ /^0$/;
+    confess "can't translate $value to OPEN or CLOSED";
 }
 
-sub state_trans_pingable_not_pingable{
+sub state_trans_pingable_unpingable{
     my ($value) = @_;
-    return $value if $value eq PINGABLE || $value eq NOT_PINGABLE;
-    return PINGABLE     if $value =~ /^1$/;
-    return NOT_PINGABLE if $value =~ /^0$/;
-    return state_to_binary_die($value) ? PINGABLE : NOT_PINGABLE;
+    return if ! defined $value;
+    return PINGABLE     if $value eq ON  || $value =~ /^1$/;
+    return NOT_PINGABLE if $value eq OFF || $value =~ /^0$/;
+    confess "can't translate $value to PINGABLE OR UNPINGABLE";
 }
 
 sub state_trans_unlocked_locked{
     my ($value) = @_;
-    return $value if $value eq LOCKED || $value eq UNLOCKED;
-    return UNLOCKED if $value =~ /^1$/;
-    return LOCKED   if $value =~ /^0$/;
-    return state_to_binary_die($value) ? UNLOCKED : LOCKED;
+    return if ! defined $value;
+    return UNLOCKED if $value eq ON  || $value =~ /^1$/;
+    return LOCKED   if $value eq OFF || $value =~ /^0$/;
+    confess "can't translate $value to UNLOCKED or LOCKED";
 }
 
 sub state_to_binary_die {
@@ -862,32 +859,21 @@ sub state_to_binary_die {
 
 sub state_to_binary {
     my ($value, $die_on_error) = @_;
-    return true  if is_on_state($value);
-    return false if is_off_state($value);
+    return true  if $value eq ON  || $value =~ /^1$/;
+    return false if $value eq OFF || $value =~ /^0$/;
 
     confess "Can't translate state '$value' to binary" if $die_on_error;
     return $value;
 }
 
 sub is_state {
+    # This is only used by validate_control_state_action, do I need it ?
     my ($value) = @_;
-    return true if is_on_state($value) || is_off_state($value);
-    return false;
-}
 
-sub is_on_state { # what if say a temp-sensor ends up using this ? hmmm.
-    my ($value) = @_;
-    return true if $value =~ /^1$/
-        || $value eq ON       || $value eq OPEN
-        || $value eq PINGABLE || $value eq UNLOCKED;
-    return false;
-}
+    return true if
+          $value eq ON  || $value =~ /^1$/
+       || $value eq OFF || $value =~ /^0$/;
 
-sub is_off_state { # what if say a temp-sensor ends up using this ? hmmm.
-    my ($value) = @_;
-    return true if $value =~ /^0$/
-        || $value eq OFF          || $value eq CLOSED
-        || $value eq NOT_PINGABLE || $value eq LOCKED;
     return false;
 }
 
