@@ -364,7 +364,8 @@ sub live_controls_conf {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
             alias         => 'Karl thermometer',
             onewire_addr  => '28-041591f5e5ff',
-            display_webui_float_control => 'var-karl-room-temp',
+            desired_temp_float_control => 'var-karl-room-temp',
+            desired_temp_range_float_control => 'var-allowed-temp-drop',
             rrd_graph     => true,
         },
         'therm-loft-over-kitchen' => {
@@ -384,7 +385,7 @@ sub live_controls_conf {
             alias         => 'Alison thermometer',
             onewire_addr  => '28-0000066ebc74'  ,
             rrd_graph     => true,
-            display_webui_float_control => 'var-alison-room-temp',
+            desired_temp_float_control => 'var-alison-room-temp',
         },
         'therm-playhouse' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
@@ -415,7 +416,7 @@ sub live_controls_conf {
             alias         => 'Amelia thermometer',
             onewire_addr  => '28-0214632d16ff',
             rrd_graph     => true,
-            display_webui_float_control => 'var-amelia-room-temp',
+            desired_temp_float_control => 'var-amelia-room-temp',
         },
         'therm-upstairs-landing' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
@@ -464,7 +465,7 @@ sub live_controls_conf {
             alias         => 'front-room thermometer',
             onewire_addr  => '28-0214630558ff',
             rrd_graph     => true,
-            display_webui_float_control => 'var-front-room-temp',
+            desired_temp_float_control => 'var-front-room-temp',
         },
         'therm-front-porch' => {
             type          => $ONEWIRE_THERM_CONTROL_TYPE,
@@ -477,7 +478,7 @@ sub live_controls_conf {
             alias         => 'dining-room thermometer',
             onewire_addr  => '28-0000066ff2ac',
             rrd_graph     => true,
-            display_webui_float_control => 'var-dining-room-temp',
+            desired_temp_float_control => 'var-dining-room-temp',
         },
 
         alisonrad       => {
@@ -1282,6 +1283,7 @@ sub live_global_conf {
     return {
         timezone  => 'Europe/London',
         log_level => 'debug',
+        temp_range_deg_c => 1.5,
     };
 }
 
@@ -1289,6 +1291,7 @@ sub test_global_conf {
     return {
         timezone  => 'Europe/London',
         log_level => 'debug',
+        temp_range_deg_c => 1.5,
     };
 }
 

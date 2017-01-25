@@ -1,7 +1,20 @@
 package Khaospy::DBH::Controls;
 use strict; use warnings;
+# by Karl Kount-Khaos Hoskin. 2015-2017
 
 use Exporter qw/import/;
+
+our @EXPORT_OK = qw(
+    get_controls
+    get_controls_from_db
+    control_status_insert
+    get_last_control_state
+    init_last_control_state
+    get_controls_in_room_for_user
+    user_can_operate_control
+    get_controls_webui_var_type
+);
+
 use Data::Dumper;
 use Carp qw(confess);
 use Try::Tiny;
@@ -19,30 +32,19 @@ use Khaospy::Utils qw(
 use Khaospy::Conf::Controls qw(
     get_control_config
     control_exists
-    can_operate
+    can_set_on_off
     can_set_value
     can_set_string
 
-    control_good_state
-
     state_trans_control
     state_to_binary
+    control_good_state
+    get_one_wire_therm_desired_range
 );
 
 use Khaospy::Constants qw(
     $PI_STATUS_RRD_UPDATE_TIMEOUT
     $WEBUI_ALL_CONTROL_TYPES
-);
-
-our @EXPORT_OK = qw(
-    get_controls
-    get_controls_from_db
-    control_status_insert
-    get_last_control_state
-    init_last_control_state
-    get_controls_in_room_for_user
-    user_can_operate_control
-    get_controls_webui_var_type
 );
 
 sub control_status_insert {
@@ -69,6 +71,13 @@ sub control_status_insert {
         get_controls_from_db($control_name);
 
     # The control_status (which is really control_logs should always have the insertion.
+
+    # TODO needs to insert / update in the controls table only ( not control_status )
+    # the fields :
+    #    last_lowest_state_time   TIMESTAMP WITH TIME ZONE,
+    #    last_lowest_state        TEXT,
+    #    last_highest_state_time  TIMESTAMP WITH TIME ZONE,
+    #    last_highest_state       TEXT,
 
     if ( scalar @$curr_rec ) {
         # update
@@ -227,14 +236,24 @@ sub get_controls_from_db {
             next;
         }
 
-        $row->{can_operate}    = can_operate($control_name);
-        $row->{can_set_value}  = can_set_value($control_name);
-        $row->{can_set_string} = can_set_string($control_name);
-        $row->{current_state_trans} = state_trans_control(
-            $control_name, get_hashval($row,'current_state', true));
+        # This method isn't used for setting the webui controls , so
+        # these aren't really needed, plus there isn't a permissions check.
+        #$row->{can_set_on_off} = can_set_on_off($control_name);
+        #$row->{can_set_value}  = can_set_value($control_name);
+        #$row->{can_set_string} = can_set_string($control_name);
+
         $row->{good_state} = control_good_state($control_name);
 
+        $row->{current_state_trans} = state_trans_control(
+            $control_name, get_hashval($row,'current_state', true));
+
         push @$results, $row;
+    }
+
+    for my $row (@$results){
+        my $control_name = get_hashval($row,'control_name');
+        ( $row->{therm_lower}, $row->{therm_higher} ) =
+            get_one_wire_therm_desired_range($control_name, $results);
     }
 
     return $results;
@@ -279,16 +298,23 @@ sub get_controls_in_room_for_user {
             next;
         }
 
+        my $c_op = $row->{can_operate};
+        $row->{can_set_on_off} = $c_op && can_set_on_off($control_name);
+        $row->{can_set_value}  = $c_op && can_set_value($control_name);
+        $row->{can_set_string} = $c_op && can_set_string($control_name);
+
+        $row->{good_state}     = control_good_state($control_name);
+
         $row->{current_state_trans} = state_trans_control(
             $control_name, get_hashval($row,'current_state', true));
 
-        my $c_op = $row->{can_operate};
-        $row->{can_operate}    = $c_op && can_operate($control_name);
-        $row->{can_set_value}  = $c_op && can_set_value($control_name);
-        $row->{can_set_string} = $c_op && can_set_string($control_name);
-        $row->{good_state} = control_good_state($control_name);
-
         push @$results, $row;
+    }
+
+    for my $row (@$results){
+        my $control_name = get_hashval($row,'control_name');
+        ( $row->{therm_lower}, $row->{therm_higher} ) =
+            get_one_wire_therm_desired_range($control_name, $results);
     }
 
     return $results;

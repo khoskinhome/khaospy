@@ -20,7 +20,6 @@ use Khaospy::Utils qw(
 );
 
 use Khaospy::Conf::Controls qw(
-    can_operate
 );
 
 our @EXPORT_OK = qw(

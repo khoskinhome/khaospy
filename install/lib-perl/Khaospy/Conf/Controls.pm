@@ -1,6 +1,5 @@
 package Khaospy::Conf::Controls;
-use strict;
-use warnings;
+use strict; use warnings;
 # by Karl Kount-Khaos Hoskin. 2015-2017
 
 use Exporter qw/import/;
@@ -14,7 +13,7 @@ our @EXPORT_OK = qw(
     is_control_rrd_graphed
     get_rrd_create_params_for_control
 
-    can_operate
+    can_set_on_off
     can_set_value
     can_set_string
 
@@ -26,7 +25,7 @@ our @EXPORT_OK = qw(
     is_off_state
 
     control_good_state
-
+    get_one_wire_therm_desired_range
     validate_control_state_action
 );
 
@@ -94,10 +93,13 @@ use Khaospy::Constants qw(
     $WEBUI_VAR_INTEGER_CONTROL_TYPE
     $WEBUI_VAR_STRING_CONTROL_TYPE
 
+    TEMP_RANGE_DEG_C_DEFAULT
+
 );
 
 use Khaospy::Conf qw(
     get_conf
+    get_global_conf
 );
 
 use Khaospy::Conf::PiHosts qw(
@@ -126,11 +128,11 @@ my $check_optional_on_off
     = check_optional_regex_sub(qr/^(on|off)$/);
 
 ##################
-# these are used by the webui to work out what type of control
+# can_set_XXXX() methods
+# These are used by the webui to work out what type of control
 # interface to display.
-#
-# TODO : following needs renaming to can_on_off :
-my $can_operate = {
+
+my $can_set_on_off = {
     $ORVIBOS20_CONTROL_TYPE                => true,
     $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE     => true,
     $PI_GPIO_RELAY_CONTROL_TYPE            => true,
@@ -154,7 +156,6 @@ my $can_set_string = {
 
 # will probably need :
 # my $can_set_ datetime_tz date time hours mins interval etc ...
-
 
 ###########################
 # state type translations types :
@@ -189,7 +190,9 @@ my $check_types = {
         onewire_addr  => check_regex_sub(
             qr/^[0-9A-Fa-f]{2}-[0-9A-Fa-f]{12}$/
         ),
-        display_webui_float_control =>
+        desired_temp_float_control =>
+            \&check_optional_webui_float_control,
+        desired_temp_range_float_control =>
             \&check_optional_webui_float_control,
     },
     $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE => {
@@ -355,12 +358,12 @@ sub is_control_rrd_graphed {
     return get_hashval($control,'rrd_graph',false,false,false);
 }
 
-sub can_operate {
+sub can_set_on_off {
     my ($control_name) = @_;
     get_controls_conf();
     my $control = get_hashval($controls_conf, $control_name);
 
-    return true if exists $can_operate->{get_hashval($control,'type')};
+    return true if exists $can_set_on_off->{get_hashval($control,'type')};
     return false;
 }
 
@@ -751,8 +754,7 @@ sub check_pi_mcp23017 {
 }
 
 sub check_optional {
-    # Do absolutely "nuffin MATE !"
-    # aka "null op".
+    # "null op".
 }
 
 sub check_mac_sub_type {
@@ -994,6 +996,63 @@ sub validate_control_state_action {
 
     $valid->($action);
     return $action;
+}
+
+sub get_one_wire_therm_desired_range {
+    my ($ow_control_name, $db_rows) = @_;
+    # This is only going to be used by a DBH::Controls call,
+    # that would've queried the DB.
+    # hence db_rows to get the latest values off any
+    # $WEBUI_VAR_FLOAT_CONTROLs
+    #
+    # returns ( lower, higher ) or ( undef, undef )
+
+    my $ow_control = get_control_config($ow_control_name);
+
+    return (undef, undef) if
+        get_hashval($ow_control,'type') ne $ONEWIRE_THERM_CONTROL_TYPE
+        || ! $ow_control->{desired_temp_float_control};
+
+    my $dtfc_control_name = $ow_control->{desired_temp_float_control};
+    my $dtfc_control      = get_control_config($dtfc_control_name);
+    my $desired_value =
+        _find_control_field_in_rows($dtfc_control_name, 'current_state', $db_rows);
+
+    return ( undef, undef ) if ! $desired_value;
+
+    my $desired_range;
+
+    if ( exists $ow_control->{desired_temp_range_float_control} ){
+        my $rng_control_name = $ow_control->{desired_temp_range_float_control};
+        $desired_range =
+            _find_control_field_in_rows($rng_control_name, 'current_state', $db_rows);
+    }
+
+    my $g_conf = get_global_conf();
+
+    $desired_range = $g_conf->{temp_range_deg_c}
+        if ! $desired_range && $g_conf->{temp_range_deg_c};
+
+    $desired_range = TEMP_RANGE_DEG_C_DEFAULT() if ! $desired_range;
+
+    my $lower  = $desired_value - ( abs($desired_range) / 2 );
+    my $higher = $desired_value + ( abs($desired_range) / 2 );
+
+    return ($lower, $higher);
+}
+
+sub _find_control_field_in_rows {
+    my ($control_name, $field, $db_rows ) = @_;
+
+    return if ! $db_rows || ref $db_rows ne 'ARRAY';
+
+    for my $rec (@$db_rows) {
+        if ( get_hashval($rec,'control_name') eq $control_name ){
+            return get_hashval($rec,$field,true);
+        }
+    }
+
+    return;
 }
 
 1;

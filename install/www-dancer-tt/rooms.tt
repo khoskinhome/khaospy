@@ -53,7 +53,7 @@
                     <tr class='list'>
                         <td >[% row.control_name %]</td>
 
-                            [% IF row.can_operate %]
+                            [% IF row.can_set_on_off %]
                                 <td>
                                     <button class='operate-control' id='[% row.control_name %]' value='on'>On</button>
                                 </td>
@@ -71,7 +71,7 @@
                                 <td></td><td></td>
                             [% END %]
 
-                        <td align='center' id='[% row.control_name %]-state_alias'>[% row.current_state_trans %]</td>
+                        <td align='center' id='[% row.control_name %]-state_trans'>[% row.current_state_trans %]</td>
                         <td id='[% row.control_name %]-request_time'>[% row.request_time %]</td>
                         <td id='[% row.control_name %]-info'></td>
                     </tr>

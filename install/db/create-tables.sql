@@ -68,12 +68,21 @@ CREATE TABLE controls (
     alias                    TEXT,
     -- control_type will eventually be NOT NULL
     control_type             CITEXT REFERENCES control_types,
+    -- some times controls will be null(orviboS20s can be an issue) :
     current_state            TEXT,
+    last_lowest_state_time   TIMESTAMP WITH TIME ZONE,
+    last_lowest_state        TEXT,
+    last_highest_state_time  TIMESTAMP WITH TIME ZONE,
+    last_highest_state       TEXT,
     -- config_json will eventually be NOT NULL
     config_json              CITEXT,
+
+    -- both these should be NOT NULL :
     last_change_state_time   TIMESTAMP WITH TIME ZONE,
     last_change_state_by     TEXT,
     manual_auto_timeout_left REAL,
+
+    -- both these should be NOT NULL :
     request_time             TIMESTAMP WITH TIME ZONE,
     db_update_time           TIMESTAMP WITH TIME ZONE
 );
