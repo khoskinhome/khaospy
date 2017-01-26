@@ -24,6 +24,7 @@ use Khaospy::Utils qw(
 
 use Khaospy::Conf::Controls qw(
     state_to_binary
+    get_one_wire_therm_desired_range
 );
 
 use Khaospy::Constants qw(
@@ -157,6 +158,10 @@ sub pi_n_other_control_msg {
         init_last_control_state($last_control_state, $control_name);
         $last_control_state->{$control_name}{last_value} = $curr_state_bin;
 
+        # The last hack to HeatingD before it gets removed :
+        $last_control_state->{$control_name}{current_state} =
+             $msg_rh->{current_state};
+
         kloginfo ("Received $control_name == $curr_state_bin");
 
         # TODO can't just assume the last_value == true means the window is open.
@@ -220,7 +225,27 @@ sub pi_n_other_control_msg {
             return ;
         }
 
-        my $lower_temp = $tc->{lower_temp} || ( $upper_temp - 1 );
+        my $lower_temp;
+
+        # The last hack to HeatingD before it gets removed:
+        my @db_rows;
+        for my $cnm ( keys %$last_control_state ){
+            $last_control_state->{$cnm}{control_name} = $cnm;
+            push @db_rows, $last_control_state->{$cnm};
+        }
+
+        my ($c_lower, $c_higher) = get_one_wire_therm_desired_range(
+            $control_name,\@db_rows );
+
+        if ($c_lower && $c_higher){
+            $lower_temp  = $c_lower;
+            $upper_temp = $c_higher;
+            kloginfo "$control_name, has been set from the control conf (last hack) $c_lower deg C -> $c_higher deg C";
+        } else {
+            $lower_temp = $tc->{lower_temp} || ( $upper_temp - 1 );
+        }
+
+        ##### end of the last hack
 
         if ( ! $operate_control_name || ! defined $upper_temp || ! defined $lower_temp ){
             klogerror "Not all the parameters are configured for this thermometer";
@@ -242,17 +267,6 @@ sub pi_n_other_control_msg {
 
         kloginfo "$name : $owaddr : $current_state C : lower = $lower_temp C : upper = $upper_temp C";
         klogdebug "msg", $msg_rh;
-
-#        my $send_cmd = sub {
-#            my ( $action ) = @_;
-#            my $retval;
-#            kloginfo "Send command to '$operate_control_name' '$action'";
-#            eval { $retval = queue_command($operate_control_name, $action); };
-#            if ( $@ ) {
-#                klogerror "$@";
-#                return
-#            }
-#        };
 
 #        my $window_sensor ==
         if ( exists $tc->{window_sensor}) {
