@@ -1,8 +1,13 @@
 package Khaospy::Log;
-use strict;
-use warnings;
+use strict; use warnings;
 
 use Exporter qw/import/;
+our @EXPORT_OK = qw(
+    klog START FATAL ERROR WARN INFO EXTRA DEBUG
+    klogstart klogfatal klogerror
+    klogwarn  kloginfo  klogextra klogdebug
+);
+
 use Carp qw/confess/;
 use Sys::Hostname;
 use Data::Dumper;
@@ -10,10 +15,13 @@ use Data::Dumper;
 use Khaospy::Conf::PiHosts qw/get_this_pi_host_config/;
 use Khaospy::Utils qw/timestamp/;
 
+use Khaospy::Conf::Global qw(
+    gc_ERROR_LOG_DAEMON_SEND_PORT
+);
+
 use Khaospy::Constants qw(
     $JSON
     $ZMQ_CONTEXT
-    $ERROR_LOG_DAEMON_SEND_PORT
     $ERROR_LOG_DAEMON_SCRIPT
 );
 
@@ -41,11 +49,6 @@ sub kloginfo  ($;$$$$) { klog(INFO ,@_) };
 sub klogextra ($;$$$$) { klog(EXTRA,@_) };
 sub klogdebug ($;$$$$) { klog(DEBUG,@_) };
 
-our @EXPORT_OK = qw(
-    klog START FATAL ERROR WARN INFO EXTRA DEBUG
-    klogstart klogfatal klogerror
-    klogwarn  kloginfo  klogextra klogdebug
-);
 =pod
     types
         ERROR
@@ -80,7 +83,7 @@ sub _get_zmq_pub {
 
         my $zmq_p = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
 
-        my $pub_to_port = "tcp://$pub_host:$ERROR_LOG_DAEMON_SEND_PORT";
+        my $pub_to_port = "tcp://$pub_host:".gc_ERROR_LOG_DAEMON_SEND_PORT;
 
         if ( my $zmq_state = zmq_connect($zmq_p, $pub_to_port )){
             # zmq_connect returns zero on success.

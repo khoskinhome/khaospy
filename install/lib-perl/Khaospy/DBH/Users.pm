@@ -2,6 +2,22 @@ package Khaospy::DBH::Users;
 use strict; use warnings;
 
 use Exporter qw/import/;
+our @EXPORT_OK = qw(
+    get_user
+    get_user_by_id
+    get_users
+    get_user_password
+    update_user_by_id
+
+    insert_user
+    delete_user
+
+    password_valid
+    password_desc
+
+    users_field_valid
+    users_field_desc
+);
 
 use Email::Valid;
 
@@ -41,23 +57,6 @@ use Khaospy::Utils qw(
 
 use Khaospy::Exception qw(
     KhaospyExcept::InvalidFieldName
-);
-
-our @EXPORT_OK = qw(
-    get_user
-    get_user_by_id
-    get_users
-    get_user_password
-    update_user_by_id
-
-    insert_user
-    delete_user
-
-    password_valid
-    password_desc
-
-    users_field_valid
-    users_field_desc
 );
 
 sub get_user_password {

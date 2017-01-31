@@ -1,16 +1,27 @@
 package Khaospy::Utils;
-use strict;
-use warnings;
+use strict; use warnings;
+
+use Exporter qw/import/;
+our @EXPORT_OK = qw(
+    trim
+    timestamp
+    slurp
+    burp
+    get_hashval
+    get_cmd
+    get_iso8601_utc_from_epoch
+    iso8601_parse
+);
 
 use POSIX qw(strftime);
 use Carp qw/croak confess/;
 use Data::Dumper;
-use Exporter qw/import/;
-use JSON;
+
 use DateTime;
 use Time::Local;
 
-my $json = JSON->new->allow_nonref;
+use Khaospy::Conf::Global qw(
+);
 
 use Khaospy::Constants qw(
     true false
@@ -23,17 +34,6 @@ use Khaospy::Constants qw(
 
 use Khaospy::Exception qw(
     KhaospyExcept::ShellCommand
-);
-
-our @EXPORT_OK = qw(
-    trim
-    timestamp
-    slurp
-    burp
-    get_hashval
-    get_cmd
-    get_iso8601_utc_from_epoch
-    iso8601_parse
 );
 
 sub timestamp { return strftime("%F %T", gmtime( $_[0] || time) ); }

@@ -32,12 +32,76 @@ i2c stuff :
         and "dtparam=i2c_vc=on" to /boot/config.txt
 
 
+/etc/fstab and usb-stick and /opt/khaospy/log
+---------------------------------------------
+lots of writing of logs will wear out flash cards.
+So I guess its better to do this on a usb-memory-stick rather than the main Pi memory-card.
 
-still to do :
+    http://www.raspberrypi-spy.co.uk/2014/05/how-to-mount-a-usb-flash-disk-on-the-raspberry-pi/
 
-    add a USB flash mem stick. (small one form factor ) 16 GB.
-    get the USB mounting in /etc/fstab.
-    mount /opt/khaospy/log on the usb flash mem stick.
+    shove in hopefully a small form factor memory stick ( so it doesn't hang out a long way )
+
+    This will usually come up as /dev/sda1 and will be preformatted with vfat.
+    I guess you could leave it as vfat, but I'd rather use ext4.
+
+
+    This will list the attached disks :
+
+    ls -l /dev/disk/by-uuid/
+
+
+
+
+    sudo mkdir /media/usb
+    sudo chown -R pi:pi /media/usb
+
+    ext4
+    ----
+    don't really want vfat , ext4 is the linux FS, so assuming its sda1,
+    make sure the drive isn't mounted, make it an ext4 partition,  :
+
+    sudo mkfs.ext4 /dev/sda1 -L media-usb
+
+
+    this should manually mount it :
+        sudo mount /dev/sda1 /media/usb -t ext4
+
+
+    but its much better to have it auto mounted in the /etc/fstab.
+
+    If it's been reformatted, the uuid would have changed , so :
+
+    ls -l /dev/disk/by-uuid/
+
+    get the uuid , and assuming ext4, then edit the /etc/fstab, and put in the following line :
+
+        if sda1 has been formatted to ext4 :
+            UUID=<the-uuid> /media/usb ext4 auto,nofail,noatime,nodiratime,users,rw 0 0
+
+
+    also needed in the fstab, if DBD::Pg is to be installed ( it uses a lot of /tmp during installation ) :
+        tmpfs    /tmp    tmpfs    defaults,noatime,nosuid,size=200m    0 0
+
+    reboot the pi , and make sure the /media/usb mounts with say :
+
+    df -h
+
+
+    getting the logs written to the /media/usb 
+
+        sudo mkdir /media/usb/khaospy-log
+        sudo chown -R pi:pi /media/usb
+        sudo chown -R pi:pi /media/usb/khaospy-log/
+
+        cd /opt/khaospy
+
+        sudo rm -rf /opt/khaospy/log
+
+        ln -s /media/usb/khaospy-log/ log
+
+    Logs should now be written to /media/usb .
+
+
 
 
 once fully setup "dd" the micro-sd card and get an image
@@ -81,12 +145,18 @@ setup bind9 DNS on piloft
 the webserver
 ##############
     https://www.digitalocean.com/community/tutorials/how-to-create-a-ssl-certificate-on-apache-for-debian-8
+    https://www.digitalocean.com/community/tutorials/how-to-create-a-ssl-certificate-on-apache-for-debian-8
+
+# NO DON'T DO THIS :
+#    in /etc/apache2/mods-available/ssl.conf change :
+#        SSLProtocol all -SSLv3
+#            to :
+#        SSLProtocol all -TLSv1.2
 
 
-    in /etc/apache2/mods-available/ssl.conf change :
-        SSLProtocol all -SSLv3
-            to :
-        SSLProtocol all -TLSv1.2
+    I think :
+        sudo a2enmod ssl
+    does the following ...
 
     At the command line :
         cd /etc/apache2/mods-enabled
@@ -143,5 +213,30 @@ https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgres
     in /etc/postgres/postgresql.conf changed the line to be :
         data_directory = '/media/120GB_ssd/postgresql/9.4/main'         # use data in another directory
 
- 
+
+
+sudo crontab -e
+################
+
+# make the daemons run on startup , and to keep try running them :
+*/1  * * * * /opt/khaospy/bin/khaospy-run-daemons.pl         2>&1  > /dev/null
+
+# keep the logs trimmed down to the last few days :
+1 1 * * * find /opt/khaospy/log -type f -mtime +3 -delete 2>&1 > /dev/null
+
+
+# Not sure about this, might generate rrd's as they're demanded.
+# requires a lot of processing :
+# */15 * * * * /opt/khaospy/bin/khaospy-generate-rrd-graphs.pl 2>&1  > /dev/null
+
+
+log-rotate stuff :
+##################
+there's stuff in my install-to-pi-pi.bash scripts.
+
+
+TODO Install from a github checkout :
+    need to allow a checkout from github on a pi and then ansible up the install.
+
+
 

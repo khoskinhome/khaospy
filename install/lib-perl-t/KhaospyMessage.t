@@ -10,6 +10,9 @@ use Test::More qw/no_plan/;
 use Test::Exception;
 use Test::Deep;
 
+use Khaospy::Conf::Global qw(
+);
+
 use Khaospy::Constants qw(
     $JSON
     ON OFF STATUS

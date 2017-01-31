@@ -19,8 +19,14 @@ use Data::Dumper;
 use Carp qw(confess);
 use Try::Tiny;
 use Khaospy::DBH qw(dbh);
+
+use Khaospy::Conf::Global qw(
+    gc_PI_STATUS_RRD_UPDATE_TIMEOUT
+);
+
 use Khaospy::Constants qw(
     true false
+    $WEBUI_ALL_CONTROL_TYPES
 );
 
 use Khaospy::Utils qw(
@@ -40,11 +46,6 @@ use Khaospy::Conf::Controls qw(
     state_to_binary
     control_good_state
     get_one_wire_therm_desired_range
-);
-
-use Khaospy::Constants qw(
-    $PI_STATUS_RRD_UPDATE_TIMEOUT
-    $WEBUI_ALL_CONTROL_TYPES
 );
 
 sub control_status_insert {
@@ -427,7 +428,7 @@ sub get_last_control_state {
             = state_to_binary( $row->{current_state} );
 
         $lcs->{$control_name}{last_rrd_update_time}
-            = time - $PI_STATUS_RRD_UPDATE_TIMEOUT;
+            = time - gc_PI_STATUS_RRD_UPDATE_TIMEOUT;
 
         for my $mpf ( keys %$row){
             $lcs->{$control_name}{$mpf} = $row->{$mpf};

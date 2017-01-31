@@ -9,6 +9,9 @@ use Data::Dumper;
 use Carp qw/confess/;
 use Time::HiRes qw/time/;
 
+use Khaospy::Conf::Global qw(
+);
+
 use Khaospy::Constants qw(
     $PI_I2C_GET
     $PI_I2C_SET

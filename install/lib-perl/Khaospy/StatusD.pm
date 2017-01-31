@@ -27,40 +27,28 @@ use Khaospy::DBH::Controls qw(
 
 use zhelpers;
 
+use Khaospy::Conf::Global qw(
+    gc_SCRIPT_TO_PORT
+    gc_PI_STATUS_DAEMON_SEND_PORT
+    gc_PI_STATUS_DAEMON_WEBUI_VAR_PUB_COUNT
+    gc_PI_STATUS_DAEMON_WEBUI_VAR_TIMER
+    gc_PI_STATUS_DAEMON_TIMER
+    gc_PI_STATUS_RRD_UPDATE_TIMEOUT
+);
+
 use Khaospy::Constants qw(
     $JSON
     $ZMQ_CONTEXT
     true false
     ON OFF STATUS
 
-
     $LOCALHOST
 
     $RRD_DIR
 
     $ONEWIRE_THERM_CONTROL_TYPE
-    $PI_STATUS_RRD_UPDATE_TIMEOUT
 
     $TIMER_AFTER_COMMON
-    $PI_STATUS_DAEMON_TIMER
-    $PI_STATUS_DAEMON_WEBUI_VAR_TIMER
-    $PI_STATUS_DAEMON_WEBUI_VAR_PUB_COUNT
-    $PI_STATUS_DAEMON_SEND_PORT
-
-    $ONE_WIRE_DAEMON_PERL_PORT
-    $ONE_WIRE_SENDER_PERL_SCRIPT
-
-    $PI_CONTROLLER_DAEMON_SEND_PORT
-    $PI_CONTROLLER_DAEMON_SCRIPT
-
-    $OTHER_CONTROLS_DAEMON_SEND_PORT
-    $OTHER_CONTROLS_DAEMON_SCRIPT
-
-    $MAC_SWITCH_DAEMON_SEND_PORT
-    $MAC_SWITCH_DAEMON_SCRIPT
-
-    $SCRIPT_TO_PORT
-
 );
 
 use Khaospy::Conf::Controls qw(
@@ -127,16 +115,16 @@ sub run_status_d {
     $last_db_control_status_purge = time;
 
     $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
-    my $pub_to_port = "tcp://*:$PI_STATUS_DAEMON_SEND_PORT";
+    my $pub_to_port = "tcp://*:".gc_PI_STATUS_DAEMON_SEND_PORT;
     zmq_bind( $zmq_publisher, $pub_to_port );
 
     my @w;
 
-    for my $script ( keys %$SCRIPT_TO_PORT ){
-        my $port = get_hashval($SCRIPT_TO_PORT, $script);
+    for my $script ( keys %{gc_SCRIPT_TO_PORT()} ){
+        my $port = get_hashval(gc_SCRIPT_TO_PORT, $script);
 
         # Don't want to subscribe to "self" :
-        next if $port eq $PI_STATUS_DAEMON_SEND_PORT;
+        next if $port eq gc_PI_STATUS_DAEMON_SEND_PORT;
 
         for my $sub_host (
             @{get_pi_hosts_running_daemon($script)}
@@ -156,13 +144,13 @@ sub run_status_d {
 
     push @w, AnyEvent->timer(
         after    => $TIMER_AFTER_COMMON,
-        interval => $PI_STATUS_DAEMON_TIMER,
+        interval => gc_PI_STATUS_DAEMON_TIMER,
         cb       => \&timer_rrd_update
     );
 
     push @w, AnyEvent->timer(
         after    => $TIMER_AFTER_COMMON,
-        interval => $PI_STATUS_DAEMON_WEBUI_VAR_TIMER,
+        interval => gc_PI_STATUS_DAEMON_WEBUI_VAR_TIMER,
         cb       => \&timer_publish_webui_var_changes,
     );
 
@@ -182,8 +170,7 @@ sub timer_rrd_update {
         if ( is_control_rrd_graphed($control_name) ){
 
             if ( $lcs->{$control_name}{last_rrd_update_time}
-                + $PI_STATUS_RRD_UPDATE_TIMEOUT
-                    < time
+                + gc_PI_STATUS_RRD_UPDATE_TIMEOUT() < time
             ){
                 klogextra "Update RRD for $control_name with last_value (timeout)";
                 update_rrd( $control_name, time,
@@ -208,6 +195,9 @@ sub timer_publish_webui_var_changes {
     # webui directly updates the DB with these.
     #kloginfo 'Dump of webvar controls',  get_controls_webui_var_type();
 
+    # TODO could also do with periodically publishing even when the status
+    # hasn't changed. ( So RulesD doesn't have to connect to the DB )
+
     my $webui_control_rows = get_controls_webui_var_type();
 
     for my $row (@$webui_control_rows){
@@ -222,7 +212,7 @@ sub timer_publish_webui_var_changes {
         ){
             $lcs->{$control_name} = $row;
             $lcs->{$control_name}{publish_count} =
-                $PI_STATUS_DAEMON_WEBUI_VAR_PUB_COUNT - 1;
+                gc_PI_STATUS_DAEMON_WEBUI_VAR_PUB_COUNT - 1;
 
             publish_webui_control($row);
         } elsif ($lcs->{$control_name}{publish_count}){

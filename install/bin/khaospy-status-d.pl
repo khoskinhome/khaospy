@@ -11,6 +11,9 @@ use Khaospy::StatusD qw(
     run_status_d
 );
 
+use Khaospy::Conf::Global qw(
+);
+
 use Khaospy::Constants qw(
     $DB_CONTROL_STATUS_DAYS_HISTORY
     $DB_CONTROL_STATUS_PURGE_TIMEOUT_SECS

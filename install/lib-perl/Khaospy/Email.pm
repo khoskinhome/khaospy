@@ -3,15 +3,15 @@ use strict;
 use warnings;
 use 5.14.2;
 
-use Try::Tiny;
 use Exporter qw/import/;
+our @EXPORT_OK = qw( send_email );
+
+use Try::Tiny;
 use Email::Send;
 use Email::Send::Gmail;
 use Email::Simple::Creator;
 
 use Khaospy::Conf qw( get_email_conf );
-
-our @EXPORT_OK = qw( send_email );
 
 use Khaospy::Utils qw(get_hashval);
 use Khaospy::Log qw(

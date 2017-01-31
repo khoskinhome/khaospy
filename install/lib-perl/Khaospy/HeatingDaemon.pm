@@ -27,6 +27,11 @@ use Khaospy::Conf::Controls qw(
     get_one_wire_therm_desired_range
 );
 
+use Khaospy::Conf::Global qw(
+    gc_SCRIPT_TO_PORT
+    gc_ONE_WIRE_DAEMON_PERL_PORT
+);
+
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     true false
@@ -34,9 +39,7 @@ use Khaospy::Constants qw(
     $HEATING_DAEMON_CONF_FULLPATH
 
     $ONE_WIRE_SENDER_PERL_SCRIPT
-    $ONE_WIRE_DAEMON_PERL_PORT
 
-    $SCRIPT_TO_PORT
 );
 
 use Khaospy::QueueCommand qw(
@@ -95,12 +98,12 @@ sub run_heating_daemon {
     for my $sub_host (
         @{get_pi_hosts_running_daemon($ONE_WIRE_SENDER_PERL_SCRIPT)}
     ){
-        kloginfo "Subscribing to One-Wire $sub_host : $ONE_WIRE_DAEMON_PERL_PORT";
+        kloginfo "Subscribing to One-Wire $sub_host : ".gc_ONE_WIRE_DAEMON_PERL_PORT;
         $count_zmq_subs++;
         push @w, zmq_anyevent({
             zmq_type          => ZMQ_SUB,
             host              => $sub_host,
-            port              => $ONE_WIRE_DAEMON_PERL_PORT,
+            port              => gc_ONE_WIRE_DAEMON_PERL_PORT,
             msg_handler       => \&process_thermometer_msg,
             msg_handler_param => "",
             klog              => true,
@@ -111,10 +114,10 @@ sub run_heating_daemon {
         if ! $count_zmq_subs;
 
     # subscribe to everything other than one-wire thermometers :
-    for my $script ( keys %$SCRIPT_TO_PORT ){
+    for my $script ( keys %{gc_SCRIPT_TO_PORT()} ){
         next if $script eq $ONE_WIRE_SENDER_PERL_SCRIPT;
 
-        my $port = get_hashval($SCRIPT_TO_PORT, $script);
+        my $port = get_hashval(gc_SCRIPT_TO_PORT, $script);
         for my $sub_host (
             @{get_pi_hosts_running_daemon($script)}
         ){

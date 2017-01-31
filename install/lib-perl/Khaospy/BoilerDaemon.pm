@@ -1,8 +1,9 @@
 package Khaospy::BoilerDaemon;
-use warnings;
-use strict;
+use warnings; use strict;
 
 use Exporter qw/import/;
+our @EXPORT_OK = qw( run_boiler_daemon );
+
 use Data::Dumper;
 use Carp qw/croak/;
 use AnyEvent;
@@ -10,6 +11,9 @@ use ZMQ::LibZMQ3;
 use ZMQ::Constants qw(ZMQ_SUB ZMQ_SUBSCRIBE ZMQ_RCVMORE ZMQ_FD);
 use Clone 'clone';
 use POSIX qw(strftime);
+
+use Khaospy::Conf::Global qw(
+);
 
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
@@ -32,7 +36,6 @@ use Khaospy::Conf         qw( get_boiler_conf );
 use Khaospy::Utils        qw( timestamp get_hashval );
 use Khaospy::ZMQAnyEvent  qw( subscribe_to_controller_daemons );
 
-our @EXPORT_OK = qw( run_boiler_daemon );
 
 my $BOILER_STATUS;
 my $BOILER_DAEMON_START_TIME;

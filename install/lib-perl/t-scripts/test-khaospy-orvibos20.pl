@@ -17,24 +17,13 @@ use Khaospy::Constants qw(
 
 use Khaospy::OrviboS20 qw/signal_control/;
 
-
-# generate the daemon-runner JSON conf file in perl !
-
 my $json = JSON->new->allow_nonref;
-
-  ## install/bin/khaospy-generate-rrd-graphs.pl:21:my $thermometer_conf = $json->decode( # TODO rm this line
-
-  ## install/lib-perl/Khaospy/Constants.pm:113:        '28-0000066ebc74' => { # TODO rm this line
 
 my $controls = $json->decode(
     slurp ( $CONTROLS_CONF_FULLPATH )
 );
 
 print Dumper ( $controls ) ;
-
-#my $host  = '192.168.1.160';
-#my $mac = 'AC-CF-23-72-F3-D4';
-#test_on_off_status($host,$mac);
 
 for my $control_key ( keys %$controls ) {
     print "##############\n";

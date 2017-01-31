@@ -10,6 +10,9 @@ use Exporter qw/import/;
 use Scalar::Util qw(looks_like_number);
 use List::Util qw(all);
 
+use Khaospy::Conf::Global qw(
+);
+
 use Khaospy::Constants qw(
     $JSON
     ON OFF STATUS

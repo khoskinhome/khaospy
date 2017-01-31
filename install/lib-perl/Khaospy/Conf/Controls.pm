@@ -90,12 +90,9 @@ use Khaospy::Constants qw(
     $WEBUI_VAR_INTEGER_CONTROL_TYPE
     $WEBUI_VAR_STRING_CONTROL_TYPE
 
-
 );
 
-use Khaospy::Conf qw(
-    get_conf
-);
+use Khaospy::Conf;
 
 use Khaospy::Conf::Global qw(
     gc_TEMP_RANGE_DEG_C
@@ -391,7 +388,7 @@ sub _set_controls_conf {
 
 sub get_controls_conf {
     my ($force_reload) = @_;
-    get_conf(
+    Khaospy::Conf::get_conf(
         \$controls_conf,
         $CONTROLS_CONF_FULLPATH,
         $force_reload,

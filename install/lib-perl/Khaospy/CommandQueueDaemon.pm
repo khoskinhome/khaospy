@@ -39,6 +39,11 @@ use Khaospy::Message qw(
     validate_control_msg_json
 );
 
+use Khaospy::Conf::Global qw(
+    gc_QUEUE_COMMAND_PORT
+    gc_COMMAND_QUEUE_DAEMON_SEND_PORT
+);
+
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     $JSON
@@ -49,8 +54,6 @@ use Khaospy::Constants qw(
     $COMMAND_QUEUE_DAEMON_TIMER
     $COMMAND_QUEUE_DAEMON_BROADCAST_TIMER
 
-    $QUEUE_COMMAND_PORT
-    $COMMAND_QUEUE_DAEMON_SEND_PORT
     $LOCALHOST
     $MESSAGE_TIMEOUT
 
@@ -102,14 +105,14 @@ sub run_command_queue_daemon {
         zmq_type          => ZMQ_REP,
         bind              => true,
         host              => $LOCALHOST,
-        port              => $QUEUE_COMMAND_PORT,
+        port              => gc_QUEUE_COMMAND_PORT,
         msg_handler       => \&queue_message,
         klog              => true,
     });
 
     # Publisher to push the queue out to controllers.
     $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
-    my $pub_to_port = "tcp://*:$COMMAND_QUEUE_DAEMON_SEND_PORT";
+    my $pub_to_port = "tcp://*:gc_COMMAND_QUEUE_DAEMON_SEND_PORT";
     zmq_bind( $zmq_publisher, $pub_to_port );
     kloginfo "Publishing to $pub_to_port";
 

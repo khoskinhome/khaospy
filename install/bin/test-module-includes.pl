@@ -42,6 +42,8 @@ use Khaospy::Conf::HardCoded;
 
 use Khaospy::Exception;
 
+use Khaospy::Conf::Global;
+
 use Khaospy::Constants;
 use Khaospy::QueueCommand;
 

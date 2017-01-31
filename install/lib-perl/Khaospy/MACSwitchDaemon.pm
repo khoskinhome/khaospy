@@ -27,6 +27,10 @@ use Khaospy::Conf::Controls qw(
     get_controls_conf_for_host
 );
 
+use Khaospy::Conf::Global qw(
+    gc_MAC_SWITCH_DAEMON_SEND_PORT
+);
+
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     $JSON
@@ -35,7 +39,6 @@ use Khaospy::Constants qw(
     true false
 
     $MAC_SWITCH_CONTROL_TYPE
-    $MAC_SWITCH_DAEMON_SEND_PORT
     $MAC_SWITCH_DAEMON_TIMER
     $MAC_SWITCH_NMAP_ARGS
     $NMAP_EXECUTABLE
@@ -99,7 +102,7 @@ sub run_mac_switch_daemon {
     }
 
     $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
-    my $pub_to_port = "tcp://*:$MAC_SWITCH_DAEMON_SEND_PORT";
+    my $pub_to_port = "tcp://*:".gc_MAC_SWITCH_DAEMON_SEND_PORT;
     zmq_bind( $zmq_publisher, $pub_to_port );
 
     my @w;

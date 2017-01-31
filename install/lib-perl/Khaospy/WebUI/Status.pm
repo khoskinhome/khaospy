@@ -23,8 +23,6 @@ use Khaospy::Constants qw(
     true false
      INC_VALUE_ONE  DEC_VALUE_ONE
     $INC_VALUE_ONE $DEC_VALUE_ONE
-
-
 );
 
 use Khaospy::WebUI::Util; # can't import.

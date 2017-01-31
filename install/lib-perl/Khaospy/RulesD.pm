@@ -21,6 +21,10 @@ use Khaospy::Conf::Controls qw(
     state_to_binary
 );
 
+use Khaospy::Conf::Global qw(
+    gc_SCRIPT_TO_PORT
+);
+
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     true false
@@ -30,8 +34,6 @@ use Khaospy::Constants qw(
 
     $RULES_DAEMON_TIMER
     $TIMER_AFTER_COMMON
-
-    $SCRIPT_TO_PORT
 );
 
 use Khaospy::QueueCommand qw(
@@ -89,8 +91,8 @@ sub run_rules_daemon {
 
     my @w = ();
 
-    for my $script ( keys %$SCRIPT_TO_PORT ){
-        my $port = get_hashval($SCRIPT_TO_PORT, $script);
+    for my $script ( keys %{gc_SCRIPT_TO_PORT()} ){
+        my $port = get_hashval(gc_SCRIPT_TO_PORT, $script);
         for my $sub_host (
             @{get_pi_hosts_running_daemon($script)}
         ){

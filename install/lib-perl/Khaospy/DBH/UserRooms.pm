@@ -2,6 +2,17 @@ package Khaospy::DBH::UserRooms;
 use strict; use warnings;
 
 use Exporter qw/import/;
+our @EXPORT_OK = qw(
+    get_user_rooms
+    insert_user_room
+    update_user_room
+    delete_user_room
+    update_user_room
+
+    user_rooms_field_valid
+    user_rooms_field_desc
+);
+
 
 use Email::Valid;
 
@@ -32,17 +43,6 @@ use Khaospy::Utils qw(
 
 use Khaospy::Exception qw(
     KhaospyExcept::InvalidFieldName
-);
-
-our @EXPORT_OK = qw(
-    get_user_rooms
-    insert_user_room
-    update_user_room
-    delete_user_room
-    update_user_room
-
-    user_rooms_field_valid
-    user_rooms_field_desc
 );
 
 sub get_user_rooms {

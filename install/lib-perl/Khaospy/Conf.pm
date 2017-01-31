@@ -10,6 +10,8 @@ use warnings;
 #
 # The rest of Khaospy should get to the confs from here.
 
+use Khaospy::Utils;
+
 use Exporter qw/import/;
 our @EXPORT_OK = qw(
     get_one_wire_heating_control_conf
@@ -20,10 +22,11 @@ our @EXPORT_OK = qw(
     get_conf
 );
 
-
-
 use Carp qw/confess croak/;
 use Data::Dumper;
+
+#use Khaospy::Conf::Global qw(
+#);
 
 use Khaospy::Constants qw(
     $JSON
@@ -41,7 +44,12 @@ use Khaospy::Constants qw(
     $EMAIL_CONF_FULLPATH
 );
 
-use Khaospy::Utils;
+sub _slurp {
+    my ( $file ) = @_;
+    open( my $fh, $file ) or die "Can't open file $file $!\n";
+    my $text = do { local( $/ ) ; <$fh> } ;
+    return $text;
+}
 
 sub get_conf {
     my ($conf_rs, $conf_path, $force_reload, $validate_rc, $last_reload_rs, $reload_every ) = @_;
@@ -57,7 +65,8 @@ sub get_conf {
         )
     ) {
         $$conf_rs = $JSON->decode(
-             Khaospy::Utils::slurp( $conf_path )
+             #Khaospy::Utils::slurp( $conf_path )
+             _slurp( $conf_path )
         );
 
         $$last_reload_rs = time if defined $reload_every;

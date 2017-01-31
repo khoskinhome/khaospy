@@ -1,0 +1,155 @@
+
+ sudo a2enmod ssl
+ cd /etc/apache2/mods-enabled/
+ ls
+ sudo ln -s ../mods-available/cgi.load
+ cd ../
+ sudo vim apache2.conf
+ cd /etc/apache2/mods-enabled
+ sudo ln -s ../mods-available/ssl.conf
+ sudo ln -s ../mods-available/ssl.load
+ sudo a2ensite default-ssl
+ sudo service apache2 reload
+ sudo mkdir /etc/apache2/ssl
+
+
+
+pi@pitest /etc/apache2/mods-enabled $ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt
+Generating a 2048 bit RSA private key
+..........+++
+..................+++
+writing new private key to '/etc/apache2/ssl/apache.key'
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:UK
+State or Province Name (full name) [Some-State]:
+Locality Name (eg, city) []:
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:khaos
+Organizational Unit Name (eg, section) []:
+Common Name (e.g. server FQDN or YOUR name) []:pitest.khaos
+Email Address []:
+
+ sudo chmod 600 /etc/apache2/ssl/*
+ sudo vim /etc/apache2/sites-enabled/default-ssl.conf
+
+        # what are are the edits ?
+
+        /etc/apache2/sites-enabled/default-ssl
+        <IfModule mod_ssl.c>
+            <VirtualHost _default_:443>
+                ServerAdmin webmaster@localhost
+                ServerName MY-SERVER-HOST-NAME-HERE:443
+                DocumentRoot /var/www/html
+
+                . . .
+                SSLEngine on
+
+                . . .
+
+            # changes these to the certs generated above :
+                SSLCertificateFile /etc/apache2/ssl/apache.crt
+                SSLCertificateKeyFile /etc/apache2/ssl/apache.key
+
+
+                . . .
+
+                <FilesMatch "\.(cgi|shtml|phtml|php)$">
+                                SSLOptions +StdEnvVars
+                </FilesMatch>
+                <Directory /usr/lib/cgi-bin>
+                        SSLOptions +StdEnvVars
+                        AllowOverride None
+                        Options +ExecCGI -MultiViews +FollowSymLinks
+                        Order allow,deny
+                        Allow from all
+                        AddHandler cgi-script .cgi .pl
+
+                </Directory>
+
+                <Location /dancer>
+                        SetHandler perl-script
+                        PerlResponseHandler Plack::Handler::Apache2
+                        PerlSetVar psgi_app /usr/lib/cgi-bin/dancer.pl
+                </Location>
+                SetEnv  DANCER_ENVIRONMENT "development"
+                SetEnv  DANCER_ENVDIR "/opt/khaospy/www-dancer-env/"
+                SetEnv  DANCER_CONFDIR "/opt/khaospy/www-dancer-env/"
+
+
+                <Directory /var/www/html>
+                        Options +FollowSymLinks
+                </Directory>
+
+
+
+
+
+
+
+
+
+
+
+ ifconfig
+ openssl s_client -connect 192.168.1.7:443
+
+ sudo a2dissite 000-default.conf
+ sudo service apache2 reload
+
+
+
+
+
+
+# need sym-links in the /var/www/html and /usr/lib/cgi-bin :
+
+cd /var/www/html
+
+sudo ln -s /opt/khaospy/www/css css
+sudo ln -s /opt/khaospy/www/js  js
+sudo ln -s /some-place-dunno-where rrdimage
+
+
+cd /usr/lib/
+
+sudo rmdir /usr/lib/cgi-bin
+
+sudo ln -s /opt/khaospy/www-bin/ cgi-bin
+
+
+    cd /var/www/html
+    khoskin@piserver /var/www/html $ 
+    khoskin@piserver /var/www/html $ 
+    khoskin@piserver /var/www/html $ ls
+    css  index.html  js  rrdimage
+    khoskin@piserver /var/www/html $ ls -la 
+    total 20
+    drwxr-xr-x 2 root root  4096 May 14  2016 .
+    drwxr-xr-x 3 root root  4096 Dec 20  2015 ..
+    lrwxrwxrwx 1 root root    20 May 14  2016 css -> /opt/khaospy/www/css
+    -rw-r--r-- 1 root root 11109 Dec 20  2015 index.html
+    lrwxrwxrwx 1 root root    19 May 14  2016 js -> /opt/khaospy/www/js
+    lrwxrwxrwx 1 root root    34 Dec 23  2015 rrdimage -> /media/120GB_ssd/khaospy-rrdimage/
+
+
+    khoskin@piserver /var/www/html $ ls -la /usr/lib/cgi-bin
+    lrwxrwxrwx 1 root root 21 Apr 17  2016 /usr/lib/cgi-bin -> /opt/khaospy/www-bin/
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -24,6 +24,9 @@ use Khaospy::DBH::Users qw(
 
 );
 
+use Khaospy::Conf::Global qw(
+);
+
 use Khaospy::WebUI::Constants qw(
     $PASSWORD_RESET_TIMEOUT
     $DANCER_BASE_URL

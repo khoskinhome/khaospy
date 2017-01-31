@@ -18,13 +18,16 @@ use ZMQ::Constants qw(
 
 use zhelpers;
 
+use Khaospy::Conf::Global qw(
+    gc_QUEUE_COMMAND_PORT
+);
+
 use Khaospy::Constants qw(
     $JSON
     $ZMQ_CONTEXT
     true false
     ON OFF STATUS
     $LOCALHOST
-    $QUEUE_COMMAND_PORT
 
     MTYPE_QUEUE_COMMAND
 
@@ -61,7 +64,7 @@ my $zmq_req_sock = zmq_socket($zmq_context,ZMQ_REQ);
 # would need to work out what hosts are running command queues.
 #
 # Currently if this is left as LOCALHOST it should fatal , if there isn't a command-queue-d running on the LOCALHOST.
-my $connect_str = "tcp://$LOCALHOST:$QUEUE_COMMAND_PORT";
+my $connect_str = "tcp://$LOCALHOST:".gc_QUEUE_COMMAND_PORT;
 
 if ( my $zmq_state = zmq_connect($zmq_req_sock, $connect_str )){
     # zmq_connect returns zero on success.

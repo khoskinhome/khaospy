@@ -23,6 +23,10 @@ use Khaospy::Conf::Controls qw(
     get_control_name_for_one_wire
 );
 
+use Khaospy::Conf::Global qw(
+    gc_ONE_WIRE_DAEMON_PERL_PORT
+);
+
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     $JSON
@@ -30,7 +34,6 @@ use Khaospy::Constants qw(
     $TIMER_AFTER_COMMON
 
     $ONE_WIRE_SENSOR_DIR
-    $ONE_WIRE_DAEMON_PERL_PORT
     $ONE_WIRE_SENDER_PERL_TIMER
 );
 
@@ -65,7 +68,7 @@ sub run_one_wire_thermometer_daemon {
     chdir($ONE_WIRE_SENSOR_DIR) || die "can't cd to $ONE_WIRE_SENSOR_DIR\n";
 
     $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
-    my $pub_to_port = "tcp://*:$ONE_WIRE_DAEMON_PERL_PORT";
+    my $pub_to_port = "tcp://*:".gc_ONE_WIRE_DAEMON_PERL_PORT;
     zmq_bind( $zmq_publisher, $pub_to_port );
 
     my @w;

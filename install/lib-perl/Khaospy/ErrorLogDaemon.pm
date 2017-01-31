@@ -30,6 +30,10 @@ use Khaospy::Conf::PiHosts qw/
     get_pi_hosts_running_daemon
 /;
 
+use Khaospy::Conf::Global qw(
+    gc_ERROR_LOG_DAEMON_SEND_PORT
+);
+
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     $JSON
@@ -38,7 +42,6 @@ use Khaospy::Constants qw(
 
     $ERROR_LOG_DAEMON
     $ERROR_LOG_DAEMON_SCRIPT
-    $ERROR_LOG_DAEMON_SEND_PORT
     $ERROR_LOG_DAEMON_TIMER
 
     $TIMER_AFTER_COMMON
@@ -70,7 +73,7 @@ sub run_error_log_daemon {
         zmq_type    => ZMQ_SUB,
         bind        => true,
         host        => "*",
-        port        => $ERROR_LOG_DAEMON_SEND_PORT,
+        port        => gc_ERROR_LOG_DAEMON_SEND_PORT,
         msg_handler => \&error_message,
         klog        => true,
     });

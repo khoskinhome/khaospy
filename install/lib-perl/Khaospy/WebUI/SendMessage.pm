@@ -1,9 +1,10 @@
 package Khaospy::WebUI::SendMessage;
+use strict; use warnings;
 # TODO should be called WebUI::Action.
 
-use strict; use warnings;
-
 use Exporter qw/import/;
+our @EXPORT_OK = qw(webui_send_message);
+
 use Try::Tiny;
 use Time::HiRes qw/usleep time/;
 use Data::Dumper;
@@ -12,10 +13,6 @@ use Khaospy::Utils qw(
     trim
     get_hashval
     get_iso8601_utc_from_epoch
-);
-
-use Khaospy::Constants qw(
-    true false
 );
 
 use Khaospy::QueueCommand qw/ queue_command /;
@@ -36,7 +33,6 @@ use Khaospy::Constants qw(
 use Khaospy::DBH::Controls qw(
     control_status_insert
     get_controls
-
 );
 
 use Khaospy::Conf::Controls qw(
@@ -47,10 +43,6 @@ use ZMQ::LibZMQ3;
 use ZMQ::Constants qw( ZMQ_PUB );
 
 use zhelpers;
-
-our @EXPORT_OK = qw(
-    webui_send_message
-);
 
 sub webui_send_message { # TODO should be called webui_action
     my ( $control_name, $action_value ) = @_;

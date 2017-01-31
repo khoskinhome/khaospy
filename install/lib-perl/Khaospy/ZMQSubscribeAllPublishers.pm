@@ -1,11 +1,11 @@
 package Khaospy::ZMQSubscribeAllPublishers;
-use strict;
-use warnings;
-use Time::HiRes qw/time/;
-
+use strict; use warnings;
 # used by CLI khaospy-zmq-subscribe.pl to listen to all publishers on a host.
 
 use Exporter qw/import/;
+our @EXPORT_OK = qw( run_subscribe_all );
+
+use Time::HiRes qw/time/;
 use Data::Dumper;
 use Carp qw/croak/;
 use Sys::Hostname;
@@ -19,6 +19,15 @@ use ZMQ::Constants qw(
 
 use zhelpers;
 
+use Khaospy::Conf::Global qw(
+    gc_ONE_WIRE_DAEMON_PERL_PORT
+    gc_COMMAND_QUEUE_DAEMON_SEND_PORT
+    gc_PI_CONTROLLER_DAEMON_SEND_PORT
+    gc_OTHER_CONTROLS_DAEMON_SEND_PORT
+    gc_PI_STATUS_DAEMON_SEND_PORT
+    gc_MAC_SWITCH_DAEMON_SEND_PORT
+);
+
 use Khaospy::Constants qw(
     $JSON
     $ZMQ_CONTEXT
@@ -27,17 +36,7 @@ use Khaospy::Constants qw(
 
     $LOCALHOST
 
-    $ONE_WIRE_DAEMON_PERL_PORT
-    $COMMAND_QUEUE_DAEMON_SEND_PORT
-    $PI_CONTROLLER_DAEMON_SEND_PORT
-    $OTHER_CONTROLS_DAEMON_SEND_PORT
-    $PI_STATUS_DAEMON_SEND_PORT
-    $MAC_SWITCH_DAEMON_SEND_PORT
-
     $RRD_IMAGE_DIR
-);
-
-use Khaospy::Conf qw(
 );
 
 use Khaospy::Log qw(
@@ -49,8 +48,6 @@ use Khaospy::Log qw(
 use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
 
 use Khaospy::Utils qw( timestamp burp );
-
-our @EXPORT_OK = qw( run_subscribe_all );
 
 our $LOGLEVEL;
 
@@ -146,32 +143,31 @@ sub get_ports {
     my ($opts) = @_;
     my @ports;
 
-    if ( $opts->{"one-wire"} ){
-        push @ports, $ONE_WIRE_DAEMON_PERL_PORT;
-    }
+    push @ports, gc_ONE_WIRE_DAEMON_PERL_PORT
+        if $opts->{"one-wire"};
 
-    push @ports, $COMMAND_QUEUE_DAEMON_SEND_PORT
+    push @ports, gc_COMMAND_QUEUE_DAEMON_SEND_PORT
         if $opts->{"command-queue"};
 
-    push @ports, $PI_CONTROLLER_DAEMON_SEND_PORT
+    push @ports, gc_PI_CONTROLLER_DAEMON_SEND_PORT
         if $opts->{"pi-control"};
 
-    push @ports, $OTHER_CONTROLS_DAEMON_SEND_PORT
+    push @ports, gc_OTHER_CONTROLS_DAEMON_SEND_PORT
         if $opts->{"other-control"};
 
-    push @ports, $PI_STATUS_DAEMON_SEND_PORT
+    push @ports, gc_PI_STATUS_DAEMON_SEND_PORT
         if $opts->{"status"};
 
-    push @ports, $MAC_SWITCH_DAEMON_SEND_PORT
+    push @ports, gc_MAC_SWITCH_DAEMON_SEND_PORT
         if $opts->{"mac"};
 
     @ports = (
-        $ONE_WIRE_DAEMON_PERL_PORT,
-        $COMMAND_QUEUE_DAEMON_SEND_PORT,
-        $PI_CONTROLLER_DAEMON_SEND_PORT,
-        $OTHER_CONTROLS_DAEMON_SEND_PORT,
-        $PI_STATUS_DAEMON_SEND_PORT,
-        $MAC_SWITCH_DAEMON_SEND_PORT,
+        gc_ONE_WIRE_DAEMON_PERL_PORT,
+        gc_COMMAND_QUEUE_DAEMON_SEND_PORT,
+        gc_PI_CONTROLLER_DAEMON_SEND_PORT,
+        gc_OTHER_CONTROLS_DAEMON_SEND_PORT,
+        gc_PI_STATUS_DAEMON_SEND_PORT,
+        gc_MAC_SWITCH_DAEMON_SEND_PORT,
     ) if ! @ports;
 
     return @ports;

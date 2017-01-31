@@ -1,6 +1,5 @@
 package Khaospy::ControlsDaemon;
-use strict;
-use warnings;
+use strict; use warnings;
 
 =pod
 Generalised Controls Daemon class.
@@ -8,10 +7,11 @@ Generalised Controls Daemon class.
 Used by Pi-Controls-D and Other-Controls-D
 
 =cut
+use Exporter qw/import/;
+our @EXPORT_OK = qw(run_daemon);
 
 use Try::Tiny;
 use Time::HiRes qw/usleep time/;
-use Exporter qw/import/;
 use Data::Dumper;
 use Carp qw/croak confess/;
 use Sys::Hostname;
@@ -34,6 +34,10 @@ use Khaospy::Conf::PiHosts qw/
     get_pi_hosts_running_daemon
 /;
 
+use Khaospy::Conf::Global qw(
+    gc_COMMAND_QUEUE_DAEMON_SEND_PORT
+);
+
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     $JSON
@@ -41,7 +45,6 @@ use Khaospy::Constants qw(
     STATUS
 
     $COMMAND_QUEUE_DAEMON_SCRIPT
-    $COMMAND_QUEUE_DAEMON_SEND_PORT
 
     MTYPE_POLL_UPDATE
     MTYPE_OPERATION_STATUS
@@ -68,10 +71,6 @@ use Khaospy::Utils qw(
 
 use Khaospy::ZMQAnyEvent qw/ zmq_anyevent /;
 use zhelpers;
-
-our @EXPORT_OK = qw(
-    run_daemon
-);
 
 my $msg_actioned = {};
 
@@ -110,7 +109,7 @@ sub run_daemon {
         push @w, zmq_anyevent({
             zmq_type    => ZMQ_SUB,
             host        => $sub_host,
-            port        => $COMMAND_QUEUE_DAEMON_SEND_PORT,
+            port        => gc_COMMAND_QUEUE_DAEMON_SEND_PORT,
             msg_handler => \&controller_message,
             klog        => true,
         });
@@ -137,7 +136,7 @@ sub timer_cb {
         next if ( $r_epoch_t > time - $MESSAGE_TIMEOUT );
 
         klogextra "deleting mkey '$mkey'";
-        delete $msg_actioned->{$mkey}
+        delete $msg_actioned->{$mkey};
     }
 }
 

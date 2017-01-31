@@ -2,10 +2,29 @@ package Khaospy::DBH::Rooms;
 use strict; use warnings;
 
 use Exporter qw/import/;
+our @EXPORT_OK = qw(
+    get_rooms
+    insert_room
+    update_room
+    delete_room
+
+    get_rooms_user_can_view
+
+    room_name_valid
+    room_name_desc
+
+    room_tag_valid
+    room_tag_desc
+
+    rooms_field_valid
+    rooms_field_desc
+);
+
 
 use Email::Valid;
 
 use Khaospy::DBH qw(dbh);
+
 use Khaospy::Constants qw(
     true false
 );
@@ -23,24 +42,6 @@ use Khaospy::Utils qw(
 
 use Khaospy::Exception qw(
     KhaospyExcept::InvalidFieldName
-);
-
-our @EXPORT_OK = qw(
-    get_rooms
-    insert_room
-    update_room
-    delete_room
-
-    get_rooms_user_can_view
-
-    room_name_valid
-    room_name_desc
-
-    room_tag_valid
-    room_tag_desc
-
-    rooms_field_valid
-    rooms_field_desc
 );
 
 sub get_rooms {

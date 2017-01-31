@@ -1,10 +1,14 @@
 package Khaospy::ZMQAnyEvent;
-use strict;
-use warnings;
+use strict; use warnings;
 
 # http://domm.plix.at/perl/2012_12_getting_started_with_zeromq_anyevent.html
 
 use Exporter qw/import/;
+our @EXPORT_OK = qw(
+    subscribe_to_controller_daemons
+    zmq_anyevent
+);
+
 use Carp qw/croak/;
 
 use AnyEvent;
@@ -18,18 +22,20 @@ use ZMQ::Constants qw(
     ZMQ_REP
 );
 
-use Khaospy::Conf::PiHosts qw/
+use Khaospy::Conf::PiHosts qw(
     get_pi_hosts_running_daemon
-/;
+);
+
+use Khaospy::Conf::Global qw(
+    gc_PI_CONTROLLER_DAEMON_SEND_PORT
+    gc_OTHER_CONTROLS_DAEMON_SEND_PORT
+);
 
 use Khaospy::Constants qw(
     $ZMQ_CONTEXT
     true false
-
     $PI_CONTROLLER_DAEMON_SCRIPT
-    $PI_CONTROLLER_DAEMON_SEND_PORT
     $OTHER_CONTROLS_DAEMON_SCRIPT
-    $OTHER_CONTROLS_DAEMON_SEND_PORT
 );
 
 use Khaospy::Log qw(
@@ -39,11 +45,6 @@ use Khaospy::Log qw(
 
 use Khaospy::Utils qw(
     get_hashval
-);
-
-our @EXPORT_OK = qw(
-    subscribe_to_controller_daemons
-    zmq_anyevent
 );
 
 =head2
@@ -153,7 +154,7 @@ sub subscribe_to_controller_daemons {
         push @$w, zmq_anyevent({
             zmq_type          => ZMQ_SUB,
             host              => $sub_host,
-            port              => $PI_CONTROLLER_DAEMON_SEND_PORT,
+            port              => gc_PI_CONTROLLER_DAEMON_SEND_PORT,
             msg_handler       => get_hashval($p, 'msg_handler'),
             msg_handler_param => $p->{msg_handler_param} || "",
             klog              => $klog,
@@ -168,7 +169,7 @@ sub subscribe_to_controller_daemons {
         push @$w, zmq_anyevent({
             zmq_type          => ZMQ_SUB,
             host              => $sub_host,
-            port              => $OTHER_CONTROLS_DAEMON_SEND_PORT,
+            port              => gc_OTHER_CONTROLS_DAEMON_SEND_PORT,
             msg_handler       => get_hashval($p, 'msg_handler'),
             msg_handler_param => $p->{msg_handler_param} || "",
             klog              => $klog,
