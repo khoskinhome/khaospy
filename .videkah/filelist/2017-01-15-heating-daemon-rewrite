@@ -1,4 +1,14 @@
-~/crap.sql
+./crapdir/crap.sql
+./crapdir/crap
+./crapdir/crapnew
+./crapdir/.crapsendport.pl
+./crapdir/crap-date-time-parse.pl
+./crapdir/crap-rewrite.pl
+./crapdir/crap2.pl
+./crapdir/crap
+./crapdir/crap.pl
+./crapdir/crap.diff.pl
+
 
 install/bin/khaospy-bash-aliases.sh:83:#TODO RM this before release
 
@@ -14,8 +24,6 @@ install/www-bin/lightba.pl
 ##./install/www/img/ where the images are
 
 #######################################################
-crap
-crapnew
 
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
@@ -43,15 +51,12 @@ crapnew
 ./install/bin/khaospy-db-conf-generate.pl
 
 
-.crapsendport.pl
-crap-date-time-parse.pl
 
 ./install/lib-perl/Khaospy/ControlDispatch.pm
 
 ./install/lib-perl/Khaospy/ControlOther.pm
 
 ./install/lib-perl/Khaospy/ControlPi.pm
-./crap-rewrite.pl
 ./install/lib-perl/Khaospy/ControlPiGPIO.pm
 ./install/lib-perl/Khaospy/ControlPiMCP23017.pm
 ./install/lib-perl-t/KhaospyControlPiMCP23017.t
@@ -105,7 +110,6 @@ install/lib-perl-t/KhaospyMessage.t
 
 ./install/lib-perl/Khaospy/Utils.pm
 
-./crap2.pl
 
 # TODO remove the password from in here :
 ./install/lib-perl/Khaospy/Email.pm
@@ -326,10 +330,6 @@ install-run-live-conf-kill-and-restart-daemons.bash
 install-run-live-conf-kill-and-restart-daemons-all.bash
 
 ###################################################################
-crap
-crap.pl
-
-crap.diff.pl
 
 ./install/lib-perl/Khaospy/Constants.pm
 
@@ -481,6 +481,6 @@ crap.diff.pl
 ./install/apache/default-ssl.conf
 ##############################
 #
-# greping crap
+# greping stuff ...
 
 
