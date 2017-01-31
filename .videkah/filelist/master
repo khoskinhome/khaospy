@@ -20,8 +20,11 @@ crapnew
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
 
+./install/lib-perl/Khaospy/Constants.pm
 ./install/lib-perl/Khaospy/Conf.pm
+./install/lib-perl/Khaospy/Conf/Global.pm
 ./install/lib-perl/Khaospy/Conf/Controls.pm
+./install/lib-perl/Khaospy/ControlsCurrentState.pm
 
 ./install/lib-perl-t/KhaospyConfControls.t
 
@@ -31,6 +34,7 @@ crapnew
 ./install/bin/test-dump-all-confs.pl
 
 ./install/lib-perl/Khaospy/Conf/HardCoded.pm
+./install/bin/khaospy-missing-controls-populate-db.pl
 
 ./install/lib-perl-t/crap.t
 ./install/bin/khaospy-test-conf-generate.pl
@@ -38,9 +42,9 @@ crapnew
 
 ./install/bin/khaospy-db-conf-generate.pl
 
-./install/lib-perl/Khaospy/Constants.pm
 
 .crapsendport.pl
+crap-date-time-parse.pl
 
 ./install/lib-perl/Khaospy/ControlDispatch.pm
 
@@ -78,6 +82,12 @@ install/lib-perl-t/KhaospyMessage.t
 
 ./install/lib-perl/Khaospy/OneWireThermometer.pm
 ./install/bin/khaospy-one-wire-daemon.pl
+
+
+./install/docs/HeatingDaemon2017-01-15.txt
+./install/lib-perl/Khaospy/RulesD.pm
+./install/bin/khaospy-rules-d.pl
+./rules-d-test.pl
 
 ./install/lib-perl/Khaospy/HeatingDaemon.pm
 ./install/bin/khaospy-one-wire-heating-daemon.pl
@@ -226,10 +236,10 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ./install/docs/todo.txt
 
 ./install/docs/setup-pi.txt
+./install/docs/dependencies.txt
 
 ./install/docs/pi-gpio-pins-wiringpi.txt
 
-./install/docs/dependencies.txt
 ./install/docs/anyevent-zmq-links.txt
 ./install/docs/proj_khaospy-home-auto-software.txt
 ./install/docs/proj_khaospy-home-auto-software2.txt
@@ -245,6 +255,7 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ./install/docs/ipcams.txt
 
 ./install/docs/apache2-sites-enabled-orig-pi.txt
+./install/docs/apache2-ssl-dancer-setup.txt
 
 ./install/docs/to-be-deleted-file-list
 
@@ -380,10 +391,6 @@ crap.diff.pl
 ./install/www-dancer-tt/cctv.tt
 
 ########
-# status .TO BE DEPRECATED
-#./install/www-dancer-tt/status.tt
-#./install/www/js/status.js
-#./install/www/css/status.css
 
 ./install/www-dancer-tt/user.tt
 
@@ -473,23 +480,7 @@ crap.diff.pl
 
 ./install/apache/default-ssl.conf
 ##############################
-
+#
 # greping crap
-install/lib-perl/Khaospy/WebUI/UserLogin.pm:154:            => "username and email combination don't match any known users";
-
-
-install/lib-perl/Khaospy/DBH/Controls.pm:228:        $row->{can_operate} = can_operate($control_name);
-
-
-
-g.grep.nH SCRIPT_TO_PORT
-install/lib-perl/Khaospy/Constants.pm:283:our $SCRIPT_TO_PORT = {
-install/lib-perl/Khaospy/Constants.pm:455:    $SCRIPT_TO_PORT
-install/lib-perl/Khaospy/HeatingDaemon.pm:35:    $SCRIPT_TO_PORT
-install/lib-perl/Khaospy/HeatingDaemon.pm:110:    for my $script ( keys %$SCRIPT_TO_PORT ){
-install/lib-perl/Khaospy/HeatingDaemon.pm:113:        my $port = get_hashval($SCRIPT_TO_PORT, $script);
-install/lib-perl/Khaospy/StatusD.pm:62:    $SCRIPT_TO_PORT
-install/lib-perl/Khaospy/StatusD.pm:135:    for my $script ( keys %$SCRIPT_TO_PORT ){
-install/lib-perl/Khaospy/StatusD.pm:136:        my $port = get_hashval($SCRIPT_TO_PORT, $script);
 
 

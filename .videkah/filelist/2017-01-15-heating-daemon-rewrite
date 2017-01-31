@@ -20,6 +20,7 @@ crapnew
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
 
+./install/lib-perl/Khaospy/Constants.pm
 ./install/lib-perl/Khaospy/Conf.pm
 ./install/lib-perl/Khaospy/Conf/Global.pm
 ./install/lib-perl/Khaospy/Conf/Controls.pm
@@ -41,7 +42,6 @@ crapnew
 
 ./install/bin/khaospy-db-conf-generate.pl
 
-./install/lib-perl/Khaospy/Constants.pm
 
 .crapsendport.pl
 crap-date-time-parse.pl
@@ -236,10 +236,10 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ./install/docs/todo.txt
 
 ./install/docs/setup-pi.txt
+./install/docs/dependencies.txt
 
 ./install/docs/pi-gpio-pins-wiringpi.txt
 
-./install/docs/dependencies.txt
 ./install/docs/anyevent-zmq-links.txt
 ./install/docs/proj_khaospy-home-auto-software.txt
 ./install/docs/proj_khaospy-home-auto-software2.txt
@@ -255,6 +255,7 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ./install/docs/ipcams.txt
 
 ./install/docs/apache2-sites-enabled-orig-pi.txt
+./install/docs/apache2-ssl-dancer-setup.txt
 
 ./install/docs/to-be-deleted-file-list
 
