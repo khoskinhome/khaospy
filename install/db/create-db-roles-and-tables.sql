@@ -1,18 +1,24 @@
 
-----CREATE DATABASE IF NOT EXISTS khaospy ;
---CREATE DATABASE khaospy ;
+--CREATE DATABASE IF NOT EXISTS khaospy ;
+CREATE DATABASE khaospy ;
 \c khaospy;
 
 BEGIN;
 
 \set ON_ERROR_STOP
 
+--TODO make something error if we are not in a blank Database.
+
+--To be honest the code is currently only using khaospy_write user (role)
+--but I'm leaving khaospy_read in for things that might connect read-only.
 
 CREATE USER khaospy_read  with LOGIN;
 CREATE USER khaospy_write with LOGIN;
 
-ALTER USER khaospy_read WITH PASSWORD 'password';
-ALTER USER khaospy_write WITH PASSWORD 'password';
+--TODO get Ansible to set these passwords so they don't get
+-- left as defaults.
+ALTER USER khaospy_read WITH PASSWORD 'changepassword';
+ALTER USER khaospy_write WITH PASSWORD 'changepassword';
 
 REVOKE CONNECT ON DATABASE khaospy FROM PUBLIC;
 --REVOKE
@@ -20,12 +26,13 @@ GRANT  CONNECT ON DATABASE khaospy TO khaospy_read;
 -- GRANT
 GRANT  CONNECT ON DATABASE khaospy TO khaospy_write;
 
+
 -- http://stackoverflow.com/questions/2647158/how-can-i-hash-passwords-in-postgresql
-
--- sudo apt-get install postgresql postgresql-contrib libpq-dev
-
 -- sql command inside of psql enable the crypto:
 -- create extension pgcrypto
+-- This needs I believe the extra apt packages postgresql-contrib libpq-dev
+-- installed with something like this (along with postgres)
+--      sudo apt-get install postgresql postgresql-contrib libpq-dev
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 ---------------------
@@ -114,7 +121,7 @@ GRANT SELECT ON control_status_seq TO khaospy_read;
 GRANT ALL ON control_status_seq TO khaospy_write;
 create table control_status (
     id INTEGER PRIMARY KEY DEFAULT nextval('control_status_seq') NOT NULL,
-    control_name             CITEXT REFERENCES controls NOT NULL,
+    control_name             CITEXT REFERENCES controls (control_name) NOT NULL,
     current_state            TEXT,
     last_change_state_time   TIMESTAMP WITH TIME ZONE,
     last_change_state_by     TEXT,
@@ -124,10 +131,6 @@ create table control_status (
 );
 
 create index control_status_control_name_idx on control_status (control_name);
-
---ALTER TABLE control_status
---  ADD CONSTRAINT control_status_control_name_fkey FOREIGN KEY (control_name)
---      REFERENCES controls (control_name);
 
 
 ALTER TABLE control_status SET (autovacuum_vacuum_scale_factor = 0.0);
@@ -191,7 +194,7 @@ CREATE TABLE users (
     passhash_expire        TIMESTAMP WITH TIME ZONE,
     passhash_must_change   BOOLEAN,
     email_confirm_hash     TEXT,
-    phone_mac_control_name CITEXT REFERENCES controls
+    phone_mac_control_name CITEXT REFERENCES controls (control_name)
 );
 
 --TODO user the phone_mac_control_name will only be settable by the administrator.
@@ -227,6 +230,7 @@ GRANT ALL    ON user_rooms TO khaospy_write;
 
 -- TODO the Ansible setup should force the installer
 -- to set a valid password.
+-- could get the webui to enforce this password change :)
 
 INSERT INTO users
 (username, name, email, passhash, is_enabled, is_admin)
@@ -240,53 +244,4 @@ VALUES(
 );
 
 COMMIT;
-
---khaospy=# INSERT INTO users
---khaospy-# (name, email,passsalt,passhash, mobile_phone)
---khaospy-# VALUES(
---khaospy(#     'test',
---khaospy(#     'test@blah.com',
---khaospy(#     crypt('zz_apsswrd', gen_salt('bf', 8)),
---khaospy(#     '07123456789'
---khaospy(# )
---khaospy-# ;
---INSERT 0 1
---khaospy=#
---khaospy=#
---khaospy=# select * from users;
--- id | name | email  | passsalt |                           passhash                           | mobile_phone
-------+------+--------+----------+--------------------------------------------------------------+--------------
---  1 | test | uk-gsc | no-salt  | $2a$08$n4OzrBPHN57uF23uS/z60Oe08ZCPVllw6nIWx5V36Q9rBLXcv/XoC | 07123456789
---(1 row)
---
---khaospy=# select * from users where passhash=crypt('zz_apsswrd', '$2a$08$n4OzrBPHN57uF23uS/z60Oe08ZCPVllw6nIWx5V36Q9rBLXcv/XoC' );
--- id | name | email  | passsalt |                           passhash                           | mobile_phone
-------+------+--------+----------+--------------------------------------------------------------+--------------
---  1 | test | uk-gsc | no-salt  | $2a$08$n4OzrBPHN57uF23uS/z60Oe08ZCPVllw6nIWx5V36Q9rBLXcv/XoC | 07123456789
---(1 row)
---
---khaospy=# select * from users where passhash=crypt('rzz_apsswrd', '$2a$08$n4OzrBPHN57uF23uS/z60Oe08ZCPVllw6nIWx5V36Q9rBLXcv/XoC' );
--- id | name | email | passsalt | passhash | mobile_phone
-------+------+-------+----------+----------+--------------
---(0 rows)
---
-
---
---INSERT INTO users
---(username, name, email,passhash, mobile_phone)
---VALUES(
---    'testacc',
---    'test person',
---    'test@example.com',
---    crypt('zz_apsswrd', gen_salt('bf', 8)),
---    '07654321765'
---
---)
---;
-
--- update users set passhash crypt('zz_apsswrd', gen_salt('bf', 8)) where id = ? ;
-
--- select * from users where passhash = crypt(:pass, passhash);
-
--- delete from  control_status where request_time < now() - interval '16 days';
 

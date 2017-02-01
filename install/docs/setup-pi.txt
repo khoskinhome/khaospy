@@ -31,11 +31,11 @@ i2c stuff :
         add the kernel parm "bcm2708.vc_i2c_override=1" to /boot/cmdline.txt
         and "dtparam=i2c_vc=on" to /boot/config.txt
 
-
+##############################################
 /etc/fstab and usb-stick and /opt/khaospy/log
 ---------------------------------------------
 lots of writing of logs will wear out flash cards.
-So I guess its better to do this on a usb-memory-stick rather than the main Pi memory-card.
+So I guess its better to do this on a usb-memory-stick rather than the main Pi memory-card. ( but if the Pi is running postgres an SSD is probably needed for speed and wear-leveling stuff that goes on inside SSDs , so no point having a USB-memory-stick and SSD .... See below for postgres stuff.)
 
     http://www.raspberrypi-spy.co.uk/2014/05/how-to-mount-a-usb-flash-disk-on-the-raspberry-pi/
 
@@ -107,7 +107,7 @@ So I guess its better to do this on a usb-memory-stick rather than the main Pi m
 once fully setup "dd" the micro-sd card and get an image
 
 
-
+##########################
 setup bind9 DNS on piloft
 
     sudo apt-get install dnsutils bind9-doc bind9
@@ -175,46 +175,91 @@ the webserver
 postgres db.
 ############
 
-https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-14-04
-
 
     https://www.digitalocean.com/community/tutorials/how-to-add-and-delete-users-on-an-ubuntu-14-04-vps
-    create unix user names :
-
-    pgread
-    pgwrite
-
-        postgres@piserver:~$ createuser --interactive
-        Enter name of role to add: khaospy_read
-        Shall the new role be a superuser? (y/n) n
-        Shall the new role be allowed to create databases? (y/n) n
-        Shall the new role be allowed to create more new roles? (y/n) n
-
-        postgres@piserver:~$ createuser --interactive
-        Enter name of role to add: khaospy_write
-        Shall the new role be a superuser? (y/n) n
-        Shall the new role be allowed to create databases? (y/n) n
-        Shall the new role be allowed to create more new roles? (y/n) n
 
 
-    stopped postgres server with
-
-        sudo service postgres stop
-
-    mkdir /media/120GB_ssd/postgres   ( on a usb attached SSD and not on pi main sd card )
+    but the raspbian (debian) install creates a unix 'postgres' user ( so don't need to create unix users for postgres )
 
 
-    cd /media/120GB_ssd ;  chown postgres.postgres postgres
+    https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-14-04
+
+    the install/db/create-db-roles-and-tables.sql pretty much sets up the DB
+    with default postgres user-roles (with "changepassword") and a Webui admin user (again with "changepassword" )
+
+    Therefore don't need to do all of this :
+
+        pgread
+        pgwrite
+
+            postgres@piserver:~$ createuser --interactive
+            Enter name of role to add: khaospy_read
+            Shall the new role be a superuser? (y/n) n
+            Shall the new role be allowed to create databases? (y/n) n
+            Shall the new role be allowed to create more new roles? (y/n) n
+
+            postgres@piserver:~$ createuser --interactive
+            Enter name of role to add: khaospy_write
+            Shall the new role be a superuser? (y/n) n
+            Shall the new role be allowed to create databases? (y/n) n
+            Shall the new role be allowed to create more new roles? (y/n) n
+
+
+    The postgres DB really could do with running on something other than the Pi's main memory card (it will wear it out) . A small (30GB probably) SSD connected via USB should do ...
+
+
+    attach a USB-SSD, do stuff pretty similar to the section above (formatting, mounting in /etc/fstab, checking a reboot auto mounts etc ...) :
+        #############################################
+        /etc/fstab and usb-stick and /opt/khaospy/log
+        #############################################
+
+    stop postgres server with ( before moving the psql data to the SSD ) :
+
+        sudo service postgresql stop
+
+    sudo mkdir -p /media/usb_ssd/postgresql/9.4/  ( on a usb attached SSD and not on pi main sd card )
+
+    cd /media/usb_ssd ;  sudo chown -R postgres.postgres postgresql
 
     cd /var/lib
 
-    mv ./postgres/* /media/120GB_ssd/postgres
+    sudo mv ./postgresql/9.4/* /media/usb_ssd/postgresql/9.4/
 
-    in /etc/postgres/postgresql.conf changed the line to be :
-        data_directory = '/media/120GB_ssd/postgresql/9.4/main'         # use data in another directory
+    sudo vim /etc/postgresql/9.4/main/postgresql.conf
+        and in the postgresql.conf change the line to be :
+        data_directory = '/media/usb_ssd/postgresql/9.4/main'         # use data in another directory
 
 
+    The  /etc/postgresql/9.4/main/pg_hba.conf will need to allow connections within the local RFC1918 network.
+    (otherwise all processes, daemons, the webui that need to connect to the DB would have to be run
+     on the Pi where the postgres DB is )
 
+    So pg_hba.conf will need something like this added :
+
+        # TYPE  DATABASE           USER            ADDRESS              METHOD
+        # "local" is for Unix domain socket connections only
+        local      all             postgres                             peer
+        # IPv4 local connections:
+        hostssl    all             all             127.0.0.1/32         md5
+        hostssl    all             all             localhost            md5
+        hostssl    all             all             192.168.1.0/24       md5
+
+    The pg_hba.conf has many settings, that are beyond the scope of this setup ...
+
+    sudo service postgresql start
+
+    and there needs to be an /opt/khaospy/conf/database.json
+
+    to generate one run the script :
+        /opt/khaospy/bin/khaospy-db-conf-generate.pl
+
+    This script is interactive, with default values.
+    But you really should change the params :
+        host
+        password
+
+
+################
 sudo crontab -e
 ################
 
