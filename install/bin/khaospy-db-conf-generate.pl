@@ -60,7 +60,7 @@ sub write_out_db_conf {
         $JSON->pretty->encode($conf_hsh)
     );
 
-    my $mode = 0600;
+    my $mode = 0644; # TODO this should maybe be more secure ...
     chmod $mode, $DATABASE_CONF_FULLPATH;
 }
 
