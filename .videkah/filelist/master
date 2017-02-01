@@ -260,6 +260,7 @@ install/bin/khaospy-generate-rrd-graphs.pl
 
 ./install/docs/apache2-sites-enabled-orig-pi.txt
 ./install/docs/apache2-ssl-dancer-setup.txt
+./install/apache/default-ssl.conf
 
 ./install/docs/to-be-deleted-file-list
 

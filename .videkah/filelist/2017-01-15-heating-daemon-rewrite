@@ -260,6 +260,7 @@ install/bin/khaospy-generate-rrd-graphs.pl
 
 ./install/docs/apache2-sites-enabled-orig-pi.txt
 ./install/docs/apache2-ssl-dancer-setup.txt
+./install/apache/default-ssl.conf
 
 ./install/docs/to-be-deleted-file-list
 
@@ -467,15 +468,18 @@ install-run-live-conf-kill-and-restart-daemons-all.bash
 ./install/www-bin/test-cgi.pl
 ./install/www-bin/graphs.pl
 ###################################################################
+# DB setup scripts.
 
+./install/db/create-db-roles-and-tables.sql
+./install/db/drop-db.sql
+./install/db/recreate-webui-admin-account.sql
+./install/db/random-postgres-comments.sql
+
+# older setup scripts , probably going to be removed :
 ./install/db/create-db.sql
 ./install/db/grant-db.sql
 ./install/db/create-tables.sql
 ./install/db/drop-tables.sql
-
-./install/db/amelia-heating.sql
-./install/db/melissa-heating.sql
-./install/db/alison-heating.sql
 
 
 ./install/apache/default-ssl.conf
