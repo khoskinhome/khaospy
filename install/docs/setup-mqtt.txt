@@ -1,0 +1,34 @@
+# http://mosquitto.org/2013/01/mosquitto-debian-repository/
+
+# on Pi :
+    cat /etc/os-release
+
+# find out debian version, jessie wheezy etc ...
+
+cd /etc/apt/sources.list.d/
+
+
+# depending on jessie , wheezy etc ...
+    sudo wget http://repo.mosquitto.org/debian/mosquitto-wheezy.list
+
+    sudo wget http://repo.mosquitto.org/debian/mosquitto-jessie.list
+
+sudo apt-get update
+
+
+# search for what's available :
+    apt-cache search mosquitto
+
+# or just :
+
+
+sudo apt-get install -y mosquitto mosquitto-clients
+
+
+## This doesn't want to install on the Pi :
+## sudo cpanm Net::MQTT
+
+sudo cpanm AnyEvent::MQTT
+
+
+
