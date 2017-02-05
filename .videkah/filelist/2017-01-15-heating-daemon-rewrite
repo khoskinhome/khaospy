@@ -17,13 +17,14 @@ install/bin/khaospy-bash-aliases.sh:83:#TODO RM this before release
 ./install/bin/display-latest-control-status-sql.sh
 
 #######################################################
-# Amelia's light hackit daemon
+#amelia's light hackit daemon
 
 ./install/bin/khaospy-amelia-hackit-daemon.pl
 install/www-bin/lightba.pl
 ##./install/www/img/ where the images are
 
 #######################################################
+#main
 
 ./install/lib-perl/Khaospy/BoilerDaemon.pm
 ./install/bin/khaospy-boiler-daemon.pl:215:
@@ -136,14 +137,58 @@ install/lib-perl-t/KhaospyMessage.t
 ./install/lib-perl-t/
 
 ######################################################
-# cctv record
+#MQTT
+
+./install/lib-perl/Khaospy/ZMQAnyEvent.pm
+./install/bin/net-mqtt-sub.pl
+
+./install/bin/mqtt-anyevent-test.pl
+
+./install/bin/mqtt-test2.pl
+/usr/local/share/perl/5.20.1/AnyEvent/MQTT.pm
+/usr/local/share/perl/5.20.1/Net/MQTT/Constants.pm
+/usr/local/share/perl/5.20.1/Net/MQTT/Message.pm
+
+/usr/local/bin/net-mqtt-pub
+/usr/local/bin/net-mqtt-sub
+
+
+./install/cpan/
+./install/cpan/AnyEvent-MQTT-Simple
+./install/cpan/AnyEvent-MQTT-Simple/ignore.txt
+./install/cpan/AnyEvent-MQTT-Simple/xt
+./install/cpan/AnyEvent-MQTT-Simple/xt/boilerplate.t
+./install/cpan/AnyEvent-MQTT-Simple/README
+./install/cpan/AnyEvent-MQTT-Simple/MANIFEST
+./install/cpan/AnyEvent-MQTT-Simple/Changes
+./install/cpan/AnyEvent-MQTT-Simple/Makefile.PL
+./install/cpan/AnyEvent-MQTT-Simple/lib
+./install/cpan/AnyEvent-MQTT-Simple/lib/AnyEvent
+./install/cpan/AnyEvent-MQTT-Simple/lib/AnyEvent/MQTT
+
+./install/cpan/AnyEvent-MQTT-Simple/lib/AnyEvent/MQTT/Simple.pm
+
+./install/cpan/AnyEvent-MQTT-Simple/t
+./install/cpan/AnyEvent-MQTT-Simple/t/pod.t
+./install/cpan/AnyEvent-MQTT-Simple/t/00-load.t
+./install/cpan/AnyEvent-MQTT-Simple/t/01-subscribe.t
+./install/cpan/AnyEvent-MQTT-Simple/t/02-publish.t
+
+./install/cpan/AnyEvent-MQTT-Simple/t/manifest.t
+./install/cpan/AnyEvent-MQTT-Simple/t/pod-coverage.t
+
+
+
+
+######################################################
+#cctv record
 ./install/bin/cctv-record.pl
 ./install/bin/cctv-mount-nas.bash
 
 ######################################################
 #
 #######################################################
-# running all the scripts
+#running all the scripts
 
 ./install/bin/khaospy-run-daemons.pl
 
@@ -153,7 +198,7 @@ install/lib-perl-t/KhaospyMessage.t
 ./install/bin/khaospy-ps.pl
 
 #######################################################
-# one wire thermometer stuff :
+#one wire thermometer stuff :
 
 ./install/bin/khaospy-one-wired-sender.py
 
@@ -162,7 +207,7 @@ install/lib-perl-t/KhaospyMessage.t
 ./install/bin/khaospy-one-wired-receiver-just-listen.py
 
 ##############################################################################
-# graphing of rrds.
+#graphing of rrds.
 
 install/bin/khaospy-generate-rrd-graphs.pl
 
@@ -234,12 +279,15 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ##############################################################################
 # DOCS
 ##############################################################################
+#docs
 
 ./install/docs
 
 ./install/docs/todo.txt
 
 ./install/docs/setup-pi.txt
+./install/docs/setup-mqtt.txt
+
 ./install/docs/dependencies.txt
 
 ./install/docs/pi-gpio-pins-wiringpi.txt
@@ -303,6 +351,7 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ./install/bin/orvibo-s20-control-karl-hack.pl
 
 ###################################################################
+#install
 
 install-to-pi.bash
 install-to-pi-pi.bash
@@ -331,6 +380,8 @@ install-run-live-conf-kill-and-restart-daemons.bash
 install-run-live-conf-kill-and-restart-daemons-all.bash
 
 ###################################################################
+#dbh
+#webui
 
 ./install/lib-perl/Khaospy/Constants.pm
 
@@ -468,7 +519,7 @@ install-run-live-conf-kill-and-restart-daemons-all.bash
 ./install/www-bin/test-cgi.pl
 ./install/www-bin/graphs.pl
 ###################################################################
-# DB setup scripts.
+#DB setup scripts.
 
 ./install/db/create-db-roles-and-tables.sql
 ./install/db/drop-db.sql
