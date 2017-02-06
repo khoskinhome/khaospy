@@ -287,12 +287,13 @@ TODO Install from a github checkout :
 ##################
 # dhcp on piboiler
 ##################
+# DON'T sudo vim /etc/network/interfaces for the static IP, that's not used in "Jessie" raspbian.
+
+# assuming "jessie" distro of raspbian.( see above )
+# add this lot to the end of the file ( without indenting )
+# (although there isn't a wifi adapter on piboiler, and probably never will be)
 
 sudo vim /etc/dhcpcd.conf
-
-# assuming "jessie" distro of raspbian.
-
-# add this lot to the end of the file ( without indenting )
 
     interface eth0
 
