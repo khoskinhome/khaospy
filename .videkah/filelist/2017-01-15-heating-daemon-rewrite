@@ -313,7 +313,7 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ./install/docs/to-be-deleted-file-list
 
 ##################################
-# DNS
+# DNS and DHCP
 ##################################
 ## ./dns/piloft/etc/bind/bind.keys
 #./dns/piloft/etc/bind/db.192
@@ -342,6 +342,8 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ./dns/generate-and-scp-to-hosts.pl
 
 ./dns/scp-dns-to-hosts.bash
+
+./dns/pitest-etc-dhcp-dhcpd.conf
 
 ###################################################################
 

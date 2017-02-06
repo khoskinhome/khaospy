@@ -284,4 +284,38 @@ TODO Install from a github checkout :
     need to allow a checkout from github on a pi and then ansible up the install.
 
 
+##################
+# dhcp on piboiler
+##################
+
+sudo vim /etc/dhcpcd.conf
+
+# assuming "jessie" distro of raspbian.
+
+# add this lot to the end of the file ( without indenting )
+
+    interface eth0
+
+    static ip_address=192.168.1.9/24
+    static routers=192.168.1.254
+    static domain_name_servers=192.168.1.14 192.168.1.8 192.168.1.254 8.8.8.8
+
+    interface wlan0
+
+    static ip_address=192.168.1.4/24
+    static routers=192.168.1.254
+    static domain_name_servers=192.168.1.14 192.168.1.8 192.168.1.254 8.8.8.8
+
+------
+
+http://www.noveldevices.co.uk/rp-dhcp-server
+https://wiki.debian.org/DHCP_Server
+https://help.ubuntu.com/community/isc-dhcp-server
+
+sudo apt-get install isc-dhcp-server
+
+dhcp conf file is ./dns/pitest-etc-dhcp-dhcpd.conf
+
+####################
+
 
