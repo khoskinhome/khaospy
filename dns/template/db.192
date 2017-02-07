@@ -21,6 +21,10 @@ $TTL	604800
 
 
 10	IN	PTR	ipcam-new-10.khaos.
+
+12	IN	PTR	picctv-wifi.khaos.
+13	IN	PTR	picctv.khaos.
+
 15	IN	PTR	ipcam-new-15.khaos.
 
 14	IN	PTR	piserver.khaos.
@@ -30,9 +34,17 @@ $TTL	604800
 
 19	IN	PTR	nas.khaos.
 
-22	IN	PTR	picctv.khaos.
 
 24	IN	PTR	printer-kyocera-fsc5100dn.khaos.
+
+; 40 -> 120 is the dynamic allocated ip range ...
+; I can't be bothered to give them dns names.
+
+; 121 -> 149 is for mobile phones, laptops and tablets.
+; I can't be bothered to give them dns names.
+
+; 150 -> 165 is for networked main switching things ...
+; these will all have dns names.
 
 159	IN	PTR	melissalight.khaos.
 160	IN	PTR	ameliarad.khaos.
@@ -42,6 +54,9 @@ $TTL	604800
 164	IN	PTR	frontroomrad.khaos.
 165	IN	PTR	testsocket.khaos.
 166	IN	PTR	espdev.khaos.
+
+; 170 -> 180s is tv, av and games systems.
+; I can't be bothered to give them dns names.
 
 230     IN      PTR     swannpvr.khaos.
 231	IN	PTR	ipcam01.khaos.
@@ -60,6 +75,7 @@ $TTL	604800
 244	IN	PTR	ipcam14.khaos.
 245	IN	PTR	ipcam15.khaos.
 
+248	IN	PTR	three-home-signal.khaos.
 249	IN	PTR	khaosamelia.khaos.
 250	IN	PTR	khaosloft.khaos.
 251	IN	PTR	khaosplayhouse.khaos.
