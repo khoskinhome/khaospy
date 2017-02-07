@@ -34,14 +34,32 @@ $TTL	604800
 
 19	IN	PTR	nas.khaos.
 
-
 24	IN	PTR	printer-kyocera-fsc5100dn.khaos.
 
 ; 40 -> 120 is the dynamic allocated ip range ...
 ; I can't be bothered to give them dns names.
 
 ; 121 -> 149 is for mobile phones, laptops and tablets.
-; I can't be bothered to give them dns names.
+121	IN	PTR	amelia-ipad.khaos.
+122	IN	PTR	amelia-iphone-6s-plus.khaos.
+123	IN	PTR	amelia-macbook-wifi.khaos.
+124	IN	PTR	amelia-macbook-eth.khaos.
+
+125	IN	PTR	karl-s4-active.khaos.
+126	IN	PTR	karl-moto-g4-phone.khaos.
+127	IN	PTR	karl-nexus-7-tablet.khaos.
+128	IN	PTR	karl-laptop-wifi.khaos.
+129	IN	PTR	karl-laptop-eth.khaos.
+
+130	IN	PTR	lenovo-laptop-wifi-melissa.khaos.
+131	IN	PTR	lenovo-laptop-eth-melissa.khaos.
+132	IN	PTR	melissa-s5-samsung-phone.khaos.
+;133	IN	PTR	melissa-?????.khaos.
+;134	IN	PTR	melissa-?????.khaos.
+;135	IN	PTR	melissa-?????.khaos.
+
+136	IN	PTR	alison-laptop-dell-wifi.khaos.
+137	IN	PTR	alison-laptop-dell-eth.khaos.
 
 ; 150 -> 165 is for networked main switching things ...
 ; these will all have dns names.
@@ -55,8 +73,19 @@ $TTL	604800
 165	IN	PTR	testsocket.khaos.
 166	IN	PTR	espdev.khaos.
 
-; 170 -> 180s is tv, av and games systems.
-; I can't be bothered to give them dns names.
+; 171 -> 180s is tv, av and games systems.
+171	IN	PTR	panasonic-karl-tv.khaos.
+172	IN	PTR	panasonic-55-tv.khaos.
+173	IN	PTR	panasonic-blu-ray.khaos.
+174	IN	PTR	chromecast2-karl.khaos.
+175	IN	PTR	chromecast1-melissa.khaos.
+176	IN	PTR	humax-pvr.khaos.
+177	IN	PTR	samsung-40inch-tv.khaos.
+;;178	IN	PTR	.khaos.
+179	IN	PTR	unidentified-sony-maybe-ps4.khaos.
+180	IN	PTR	melissa-wii-u.khaos.
+181	IN	PTR	melissa-xbox360.khaos.
+182	IN	PTR	melissa-nintendo-switch.khaos.
 
 230     IN      PTR     swannpvr.khaos.
 231	IN	PTR	ipcam01.khaos.
