@@ -35,12 +35,23 @@ piboiler	IN	A	192.168.1.9
 
 ; needs reserving for the cheapo ip-cams that by default use that IP.
 ipcam-new-10		IN	A	192.168.1.10
-ipcam-new-15		IN	A	192.168.1.15
 
 
-; B8-27-EB-96-88-FC piserver
+; hardware ethernet B8:27:EB:45:20:DB;
+;                   b8:27:eb:45:20:db
+picctv-wifi  	IN	A	192.168.1.12
+
+
+; hardware ethernet B8:27:EB:10:75:8E;
+;                   b8:27:eb:10:75:8e
+picctv  	IN	A	192.168.1.13
+
+
+; hardware ethernet B8:27:EB:96:88:FC;
 piserver	IN	A	192.168.1.14
 
+; needs reserving for the cheapo ip-cams that by default use that IP.
+ipcam-new-15		IN	A	192.168.1.15
 
 ; 00-00-F0-AD-33-49 samsung printer :
 printer-samsung-ml2251n	IN	A	192.168.1.16
@@ -55,13 +66,38 @@ melissapc	IN	A	192.168.1.17
 nas		IN	A	192.168.1.19
 
 
-; b8:27:eb:ab:e8:ec picctv
-picctv  	IN	A	192.168.1.22
 
 ; 00-C0-EE-43-C4-CE  00:C0:EE:43:C4:CE kyocera printer :
 printer-kyocera-fsc5100dn	IN	A	192.168.1.24
 prtk		IN	CNAME	printer-kyocera-fsc5100dn.khaos.
 
+; 40 -> 120 is the dynamic range ...
+; I can't be bothered to give them dns names.
+
+; 121 -> 149 is for mobile phones, laptops and tablets.
+amelia-ipad           	IN	A	192.168.1.121
+amelia-iphone-6s-plus 	IN	A	192.168.1.122
+amelia-macbook-wifi   	IN	A	192.168.1.123
+amelia-macbook-eth    	IN	A	192.168.1.124
+
+karl-s4-active        	IN	A	192.168.1.125
+karl-moto-g4-phone    	IN	A	192.168.1.126
+karl-nexus-7-tablet	IN	A	192.168.1.127
+karl-laptop-wifi	IN	A	192.168.1.128
+karl-laptop-eth 	IN	A	192.168.1.129
+
+lenovo-laptop-wifi-melissa	IN	A	192.168.1.130
+lenovo-laptop-eth-melissa	IN	A	192.168.1.131
+melissa-s5-samsung-phone 	IN	A	192.168.1.132
+;melissa??	IN	A	192.168.1.133
+;melissa??	IN	A	192.168.1.134
+;melissa??	IN	A	192.168.1.135
+
+alison-laptop-dell-wifi 	IN	A	192.168.1.136
+alison-laptop-dell-eth  	IN	A	192.168.1.137
+
+; 150 -> 165 is for networked main switching things ...
+; these will all have dns names.
 
 ; AC-CF-23-72-28-30 melissalight
 melissalight	IN	A	192.168.1.159
@@ -87,6 +123,23 @@ testsocket	IN	A	192.168.1.165
 
 ; 18-FE-34-D6-78-6D espdev
 espdev          IN	A	192.168.1.166
+
+; 171 -> 180s is tv, av and games systems.
+; I can't be bothered to give them dns names.
+
+panasonic-karl-tv                    IN	A	192.168.1.171
+panasonic-55-tv                      IN	A	192.168.1.172
+panasonic-blu-ray                    IN	A	192.168.1.173
+chromecast2-karl                     IN	A	192.168.1.174
+chromecast1-melissa                  IN	A	192.168.1.175
+humax-pvr                            IN	A	192.168.1.176
+samsung-40inch-tv                    IN	A	192.168.1.177
+;;.khaos.                            IN	A	192.168.1.178
+unidentified-sony-maybe-ps4          IN	A	192.168.1.179
+melissa-wii-u                        IN	A	192.168.1.180
+melissa-xbox360                      IN	A	192.168.1.181
+melissa-nintendo-switch              IN	A	192.168.1.182
+
 
 swannpvr	IN	A	192.168.1.230
 swann           IN	CNAME	swannpvr.khaos.
@@ -120,6 +173,8 @@ ipcam15		IN	A	192.168.1.245
 ; # routers, and wifi access points .
 ; # all have a khaos prefix since the wifi SSIDs are prefixed with that.
 ; ##############################################
+
+three-home-signal	IN	A	192.168.1.248
 
 ; # On patch panel : A n M 2
 ; # MAC address. C4-6E-1F-47-80-23
