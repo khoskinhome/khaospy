@@ -66,6 +66,7 @@ $TTL	604800
 ; 150 -> 165 is for networked main switching things ...
 ; these will all have dns names.
 
+150	IN	PTR	esp12e-dev01.khaos.
 159	IN	PTR	melissalight.khaos.
 160	IN	PTR	ameliarad.khaos.
 161	IN	PTR	alisonrad.khaos.

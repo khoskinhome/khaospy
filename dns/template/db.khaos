@@ -101,6 +101,9 @@ alison-laptop-dell-eth  	IN	A	192.168.1.137
 ; 150 -> 165 is for networked main switching things ...
 ; these will all have dns names.
 
+; 18:FE:34:D6:78:6D;
+esp12e-dev01	IN	A	192.168.1.150
+
 ; AC-CF-23-72-28-30 melissalight
 melissalight	IN	A	192.168.1.159
 
