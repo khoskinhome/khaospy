@@ -103,6 +103,11 @@ alison-laptop-dell-eth  	IN	A	192.168.1.137
 
 ; 18:FE:34:D6:78:6D;
 esp12e-dev01	IN	A	192.168.1.150
+esp01           IN	CNAME	esp12e-dev01.khaos.
+
+
+esp12e-dev02	IN	A	192.168.1.151
+esp02           IN	CNAME	esp12e-dev02.khaos.
 
 ; AC-CF-23-72-28-30 melissalight
 melissalight	IN	A	192.168.1.159
