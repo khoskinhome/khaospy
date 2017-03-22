@@ -30,5 +30,24 @@ sudo apt-get install -y mosquitto mosquitto-clients
 
 sudo cpanm AnyEvent::MQTT
 
+###############################################################
+# mqtt and tls
+
+http://www.steves-internet-guide.com/mosquitto-tls/
+http://www.hivemq.com/blog/mqtt-security-fundamentals-tls-ssl
+
+pitest
+
+~/ssl-mqtt
+
+
+
+
+openssl s_client -connect pitest.khaos:8883
+
+openssl x509 -in /etc/mosquitto/certs/ca.crt -text -noout
+
+
+
 
 
