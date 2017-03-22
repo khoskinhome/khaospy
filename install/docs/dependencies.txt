@@ -66,17 +66,7 @@ sudo pip install pyzmq
 #######################################
 # cpanm installs
 
-sudo cpanm Clone
-sudo cpanm JSON
-sudo cpanm AnyEvent
-sudo cpanm ZMQ::LibZMQ3
-sudo cpanm List::Compare
-sudo cpanm Sub::Override
-sudo cpanm Test::More
-sudo cpanm Test::Exception
-sudo cpanm Test::Deep
-sudo cpanm DateTime
-sudo cpanm Email::Valid
+sudo cpanm Clone JSON AnyEvent ZMQ::LibZMQ3 List::Compare Sub::Override Test::More Test::Exception Test::Deep DateTime Email::Valid
 
 sudo cpanm Exception::Class
 
@@ -84,11 +74,7 @@ sudo cpanm Clone JSON AnyEvent ZMQ::LibZMQ3 List::Compare Sub::Override Test::Mo
 
 
 # Only needed on DB / WebUI :
-sudo cpanm Dancer2
-sudo cpanm Dancer2::Plugin::Database
-sudo cpanm Dancer2::Plugin::Auth::Tiny
-sudo cpanm Dancer2::Session::Memcached
-sudo cpanm Email::Send::Gmail   Email::Simple::Creator   Email::Send
+sudo cpanm Dancer2 Dancer2::Plugin::Database Dancer2::Plugin::Auth::Tiny Dancer2::Session::Memcached Email::Send::Gmail Email::Simple::Creator Email::Send
 # installing DBD::Pg needs a /tmp of at least 166M . Best go for 250M
 sudo cpanm DBD::Pg
 
