@@ -177,8 +177,15 @@ install/lib-perl-t/KhaospyMessage.t
 ./install/cpan/AnyEvent-MQTT-Simple/t/manifest.t
 ./install/cpan/AnyEvent-MQTT-Simple/t/pod-coverage.t
 
+######################################################
 
+./install/golang/scratchpad/testgingonic.go
+./install/golang/scratchpad/testpahomqtt.go
+./install/golang/scratchpad/testpahomqtt-tls.go
 
+./install/golang/scratchpad/
+./install/golang/scratchpad/
+./install/golang/scratchpad/
 
 ######################################################
 #cctv record
@@ -280,7 +287,7 @@ install/bin/khaospy-generate-rrd-graphs.pl
 # DOCS
 ##############################################################################
 #docs
-
+./crapdir/
 ./install/docs
 
 ./install/docs/todo.txt
