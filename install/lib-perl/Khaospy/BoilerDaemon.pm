@@ -228,12 +228,19 @@ sub operate_boiler {
         return;
     }
 
-    kloginfo "TURN BOILER '$boiler_name' OFF";
+    if ( # TODO : could do with a different constant for $BOILER_STATUS_REFRESH_EVERY_SECS
+        $boiler_state->{current_status} ne OFF
+        || $boiler_state->{last_time_off} + $BOILER_STATUS_REFRESH_EVERY_SECS < time
+    ){
+        kloginfo "TURN BOILER '$boiler_name' OFF";
+        queue_command ( $boiler_name, OFF );
 
-    queue_command ( $boiler_name, OFF );
-    $boiler_state->{current_status} = OFF ;
-    delete $boiler_state->{boiler_next_on_at};
-    $boiler_state->{last_time_off} = time;
+        $boiler_state->{current_status} = OFF ;
+        delete $boiler_state->{boiler_next_on_at};
+        $boiler_state->{last_time_off} = time;
+    } else {
+        kloginfo "BOILER '$boiler_name' IS CURRENTLY OFF";
+    }
 }
 
 sub check_boiler_next_on_at {
