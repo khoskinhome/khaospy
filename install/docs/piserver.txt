@@ -134,10 +134,23 @@ check the logrotate file is at :
 
 
 
+# DNS on piserver
+sudo apt-get install dnsutils bind9-doc bind9
+
+# will need to allow ssh to root on the pi.
+Login, and edit this file: sudo nano /etc/ssh/sshd_config
+Find this line: PermitRootLogin without-password
+Edit: PermitRootLogin yes
+Close and save file
+reboot or restart sshd service using: /etc/init.d/ssh restart
+Set a root password if there isn't one already: sudo passwd root
 
 
+put the authorized_keys in the pi and the root account
+/home/pi/.ssh/authorized_keys /root/.ssh/
 
 
+in the khaospy git repo :
+    cd dns
 
-
-
+    ./generate-and-scp-to-hosts.pl
