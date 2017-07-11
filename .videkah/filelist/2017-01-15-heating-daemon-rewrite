@@ -299,6 +299,8 @@ install/bin/khaospy-generate-rrd-graphs.pl
 
 ./install/docs/pi-gpio-pins-wiringpi.txt
 
+./install/docs/piserver.txt
+
 ./install/docs/anyevent-zmq-links.txt
 ./install/docs/proj_khaospy-home-auto-software.txt
 ./install/docs/proj_khaospy-home-auto-software2.txt
