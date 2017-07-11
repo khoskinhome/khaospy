@@ -112,7 +112,7 @@ sub run_command_queue_daemon {
 
     # Publisher to push the queue out to controllers.
     $zmq_publisher  = zmq_socket($ZMQ_CONTEXT, ZMQ_PUB);
-    my $pub_to_port = "tcp://*:gc_COMMAND_QUEUE_DAEMON_SEND_PORT";
+    my $pub_to_port = "tcp://*:".gc_COMMAND_QUEUE_DAEMON_SEND_PORT;
     zmq_bind( $zmq_publisher, $pub_to_port );
     kloginfo "Publishing to $pub_to_port";
 
