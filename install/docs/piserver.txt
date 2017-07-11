@@ -1,0 +1,143 @@
+Piserver build ...
+##################
+write latest jessie raspbian to an sd card.
+
+
+2017-07-11
+############
+
+install the ./install/docs/dependencies.txt
+
+
+mounting the 120GB_ssd
+######################
+
+put this line in /etc/fstab
+##### UUID=cdc4f0a4-bf76-474a-afa9-cd18e6b79ec5 /media/120GB_ssd ext4    errors=remount-ro 0       1
+
+sudo reboot
+
+
+
+postgres
+########
+
+
+    edit /etc/postgresql/9.4/main/pg_hba.conf
+    and put in :
+
+
+        # "local" is for Unix domain socket connections only
+        local   all             all                                     peer
+        # IPv4 local connections:
+        hostssl    all             all             127.0.0.1/32         md5
+        hostssl    all             all             localhost            md5
+        hostssl    all             all             192.168.1.0/24       md5
+
+
+    copy over the /etc/postgresql/9.4/main/postgresql.conf
+
+
+    moving it onto the 120GB-ssd
+
+
+
+webserver
+#########
+
+    # setup https, and the apache server.
+
+
+    # copy over the apache key files and move them to the correct place
+    #####
+    sudo a2enmod ssl
+    sudo mkdir /etc/apache2/ssl/
+    sudo mv apache.* /etc/apache2/ssl/
+    cd /etc/apache2/ssl
+    ls -la
+    sudo chown root.root apache.*
+
+    # move the original default-ssl conf out of the way
+    # copy over the default-ssl.conf with the dancer stuff :
+    #####
+
+   51  cat /etc/apache2/sites-available/default-ssl.conf
+   52  sudo mv /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-available/ORIG-INSTALL-default-ssl.conf
+   53  sudo mv ~/default-ssl.conf /etc/apache2/sites-available/
+   54  diff /etc/apache2/sites-available/ORIG-INSTALL-default-ssl.conf /etc/apache2/sites-available/
+   55  diff /etc/apache2/sites-available/ORIG-INSTALL-default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
+   59  ls -la
+
+   60  #sudo service apache2 restart
+   61  ls ../sites-enabled/
+   62  sudo a2ensite default-ssl.conf
+   63  sudo service apache2 restart
+   64  sudo systemctl daemon-reload
+   65  sudo service apache2 restart
+   66  cd ..
+   67  ls
+   68  ls mods-enabled/
+   70  sudo service apache2 restart
+   71  history
+
+
+    # sym link /usr/lib/cgi-bin to /opt/khaospy/www-bin
+    ####
+   72  cd /usr/lib
+   73  ls cgi-bin/
+   74  rmdir cgi-bin
+   75  sudo rmdir cgi-bin
+   76  sudo ln -s /opt/khaospy/www-bin/ cgi-bin
+
+
+    # copy over the database conf and move it to the correct place.
+    ####
+   82  sudo mv ~/database.json /opt/khaospy/conf/database.json
+   83  ls -la /opt/khaospy/conf/database.json
+   84  sudo chown root.root /opt/khaospy/conf/database.json
+
+
+    # sym link the /var/www/html
+   86  cd /var/www/html/
+   87  ls -la
+   88  sudo ln -s /opt/khaospy/www/css css
+   89  sudo ln -s /opt/khaospy/www/js js
+   90  sudo ln -s /media/120GB_ssd/khaospy-rrdimage/ rrdimage
+
+    # sym link /opt/khaospy
+   92  ls -la /opt/khaospy/
+   93  cd /opt/khaospy/
+   94  sudo ln -s /media/120GB_ssd/khaospy-log log
+   95  sudo ln -s /media/120GB_ssd/khaospy-pid pid
+   96  sudo ln -s /media/120GB_ssd/khaospy-rrd rrd
+   97  sudo ln -s /media/120GB_ssd/khaospy-rrdimage/ rrdimage
+   98  sudo ln -s /media/120GB_ssd/khaospy-rrdimage/ rrdimg
+
+   # run the khaospy ./install-run-live-conf-kill-and-restart-daemons.bash piserver
+
+
+   78  sudo service apache2 restart
+
+
+add to the root crontab :
+
+
+*/1  * * * * /opt/khaospy/bin/khaospy-run-daemons.pl         2>&1  > /dev/null
+
+1 1 * * * find /opt/khaospy/log -type f -mtime +3 -delete 2>&1 > /dev/null
+
+
+check the logrotate file is at :
+
+/etc/logrotate.d/khaospy
+
+
+
+
+
+
+
+
+
+
+
