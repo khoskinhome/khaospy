@@ -550,11 +550,20 @@ sub live_controls_conf {
 
 # pi gpio
         boiler => {
-            type => $PI_GPIO_RELAY_MANUAL_CONTROL_TYPE, host => "piboiler",
-            ex_or_for_state => false,
+
+            type => $PI_GPIO_RELAY_CONTROL_TYPE,
+            host => "piboiler",
             invert_state => true,
             gpio_relay  => 4,
-            gpio_detect => 0,
+            rrd_graph     => true,
+        },
+
+        boiler_state => { # boiler state
+            type => $PI_GPIO_SWITCH_CONTROL_TYPE  ,
+            host => "piboiler",
+            invert_state => true,
+            gpio_switch => 0,
+            alias => "boiler state",
             rrd_graph     => true,
         },
 

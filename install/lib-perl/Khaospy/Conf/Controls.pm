@@ -856,6 +856,7 @@ sub state_to_binary_die {
 
 sub state_to_binary {
     my ($value, $die_on_error) = @_;
+    $value = '' if ! defined $value;
     return true  if $value eq ON  || $value =~ /^1$/;
     return false if $value eq OFF || $value =~ /^0$/;
 
