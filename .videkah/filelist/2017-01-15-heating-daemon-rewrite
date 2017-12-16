@@ -136,6 +136,11 @@ install/lib-perl-t/KhaospyMessage.t
 ./install/lib-perl-t/alltests.t
 ./install/lib-perl-t/
 
+
+
+######################################################
+install/lib-perl/Khaospy/Conf/Global.pm
+install/lib-perl/Khaospy/CommandQueueDaemon.pm
 ######################################################
 #MQTT
 
@@ -389,6 +394,9 @@ install-run-test-conf-kill-and-restart-daemons-all.bash
 
 install-run-live-conf-kill-and-restart-daemons.bash
 install-run-live-conf-kill-and-restart-daemons-all.bash
+
+run-kill-and-restart-control-daemons-on-pi.bash
+run-kill-and-restart-control-daemons-on-pi-all.bash
 
 ###################################################################
 #dbh

@@ -10,10 +10,18 @@ if ( $>  != 0 ) {
 }
 
 use Getopt::Long;
-my $KILL;
-GetOptions ( "kill|k" => \$KILL );
+my ($KILL, $GREP);
+GetOptions ( "kill|k" => \$KILL ,
+    "grep|g=s" => \$GREP,
+);
 
-my $out = qx{ps -eF | grep khaospy | grep -v grep};
+my $out ;
+if ( $GREP ) {
+    $out = qx{ps -eF | grep khaospy | grep $GREP | grep -v grep};
+} else {
+    $out = qx{ps -eF | grep khaospy | grep -v grep};
+}
+
 my $struct = { 1 => {} };
 for my $line (  split /\n/, $out ) {
     if ( my ($pid , $ppid, $script ) = $line  =~ /^\w+\s*(\d+)\s*(\d+).*?\d\d:\d\d:\d\d\s(.*)/ ){

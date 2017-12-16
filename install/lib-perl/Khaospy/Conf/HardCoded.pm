@@ -1332,7 +1332,7 @@ sub live_pi_host_conf {
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT , options => { }, },
 #                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $ERROR_LOG_DAEMON_SCRIPT     , options => { }, },
-                { script  => $HEATING_DAEMON_SCRIPT,        options => { }, },
+#                { script  => $HEATING_DAEMON_SCRIPT,        options => { }, },
 #                { script  => $RULES_DAEMON_SCRIPT         , options => { }, },
 #                {
 #                    script  => $MAC_SWITCH_DAEMON_SCRIPT,
@@ -1374,6 +1374,7 @@ sub live_pi_host_conf {
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT,  options => { }, },
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT,  options => { }, },
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                { script  => $HEATING_DAEMON_SCRIPT,        options => { }, },
                 {
                     script  => $MAC_SWITCH_DAEMON_SCRIPT,
                     options => { '-i' => '192.168.1.0/24' }
