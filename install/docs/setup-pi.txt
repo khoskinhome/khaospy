@@ -9,6 +9,8 @@ raspi-config :
         i2c enable
         ssh-login-enable.
 
+    make sure the /etc/hosts localhost entry points to the hostname. ( usually at the top of the file )
+
     get the mac-address and add a dhcp config in the tp-link so it will always get the same ip-address.
 
     copy over the ssh public key, and put in .ssh/authorized_keys
