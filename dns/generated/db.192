@@ -31,12 +31,12 @@ $TTL	604800
 
 14	IN	PTR	piserver.khaos.
 
-16	IN	PTR	printer-samsung-ml2251n.khaos.
+;16	IN	PTR	printer-samsung-ml2251n.khaos.
 17	IN	PTR	melissapc.khaos.
 
 19	IN	PTR	nas.khaos.
 
-24	IN	PTR	printer-kyocera-fsc5100dn.khaos.
+;24	IN	PTR	printer-kyocera-fsc5100dn.khaos.
 
 ; 40 -> 120 is the dynamic allocated ip range ...
 ; I can't be bothered to give them dns names.

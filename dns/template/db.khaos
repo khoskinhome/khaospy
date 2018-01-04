@@ -56,8 +56,8 @@ piserver	IN	A	192.168.1.14
 ipcam-new-15		IN	A	192.168.1.15
 
 ; 00-00-F0-AD-33-49 samsung printer :
-printer-samsung-ml2251n	IN	A	192.168.1.16
-prts		IN	CNAME	printer-samsung-ml2251n.khaos.
+;printer-samsung-ml2251n	IN	A	192.168.1.16
+;prts		IN	CNAME	printer-samsung-ml2251n.khaos.
 
 
 ; D8-50-E6-DC-FE-41  melissa
@@ -70,8 +70,12 @@ nas		IN	A	192.168.1.19
 
 
 ; 00-C0-EE-43-C4-CE  00:C0:EE:43:C4:CE kyocera printer :
-printer-kyocera-fsc5100dn	IN	A	192.168.1.24
-prtk		IN	CNAME	printer-kyocera-fsc5100dn.khaos.
+;printer-kyocera-fsc5100dn	IN	A	192.168.1.24
+;prtk		IN	CNAME	printer-kyocera-fsc5100dn.khaos.
+
+; D4:6A:6A:B1:F5:D2  D4-6A-6A-B1-F5-D2 brother printer :
+printer-brother-dcp-9020	IN	A	192.168.1.25
+prt		IN	CNAME	printer-brother-dcp-9020.khaos.
 
 ; 40 -> 120 is the dynamic range ...
 ; I can't be bothered to give them dns names.
