@@ -3,9 +3,13 @@
 
 ./install-to-pi-pi.bash piserver
 
+
+
 #########
 
 # also restarts apache :
+
+
 
 ./install-run-live-conf-kill-and-restart-daemons.bash piserver
 ./install-run-live-conf-kill-and-restart-daemons.bash piboiler

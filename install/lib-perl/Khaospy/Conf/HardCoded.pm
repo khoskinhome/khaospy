@@ -1330,9 +1330,10 @@ sub live_pi_host_conf {
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT , options => { }, },
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT , options => { }, },
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT , options => { }, },
-#                { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
+                #{ script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $ERROR_LOG_DAEMON_SCRIPT     , options => { }, },
-#                { script  => $HEATING_DAEMON_SCRIPT,        options => { }, },
+                # HEATING_DAEMON_SCRIPT has to run on the machine with the DB.
+                { script  => $HEATING_DAEMON_SCRIPT,        options => { }, },
 #                { script  => $RULES_DAEMON_SCRIPT         , options => { }, },
 #                {
 #                    script  => $MAC_SWITCH_DAEMON_SCRIPT,
@@ -1349,10 +1350,10 @@ sub live_pi_host_conf {
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
                 { script  => $ONE_WIRE_SENDER_PERL_SCRIPT , options => { }, },
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT , options => { }, },
-                {
-                    script  =>"/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
-                    options => { },
-                },
+#                {
+#                    script  =>"/opt/khaospy/bin/khaospy-amelia-hackit-daemon.pl",
+#                    options => { },
+#                },
             ],
         },
 #        piold => {
@@ -1374,7 +1375,7 @@ sub live_pi_host_conf {
                 { script  => $PI_CONTROLLER_DAEMON_SCRIPT,  options => { }, },
                 { script  => $COMMAND_QUEUE_DAEMON_SCRIPT,  options => { }, },
                 { script  => $OTHER_CONTROLS_DAEMON_SCRIPT, options => { }, },
-                { script  => $HEATING_DAEMON_SCRIPT,        options => { }, },
+#                { script  => $HEATING_DAEMON_SCRIPT,        options => { }, },
                 {
                     script  => $MAC_SWITCH_DAEMON_SCRIPT,
                     options => { '-i' => '192.168.1.0/24' }

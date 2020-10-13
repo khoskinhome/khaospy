@@ -19,6 +19,11 @@
 
 sudo apt-get update
 
+sudo apt-get install mosquitto mosquitto-clients -y
+sudo cpanm Net::MQTT::Simple AnyEvent::MQTT
+
+sudo apt-get install -y cpanminus
+
 sudo apt-get install -y make autoconf automake libtool
 
 sudo apt-get install -y rrdtool vim git
@@ -63,6 +68,9 @@ sudo pip install pyzmq
 #######################################
 # cpanm installs
 
+# issues with this one : t/Server.pm in the  t/ dir 
+sudo cpanm Test::TCP 
+
 # installing DBD::Pg needs a /tmp of at least 166M . Best go for 250M
 # the standard pi tmpfs of 100MB isn't enough, and needs altering in /etc/fstab. ( see setup guide )
 sudo cpanm   Nmap::Parser   Net::Address::Ethernet   DBD::Pg \
@@ -70,7 +78,9 @@ sudo cpanm   Nmap::Parser   Net::Address::Ethernet   DBD::Pg \
     Sub::Override   Test::More   Test::Exception   Test::Deep \
     Email::Valid   Email::Send::Gmail   Email::Simple::Creator   Email::Send \
     Exception::Class   DateTime   List::Compare \
-    Dancer2   Dancer2::Plugin::Database   Dancer2::Plugin::Auth::Tiny   Dancer2::Session::Memcached
+    Dancer2   Dancer2::Plugin::Database   Dancer2::Plugin::Auth::Tiny   Dancer2::Session::Memcached \
+    Term::ReadKey
 
 
 
+sudo cpanm Plack::Builder

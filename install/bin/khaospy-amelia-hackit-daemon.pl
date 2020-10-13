@@ -870,7 +870,7 @@ sub print_debug {
 
 sub slurp {
     my ( $file ) = @_;
-    open( my $fh, $file ) or die "sudden flaming death\n";
+    open( my $fh, $file ) or die "sudden flaming death $file\n";
     my $text = do { local( $/ ) ; <$fh> } ;
     return $text;
 }

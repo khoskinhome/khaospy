@@ -1,3 +1,5 @@
+~/kawbs
+
 ./crapdir/crap.sql
 ./crapdir/crap
 ./crapdir/crapnew
@@ -8,6 +10,11 @@
 ./crapdir/crap
 ./crapdir/crap.pl
 ./crapdir/crap.diff.pl
+
+
+./non-git/
+non-git/opt/khaospy/conf/database.json
+./non-git/fstab_piserver
 
 
 install/bin/khaospy-bash-aliases.sh:83:#TODO RM this before release
@@ -151,6 +158,7 @@ install/lib-perl-t/KhaospyMessage.t
 ./install/bin/khaospy-restart-daemons.pl
 
 ./install/bin/khaospy-ps.pl
+./install/bin/khaospy-clear-logs.pl
 
 #######################################################
 # one wire thermometer stuff :
@@ -184,7 +192,6 @@ install/bin/khaospy-generate-rrd-graphs.pl
 ./install/bin/helper/gpio-4-relay-on.sh
 ./install/bin/helper/gpio-4-relay-off.sh
 ./install/bin/helper/gpio-0-input-status.sh
-
 
 
 
@@ -241,6 +248,8 @@ install/bin/khaospy-generate-rrd-graphs.pl
 
 ./install/docs/setup-pi.txt
 ./install/docs/dependencies.txt
+
+./non-git/opt/khaospy/conf/database.json
 
 ./install/docs/pi-gpio-pins-wiringpi.txt
 

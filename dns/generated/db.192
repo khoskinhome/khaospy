@@ -2,14 +2,14 @@
 ; BIND reverse data file for local loopback interface
 ;
 $TTL	604800
-@	IN	SOA	piserver.khaos. root.localhost. (
+@	IN	SOA	piloft.khaos. root.localhost. (
 			      1		; Serial
 			 604800		; Refresh
 			  86400		; Retry
 			2419200		; Expire
 			 604800 )	; Negative Cache TTL
 ;
-@	IN	NS	piserver.khaos.
+@	IN	NS	piloft.khaos.
 
 2	IN	PTR	karl-desktop.khaos.
 

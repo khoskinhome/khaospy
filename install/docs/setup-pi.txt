@@ -251,6 +251,12 @@ postgres db.
     sudo service postgresql start
 
     and there needs to be an /opt/khaospy/conf/database.json
+    have a look in ./non-git/ for my current one . Not pushed to repo.
+    ./non-git//opt/khaospy/conf/database.json
+
+
+
+
 
     to generate one run the script :
         /opt/khaospy/bin/khaospy-db-conf-generate.pl
